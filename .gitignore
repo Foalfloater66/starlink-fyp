@@ -7,19 +7,22 @@ UnityGenerated/
 Library/
 Assets/AssetStoreTools*
 
-# ===================================== #
-# Visual Studio / MonoDevelop generated #
-# ===================================== #
+# ============================================= #
+# Visual Studio / MonoDevelop / Rider generated #
+# ============================================= #
 ExportedObj/
 *.svd
 *.userprefs
 *.csproj
 *.pidb
 *.suo
-*.sln
+*.sln    
 *.user
 *.unityproj
 *.booproj
+.idea/
+UserSettings/
+App.config
 
 # ============ #
 # OS generated #
@@ -32,3 +35,22 @@ ExportedObj/
 Icon?
 ehthumbs.db
 Thumbs.db
+
+# ====== #
+# Python #
+# ====== #
+.env/
+__pycache__/
+
+# ======= #
+# Logging #
+# ======= #
+Logs/
+
+# ==== #
+# Docs #
+# ==== # 
+!Docs/*
+
+
+
