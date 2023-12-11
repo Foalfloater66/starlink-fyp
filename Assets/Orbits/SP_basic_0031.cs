@@ -129,7 +129,7 @@ public class SP_basic_0031: MonoBehaviour {
 	public float raan0 = 0f;
 
 	public LogChoice log_choice = LogChoice.None;
-	public string log_filename = "/users/mjh/docs/starlink/rtt.txt";
+	public string log_filename = "/Users/morganeohlig/workspace/fyp/Starlink0031/Logs/rtt.txt"; // add my own log filename
 	public enum BeamChoice {AllOff, AllOn, SrcDstOn};
 	public BeamChoice beam_on;
 	public bool graph_on;

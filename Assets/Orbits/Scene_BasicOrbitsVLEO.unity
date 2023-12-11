@@ -196,22 +196,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 11491094, guid: 27fe6d2a15a377f4587f716a2d37ca8a, type: 3}
+    - target: {fileID: 0}
       propertyPath: orbit
       value: 
       objectReference: {fileID: 1202102719917394, guid: fb540130434c74c15b995605c6748f1f,
         type: 2}
-    - target: {fileID: 11491094, guid: 27fe6d2a15a377f4587f716a2d37ca8a, type: 3}
+    - target: {fileID: 0}
       propertyPath: speed
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 11491094, guid: 27fe6d2a15a377f4587f716a2d37ca8a, type: 3}
+    - target: {fileID: 0}
       propertyPath: satellite
       value: 
       objectReference: {fileID: 1842355326392174, guid: 7327322cd40cd49898f0f3e031d063e4,
         type: 3}
-    m_RemovedComponents:
-    - {fileID: 11491094, guid: 27fe6d2a15a377f4587f716a2d37ca8a, type: 3}
+    m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 27fe6d2a15a377f4587f716a2d37ca8a, type: 3}
 --- !u!1 &191554812
 GameObject:
