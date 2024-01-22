@@ -505,13 +505,13 @@ MonoBehaviour:
   countdown: {fileID: 485043185}
   rightbottom: {fileID: 1204926847}
   maxorbits: 24
-  route_choice: 3
+  route_choice: 4
   constellation: 0
-  no_of_paths: 4
+  no_of_paths: 2
   decimator: 1
   raan0: 0
-  log_choice: 1
-  log_filename: /Users/morganeohlig/workspace/fyp/Starlink0031/Logs/dist.txt
+  log_choice: 5
+  log_filename: /Users/morganeohlig/workspace/fyp/Starlink0031/Logs/path.txt
   beam_on: 0
   graph_on: 0
   speedup: 1

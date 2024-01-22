@@ -2,7 +2,8 @@
 using System.Collections;
 using System.IO;
 
-public class SatelliteSP0031 {
+public class SatelliteSP0031
+{
 	int maxsats;
 	int phase1_satcount;
 	int maxlasers;
@@ -55,12 +56,32 @@ public class SatelliteSP0031 {
 	System.IO.StreamWriter logfile;
 	LogChoice log_choice;
 
-	public SatelliteSP0031(int satelliteid, int satellitenum, int orbitnumber, Transform earth_transform_, 
+	// public int SatId
+	// {
+	// 	/* Returns the satellite ID! */
+	// 	get
+	// 	{
+	// 		return satnum;
+	// 	}
+
+	// }
+
+	public int Orbit
+	{
+		/* Returns the orbit ID, not the object! */
+		get
+		{
+			return orbitnum;
+		}
+	}
+
+	public SatelliteSP0031(int satelliteid, int satellitenum, int orbitnumber, Transform earth_transform_,
 		GameObject orbit_, double orbitalangle, int maxlasercount, int maxsatcount, int phase1_satcount_,
-		double sat_phase_stagger_, int sats_per_orbit_, int orbital_planes_, 
-		float altitude_, int beam_angle_, float beam_radius_, GameObject sat_prefab, GameObject beam_prefab1_, 
+		double sat_phase_stagger_, int sats_per_orbit_, int orbital_planes_,
+		float altitude_, int beam_angle_, float beam_radius_, GameObject sat_prefab, GameObject beam_prefab1_,
 		GameObject beam_prefab2_, GameObject laser_prefab_, GameObject thin_laser_prefab_,
-        System.IO.StreamWriter logfile_, LogChoice log_choice_) {
+		System.IO.StreamWriter logfile_, LogChoice log_choice_)
+	{
 		orbit = orbit_;
 		satid = satelliteid; /* globally unique satellite ID */
 		satnum = satellitenum; /* satellite's position in its orbit */
@@ -71,14 +92,14 @@ public class SatelliteSP0031 {
 		beam_prefab1 = beam_prefab1_;
 		beam_prefab2 = beam_prefab2_;
 		laser_prefab = laser_prefab_;
-        thin_laser_prefab = thin_laser_prefab_;
-        earth_transform = earth_transform_;
+		thin_laser_prefab = thin_laser_prefab_;
+		earth_transform = earth_transform_;
 		logfile = logfile_;
 		log_choice = log_choice_;
 
 		maxsats = maxsatcount; /* total number of satellites */
 		phase1_satcount = phase1_satcount_; // number of satellites in phase 1 
-		                                    // (will equal maxsats if only simulating phase 1)
+											// (will equal maxsats if only simulating phase 1)
 		maxlasers = maxlasercount;
 		sat_phase_stagger = sat_phase_stagger_;
 		sats_per_orbit = sats_per_orbit_;
@@ -98,9 +119,9 @@ public class SatelliteSP0031 {
 
 		Vector3 pos = earth_transform.position;
 		pos.x += 1f;
-		gameobject = GameObject.Instantiate (sat_prefab, pos, earth_transform.rotation);
-		gameobject.transform.RotateAround (Vector3.zero, Vector3.up, (float)orbitalangle);
-		gameobject.transform.SetParent (orbit.transform, false);
+		gameobject = GameObject.Instantiate(sat_prefab, pos, earth_transform.rotation);
+		gameobject.transform.RotateAround(Vector3.zero, Vector3.up, (float)orbitalangle);
+		gameobject.transform.SetParent(orbit.transform, false);
 
 		links = new GameObject[2];
 
@@ -108,71 +129,84 @@ public class SatelliteSP0031 {
 		laserdsts = new SatelliteSP0031[LASERS_PER_SAT];
 		lasertimes = new double[LASERS_PER_SAT];
 		laseron = new bool[LASERS_PER_SAT];
-		for (int lc = 0; lc < maxlasers; lc++) {
-			lasers [lc] = GameObject.Instantiate (laser_prefab, position(), 
+		for (int lc = 0; lc < maxlasers; lc++)
+		{
+			lasers[lc] = GameObject.Instantiate(laser_prefab, position(),
 				gameobject.transform.rotation);
-			lasers [lc].transform.SetParent (gameobject.transform, true);
-			lasertimes [lc] = Time.time;
+			lasers[lc].transform.SetParent(gameobject.transform, true);
+			lasertimes[lc] = Time.time;
 			laseron[lc] = false;
-		} 
+		}
 
-		for (int linknum = 0; linknum < 2; linknum++) {
-			links [linknum] = GameObject.Instantiate (laser_prefab, position (), 
+		for (int linknum = 0; linknum < 2; linknum++)
+		{
+			links[linknum] = GameObject.Instantiate(laser_prefab, position(),
 				gameobject.transform.rotation);
-			links [linknum].transform.SetParent (gameobject.transform, true);
+			links[linknum].transform.SetParent(gameobject.transform, true);
 		}
 	}
 
 	// clear out all references so GC can work, delete game objects, prepare for deletion
-	public void clearrefs() {
-		for (int lc = 0; lc < maxlasers; lc++) {
-			MonoBehaviour.Destroy (lasers [lc]);
-			lasers [lc] = null;
+	public void clearrefs()
+	{
+		for (int lc = 0; lc < maxlasers; lc++)
+		{
+			MonoBehaviour.Destroy(lasers[lc]);
+			lasers[lc] = null;
 		}
 
-		for (int linknum = 0; linknum < 2; linknum++) {
-			MonoBehaviour.Destroy(links [linknum]);
-			links [linknum] = null;
+		for (int linknum = 0; linknum < 2; linknum++)
+		{
+			MonoBehaviour.Destroy(links[linknum]);
+			links[linknum] = null;
 		}
 
-		for (int satnum = 0; satnum < maxsats; satnum++) {
-			nearestsats [satnum] = null;
+		for (int satnum = 0; satnum < maxsats; satnum++)
+		{
+			nearestsats[satnum] = null;
 		}
 
-		for (int satnum = 0; satnum < LASERS_PER_SAT; satnum++) {
-			assignedsats [satnum] = null;
-			preassignedsats [satnum] = null;
-			prevassignedsats [satnum] = null;
+		for (int satnum = 0; satnum < LASERS_PER_SAT; satnum++)
+		{
+			assignedsats[satnum] = null;
+			preassignedsats[satnum] = null;
+			prevassignedsats[satnum] = null;
 		}
 	}
 
-	public bool glow {
-		set {
+	public bool glow
+	{
+		set
+		{
 			_glow = value;
-			for (int lc = 0; lc < maxlasers; lc++) {
-				lasertimes [lc] = Time.time;
+			for (int lc = 0; lc < maxlasers; lc++)
+			{
+				lasertimes[lc] = Time.time;
 			}
 		}
-		get {
+		get
+		{
 			return _glow;
 		}
 	}
 
-	public void BeamOn() {
-		if (_beam) {
+	public void BeamOn()
+	{
+		if (_beam)
+		{
 			return;
 		}
 		_beam = true;
 
 		Vector3 pos = earth_transform.position;
 
-		beam1 = MonoBehaviour.Instantiate (beam_prefab1, pos, Quaternion.Euler(0f, -90f, 0f));
-		beam1.transform.SetParent (gameobject.transform, false);
+		beam1 = MonoBehaviour.Instantiate(beam_prefab1, pos, Quaternion.Euler(0f, -90f, 0f));
+		beam1.transform.SetParent(gameobject.transform, false);
 
 		// move the ring down to earth's surface.  0.99 is a spherical correction, as we need 
 		// to center to be below ground and the edge on the ground
 		Vector3 scale = orbit.transform.localScale;
-		pos = gameobject.transform.position * 0.99f * 6371/scale.x;
+		pos = gameobject.transform.position * 0.99f * 6371 / scale.x;
 		beam1.transform.position = pos;
 		// radius of circle for 25 degree beam/550km alt is 940km - adjust in GUI
 		// radius of circle for 40 degree beam/550km alt is 573.5km
@@ -180,95 +214,116 @@ public class SatelliteSP0031 {
 
 		/* this is a very ugly way of changing the radius of the ring, 
 		 * but you cannot directly change a particle system from the API */
-		ParticleSystem ps = (ParticleSystem)beam1.GetComponent (typeof(ParticleSystem));
+		ParticleSystem ps = (ParticleSystem)beam1.GetComponent(typeof(ParticleSystem));
 		float radius = ps.shape.radius;
-		if (radius != beam_radius) {
-			float sf = beam_radius/radius;
-			ps.transform.localScale = new Vector3 (sf, sf, sf);
+		if (radius != beam_radius)
+		{
+			float sf = beam_radius / radius;
+			ps.transform.localScale = new Vector3(sf, sf, sf);
 		}
 
 		pos = earth_transform.position;
-		beam2 = MonoBehaviour.Instantiate (beam_prefab2, pos, Quaternion.Euler(0f, -90f, 0f));
-		beam2.transform.SetParent (gameobject.transform, false);
-		Light light = (Light)beam2.GetComponent (typeof(Light));
-		if (beam_angle == 25) {
+		beam2 = MonoBehaviour.Instantiate(beam_prefab2, pos, Quaternion.Euler(0f, -90f, 0f));
+		beam2.transform.SetParent(gameobject.transform, false);
+		Light light = (Light)beam2.GetComponent(typeof(Light));
+		if (beam_angle == 25)
+		{
 			light.spotAngle = 122f;
-		} else if (beam_angle == 40) {
+		}
+		else if (beam_angle == 40)
+		{
 			light.spotAngle = 95f;
 		}
 	}
 
-	public void BeamOff() {
-		if (!_beam) {
+	public void BeamOff()
+	{
+		if (!_beam)
+		{
 			return;
 		}
-		MonoBehaviour.Destroy (beam1);
-		MonoBehaviour.Destroy (beam2);
+		MonoBehaviour.Destroy(beam1);
+		MonoBehaviour.Destroy(beam2);
 		_beam = false;
 	}
 
-	public void LinkOn(GameObject city) {
-		LaserScript ls = (LaserScript)links[_linkson].GetComponent (typeof(LaserScript));
+	public void LinkOn(GameObject city)
+	{
+		LaserScript ls = (LaserScript)links[_linkson].GetComponent(typeof(LaserScript));
 		ls.SetPos(gameobject.transform.position, city.transform.position);
 		_linkson++;
 	}
 
-	public void LinkOff() {
-		if (_linkson > 0) {
-			for (int linknum = 0; linknum < 2; linknum++) {
-				LaserScript ls = (LaserScript)links [linknum].GetComponent (typeof(LaserScript));
-				ls.SetPos (position (), position ());
+	public void LinkOff()
+	{
+		if (_linkson > 0)
+		{
+			for (int linknum = 0; linknum < 2; linknum++)
+			{
+				LaserScript ls = (LaserScript)links[linknum].GetComponent(typeof(LaserScript));
+				ls.SetPos(position(), position());
 			}
 			_linkson = 0;
 		}
 	}
 
-	public void GraphOn(GameObject city, Material mat) {
-		if (graphon == false) {
+	public void GraphOn(GameObject city, Material mat)
+	{
+		if (graphon == false)
+		{
 			graphlinks = new GameObject[1200];
 			graphcount = 0;
 			graphon = true;
 		}
 		bool newlink = false;
-		if (graphcount > maxgraph) {
-			graphlinks [graphcount] = GameObject.Instantiate (thin_laser_prefab, position (), gameobject.transform.rotation);
-			graphlinks [graphcount].transform.SetParent (gameobject.transform, true);
+		if (graphcount > maxgraph)
+		{
+			graphlinks[graphcount] = GameObject.Instantiate(thin_laser_prefab, position(), gameobject.transform.rotation);
+			graphlinks[graphcount].transform.SetParent(gameobject.transform, true);
 			maxgraph = graphcount;
 			newlink = true;
 		}
-		LaserScript ls = (LaserScript)graphlinks [graphcount].GetComponent (typeof(LaserScript));
-		if (newlink) {
-			ls.line = ls.GetComponent<LineRenderer> ();
+		LaserScript ls = (LaserScript)graphlinks[graphcount].GetComponent(typeof(LaserScript));
+		if (newlink)
+		{
+			ls.line = ls.GetComponent<LineRenderer>();
 		}
 		ls.SetPos(gameobject.transform.position, city.transform.position);
-		if (mat != null) {
-			ls.ChangeMaterial (mat);
+		if (mat != null)
+		{
+			ls.ChangeMaterial(mat);
 		}
 		graphcount++;
 	}
 
-	public void GraphReset() {
+	public void GraphReset()
+	{
 		graphcount = 0;
 	}
 
-	public void GraphDone() {
-		for (int i = graphcount; i <= maxgraph; i++) {
-			MonoBehaviour.Destroy (graphlinks [i]);
-			graphlinks [i] = null;
+	public void GraphDone()
+	{
+		for (int i = graphcount; i <= maxgraph; i++)
+		{
+			MonoBehaviour.Destroy(graphlinks[i]);
+			graphlinks[i] = null;
 		}
 		maxgraph = graphcount - 1;
 	}
 
-	public Vector3 position() {
+	public Vector3 position()
+	{
 		return gameobject.transform.position;
 	}
 
-	public void AddSat(SatelliteSP0031 newsat) {
+	public void AddSat(SatelliteSP0031 newsat)
+	{
 		nearestsats[nearestcount] = newsat;
 		nearestcount++;
 	}
 
-	public void ChangeMaterial(Material newMat) {
+	public void ChangeMaterial(Material newMat)
+	{
 		Renderer[] renderers = gameobject.GetComponentsInChildren<Renderer>();
 		foreach (Renderer r in renderers)
 		{
@@ -276,91 +331,114 @@ public class SatelliteSP0031 {
 		}
 	}
 
-	public float Dist(SatelliteSP0031 s) {
+	public float Dist(SatelliteSP0031 s)
+	{
 		return Vector3.Distance(position(), s.position());
 	}
 
 
-	bool IsAssigned(SatelliteSP0031 s) {
-		for (int i = 0; i < assignedcount; i++) {
-			if (assignedsats [i] == s) {
+	bool IsAssigned(SatelliteSP0031 s)
+	{
+		for (int i = 0; i < assignedcount; i++)
+		{
+			if (assignedsats[i] == s)
+			{
 				return true;
 			}
 		}
 		return false;
 	}
 
-	public void ClearAssignment() {
-		for (int i = 0; i < assignedcount; i++) {
-			prevassignedsats [i] = assignedsats [i];
+	public void ClearAssignment()
+	{
+		for (int i = 0; i < assignedcount; i++)
+		{
+			prevassignedsats[i] = assignedsats[i];
 		}
 		prevassignedcount = assignedcount;
 		assignedcount = 0;
 	}
 
-	bool WasAssigned(SatelliteSP0031 s) {
-		for (int i = 0; i < prevassignedcount; i++) {
-			if (prevassignedsats [i] == s) {
+	bool WasAssigned(SatelliteSP0031 s)
+	{
+		for (int i = 0; i < prevassignedcount; i++)
+		{
+			if (prevassignedsats[i] == s)
+			{
 				return true;
 			}
 		}
 		return false;
 	}
 
-	public void SimpleAssign(SatelliteSP0031 s) {
-		assignedsats [assignedcount] = s;
+	public void SimpleAssign(SatelliteSP0031 s)
+	{
+		assignedsats[assignedcount] = s;
 		assignedcount++;
 	}
 
-	bool Assign(SatelliteSP0031 s) {
-		if (assignedcount == LASERS_PER_SAT || s.assignedcount == LASERS_PER_SAT || IsAssigned(s) ) {
+	bool Assign(SatelliteSP0031 s)
+	{
+		if (assignedcount == LASERS_PER_SAT || s.assignedcount == LASERS_PER_SAT || IsAssigned(s))
+		{
 			return false;
 		}
-		Debug.Assert (s.IsAssigned (this) == false);
-		SimpleAssign (s);
-		s.SimpleAssign (this);
+		Debug.Assert(s.IsAssigned(this) == false);
+		SimpleAssign(s);
+		s.SimpleAssign(this);
 		return true;
 	}
 
-	public void SimplePreAssign(SatelliteSP0031 s) {
-		preassignedsats [preassignedcount] = s;
+	public void SimplePreAssign(SatelliteSP0031 s)
+	{
+		preassignedsats[preassignedcount] = s;
 		preassignedcount++;
 	}
 
-	bool IsPreAssigned(SatelliteSP0031 s) {
-		for (int i = 0; i < preassignedcount; i++) {
-			if (preassignedsats [i] == s) {
+	bool IsPreAssigned(SatelliteSP0031 s)
+	{
+		for (int i = 0; i < preassignedcount; i++)
+		{
+			if (preassignedsats[i] == s)
+			{
 				return true;
 			}
 		}
 		return false;
 	}
 
-	bool PreAssign(SatelliteSP0031 s) {
-		if (preassignedcount == LASERS_PER_SAT || s.preassignedcount == LASERS_PER_SAT || IsPreAssigned(s) ) {
+	bool PreAssign(SatelliteSP0031 s)
+	{
+		if (preassignedcount == LASERS_PER_SAT || s.preassignedcount == LASERS_PER_SAT || IsPreAssigned(s))
+		{
 			return false;
 		}
-		Debug.Assert (s.IsPreAssigned (this) == false);
-        if (log_choice == LogChoice.LaserDists) {
+		Debug.Assert(s.IsPreAssigned(this) == false);
+		if (log_choice == LogChoice.LaserDists)
+		{
 			logfile.WriteLine("dist: " + Dist(s));
 			logfile.Flush();
 		}
-		SimplePreAssign (s);
-		s.SimplePreAssign (this);
+		SimplePreAssign(s);
+		s.SimplePreAssign(this);
 		return true;
 	}
 
-	public void ClearPreAssignedLasers() {
+	public void ClearPreAssignedLasers()
+	{
 		preassignedcount = 0;
 	}
-		
-	public void PreAssignLasersOrbitalPlane() {
+
+	public void PreAssignLasersOrbitalPlane()
+	{
 		int count = 0;
 		int satbase = (satid / sats_per_orbit) * sats_per_orbit;
 		int nextsat = (((satid - satbase) + 1) % sats_per_orbit) + satbase;
-		for (int i = 0; i < nearestcount; i++) {
-			if (nearestsats [i].satid == nextsat) {
-				PreAssign (nearestsats [i]);
+		for (int i = 0; i < nearestcount; i++)
+		{
+			if (nearestsats[i].satid == nextsat)
+			{
+				PreAssign(nearestsats[i]);
 				if (count == 2)
 					return;
 				count++;
@@ -369,13 +447,16 @@ public class SatelliteSP0031 {
 	}
 
 	// code intended for polar satellites
-	public void PreAssignLasers1b() {
+	public void PreAssignLasers1b()
+	{
 		int count = 0;
 		int satbase = (satid / 75) * 75;
 		int nextsat = (((satid - satbase) + 1) % 75) + satbase;
-		for (int i = 0; i < nearestcount; i++) {
-			if (nearestsats [i].satid == nextsat) {
-				PreAssign (nearestsats [i]);
+		for (int i = 0; i < nearestcount; i++)
+		{
+			if (nearestsats[i].satid == nextsat)
+			{
+				PreAssign(nearestsats[i]);
 				if (count == 2)
 					return;
 				count++;
@@ -383,17 +464,23 @@ public class SatelliteSP0031 {
 		}
 	}
 
-	public void PreAssignLasersBetweenPlanes(int plane_shift, int plane_step) {
-		if (satid < phase1_satcount) {
-			PreAssignLasersBetweenPlanes1 (plane_shift, plane_step);
-		} else {
-			PreAssignLasersBetweenPlanes2 (plane_shift);
+	public void PreAssignLasersBetweenPlanes(int plane_shift, int plane_step)
+	{
+		if (satid < phase1_satcount)
+		{
+			PreAssignLasersBetweenPlanes1(plane_shift, plane_step);
+		}
+		else
+		{
+			PreAssignLasersBetweenPlanes2(plane_shift);
 		}
 	}
 
-	public void PreAssignLasersBetweenPlanes1(int plane_shift, int plane_step) {
+	public void PreAssignLasersBetweenPlanes1(int plane_shift, int plane_step)
+	{
 		int tmpsatid = satid;
-		if (satid >= phase1_satcount) {
+		if (satid >= phase1_satcount)
+		{
 			return;
 		}
 		int count = 0;
@@ -403,30 +490,37 @@ public class SatelliteSP0031 {
 		int offset = plane_step * sats_per_orbit + plane_shift;  // default offset, ignoring wrapping
 
 		// ensure we connect to the correct plane
-		while ((modsatid + offset) / sats_per_orbit < plane_step) {
+		while ((modsatid + offset) / sats_per_orbit < plane_step)
+		{
 			offset += sats_per_orbit;
 		}
-		while ((modsatid + offset) / sats_per_orbit > plane_step) {
+		while ((modsatid + offset) / sats_per_orbit > plane_step)
+		{
 			offset -= sats_per_orbit;
 		}
 		sideways = satid + offset;
 
-		if (sideways >= phase1_satcount) {
+		if (sideways >= phase1_satcount)
+		{
 			// wrap around end of constellation
-			int stagger = ((int)Mathf.Round ((float)(orbital_planes * sat_phase_stagger)));
+			int stagger = ((int)Mathf.Round((float)(orbital_planes * sat_phase_stagger)));
 			offset = plane_step * sats_per_orbit + plane_shift + stagger;
-			while ((modsatid + offset) / sats_per_orbit < plane_step) {
+			while ((modsatid + offset) / sats_per_orbit < plane_step)
+			{
 				offset += sats_per_orbit;
 			}
-			while ((modsatid + offset) / sats_per_orbit > plane_step) {
+			while ((modsatid + offset) / sats_per_orbit > plane_step)
+			{
 				offset -= sats_per_orbit;
 			}
 			sideways = (satid + offset) % phase1_satcount;
 		}
 
-		for (int i = 0; i < nearestcount; i++) {
-			if (nearestsats [i].satid == sideways) {
-				PreAssign (nearestsats [i]);
+		for (int i = 0; i < nearestcount; i++)
+		{
+			if (nearestsats[i].satid == sideways)
+			{
+				PreAssign(nearestsats[i]);
 				if (count == 2)
 					return;
 				count++;
@@ -435,31 +529,41 @@ public class SatelliteSP0031 {
 	}
 
 	// old code for phase 2
-	public void PreAssignLasersBetweenPlanes2(int shift) {
+	public void PreAssignLasersBetweenPlanes2(int shift)
+	{
 		int tmpsatid = satid;
 		int offset = 0;
-		if (satid >= phase1_satcount) {
+		if (satid >= phase1_satcount)
+		{
 			offset = phase1_satcount;
 			tmpsatid -= offset;
 		}
 		int count = 0;
 		int sideways;
-		if ((tmpsatid % 50) + 50 + shift < 50) {
+		if ((tmpsatid % 50) + 50 + shift < 50)
+		{
 			sideways = tmpsatid + 100 + shift; // don't connect to your own orbital place with negative shifts
-		} else if ((tmpsatid % 50) + 50 + shift >= 100) {
+		}
+		else if ((tmpsatid % 50) + 50 + shift >= 100)
+		{
 			sideways = tmpsatid + shift; // don't connect to two orbital planes over
-		} else {
+		}
+		else
+		{
 			sideways = tmpsatid + 50 + shift;
 		}
 
-		if (sideways >= 1600) {
-			int stagger = (int)Mathf.Round ((float)(orbital_planes * sat_phase_stagger));
+		if (sideways >= 1600)
+		{
+			int stagger = (int)Mathf.Round((float)(orbital_planes * sat_phase_stagger));
 			sideways = ((sideways % 1600) + stagger) % 50; // 8 comes from the phase offset per plane 32/4 = 8
 		}
 		sideways += offset;
-		for (int i = 0; i < nearestcount; i++) {
-			if (nearestsats [i].satid == sideways) {
-				PreAssign (nearestsats [i]);
+		for (int i = 0; i < nearestcount; i++)
+		{
+			if (nearestsats[i].satid == sideways)
+			{
+				PreAssign(nearestsats[i]);
 				if (count == 2)
 					return;
 				count++;
@@ -468,73 +572,93 @@ public class SatelliteSP0031 {
 	}
 
 
-	public void UsePreAssigned() {
-		for (int i = 0; i < preassignedcount; i++) {
-			Assign (preassignedsats [i]);
+	public void UsePreAssigned()
+	{
+		for (int i = 0; i < preassignedcount; i++)
+		{
+			Assign(preassignedsats[i]);
 		}
 	}
 
-	int FindFreeLaser() {
-		for (int lc = 0; lc < maxlasers; lc++) {
-			if (!laseron [lc]) {
+	int FindFreeLaser()
+	{
+		for (int lc = 0; lc < maxlasers; lc++)
+		{
+			if (!laseron[lc])
+			{
 				return lc;
 			}
 		}
 		return -1;
 	}
 
-	public void FinalizeLasers(float speed, Material isl_material) {
+	public void FinalizeLasers(float speed, Material isl_material)
+	{
 		// Turn off lasers that are no longer assigned to the same target
-		for (int lc = 0; lc < maxlasers; lc++) {
-			if (laseron [lc]) {
-				if (!IsAssigned (laserdsts [lc])) {
+		for (int lc = 0; lc < maxlasers; lc++)
+		{
+			if (laseron[lc])
+			{
+				if (!IsAssigned(laserdsts[lc]))
+				{
 					// laser will need to be reassigned
 					laseron[lc] = false;
 				}
 			}
 		}
 
-		for (int i = 0; i < assignedcount; i++) {
-			SatelliteSP0031 sat = assignedsats [i];
-			if (!WasAssigned (sat)) {
+		for (int i = 0; i < assignedcount; i++)
+		{
+			SatelliteSP0031 sat = assignedsats[i];
+			if (!WasAssigned(sat))
+			{
 				/* destination is a new one - find a laser */
-				int lasernum = FindFreeLaser ();
-				laseron [lasernum] = true;
-				lasertimes [lasernum] = Time.time;
-				laserdsts [lasernum] = sat;
-				LaserScript ls = (LaserScript)lasers [lasernum].GetComponent (typeof(LaserScript));
-				ls.SetMaterial (isl_material);
+				int lasernum = FindFreeLaser();
+				laseron[lasernum] = true;
+				lasertimes[lasernum] = Time.time;
+				laserdsts[lasernum] = sat;
+				LaserScript ls = (LaserScript)lasers[lasernum].GetComponent(typeof(LaserScript));
+				ls.SetMaterial(isl_material);
 			}
 		}
 
 		int oncount = 0;
-		for (int lc = 0; lc < maxlasers; lc++) {
-			if (laseron [lc]) {
+		for (int lc = 0; lc < maxlasers; lc++)
+		{
+			if (laseron[lc])
+			{
 				oncount++;
-				LaserScript ls = (LaserScript)lasers [lc].GetComponent (typeof(LaserScript));
-				Debug.Assert (this != laserdsts [lc]);
-				if (position () == laserdsts [lc].position ()) {
-					Debug.Log ("Same pos");
-					Debug.Log ("Me: " + satid.ToString() + " Him: " + laserdsts [lc].satid.ToString());
-					Debug.Log ("My pos: " + position ().ToString() + " His pos: " + laserdsts [lc].position ().ToString ());
+				LaserScript ls = (LaserScript)lasers[lc].GetComponent(typeof(LaserScript));
+				Debug.Assert(this != laserdsts[lc]);
+				if (position() == laserdsts[lc].position())
+				{
+					Debug.Log("Same pos");
+					Debug.Log("Me: " + satid.ToString() + " Him: " + laserdsts[lc].satid.ToString());
+					Debug.Log("My pos: " + position().ToString() + " His pos: " + laserdsts[lc].position().ToString());
 				}
-				Debug.Assert (position () != laserdsts [lc].position());
+				Debug.Assert(position() != laserdsts[lc].position());
 
-				ls.SetPos (position (), laserdsts [lc].position ());
+				ls.SetPos(position(), laserdsts[lc].position());
 				//ls.SetMaterial (isl_material);
-			} else {
-				LaserScript ls = (LaserScript)lasers [lc].GetComponent (typeof(LaserScript));
-				ls.SetPos (position(), position());
+			}
+			else
+			{
+				LaserScript ls = (LaserScript)lasers[lc].GetComponent(typeof(LaserScript));
+				ls.SetPos(position(), position());
 			}
 		}
 	}
 
-	public void ColourLink(SatelliteSP0031 nextsat, Material mat) {
-		for (int lc = 0; lc < maxlasers; lc++) {
-			if (laseron [lc]) {
-				if (laserdsts [lc] == nextsat) {
-					LaserScript ls = (LaserScript)lasers [lc].GetComponent (typeof(LaserScript));
-					ls.SetMaterial (mat);
+	public void ColourLink(SatelliteSP0031 nextsat, Material mat)
+	{
+		for (int lc = 0; lc < maxlasers; lc++)
+		{
+			if (laseron[lc])
+			{
+				if (laserdsts[lc] == nextsat)
+				{
+					LaserScript ls = (LaserScript)lasers[lc].GetComponent(typeof(LaserScript));
+					ls.SetMaterial(mat);
 				}
 			}
 		}

@@ -79,6 +79,7 @@ public class CameraSP_0031 : MonoBehaviour {
 			    FoV = 45f;
                 break;
 		    case RouteChoice.USdense:
+			case RouteChoice.USsparseAttacked:
 		    case RouteChoice.USsparse:
 		    // US view 60 degree
 			    cam_count = 2;
