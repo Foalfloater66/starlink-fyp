@@ -511,7 +511,7 @@ MonoBehaviour:
   decimator: 1
   raan0: 0
   log_choice: 5
-  log_filename: /Users/morganeohlig/workspace/fyp/Starlink0031/Logs/path.txt
+  log_filename: /Users/morganeohlig/workspace/fyp/Starlink0031/Logs/path/
   beam_on: 0
   graph_on: 0
   speedup: 1

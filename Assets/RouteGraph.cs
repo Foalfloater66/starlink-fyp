@@ -120,6 +120,14 @@ public class RouteGraph
 		startnode.Dist = 0f;
 	}
 
+	public void ResetOnPathStatus()
+	{
+		for (int i = 0; i < nodecount; i++)
+		{
+			nodes[i].OnPath = false;
+		}
+	}
+
 	public void AddNeighbour(int nodenum1, int nodenum2, bool dist_limited)
 	{
 		nodes[nodenum1].AddNeighbour(nodes[nodenum2], dist_limited);
@@ -135,6 +143,7 @@ public class RouteGraph
 
 	public void ComputeRoutes()
 	{
+		/* Essentially runs Djikstra. */
 		/* Make new binary heap. Add all of the nodes. */
 		heap = new BinaryHeap(nodecount);
 		for (int i = 0; i < nodecount; i++)
