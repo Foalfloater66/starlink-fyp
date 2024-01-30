@@ -123,6 +123,7 @@ public class SP_basic_0031 : MonoBehaviour
 	float mindist = Node.INFINITY; // used for calculating collision distances
 
 	System.IO.StreamWriter logfile;
+	System.IO.StreamWriter summary_logfile;
 	float maxdist = 0f;
 	float beam_radius = 0f;
 	float margin = 100f;
@@ -139,11 +140,13 @@ public class SP_basic_0031 : MonoBehaviour
 	public float raan0 = 0f;
 
 	public LogChoice log_choice = LogChoice.None;
-	public string log_filename = "/Users/morganeohlig/workspace/fyp/Starlink0031/Logs/path.txt"; // add my own log filename. TIME TO CHANGE THIS 
+	public string log_filename = "/Users/morganeohlig/workspace/fyp/Starlink0031/Logs/path/summary.txt"; // What is this for, if it doesn't get used? 
+
+	private int log_filename_counter = 0;
 	public enum BeamChoice { AllOff, AllOn, SrcDstOn };
 	public BeamChoice beam_on;
 	public bool graph_on;
-	public int speedup;
+
 	public Utilities.SceneField prevscene;
 	public Utilities.SceneField nextscene;
 
@@ -161,9 +164,13 @@ public class SP_basic_0031 : MonoBehaviour
 		satcount = 0;
 		Application.runInBackground = true;
 		sat0pos = Vector3.zero; // center of earth!
-		if (log_choice != LogChoice.None)
+		if (log_choice != LogChoice.None && log_choice != LogChoice.Path)
 		{
 			logfile = new System.IO.StreamWriter(@log_filename);
+		}
+		else if (log_choice == LogChoice.Path)
+		{
+			summary_logfile = new System.IO.StreamWriter(@log_filename + "summary.txt");
 		}
 		start_time = Time.time;
 
@@ -1092,21 +1099,21 @@ public class SP_basic_0031 : MonoBehaviour
 
 	float Route(bool reset_route, int pathnum, GameObject city1, GameObject city2, string name, float rtt, float actualdist)
 	{
-
-		// if (log_choice == LogChoice.Path)
-		// {
 		StringBuilder sb = new StringBuilder(string.Format("{0} - {1}, ", cityStrings[city1], cityStrings[city2]));
+		bool success = false;
 
-		// if (log_choice == LogChoice.Path)
-		// {
-
-		// }
+		reset_route = false;
 
 		DateTime startdate = DateTime.Now;
 
 		Node rn = rg.endnode; // node groundstation. TODO: what if I change this?
 		SatelliteSP0031 sat = null, prevsat;
 		int id = -1;
+
+		// ClearRoute();
+		// reset_route = true;
+
+		// TODO: might remove reset_route entirely.
 
 		/* pathnum indicates the order the appearance. This is strictly ascending. So any route that has a pathnum cannot be
 		equal or lower than that of the previously generated path. */
@@ -1149,6 +1156,7 @@ public class SP_basic_0031 : MonoBehaviour
 		else
 		{
 			rg.ResetNodeDistances();
+			// Unsure what this is. Shouldn't be enabled anyways. since reset_route is always true.
 		}
 
 		/* N.B. 
@@ -1156,12 +1164,9 @@ public class SP_basic_0031 : MonoBehaviour
 		* rn = RouteNode
 		*/
 
-		rg.ComputeRoutes();
+		rg.ResetOnPathStatus();
 
-		if (log_choice == LogChoice.Path)
-		{
-			LogSatelliteStates(cityStrings[city1], cityStrings[city2]);
-		}
+		rg.ComputeRoutes();
 
 		string path = "";
 
@@ -1171,12 +1176,15 @@ public class SP_basic_0031 : MonoBehaviour
 		id = -4;
 		while (true)
 		{
+			// THIS IS THE PATH FIGURER..... NEED TO LOG AFTER THIS...
 			if (rn == rg.startnode)
 			{
 				startsatid = id; // choses the start satellite ID.
+								 // END...
 				break;
 			}
 			id = rn.Id;
+			rn.OnPath = true;
 			path = path + id.ToString() + " ";
 
 			if (endsatid == -1 && id >= 0)
@@ -1195,8 +1203,8 @@ public class SP_basic_0031 : MonoBehaviour
 				}
 				if (log_choice == LogChoice.Path)
 				{
-					logfile.WriteLine("FAILURE.");
-					logfile.Flush();
+					/* Log the route */
+					LogSatelliteStates(false, cityStrings[city1], cityStrings[city2], path);
 				}
 
 				highlight_reachable();
@@ -1209,6 +1217,14 @@ public class SP_basic_0031 : MonoBehaviour
 			prevpath = path;
 			pathchange = 1;
 		}
+
+		/* Log the route */
+		if (log_choice == LogChoice.Path)
+		{
+			LogSatelliteStates(true, cityStrings[city1], cityStrings[city2], path);
+		}
+
+		// TODO: put this in a separate function.
 
 		/* Compute data related to the path for the logfile. */
 		float enddist = km_per_unit * rg.endnode.Dist;
@@ -1348,9 +1364,6 @@ public class SP_basic_0031 : MonoBehaviour
 		elapsed_count++;
 		CreateSatBeams(satlist[startsatid], city1, satlist[endsatid], city2);
 
-		logfile.WriteLine("SUCCESS.");
-		logfile.Flush();
-
 		return ms;
 	}
 
@@ -1414,15 +1427,20 @@ public class SP_basic_0031 : MonoBehaviour
 		txt.text = s2;
 	}
 
-	void LogSatelliteStates(string cityString1, string cityString2)
+	// void LogSuccesses()
+
+	void LogSatelliteStates(bool success, string cityString1, string cityString2, string path)
 	{
 		/* Writes information about all nodes in the RouteGraph into the logfile. Specifies if the node is part of an existing computed path. */
-		// return;
+
+		logfile = new System.IO.StreamWriter(@log_filename + log_filename_counter.ToString("D4") + (success ? "_success_" : "_fail_") + string.Format("{0}_{1}", cityString1, cityString2) + ".txt");
 		logfile.WriteLine(new String('=', 20));
 		logfile.WriteLine(string.Format("{0} - {1}, ", cityString1, cityString2));
 		logfile.Flush();
 
 		StringBuilder sb = new StringBuilder();
+
+		int path_counter = 0;
 
 		for (int orbitnum = 0; orbitnum < maxorbits; orbitnum++)
 		{
@@ -1433,15 +1451,13 @@ public class SP_basic_0031 : MonoBehaviour
 
 			foreach (int satid in orbit2sats[orbitnum])
 			{
-				// logfile.WriteLine(satid);
 				Node nodes = rg.GetNode(satid);
 				sb.Append("<name> " + nodes + "; <id> " + nodes.Id + "; <pos>" + nodes._position + ";");
 
-
-				if (null != nodes.Parent)
+				if (nodes.OnPath)
 				{
-					// TODO: having a parent DOES NOT mean you are on the path.
 					sb.Append(" ON PATH.");
+					path_counter += 1;
 				}
 				logfile.WriteLine(sb.ToString());
 				logfile.Flush();
@@ -1450,23 +1466,20 @@ public class SP_basic_0031 : MonoBehaviour
 			}
 			logfile.WriteLine(new String('-', 10));
 		}
-		// return;
-		// for (int i = 0; i < nodecount; i++)
-		// {
-		// 	sb.Append("<orbit> " + nodes[i].Orbit + "<name> " + nodes[i] + "; <id> " + nodes[i].Id + "; <pos>" + nodes[i]._position + ";");
 
-
-		// 	if (null != nodes[i].Parent)
-		// 	{
-		// 		// TODO: having a parent DOES NOT mean you are on the path.
-		// 		sb.Append(" ON PATH.");
-		// 	}
-		// 	logfile.WriteLine(sb.ToString());
-		// 	sb.Clear();
-		// }
 		logfile.WriteLine("END.");
 		logfile.WriteLine(new String('=', 20));
 		logfile.Flush();
+
+
+		/* Print this data into the summary logfile */
+		summary_logfile.WriteLine(log_filename_counter.ToString("D4") + string.Format("_{0}_{1}", cityString1, cityString2) + ":" + (success ? " success " : " fail ") + ": " + path_counter.ToString() + " path nodes. Path: " + path.ToString());
+		summary_logfile.Flush();
+
+		logfile.WriteLine(new String('=', 20));
+		logfile.Flush();
+
+		log_filename_counter += 1;
 	}
 	float FindNearest(int sat_id, float now)
 	{
@@ -1652,8 +1665,7 @@ public class SP_basic_0031 : MonoBehaviour
 				// TODO: must change to do multiple routes simultaneously.
 				// TODO: stop camera from changing position over time.
 
-				// TODO: IDK HOW THE ORANGE LINES WORK...
-				// Debug.Log(lastpath);
+				// TODO: should add this stuff somewhere else.
 				if (!cityStrings.ContainsKey(miami))
 				{
 					cityStrings.Add(miami, "Miami");
@@ -1666,8 +1678,12 @@ public class SP_basic_0031 : MonoBehaviour
 				{
 					cityStrings.Add(new_york, "New York");
 				}
+				if (!cityStrings.ContainsKey(toronto))
+				{
+					cityStrings.Add(toronto, "Toronto");
+				}
 
-				SingleRoute(0, miami, redmond, "Miami-Seattle (Malicious)", 78f, 3876f); // Malicious comms. TODO: what is the actual distance? How do I calculate that?
+				SingleRoute(0, miami, toronto, "Miami-Toronto (Malicious)", 78f, 3876f); // Malicious comms. TODO: what is the actual distance? How do I calculate that?
 				SingleRoute(1, new_york, redmond, "New York-Seattle", 78f, 3876f); // Real comms
 																				   // How did he determine the last 2 parameters?
 																				   // SingleRoute(2, chicago, redmond, "Chicago-Seattle (Malicious)", 78f, 3876f); // More malicious comms.

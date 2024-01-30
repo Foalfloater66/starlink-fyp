@@ -66,11 +66,13 @@ public class Node
 	int _linkcount = 0;
 	public const float INFINITY = 1000000f;
 
-	public int _orbit = -5; // just means an orbit hasn't been assigned. I don't know if -5 is used for it. Also it would frankly be better to just have a macro or smth.
+	public int _orbit = -5; // TODO: make this private. Was it always public?
 	float _dist = INFINITY; // distance from src.
 	Node _parent_node;  // predecessor on path from src
 						//bool _done = false;
 	public int QueuePosition;
+
+	bool _on_path = false; /* Determines if the node is on the selected path. */
 
 	public Node(int id, Vector3 pos)
 	{
@@ -141,6 +143,18 @@ public class Node
 		set
 		{
 			_orbit = value;
+		}
+	}
+
+	public bool OnPath
+	{
+		get
+		{
+			return _on_path;
+		}
+		set
+		{
+			_on_path = value;
 		}
 	}
 
