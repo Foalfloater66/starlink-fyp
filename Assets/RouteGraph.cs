@@ -19,6 +19,22 @@ public class RouteGraph
 
 	System.IO.StreamWriter logfile;
 
+	public GameObject StartObj
+	{
+		get
+		{
+			return objs[satcount];
+		}
+	}
+
+	public GameObject EndObj
+	{
+		get
+		{
+			return objs[satcount + 1];
+		}
+	}
+
 	public RouteGraph()
 	{
 	}
@@ -85,6 +101,12 @@ public class RouteGraph
 		nodecount++;
 	}
 
+	public void ResetEndpointNodes(GameObject startobj, GameObject endobj)
+	{
+		objs[satcount] = startobj;
+		objs[satcount + 1] = endobj;
+	}
+
 	public void ResetNodes(GameObject startobj, GameObject endobj)
 	{
 		objs[satcount] = startobj;
@@ -106,7 +128,7 @@ public class RouteGraph
 		}
 		for (int i = 0; i < nodecount; i++)
 		{
-			nodes[i].UpdateDists(maxdist / km_per_unit);
+			nodes[i].UpdateDists(maxdist / km_per_unit); // IT COULD BE THIS!!! THATS CAUSING A PROBLEM!!! maybe its making them unreachable, etc.
 		}
 		startnode.Dist = 0f;
 	}
