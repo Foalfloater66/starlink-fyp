@@ -1175,11 +1175,6 @@ public class SP_basic_0031 : MonoBehaviour
 		SatelliteSP0031 sat = null, prevsat;
 		int id = -1;
 
-		// ClearRoute();
-		// reset_route = true;
-
-		// TODO: might remove reset_route entirely.
-
 		/* pathnum indicates the order the appearance. This is strictly ascending. So any route that has a pathnum cannot be
 		equal or lower than that of the previously generated path. */
 		if (pathnum <= lastpath)
@@ -1199,54 +1194,20 @@ public class SP_basic_0031 : MonoBehaviour
 
 		int uplinks = 0, downlinks = 0; // what are uplinks and downlinks?
 
-		// rg.ResetEndpointNodes(city1, city2);
-
-		// ResetRoute(city1, city2);
-		// sat0pos = satlist[0].gameobject.transform.position;
-		// BuildRouteGraph(rg, city1, city2, maxdist, margin); // Only builds a route graph when a route reset has been requested.
-
 		/* Build another route graph if a route reset has been requested. */
-		// reset_route = true;
+		ResetRoute(city1, city2);
+
 		if (reset_route)
 		{
 			float satmoveddist = Vector3.Distance(satlist[0].gameobject.transform.position, sat0pos);
 
-			// this here, sets something that hasn't been set in the other one.
 			if (route_init == false || satmoveddist * km_per_unit > margin || graph_on)
 			{
-				// This happens only once. it happens when the route hasn't been initalized yet.
-				/* Either, a route hasn't been initialised, the satellites have moved beyond the functional boundary, or the graph has just been turned on (?) */
-				ResetRoute(city1, city2);
+				// WHAT IS THE SAT0POS VARIABLE?			
 				sat0pos = satlist[0].gameobject.transform.position;
-				BuildRouteGraph(rg, city1, city2, maxdist, margin); // Only builds a route graph when a route reset has been requested.
-				route_init = true;
-			}
-			else
-			{
-				/* reset dijkstra, but not neighbours */
-				// TODO: temprorarily turn this off
-
-				// Reset dijsktra. Also resets the positions of the nodes.
-				// rg.ResetEndpointNodes(city1, city2);
-				// ResetRoutePos(city1, city2); // maybe this is missing?
-				ResetRoute(city1, city2);
-				// sat0pos = satlist[0].gameobject.transform.position;
-				BuildRouteGraph(rg, city1, city2, maxdist, margin);
-
 			}
 		}
-		else
-		{
-			ResetRoute(city1, city2);
-			// sat0pos = satlist[0].gameobject.transform.position;
-			BuildRouteGraph(rg, city1, city2, maxdist, margin);
-			/* resets distances assigned to all nodes with dijkstra */
-			// ResetRoutePos(city1, city2);
-			// UpdateRouteGraphEndpoints(rg, city1, city2, maxdist, margin);
-			// rg.ResetNodeDistances(); // and then this is most likely a big problem as well.
-			// Unsure what this is. Shouldn't be enabled anyways. since reset_route is always true
-			// rg.ResetEndpointNodes(city1, city2);
-		}
+		BuildRouteGraph(rg, city1, city2, maxdist, margin);
 
 		/* N.B. 
 		* rg = RouteGraph
