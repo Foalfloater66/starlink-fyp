@@ -7,6 +7,9 @@ using System;
 using System.Text;
 using UnityEngine.SceneManagement;
 
+// remove later
+// using System.Diagnostics;
+
 public enum RouteChoice { TransAt, TransPac, LonJob, USsparse, USsparseAttacked, USdense, TorMia, Sydney_SFO, Sydney_Tokyo, Sydney_Lima, Followsat };
 public enum LogChoice { None, RTT, Distance, HopDists, LaserDists, Path };
 
@@ -66,8 +69,6 @@ public class SP_basic_0031 : MonoBehaviour
 	public GameObject beam_prefab;
 	public GameObject beam_prefab2;
 
-	private Dictionary<GameObject, string> cityStrings = new Dictionary<GameObject, string>();
-
 	private Dictionary<int, List<int>> orbit2sats = new Dictionary<int, List<int>>(); /* Orbit ID mapping to satellite ID list. */
 
 	GameObject[] orbits;
@@ -106,6 +107,8 @@ public class SP_basic_0031 : MonoBehaviour
 	GameObject london, new_york, san_francisco, singapore, johannesburg, athens, auckland, sydney;
 	GameObject northbend, conrad, merrillan, greenville, redmond, hawthorne, bismarck, toronto,
 		thunderbay, columbus, lisbon, miami, majorca, tokyo, chicago, lima;
+
+	private Dictionary<GameObject, string> cityStrings = new Dictionary<GameObject, string>();
 
 	//GameObject beam1 = null, beam2 = null;
 	GameObject[] lasers;
@@ -365,6 +368,22 @@ public class SP_basic_0031 : MonoBehaviour
 		tokyo = CreateCity(35.652832f, -139.839478f, false);
 		chicago = CreateCity(41.881832f, 87.623177f, false);
 		toronto = CreateCity(43.70011f, 79.4163f, false);
+
+		cityStrings = new Dictionary<GameObject, string>(){
+			{london, "London"},
+			{new_york, "New York"},
+			{san_francisco, "San Francisco"},
+			{singapore, "Singapore"},
+			{johannesburg, "Johannesburg"},
+			{athens, "Athens"},
+			{auckland, "Auckland"},
+			{sydney, "Sydney"},
+			{redmond, "Redmond"},
+			{miami, "Miami"},
+			{tokyo,  "Tokyo"},
+			{chicago, "Chicago"},
+			{toronto, "Toronto"}
+		};
 
 
 		/*
@@ -999,11 +1018,15 @@ public class SP_basic_0031 : MonoBehaviour
 		}
 	}
 
-	void UpdateRouteGraphEndpoints(RouteGraph rgph, GameObject city1, GameObject city2, float maxdist, float margin)
+
+	void PartiallyBuildRouteGraph(RouteGraph rgph, GameObject city1, GameObject city2, float maxdist, float margin)
 	{
-		// TODO: I need to finish and fix this.
+		/* Done for route creation. */
+
+		/* This function builds the route graph. Although I have no idea why it's here and not in the RouteGraph function itself. I suppose it's because the routegraph can't perform this operation on itself. But I'm not a massive fan of this design to be perfectly honest. */
 		for (int satnum = 0; satnum < maxsats; satnum++)
 		{
+			// I'm going to pass the satellite orbit information to the RouteGraph. So that it can encapsulate it properly. Makes log reading much easier.
 
 			// Add start city
 			float radiodist = Vector3.Distance(satlist[satnum].gameobject.transform.position,
@@ -1033,45 +1056,43 @@ public class SP_basic_0031 : MonoBehaviour
 				rgph.AddNeighbour(maxsats + 1, satnum, Node.INFINITY, true);
 			}
 
-			// Add relays
-			if (graph_on)
-			{
-				satlist[satnum].GraphReset();
-			}
+			// // Add relays
+			// if (graph_on)
+			// {
+			// 	satlist[satnum].GraphReset();
+			// }
 
-			List<List<City>> in_range = grid.FindInRange(satlist[satnum].gameobject.transform.position);
-			foreach (List<City> lst in in_range)
-			{
-				foreach (City relay in lst)
-				{
-					radiodist = Vector3.Distance(satlist[satnum].gameobject.transform.position, relay.gameobject.transform.position);
-					if (radiodist * km_per_unit < maxdist)
-					{
-						rgph.AddNeighbour(maxsats + 2 + relay.relayid, satnum, radiodist, true);
-						if (graph_on)
-						{
-							satlist[satnum].GraphOn(relay.gameobject, null);
-						}
-					}
-					else if (radiodist * km_per_unit < maxdist + margin)
-					{
-						rgph.AddNeighbour(maxsats + 2 + relay.relayid, satnum, Node.INFINITY, true);
-					}
-				}
-			}
-			if (graph_on)
-			{
-				satlist[satnum].GraphDone();
-			}
+			// List<List<City>> in_range = grid.FindInRange(satlist[satnum].gameobject.transform.position);
+			// foreach (List<City> lst in in_range)
+			// {
+			// 	foreach (City relay in lst)
+			// 	{
+			// 		radiodist = Vector3.Distance(satlist[satnum].gameobject.transform.position, relay.gameobject.transform.position);
+			// 		if (radiodist * km_per_unit < maxdist)
+			// 		{
+			// 			rgph.AddNeighbour(maxsats + 2 + relay.relayid, satnum, radiodist, true);
+			// 			if (graph_on)
+			// 			{
+			// 				satlist[satnum].GraphOn(relay.gameobject, null);
+			// 			}
+			// 		}
+			// 		else if (radiodist * km_per_unit < maxdist + margin)
+			// 		{
+			// 			rgph.AddNeighbour(maxsats + 2 + relay.relayid, satnum, Node.INFINITY, true);
+			// 		}
+			// 	}
+			// // }
+			// if (graph_on)
+			// {
+			// 	satlist[satnum].GraphDone();
+			// }
 		}
 	}
-
 	void BuildRouteGraph(RouteGraph rgph, GameObject city1, GameObject city2, float maxdist, float margin)
 	{
 		/* Done for route creation. */
 
 		/* This function builds the route graph. Although I have no idea why it's here and not in the RouteGraph function itself. I suppose it's because the routegraph can't perform this operation on itself. But I'm not a massive fan of this design to be perfectly honest. */
-		// NB. what is Max Sats? 
 		for (int satnum = 0; satnum < maxsats; satnum++)
 		{
 			// I'm going to pass the satellite orbit information to the RouteGraph. So that it can encapsulate it properly. Makes log reading much easier.
@@ -1162,12 +1183,18 @@ public class SP_basic_0031 : MonoBehaviour
 		}
 	}
 
-	float Route(bool reset_route, int pathnum, GameObject city1, GameObject city2, string name, float rtt, float actualdist)
+	float Route(int pathnum, GameObject city1, GameObject city2, string name, float rtt, float actualdist)
 	{
-		StringBuilder sb = new StringBuilder(string.Format("{0} - {1}, ", cityStrings[city1], cityStrings[city2]));
-		bool success = false;
+		/* N.B. 
+		* rg = RouteGraph
+		* rn = RouteNode
+		*/
 
-		reset_route = false;
+		Debug.Log("Problem...");
+		StringBuilder sb = new StringBuilder(string.Format("{0} - {1}, ", cityStrings[city1], cityStrings[city2])); // logging.
+		Debug.Log("After the potential problem");
+		bool success = false;
+		bool reset_route = false;
 
 		DateTime startdate = DateTime.Now;
 
@@ -1175,62 +1202,59 @@ public class SP_basic_0031 : MonoBehaviour
 		SatelliteSP0031 sat = null, prevsat;
 		int id = -1;
 
-		/* pathnum indicates the order the appearance. This is strictly ascending. So any route that has a pathnum cannot be
+
+		/* Clears and resets the routegraph if going through another Update() iteration.
+		Context: pathnum indicates the order the appearance. This is strictly ascending. So any route that has a pathnum cannot be
 		equal or lower than that of the previously generated path. */
 		if (pathnum <= lastpath)
 		{
-			/* Clears the entire route graph. */
 			ClearRoute();
 			reset_route = true;
-
 		}
 		else
 		{
-			/* Otherwise, keep the route */
 			LockRoute();
 		}
-
 		lastpath = pathnum;
 
-		int uplinks = 0, downlinks = 0; // what are uplinks and downlinks?
 
-		/* Build another route graph if a route reset has been requested. */
+		// Reset the route.
+		// TODO: fix this here.
 		ResetRoute(city1, city2);
 
 		if (reset_route)
 		{
 			float satmoveddist = Vector3.Distance(satlist[0].gameobject.transform.position, sat0pos);
+			BuildRouteGraph(rg, city1, city2, maxdist, margin);
 
 			if (route_init == false || satmoveddist * km_per_unit > margin || graph_on)
 			{
-				// WHAT IS THE SAT0POS VARIABLE?			
-				sat0pos = satlist[0].gameobject.transform.position;
+				sat0pos = satlist[0].gameobject.transform.position; // What is the sat0pos variable?
 			}
 		}
-		BuildRouteGraph(rg, city1, city2, maxdist, margin);
+		else
+		{
+			PartiallyBuildRouteGraph(rg, city1, city2, maxdist, margin);
+		}
+		// BuildRouteGraph(rg, city1, city2, maxdist, margin);
 
-		/* N.B. 
-		* rg = RouteGraph
-		* rn = RouteNode
-		*/
 
-		rg.ResetOnPathStatus();
-
+		rg.ResetOnPathStatus(); // TODO: remove this as well
 		rg.ComputeRoutes();
 
+		/* Figure out the start and end satellites IDs.
+		Start with the endnode ground station, and passes through all of the nodes in the computed route
+		until the startnode is found. If the startnode is found, then store the start satid. Otherwise,
+		return Node.INFINITY.*/
 		string path = "";
-
-		/* Figure out the start and end satellites */
-		rn = rg.endnode; // groundstation. Set rn initial
+		rn = rg.endnode;
 		int startsatid = 0, endsatid = -1;
 		id = -4;
 		while (true)
 		{
-			// THIS IS THE PATH FIGURER..... NEED TO LOG AFTER THIS...
 			if (rn == rg.startnode)
 			{
-				startsatid = id; // choses the start satellite ID.
-								 // END...
+				startsatid = id;
 				break;
 			}
 			id = rn.Id;
@@ -1239,12 +1263,11 @@ public class SP_basic_0031 : MonoBehaviour
 
 			if (endsatid == -1 && id >= 0)
 			{
-				endsatid = id; // choses the end satellite ID.
+				endsatid = id;
 			}
-			rn = rn.Parent; // Update rn to be its parent.
+			rn = rn.Parent;
 
-			/* If "rn" has no parent, return "Node.Infinity" */
-			if (rn == null)
+			if (rn == null) // No complete route was found. Return Node.INFINITY.
 			{
 				Debug.Log("No route " + pathnum.ToString());
 				if (log_choice == LogChoice.RTT)
@@ -1261,28 +1284,25 @@ public class SP_basic_0031 : MonoBehaviour
 				return Node.INFINITY;
 			}
 		}
+
+
+		/* Log the route nodes. */
+		// TODO: change this.
+		// if (log_choice == LogChoice.Path) { LogSatelliteStates(true, cityStrings[city1], cityStrings[city2], path); }
+
+
+		/* Calculate RTT information to display on the screen. */
 		int pathchange = 0;
 		if (path != prevpath)
 		{
 			prevpath = path;
 			pathchange = 1;
 		}
-
-		/* Log the route */
-		if (log_choice == LogChoice.Path)
-		{
-			LogSatelliteStates(true, cityStrings[city1], cityStrings[city2], path);
-		}
-
-		// TODO: put this in a separate function.
-
-		/* Compute data related to the path for the logfile. */
 		float enddist = km_per_unit * rg.endnode.Dist;
 		float radiodist1 = km_per_unit * Vector3.Distance(satlist[startsatid].gameobject.transform.position, city1.gameObject.transform.position);
 		float radiodist2 = km_per_unit * Vector3.Distance(satlist[endsatid].gameobject.transform.position, city2.gameObject.transform.position);
 		float satdist = enddist - (radiodist1 + radiodist2);
-		string s = "Sat: " + ((int)satdist).ToString() + " Dist: " + ((int)enddist).ToString() + " R1 " + ((int)radiodist1).ToString() + " R2 " + ((int)radiodist2).ToString()
-			+ " Up " + uplinks.ToString() + " Down " + downlinks.ToString();
+		string s = "Sat: " + ((int)satdist).ToString() + " Dist: " + ((int)enddist).ToString() + " R1 " + ((int)radiodist1).ToString() + " R2 " + ((int)radiodist2).ToString();
 		float ms = 2 * enddist / 299.792f;
 		if (log_choice == LogChoice.RTT)
 		{
@@ -1295,6 +1315,9 @@ public class SP_basic_0031 : MonoBehaviour
 			+ "\nGreat circle fibre RTT: " + ((int)fibre_rtt).ToString() + "ms"
 			+ "\nCurrent Internet RTT: " + ((int)rtt).ToString() + "ms";
 		txt.text = s2;
+
+
+		/* Draw the path */
 		rn = rg.endnode;
 		Node prevnode = null;
 		sat = null;
@@ -1304,15 +1327,13 @@ public class SP_basic_0031 : MonoBehaviour
 		id = -4; /* first id */
 		double prevdist = km_per_unit * rn.Dist;
 		int hop = 0;
-
-		/* Draw the path */
 		while (true)
 		{
 			previd = id;
 			id = rn.Id;
 			ds += "s" + id.ToString() + "," + ((int)(km_per_unit * rn.Dist)).ToString() + " ";
 
-			/* LOG HOPPING DISTANCE */
+			// TODO THIS IS A FUncTION THAT SHOULD REALLY BE SOMEWHERE ELSE HONESTLy...
 			if (log_choice == LogChoice.HopDists)
 			{
 				double dist = prevdist - km_per_unit * rn.Dist;
@@ -1328,46 +1349,53 @@ public class SP_basic_0031 : MonoBehaviour
 			}
 
 			if (previd != -4)
-			{ /* if it's not the start node */
-				// sb.Append(new char )
-				if (previd >= 0 && id >= 0)
+			{
+				if (previd >= 0 && id >= 0) // It's an ISL
 				{
-					/* it's an ISL */
 					sat = satlist[id];
 					prevsat = satlist[previd];
+
+					// Node curr_node = rg.GetNode(previd);
+					// Link link = prevnode.GetLinkByNeighbour(id);
+					// Debug.Assert(link != null);
+					// link.increaseLoad(5);
+
+					// if (link.IsFlooded())
+					// {
+					// basically means, we can't continue further.
+					// TODO: color the link in another color.
+					// break;
+					// TODO: there is a bug. I need to think about this deeper.
+					// }
+
 					int pathcolour = pathnum;
 					if (pathcolour >= laserMaterials.Length)
 					{
 						pathcolour = laserMaterials.Length - 1;
 					}
-					sat.ColourLink(prevsat, laserMaterials[pathcolour]);
+					sat.ColourLink(prevsat, laserMaterials[pathcolour]); // TODO: check this.
 					prevsat.ColourLink(sat, laserMaterials[pathcolour]);
 					used_isl_links.Add(new ActiveISL(sat, rn, prevsat, prevnode));
 				}
-				else
+				else // It's an RF (radio frequency) link
 				{
-					/* it's an RF link */
-					/* P.S. RF link = radio frequency link */
-					if (id >= 0)
+					if (id >= 0) // the current node is a satellite
 					{
-						/* It's a satellite. */
 						sat = satlist[id];
-						if (previd == -2)
+						if (previd == -2) // the previous node was a city. Add an active RF link.
 						{
-							/* The previous node was a city. */
 							used_rf_links.Add(new ActiveRF(city2, prevnode, sat, rn));
 						}
 						else
 						{
-							/* The previous node is ?... */
+							// NB. Not sure what this is either.
 							GameObject city = get_relay(previd);
 							sat.LinkOn(city);
 							used_rf_links.Add(new ActiveRF(city, prevnode, sat, rn));
 						}
 					}
-					else
+					else // the node is a city
 					{
-						/* It's a city */
 						sat = satlist[previd];
 						if (id == -1)
 						{
@@ -1403,6 +1431,7 @@ public class SP_basic_0031 : MonoBehaviour
 		elapsed_sum += elapsed;
 		elapsed_count++;
 
+		/* Add satellite beams if the link gets selected by the user. */
 		CreateSatBeams(satlist[startsatid], city1, satlist[endsatid], city2);
 
 		return ms;
@@ -1412,7 +1441,7 @@ public class SP_basic_0031 : MonoBehaviour
 	{
 		string s2 = name + "\nSat path RTTs: ";
 
-		float satrtt = Route(true, pathnum, city1, city2, name, rtt, actualdist); /* Creates a route */
+		float satrtt = Route(pathnum, city1, city2, name, rtt, actualdist); /* Creates a route */
 		if (pathnum != 0)
 		{
 			s2 += ", ";
@@ -1445,7 +1474,7 @@ public class SP_basic_0031 : MonoBehaviour
 		string s2 = name + "\nSat path RTTs: ";
 		for (int i = 0; i < numroutes; i++)
 		{ // for the number of routes, do this!!!!. I'm going to just do two different routes. 
-			float satrtt = Route(false, i, city1, city2, name, rtt, actualdist); /* Creates a route */
+			float satrtt = Route(i, city1, city2, name, rtt, actualdist); /* Creates a route */
 			if (i != 0)
 			{
 				s2 += ", ";
@@ -1701,41 +1730,15 @@ public class SP_basic_0031 : MonoBehaviour
 				break;
 
 			case RouteChoice.USsparseAttacked:
-				// TODO: must change to do multiple routes simultaneously.
-				// TODO: stop camera from changing position over time.
-
-				// TODO: should add this stuff somewhere else.
-				if (!cityStrings.ContainsKey(miami))
-				{
-					cityStrings.Add(miami, "Miami");
-				}
-				if (!cityStrings.ContainsKey(redmond))
-				{
-					cityStrings.Add(redmond, "Redmond");
-				}
-				if (!cityStrings.ContainsKey(new_york))
-				{
-					cityStrings.Add(new_york, "New York");
-				}
-				if (!cityStrings.ContainsKey(toronto))
-				{
-					cityStrings.Add(toronto, "Toronto");
-				}
-				if (!cityStrings.ContainsKey(chicago))
-				{
-					cityStrings.Add(chicago, "Chicago");
-				}
-
 				// parameters that don't matter: RTT, & actual dist. (last 2 arguments)
 
-
-
-				SingleRoute(0, chicago, redmond, "Chicago-Seattle (Malicious)", 78f, 3876f); // More malicious comms.
-				SingleRoute(1, miami, toronto, "Miami-Toronto (Malicious)", 78f, 3876f); // Malicious comms. TODO: what is the actual distance? How do I calculate that?
-				SingleRoute(2, new_york, redmond, "New York-Seattle", 78f, 3876f); // Real comms
-																				   // How did he determine the last 2 parameters?
-				SingleRoute(3, new_york, miami, "New York-Miami", 78f, 30f);
-
+				// TODO: for all the links, set the capacity to 0.
+				SingleRoute(0, chicago, redmond, "Chicago-Seattle", 78f, 3876f);
+				SingleRoute(1, miami, toronto, "Miami-Toronto", 78f, 3876f);
+				SingleRoute(2, new_york, redmond, "New York-Seattle", 78f, 3876f);
+				// SingleRoute(3, new_york, redmond, "New York-Seattle", 78f, 3876f);
+				// SingleRoute(4, new_york, redmond, "New York-Seattle", 78f, 3876f);
+				// SingleRoute(3, new_york, miami, "New York-Miami", 78f, 30f);
 				break;
 
 
@@ -1778,6 +1781,7 @@ public class SP_basic_0031 : MonoBehaviour
 		used_rf_links.ForEach(a => a.sat.LinkOn(a.city));
 
 		UpdateLasers();
+		// TODO: OR.. reset the capacity here.
 
 		framecount++;
 	}
