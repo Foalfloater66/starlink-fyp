@@ -10,11 +10,6 @@ public class Link
 	float dist; // length of link
 	bool dist_limited;  // RF links have a distance limit, lasers do not
 
-	// TODO: change the maximum packet capacity of the link. Make it variable
-	uint max_capacity = 10; // Maximum packet capacity of the link. 
-
-	uint curr_load = 0; // Current packet load on the link.
-
 	public Link(Node n1, Node n2, bool dist_limited_)
 	{
 		nodes = new Node[2];
@@ -64,27 +59,6 @@ public class Link
 		}
 	}
 
-	public void resetLoad()
-	{
-		this.curr_load = 0;
-	}
-
-	/* Add a load of <packet_count> packets to the link.
-	If <curr_load> exceeds the <max_capacity>, no packets more packets can be sent over this link. */
-	public void increaseLoad(uint packet_count)
-	{
-		if (this.IsFlooded())
-		{
-			this.curr_load += packet_count;
-		}
-	}
-
-	/* Check if the number of incoming packets exceeds the link capacity.
-	If <curr_load> exceeds the <max_capacity>, no packets more packets can be sent over this link. */
-	public bool IsFlooded()
-	{
-		return (this.curr_load > this.max_capacity);
-	}
 }
 
 public class Node

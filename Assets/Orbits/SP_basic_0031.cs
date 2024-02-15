@@ -71,6 +71,10 @@ public class SP_basic_0031 : MonoBehaviour
 
 	private Dictionary<int, List<int>> orbit2sats = new Dictionary<int, List<int>>(); /* Orbit ID mapping to satellite ID list. */
 
+	private Dictionary<string, int> linkCapacity = new Dictionary<string, int>(); /* (node1, node2) link mapping to capacity. Links are full duplex. */
+
+	public const int MAX_CAPACITY = 110;
+
 	GameObject[] orbits;
 	double[] orbitalperiod;
 	SatelliteSP0031[] satlist;
@@ -1225,18 +1229,14 @@ public class SP_basic_0031 : MonoBehaviour
 		if (reset_route)
 		{
 			float satmoveddist = Vector3.Distance(satlist[0].gameobject.transform.position, sat0pos);
-			BuildRouteGraph(rg, city1, city2, maxdist, margin);
 
 			if (route_init == false || satmoveddist * km_per_unit > margin || graph_on)
 			{
 				sat0pos = satlist[0].gameobject.transform.position; // What is the sat0pos variable?
 			}
 		}
-		else
-		{
-			PartiallyBuildRouteGraph(rg, city1, city2, maxdist, margin);
-		}
-		// BuildRouteGraph(rg, city1, city2, maxdist, margin);
+		BuildRouteGraph(rg, city1, city2, maxdist, margin);
+
 
 
 		rg.ResetOnPathStatus(); // TODO: remove this as well
@@ -1355,18 +1355,18 @@ public class SP_basic_0031 : MonoBehaviour
 					sat = satlist[id];
 					prevsat = satlist[previd];
 
-					// Node curr_node = rg.GetNode(previd);
-					// Link link = prevnode.GetLinkByNeighbour(id);
-					// Debug.Assert(link != null);
-					// link.increaseLoad(5);
+					// Increase the load of the link
+					string linkName = previd.ToString() + "-" + id.ToString();
+					if (!linkCapacity.ContainsKey(linkName))
+					{
+						linkCapacity.Add(linkName, 0);
+					}
+					linkCapacity[linkName] += 100; // Add 100 mbits
 
-					// if (link.IsFlooded())
-					// {
-					// basically means, we can't continue further.
-					// TODO: color the link in another color.
-					// break;
-					// TODO: there is a bug. I need to think about this deeper.
-					// }
+					if (linkCapacity[linkName] >= MAX_CAPACITY) // Link is flooded.
+					{
+						break;
+					}
 
 					int pathcolour = pathnum;
 					if (pathcolour >= laserMaterials.Length)
@@ -1659,6 +1659,7 @@ public class SP_basic_0031 : MonoBehaviour
 	void Update()
 	{
 		elapsed_time = last_elapsed_time + (Time.time - last_speed_change) * speed;
+		linkCapacity.Clear();
 
 		if (Input.GetKeyDown("space") || Input.GetKeyDown("."))
 		{
