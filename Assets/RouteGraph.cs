@@ -88,6 +88,25 @@ public class RouteGraph
 		return null;
 	}
 
+	// public Link GetLink(int satid1, int satid2)
+	// {
+	// 	// TODO: is this actually of any use.
+	// 	Node node1 = this.GetNode(satid1);
+	// 	Node node2 = this.GetNode(satid2);
+
+	// 	for (int index = 0; index < _links.length; index += 1)
+	// 	{
+	// 		// this is kind of a rudimentary way of doing so. Probably, what'd be better is to have some sort of hash table.
+	// 		if (_links[index].OtherNode(this).Id == id)
+	// 		{
+	// 			return _links[index];
+	// 		}
+	// 	}
+	// 	return None; // If there aren't any nodes.
+	// }
+
+
+
 	// only call AddEndNodes after you've added all the satellites
 	public void AddEndNodes()
 	{
@@ -144,6 +163,7 @@ public class RouteGraph
 
 	public void ResetOnPathStatus()
 	{
+		// TODO: am I still using this?
 		for (int i = 0; i < nodecount; i++)
 		{
 			nodes[i].OnPath = false;

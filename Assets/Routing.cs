@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 
 
@@ -8,6 +9,7 @@ public class Link
 	Node[] nodes;
 	float dist; // length of link
 	bool dist_limited;  // RF links have a distance limit, lasers do not
+
 	public Link(Node n1, Node n2, bool dist_limited_)
 	{
 		nodes = new Node[2];
@@ -56,6 +58,7 @@ public class Link
 			dist = Node.INFINITY; // unreachable
 		}
 	}
+
 }
 
 public class Node
@@ -69,10 +72,12 @@ public class Node
 	public int _orbit = -5; // TODO: make this private. Was it always public?
 	float _dist = INFINITY; // distance from src.
 	Node _parent_node;  // predecessor on path from src
-						//bool _done = false;
+
+	private Dictionary<int, Link> _neighbours = new Dictionary<int, Link>(); // all node neighbours and their respective links.
+
 	public int QueuePosition;
 
-	bool _on_path = false; /* Determines if the node is on the selected path. */
+	bool _on_path = false; /* Determines if the node is on the selected path. */ // TODO: is this even used?
 
 	public Node(int id, Vector3 pos)
 	{
@@ -209,6 +214,7 @@ public class Node
 		Link l = new Link(this, node, dist_limited);
 		AddLink(l);
 		node.AddLink(l);
+		// _neighbours.Add(node.Id, l);
 	}
 
 	public void AddNeighbour(Node node, float dist, bool dist_limited)
@@ -228,12 +234,27 @@ public class Node
 		Link l = new Link(this, node, dist, dist_limited); /* create a link object with the distance data. */
 		AddLink(l); /* add the link to our node */
 		node.AddLink(l); /* add the link to the desired neighbour */
+		// _neighbours.Add(node.Id, l);
 	}
 
 	public Node GetNeighbour(Link l)
 	{
 		Node n = l.OtherNode(this);
 		return n;
+	}
+
+	public Link GetLinkByNeighbour(int id)
+	{
+		// return _neighbours[satid];
+		for (int i = 0; i < _linkcount; i++)
+		{
+			if (_links[i].OtherNode(this).Id == id)
+			{
+				// this is the correct neighbour
+				return _links[i];
+			}
+		}
+		return null;
 	}
 
 	public Link GetLink(int index)
