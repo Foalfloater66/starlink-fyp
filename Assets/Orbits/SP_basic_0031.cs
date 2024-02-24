@@ -7,9 +7,6 @@ using System;
 using System.Text;
 using UnityEngine.SceneManagement;
 
-// remove later
-// using System.Diagnostics;
-
 public enum RouteChoice { TransAt, TransPac, LonJob, USsparse, USsparseAttacked, USdense, TorMia, Sydney_SFO, Sydney_Tokyo, Sydney_Lima, Followsat };
 public enum LogChoice { None, RTT, Distance, HopDists, LaserDists, Path };
 
@@ -59,9 +56,16 @@ public class SP_basic_0031 : MonoBehaviour
 	public float direction = 1f;
 	[HideInInspector]
 	public float directionChangeSpeed = 2f;
+
+	/* Latitude and longitude of the center of the attacker's target sphere */
+	public float target_latitude = 40.7128f; // new york as a default value;
+
+	public float target_longitude = 74.0060f; // new york as a default value.
 	const double earthperiod = 86400f;
 
 	public GameObject orbit;
+
+	private AreaAttacker _attacker;
 	public GameObject satellite;
 	public GameObject laser;
 	public GameObject thin_laser;
@@ -353,6 +357,8 @@ public class SP_basic_0031 : MonoBehaviour
 		//km_per_unit2 = (12756f / 2) / earthradius;
 		//Debug.Log("km_per_unit: " + km_per_unit.ToString() + " km_per_unit2: " + km_per_unit2.ToString());
 
+		// for now, only allows for Radius Attacks
+		this._attacker = new AreaAttacker(target_latitude, target_longitude, city_prefab, transform, this.summary_logfile);
 	}
 
 	void InitCities()
@@ -1022,7 +1028,6 @@ public class SP_basic_0031 : MonoBehaviour
 		}
 	}
 
-
 	void PartiallyBuildRouteGraph(RouteGraph rgph, GameObject city1, GameObject city2, float maxdist, float margin)
 	{
 		/* Done for route creation. */
@@ -1092,6 +1097,83 @@ public class SP_basic_0031 : MonoBehaviour
 			// }
 		}
 	}
+
+	void BuildSatelliteRouteGraph(RouteGraph rgph)
+	{
+		/* Done for route creation. */
+
+		/* This function builds the route graph. Although I have no idea why it's here and not in the RouteGraph function itself. I suppose it's because the routegraph can't perform this operation on itself. But I'm not a massive fan of this design to be perfectly honest. */
+		for (int satnum = 0; satnum < maxsats; satnum++)
+		{
+			// I'm going to pass the satellite orbit information to the RouteGraph. So that it can encapsulate it properly. Makes log reading much easier.
+
+
+			for (int i = 0; i < satlist[satnum].assignedcount; i++)
+			{
+				rgph.AddNeighbour(satnum, satlist[satnum].assignedsats[i].satid, false);
+			}
+
+			// Add start city
+			// float radiodist = Vector3.Distance(satlist[satnum].gameobject.transform.position,
+			// city1.transform.position);
+			// THIS is why there's only one routegraph. or at least I think this is why.
+			// if (radiodist * km_per_unit < maxdist)
+			// {
+			/* I THINK this takes the groundstation, if the radio distance * km per unit is smaller than the maximum distance,
+			then one can add a satellite neighbour to it. */
+			/* create a link between maxsats and satnum of distance radiodist */
+			// rgph.AddNeighbour(maxsats, satnum, radiodist, true);
+			// }
+			// else if (radiodist * km_per_unit < maxdist + margin)
+			// {
+			// rgph.AddNeighbour(maxsats, satnum, Node.INFINITY, true);
+			// }
+
+			// Add end city
+			// radiodist = Vector3.Distance(satlist[satnum].gameobject.transform.position,
+			// 	city2.transform.position);
+			// if (radiodist * km_per_unit < maxdist)
+			// {
+			// 	rgph.AddNeighbour(maxsats + 1, satnum, radiodist, true);
+			// }
+			// else if (radiodist * km_per_unit < maxdist + margin)
+			// {
+			// 	rgph.AddNeighbour(maxsats + 1, satnum, Node.INFINITY, true);
+			// }
+
+			// Add relays
+			if (graph_on)
+			{
+				satlist[satnum].GraphReset();
+			}
+
+			// List<List<City>> in_range = grid.FindInRange(satlist[satnum].gameobject.transform.position);
+			// foreach (List<City> lst in in_range)
+			// {
+			// 	foreach (City relay in lst)
+			// 	{
+			// 		radiodist = Vector3.Distance(satlist[satnum].gameobject.transform.position, relay.gameobject.transform.position);
+			// 		if (radiodist * km_per_unit < maxdist)
+			// 		{
+			// 			rgph.AddNeighbour(maxsats + 2 + relay.relayid, satnum, radiodist, true);
+			// 			if (graph_on)
+			// 			{
+			// 				satlist[satnum].GraphOn(relay.gameobject, null);
+			// 			}
+			// 		}
+			// 		else if (radiodist * km_per_unit < maxdist + margin)
+			// 		{
+			// 			rgph.AddNeighbour(maxsats + 2 + relay.relayid, satnum, Node.INFINITY, true);
+			// 		}
+			// 	}
+			// }
+			if (graph_on)
+			{
+				satlist[satnum].GraphDone();
+			}
+		}
+	}
+
 	void BuildRouteGraph(RouteGraph rgph, GameObject city1, GameObject city2, float maxdist, float margin)
 	{
 		/* Done for route creation. */
@@ -1541,8 +1623,8 @@ public class SP_basic_0031 : MonoBehaviour
 
 
 		/* Print this data into the summary logfile */
-		summary_logfile.WriteLine(log_filename_counter.ToString("D4") + string.Format("_{0}_{1}", cityString1, cityString2) + ":" + (success ? " success " : " fail ") + ": " + path_counter.ToString() + " path nodes. Path: " + path.ToString());
-		summary_logfile.Flush();
+		// summary_logfile.WriteLine(log_filename_counter.ToString("D4") + string.Format("_{0}_{1}", cityString1, cityString2) + ":" + (success ? " success " : " fail ") + ": " + path_counter.ToString() + " path nodes. Path: " + path.ToString());
+		// summary_logfile.Flush();
 
 		logfile.WriteLine(new String('=', 20));
 		logfile.Flush();
@@ -1655,9 +1737,18 @@ public class SP_basic_0031 : MonoBehaviour
 		return nearest_dist;
 	}
 
+
+	// void OnDrawGizmos() // DEBUGGED CODE. REMOVE THIS.
+	// {
+	// 	// Gizmos.color = Color.yellow;
+	// 	// Gizmos.DrawSphere(this._attacker.TargetAreaCenterpoint, 1300f);
+	// }
+
 	// Update is called once per frame
 	void Update()
 	{
+
+
 		elapsed_time = last_elapsed_time + (Time.time - last_speed_change) * speed;
 		linkCapacity.Clear();
 
@@ -1701,6 +1792,25 @@ public class SP_basic_0031 : MonoBehaviour
 		for (i = 0; i < maxorbits; i++)
 		{
 			orbits[i].transform.RotateAround(Vector3.zero, orbitaxes[i], (float)(-1f * earthperiod / orbitalperiod[i] * simspeed * direction) * Time.deltaTime);
+		}
+
+		// 1. get a set of groundstations.
+
+		// 2. identify a link to target.
+		Debug.Assert(this._attacker != null);
+		UnityEngine.Debug.DrawLine(Vector3.zero, this._attacker.TargetAreaCenterpoint, Color.yellow);
+		if (!this._attacker.HasValidVictimLink())
+		{
+			// BuildRouteGraph(this.rg, new_york, toronto, maxdist, margin); // TODO: remove the mentions of cities. Clearly that's not needed here. I need to remove the cities so that it doesn't include RF links as well.
+			// BuildSatelliteRouteGraph(this.rg); // honestly this should just be its own thing, but whatever. (at least for now)
+
+
+
+			(Node, Node) r = this._attacker.SwitchVictimLink(this.rg);
+			Debug.Assert(r != (null, null));
+
+			Debug.Log(this._attacker.VictimSrcNode.Id);
+			Debug.Log(this._attacker.VictimDestNode.Id);
 		}
 
 		/* 

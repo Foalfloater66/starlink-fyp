@@ -8,6 +8,7 @@ public class Link
 {
 	Node[] nodes;
 	float dist; // length of link
+	public float Dist { get; set; }
 	bool dist_limited;  // RF links have a distance limit, lasers do not
 
 	public Link(Node n1, Node n2, bool dist_limited_)
@@ -15,7 +16,7 @@ public class Link
 		nodes = new Node[2];
 		nodes[0] = n1;
 		nodes[1] = n2;
-		dist = Vector3.Distance(n1._position, n2._position);
+		Dist = Vector3.Distance(n1._position, n2._position);
 		dist_limited = dist_limited_;
 	}
 
@@ -24,7 +25,7 @@ public class Link
 		nodes = new Node[2];
 		nodes[0] = n1;
 		nodes[1] = n2;
-		dist = dist_;
+		Dist = dist_;
 		dist_limited = dist_limited_;
 	}
 
@@ -38,24 +39,12 @@ public class Link
 		return nodes[0];
 	}
 
-	public float Dist
-	{
-		get
-		{
-			return dist;
-		}
-		set
-		{
-			dist = value;
-		}
-	}
-
 	public void UpdateDist(float maxdist)
 	{
-		dist = Vector3.Distance(nodes[0]._position, nodes[1]._position);
-		if (dist_limited && dist > maxdist)
+		Dist = Vector3.Distance(nodes[0]._position, nodes[1]._position);
+		if (dist_limited && Dist > maxdist)
 		{
-			dist = Node.INFINITY; // unreachable
+			Dist = Node.INFINITY; // unreachable
 		}
 	}
 
@@ -136,6 +125,14 @@ public class Node
 		get
 		{
 			return _id;
+		}
+	}
+
+	public Vector3 Position
+	{
+		get
+		{
+			return _position;
 		}
 	}
 
