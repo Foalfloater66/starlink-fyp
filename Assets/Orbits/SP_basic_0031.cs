@@ -1278,9 +1278,9 @@ public class SP_basic_0031 : MonoBehaviour
 		* rn = RouteNode
 		*/
 
-		Debug.Log("Problem...");
+		// Debug.Log("Problem...");
 		StringBuilder sb = new StringBuilder(string.Format("{0} - {1}, ", cityStrings[city1], cityStrings[city2])); // logging.
-		Debug.Log("After the potential problem");
+																													// Debug.Log("After the potential problem");
 		bool success = false;
 		bool reset_route = false;
 
@@ -1740,11 +1740,11 @@ public class SP_basic_0031 : MonoBehaviour
 	}
 
 	// Only uncomment for debugging if I need to see the attack sphere.
-	// void OnDrawGizmos()
-	// {
-	// 	Gizmos.color = Color.yellow;
-	// 	Gizmos.DrawSphere(this._attacker.TargetAreaCenterpoint, this._attacker.Radius);
-	// }
+	void OnDrawGizmos()
+	{
+		Gizmos.color = Color.yellow;
+		Gizmos.DrawSphere(this._attacker.TargetAreaCenterpoint, this._attacker.Radius);
+	}
 
 	// Update is called once per frame
 	void Update()
@@ -1877,52 +1877,38 @@ public class SP_basic_0031 : MonoBehaviour
 
 		if (!pause) countdown.text = elapsed_time.ToString("0.0");
 		Route(1, new_york, san_francisco, "New York-San Francisco", 0f, 4689f); // road route
-																				//}
-																				// foreach (ActiveISL a in used_isl_links)
-																				// {
-																				// 	a.sat1.BeamOn();
-																				// 	a.sat2.BeamOn();
-																				// }
-																				// used_isl_links.ForEach(ActiveISL aa => a.sat1.Beam(); a.sat2.Beam());
 
-		this.rg = BuildRouteGraph(this.rg, new_york, toronto, this.maxdist, this.margin); // WOULD RATHER NOT HAVE NEW YORK & TORONTO HERE IF I DONT NEED IT
-		if (!this._attacker.HasValidVictimLink()) // this function might not work! the link isn't being updated ://
+		this.rg = BuildRouteGraph(this.rg, new_york, toronto, this.maxdist, this.margin); // TODO: WOULD RATHER NOT HAVE NEW YORK & TORONTO HERE IF I DONT NEED IT
+
+		if (!this._attacker.HasValidVictimLink())
 		{
-			// BuildRouteGraph(this.rg, new_york, toronto, maxdist, margin); // TODO: remove the mentions of cities. Clearly that's not needed here. I need to remove the cities so that it doesn't include RF links as well.
-			// BuildSatelliteRouteGraph(this.rg); // honestly this should just be its own thing, but whatever. (at least for now)
-
-
-
 			(Node, Node) r = this._attacker.SwitchVictimLink(this.rg);
 			if (r == (null, null))
 			{
-				Debug.Log("No link could be selected.");
+				Debug.Log("Update | Could not select a new link.");
 			}
 		}
 		else
 		{
-			Debug.Log("No need to select a new link."); // I need to highlight the link.
+			Debug.Log("Update | Previous link is still valid."); // I need to highlight the link.
 		}
 
 		if (this._attacker.HasValidVictimLink())
 		{
-			Debug.Log("Selected link: " + this._attacker.VictimSrcNode.Id + " - " + this._attacker.VictimDestNode.Id);
-			// Debug.Log(this._attacker.VictimDestNode.Id);
+			Debug.Log("Update | Selected link: " + this._attacker.VictimSrcNode.Id + " - " + this._attacker.VictimDestNode.Id);
+
 			int pathcolour = 3;
-			Node rn = this._attacker.VictimDestNode;
-			Node prevnode = this._attacker.VictimSrcNode;
+
 			SatelliteSP0031 sat = satlist[this._attacker.VictimDestNode.Id];
 			SatelliteSP0031 prevsat = satlist[this._attacker.VictimSrcNode.Id];
+
 			sat.ColourLink(prevsat, laserMaterials[pathcolour]); // TODO: check this.
 			prevsat.ColourLink(sat, laserMaterials[pathcolour]);
-			used_isl_links.Add(new ActiveISL(sat, rn, prevsat, prevnode));
-
-			Debug.Log("HasValidVictimLink: is this assigned? " + sat.IsAssigned(prevsat));
-
+			used_isl_links.Add(new ActiveISL(sat, this._attacker.VictimDestNode, prevsat, this._attacker.VictimSrcNode));
 		}
 		else
 		{
-			Debug.Log("HasValidVictimLink: We don't have any assignments, unfortunately.");
+			Debug.Log("Update | Could not find any valid links.");
 		}
 
 		/* Turn on RF links for each satellite pair found */

@@ -159,26 +159,21 @@ public class AreaAttacker : Attacker
         return false;
     }
 
-    /* randomly select a victim link within the target radius. If no target radius is specified, return a NoVictimError. If success, returns the victim link (src, dest) node. If failure, returns nothing. Failure may occur if no source node was found, or if the source node has no links.
-  */
-    public (Node, Node) SwitchVictimLink(RouteGraph rg)
+    private void SelectRandomSrcNode(RouteGraph rg)
     {
-        // TODO: clean this function.
-        int remaining_nodes;
-
         // Pick a random source node.
         Dictionary<int, Node> nodes = new Dictionary<int, Node>(); // index, node 
-        remaining_nodes = rg.nodes.Count();
+        int remaining_nodes = rg.nodes.Count();
         for (int i = 0; i < rg.nodes.Count(); i++) nodes.Add(i, rg.nodes[i]);
 
         while (remaining_nodes > 0)
         {
             int i = new System.Random().Next(rg.nodes.Count());
-
             Node node = nodes[i];
-
-            if (node == null) continue; // already seen.
-
+            if (node == null)
+            {
+                continue; // already seen.
+            }
             if (node.Id > 0 && this.InTargetArea(node.Position))
             {
                 this.VictimSrcNode = node;
@@ -187,52 +182,87 @@ public class AreaAttacker : Attacker
             nodes[i] = null;
             remaining_nodes -= 1;
         }
+        if (this.VictimSrcNode != null && this.VictimSrcNode.LinkCount == 0)
+        {
+            this.VictimSrcNode = null; // the source node has no links.
+        }
+    }
 
-        if (this.VictimSrcNode == null) return (null, null); // couldn't find a source node.
+    private Node SelectRandomOutOfTargetDestinationNode(RouteGraph rg)
+    {
+        Node node = null;
+        HashSet<int> explored_indexes = new HashSet<int>();
+        int j = 0;
 
-        if (this.VictimSrcNode.LinkCount == 0) return (null, null); // the source node has no links.
-
-        // Pick a random neighbour.
-        nodes.Clear();
-        remaining_nodes = this.VictimSrcNode.LinkCount;
-        for (int i = 0; i < this.VictimSrcNode.LinkCount; i++) nodes.Add(i, this.VictimSrcNode.GetNeighbour(this.VictimSrcNode.GetLink(i)));
-
-        while (remaining_nodes > 0)
+        while (j < this.VictimSrcNode.LinkCount)
         {
             int i = new System.Random().Next(this.VictimSrcNode.LinkCount);
+            if (explored_indexes.Contains(i))
+            {
+                continue;
+            }
+            node = this.VictimSrcNode.GetNeighbour(this.VictimSrcNode.GetLink(i));
+            if (node.Id > 0)
+            {
+                break;
+            }
+            explored_indexes.Add(i);
+            j++;
+        }
 
+        return (node != null && node.Id > 0 ? node : null); // only return valid destination nodes.
+    }
+
+    private Node SelectRandomInTargetDestinationNode(RouteGraph rg)
+    {
+
+        Dictionary<int, Node> nodes = new Dictionary<int, Node>(); // index, node 
+        int remaining_nodes = this.VictimSrcNode.LinkCount;
+
+        for (int i = 0; i < this.VictimSrcNode.LinkCount; i++) nodes.Add(i, this.VictimSrcNode.GetNeighbour(this.VictimSrcNode.GetLink(i)));
+
+        while (remaining_nodes > 0) // prioritise ISL links that are fully contained in the target radius.
+        {
+            int i = new System.Random().Next(this.VictimSrcNode.LinkCount);
             Node node = nodes[i];
-            if (node == null) continue;
-
+            if (node == null)
+            {
+                continue;
+            }
             if (node.Id > 0 && this.InTargetArea(node.Position))
             {
-                // select ISL links that are within range.
-                this.VictimDestNode = node;
-                break;
+                return node;
             }
             nodes[i] = null;
             remaining_nodes -= 1;
         }
+        return null;
+    }
 
-        if (this.VictimDestNode == null && this.VictimSrcNode.LinkCount > 0)
+    private void SelectRandomDestinationNode(RouteGraph rg)
+    {
+        this.VictimDestNode = this.SelectRandomInTargetDestinationNode(rg);
+        if (this.VictimDestNode == null)
         {
-            Node node = null;
+            this.VictimDestNode = this.SelectRandomOutOfTargetDestinationNode(rg); // select random link which is partially in the target radius
+        }
+    }
 
-            do
-            {
-                int i = new System.Random().Next(this.VictimSrcNode.LinkCount);
-                System.Diagnostics.Debug.Assert(i < this.VictimSrcNode.LinkCount, "SwitchVictimLink: The random destination node id is out of bounds.");
-
-                node = this.VictimSrcNode.GetNeighbour(this.VictimSrcNode.GetLink(i));
-                // this code is unsafe. It's assuming that the nodes could never only have RF nodes as neighbours. (if they do, the code will loop forever)
-
-            } while (node.Id < 0);
-
-            this.VictimDestNode = node;
+    /* randomly select a victim link within the target radius. If no target radius is specified, return a NoVictimError. If success, returns the victim link (src, dest) node. If failure, returns nothing. Failure may occur if no source node was found, or if the source node has no links.
+  */
+    public (Node, Node) SwitchVictimLink(RouteGraph rg)
+    {
+        this.SelectRandomSrcNode(rg);
+        if (this.VictimSrcNode == null)
+        {
+            return (null, null);
+        }
+        this.SelectRandomDestinationNode(rg);
+        if (this.VictimDestNode == null)
+        {
+            return (null, null);
         }
         return (this.VictimSrcNode, this.VictimDestNode);
     }
-
-
 }
 
