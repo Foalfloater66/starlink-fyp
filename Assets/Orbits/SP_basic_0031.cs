@@ -358,7 +358,7 @@ public class SP_basic_0031 : MonoBehaviour
 		//Debug.Log("km_per_unit: " + km_per_unit.ToString() + " km_per_unit2: " + km_per_unit2.ToString());
 
 		// for now, only allows for Radius Attacks
-		this._attacker = new AreaAttacker(target_latitude, target_longitude, city_prefab, transform, sat0r, this.summary_logfile, 500f);
+		this._attacker = new AreaAttacker(target_latitude, target_longitude, city_prefab, transform, sat0r, this.summary_logfile, 800f);
 	}
 
 	void InitCities()
@@ -1746,15 +1746,9 @@ public class SP_basic_0031 : MonoBehaviour
 		Gizmos.DrawSphere(this._attacker.TargetAreaCenterpoint, this._attacker.Radius);
 	}
 
-	// Update is called once per frame
-	void Update()
+	/* Process external input commands. If Update() is to be called once again, returns true. Otherwise, returns false. */
+	bool ProcessInput()
 	{
-		UnityEngine.Debug.Log("update attempt");
-
-
-		elapsed_time = last_elapsed_time + (Time.time - last_speed_change) * speed;
-		linkCapacity.Clear();
-
 		if (Input.GetKeyDown("space") || Input.GetKeyDown("."))
 		{
 			if (pause == false)
@@ -1774,14 +1768,18 @@ public class SP_basic_0031 : MonoBehaviour
 		if (Input.GetKeyDown("b") || Input.GetKeyDown(KeyCode.PageUp))
 		{
 			SceneManager.LoadScene(prevscene);
-			return;
+			return true;
 		}
 		if (Input.GetKeyDown("n") || Input.GetKeyDown(KeyCode.PageDown))
 		{
 			SceneManager.LoadScene(nextscene);
-			return;
+			return true;
 		}
+		return false;
+	}
 
+	void RotateCamera()
+	{
 		int i = 0;
 		if (direction < 1f)
 		{
@@ -1796,88 +1794,32 @@ public class SP_basic_0031 : MonoBehaviour
 		{
 			orbits[i].transform.RotateAround(Vector3.zero, orbitaxes[i], (float)(-1f * earthperiod / orbitalperiod[i] * simspeed * direction) * Time.deltaTime);
 		}
+	}
+
+	// Update is called once per frame
+	void Update()
+	{
+		UnityEngine.Debug.Log("update attempt");
+
+
+		elapsed_time = last_elapsed_time + (Time.time - last_speed_change) * speed;
+		linkCapacity.Clear();
+
+		bool skip_scene = this.ProcessInput();
+		if (skip_scene)
+		{
+			return;
+		}
+		this.RotateCamera();
+
+		Debug.Assert(this._attacker != null);
+
+		if (!pause) countdown.text = elapsed_time.ToString("0.0");
+		Route(1, new_york, san_francisco, "New York-San Francisco", 0f, 4689f); // example route
 
 		// 1. get a set of groundstations.
 
 		// 2. identify a link to target.
-		// Debug.Log("Checking if the attacker exists");
-		Debug.Assert(this._attacker != null);
-		// UnityEngine.Debug.DrawLine(Vector3.zero, this._attacker.TargetAreaCenterpoint, Color.yellow); // MORE DEBUGGING CODE
-
-		// BuildRouteGraph();
-
-
-
-		// TEMPORARILY REMOVED. BECAUSE THIS IS NOT IN MY FRAME OF WORK
-		/* 
-		* 0 - transatlantic
-		* 1 - london-joburg
-		* 2 - transpacific
-		* 3 - us, sparse
-		* 4 - us, dense
-		* 5 - us, sparse, attacked.
-		// */
-		// switch (route_choice)
-		// {
-		// 	case RouteChoice.TransAt:
-		// 		MultiRoute(no_of_paths, london, new_york, "London-New York", 76f, 5576f);
-		// 		break;
-
-		// 	case RouteChoice.LonJob:
-		// 		MultiRoute(no_of_paths, london, johannesburg, "London-Johannesburg", 164f, 9079.92f);
-		// 		break;
-
-		// 	case RouteChoice.TransPac:
-		// 		MultiRoute(no_of_paths, tokyo, chicago, "Chicago-Tokyo", 143f, 10159f);
-		// 		break;
-
-		// 	case RouteChoice.USdense:
-		// 	case RouteChoice.USsparse:
-		// 		MultiRoute(no_of_paths, new_york, redmond, "New York-Seattle", 78f, 3876f);
-		// 		break;
-
-		// 	case RouteChoice.USsparseAttacked:
-		// 		// parameters that don't matter: RTT, & actual dist. (last 2 arguments)
-
-		// 		// TODO: for all the links, set the capacity to 0.
-		// 		SingleRoute(0, chicago, redmond, "Chicago-Seattle", 78f, 3876f);
-		// 		SingleRoute(1, miami, toronto, "Miami-Toronto", 78f, 3876f);
-		// 		SingleRoute(2, new_york, redmond, "New York-Seattle", 78f, 3876f);
-		// 		// SingleRoute(3, new_york, redmond, "New York-Seattle", 78f, 3876f);
-		// 		// SingleRoute(4, new_york, redmond, "New York-Seattle", 78f, 3876f);
-		// 		// SingleRoute(3, new_york, miami, "New York-Miami", 78f, 30f);
-		// 		break;
-
-
-		// 	case RouteChoice.TorMia:
-		// 		MultiRoute(no_of_paths, toronto, miami, "Toronto-Miami", 41f, 1985f);
-		// 		break;
-
-		// 	case RouteChoice.Sydney_SFO:
-		// 		MultiRoute(no_of_paths, sydney, san_francisco, "Sydney-San Francisco", 151f, 11940f);
-		// 		break;
-
-		// 	case RouteChoice.Sydney_Tokyo:
-		// 		MultiRoute(no_of_paths, sydney, tokyo, "Sydney-Tokyo", 0f, 0f);
-		// 		break;
-
-		// 	case RouteChoice.Sydney_Lima:
-		// 		MultiRoute(no_of_paths, sydney, lima, "Sydney-lima", 0f, 0f);
-		// 		break;
-
-		// 	case RouteChoice.Followsat:
-		// 		// no actual routing, just show the lasers of one satellite
-		// 		float dist = FindNearest(followsat_id, elapsed_time);
-		// 		if (log_choice == LogChoice.Distance)
-		// 		{
-		// 			logfile.WriteLine(elapsed_time.ToString() + " " + dist.ToString());
-		// 		}
-		// 		break;
-		// }
-
-		if (!pause) countdown.text = elapsed_time.ToString("0.0");
-		Route(1, new_york, san_francisco, "New York-San Francisco", 0f, 4689f); // road route
-
 		this.rg = BuildRouteGraph(this.rg, new_york, toronto, this.maxdist, this.margin); // TODO: WOULD RATHER NOT HAVE NEW YORK & TORONTO HERE IF I DONT NEED IT
 
 		if (!this._attacker.HasValidVictimLink())
