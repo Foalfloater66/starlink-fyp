@@ -56,9 +56,6 @@ abstract public class Attacker
 
         this.VictimSrcNode = src_node;
         this.VictimDestNode = dest_node;
-
-        bool src_updated = false;
-        bool dest_updated = false;
     }
 
 }
@@ -82,53 +79,58 @@ public class AreaAttacker : Attacker
 
     public Vector3 TargetAreaCenterpoint { get; private set; }
 
+    public float Radius { get; private set; }
+
     public System.IO.StreamWriter summary_logfile;
 
     /* instantiates the attacker object with a requested victim radius of specified latitude and longitude. */
-    public AreaAttacker(float latitude, float longitude, GameObject prefab, Transform transform /* try and make these last 2 vars optional as they seem kind of weird to add here as variables */, System.IO.StreamWriter summary_logfile)
+    public AreaAttacker(float latitude, float longitude, GameObject prefab, Transform transform /* try and make these last 2 vars optional as they seem kind of weird to add here as variables */, float sat0r /* satellite radius from earth centre */, System.IO.StreamWriter summary_logfile, float radius)
     {
         this.SourceGroundstations = new List<GameObject>();
         this.TargetAreaCenterpoint = Vector3.zero;
-        this.SetVictimRadius(latitude, longitude, prefab, transform);
+        this.Radius = radius;
+        this.SetVictimRadius(latitude, longitude, sat0r, prefab, transform);
         this.summary_logfile = summary_logfile;
         System.Diagnostics.Debug.Assert(this.TargetAreaCenterpoint != null);
     }
 
-
-    /* select a specified centerpoint for the target sphere. If latitude and longitude are not specified, generates them randomly. */
-    private void SetVictimRadius(float latitude, float longitude, GameObject prefab, Transform transform)
+    /* select a specified centerpoint for the target sphere. If latitude and longitude are 0, generates them randomly. WELL ACTUALLY I CANT DO THAT AND I HAVE TO CHANGE THIS :(*/
+    private void SetVictimRadius(float latitude, float longitude, float altitude, GameObject prefab, Transform transform)
     {
-        if (latitude == null)
+        if (latitude == 0)
         {
             latitude = (float)new System.Random().NextDouble() * 180f - 90f; // between -90f and 90f. NEEDS TESTING.
         }
-        if (longitude == null)
+        if (longitude == 0)
         {
             longitude = (float)new System.Random().NextDouble() * 360f - 180f; // between -180f and 180f. NEEDS TESTING.
         }
 
+        // UnityEngine.Debug.Log("Are the latitude and longitude correct?");
         System.Diagnostics.Debug.Assert(latitude > -90 && latitude < 90);
-        System.Diagnostics.Debug.Assert(longitude > -180 && latitude < 180);
+        System.Diagnostics.Debug.Assert(longitude > -180 && longitude < 180);
 
-        // convert from lat, long to Vector3 representation.
-        GameObject target = GameObject.Instantiate(prefab /* don't know if I need to add a prefab here. I'd rather not */ , new Vector3(0f, 0f, /*-6382.2f*/-6371.0f), transform.rotation);
+        // convert from lat, long, and altitude to Vector3 representation.
+        /*
+        float latRad = latitude * Mathf.Deg2Rad;
+        float longRad = longitude * Mathf.Deg2Rad;
+        float x = altitude * Mathf.Sin(latRad) * Mathf.Cos(longRad);
+        float y = altitude * Mathf.Sin(latRad) * Mathf.Sin(longRad);
+        float z = altitude * Mathf.Cos(latRad);
+*/
+
+
+
+        // GameObject target = GameObject.Instantiate(prefab /* don't know if I need to add a prefab here. I'd rather not */ , new Vector3(x, y, /*-6382.2f*/z), transform.rotation);
+
+        GameObject target = GameObject.Instantiate(prefab, new Vector3(0f, 0f, /*-6382.2f*/-6371.0f - 550f /* TODO: change this distance as well */ ), transform.rotation);
         float long_offset = 20f;
         target.transform.RotateAround(Vector3.zero, Vector3.up, longitude - long_offset);
         Vector3 lat_axis = Quaternion.Euler(0f, -90f, 0f) * target.transform.position;
         target.transform.RotateAround(Vector3.zero, lat_axis, latitude);
         target.transform.SetParent(transform, false);
 
-        // test
-        // CityScript cs = (CityScript)target.GetComponent(typeof(CityScript));
-        // cs.longitude = longitude;
-        // cs.latitude = latitude;
-
         this.TargetAreaCenterpoint = target.transform.position;
-
-        // draw the sphere for testing
-        // UnityEngine.Debug.DrawLine(Vector3.zero, target.transform.position, Color.yellow);
-        // Gizmos.color = Color.yellow;
-        // Gizmos.DrawSphere(target.transform.position, 1000f);
     }
 
 
@@ -142,12 +144,12 @@ public class AreaAttacker : Attacker
         summary_logfile.WriteLine("DISTANCE BETWEEN THE TWO: " + Vector3.Distance(position, this.TargetAreaCenterpoint));
         summary_logfile.Flush();
 
-        return (Vector3.Distance(position, this.TargetAreaCenterpoint) < 1300f /* temporary radius */);
+        return (Vector3.Distance(position, this.TargetAreaCenterpoint) < this.Radius /* temporary radius */);
     }
 
 
     /* Check if the currently selected victim link is still within the target area. Returns true if at least one node is in the target area,
-    false otherwise. If the victim link hasn't been set, returns false. */ // UNTESTED
+    false otherwise. If the victim link hasn't been set, returns false. */
     public bool HasValidVictimLink()
     {
         if (this.VictimSrcNode != null && this.VictimDestNode != null)
@@ -157,47 +159,76 @@ public class AreaAttacker : Attacker
         return false;
     }
 
-    /* randomly select a victim link within the target radius. If no target radius is specified, return a NoVictimError. If success, returns the victim link (src, dest) node. If failure, returns nothing.
-  */ // UNTESTED.
+    /* randomly select a victim link within the target radius. If no target radius is specified, return a NoVictimError. If success, returns the victim link (src, dest) node. If failure, returns nothing. Failure may occur if no source node was found, or if the source node has no links.
+  */
     public (Node, Node) SwitchVictimLink(RouteGraph rg)
     {
-        UnityEngine.Debug.Log("I got here 1.");
-        foreach (Node node in rg.nodes)
+        // TODO: clean this function.
+        int remaining_nodes;
+
+        // Pick a random source node.
+        Dictionary<int, Node> nodes = new Dictionary<int, Node>(); // index, node 
+        remaining_nodes = rg.nodes.Count();
+        for (int i = 0; i < rg.nodes.Count(); i++) nodes.Add(i, rg.nodes[i]);
+
+        while (remaining_nodes > 0)
         {
-            if (this.InTargetArea(node.Position))
+            int i = new System.Random().Next(rg.nodes.Count());
+
+            Node node = nodes[i];
+
+            if (node == null) continue; // already seen.
+
+            if (node.Id > 0 && this.InTargetArea(node.Position))
             {
                 this.VictimSrcNode = node;
                 break;
             }
+            nodes[i] = null;
+            remaining_nodes -= 1;
         }
 
-        UnityEngine.Debug.Log("I got here 2.");
+        if (this.VictimSrcNode == null) return (null, null); // couldn't find a source node.
 
-        if (this.VictimSrcNode == null)
+        if (this.VictimSrcNode.LinkCount == 0) return (null, null); // the source node has no links.
+
+        // Pick a random neighbour.
+        nodes.Clear();
+        remaining_nodes = this.VictimSrcNode.LinkCount;
+        for (int i = 0; i < this.VictimSrcNode.LinkCount; i++) nodes.Add(i, this.VictimSrcNode.GetNeighbour(this.VictimSrcNode.GetLink(i)));
+
+        while (remaining_nodes > 0)
         {
-            UnityEngine.Debug.Log("It's not working :()");
-            return (null, null);
-        }
+            int i = new System.Random().Next(this.VictimSrcNode.LinkCount);
 
-        UnityEngine.Debug.Log("I got here 2.1");
+            Node node = nodes[i];
+            if (node == null) continue;
 
-        for (int i = 0; i < this.VictimSrcNode.LinkCount; i++)
-        {
-            UnityEngine.Debug.Log("Am I able to read the neighbours?");
-            Node node = this.VictimSrcNode.GetNeighbour(this.VictimSrcNode.GetLink(i));
-            UnityEngine.Debug.Log("Looks like I am.");
-            if (this.InTargetArea(node.Position))
+            if (node.Id > 0 && this.InTargetArea(node.Position))
             {
+                // select ISL links that are within range.
                 this.VictimDestNode = node;
                 break;
             }
+            nodes[i] = null;
+            remaining_nodes -= 1;
         }
 
-        UnityEngine.Debug.Log("I got here 3.");
-
-        if (this.VictimDestNode == null)
+        if (this.VictimDestNode == null && this.VictimSrcNode.LinkCount > 0)
         {
-            this.VictimDestNode = this.VictimSrcNode.GetNeighbour(this.VictimSrcNode.GetLink(new System.Random().Next()));
+            Node node = null;
+
+            do
+            {
+                int i = new System.Random().Next(this.VictimSrcNode.LinkCount);
+                System.Diagnostics.Debug.Assert(i < this.VictimSrcNode.LinkCount, "SwitchVictimLink: The random destination node id is out of bounds.");
+
+                node = this.VictimSrcNode.GetNeighbour(this.VictimSrcNode.GetLink(i));
+                // this code is unsafe. It's assuming that the nodes could never only have RF nodes as neighbours. (if they do, the code will loop forever)
+
+            } while (node.Id < 0);
+
+            this.VictimDestNode = node;
         }
         return (this.VictimSrcNode, this.VictimDestNode);
     }

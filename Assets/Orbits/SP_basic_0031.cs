@@ -58,9 +58,9 @@ public class SP_basic_0031 : MonoBehaviour
 	public float directionChangeSpeed = 2f;
 
 	/* Latitude and longitude of the center of the attacker's target sphere */
-	public float target_latitude = 40.7128f; // new york as a default value;
+	public float target_latitude = 1.290270f; // new york as a default value;
 
-	public float target_longitude = 74.0060f; // new york as a default value.
+	public float target_longitude = -103.851959f; // new york as a default value.
 	const double earthperiod = 86400f;
 
 	public GameObject orbit;
@@ -358,7 +358,7 @@ public class SP_basic_0031 : MonoBehaviour
 		//Debug.Log("km_per_unit: " + km_per_unit.ToString() + " km_per_unit2: " + km_per_unit2.ToString());
 
 		// for now, only allows for Radius Attacks
-		this._attacker = new AreaAttacker(target_latitude, target_longitude, city_prefab, transform, this.summary_logfile);
+		this._attacker = new AreaAttacker(target_latitude, target_longitude, city_prefab, transform, sat0r, this.summary_logfile, 500f);
 	}
 
 	void InitCities()
@@ -1174,8 +1174,9 @@ public class SP_basic_0031 : MonoBehaviour
 		}
 	}
 
-	void BuildRouteGraph(RouteGraph rgph, GameObject city1, GameObject city2, float maxdist, float margin)
+	RouteGraph BuildRouteGraph(RouteGraph rgph, GameObject city1, GameObject city2, float maxdist, float margin)
 	{
+		// TODO: create a routegraph function that DOES NOT include cities!
 		/* Done for route creation. */
 
 		/* This function builds the route graph. Although I have no idea why it's here and not in the RouteGraph function itself. I suppose it's because the routegraph can't perform this operation on itself. But I'm not a massive fan of this design to be perfectly honest. */
@@ -1248,6 +1249,7 @@ public class SP_basic_0031 : MonoBehaviour
 				satlist[satnum].GraphDone();
 			}
 		}
+		return rgph;
 	}
 
 	void highlight_reachable()
@@ -1457,7 +1459,7 @@ public class SP_basic_0031 : MonoBehaviour
 					}
 					sat.ColourLink(prevsat, laserMaterials[pathcolour]); // TODO: check this.
 					prevsat.ColourLink(sat, laserMaterials[pathcolour]);
-					used_isl_links.Add(new ActiveISL(sat, rn, prevsat, prevnode));
+					used_isl_links.Add(new ActiveISL(sat, rn, prevsat, prevnode)); // TODO: remove this afterwards.
 				}
 				else // It's an RF (radio frequency) link
 				{
@@ -1547,7 +1549,7 @@ public class SP_basic_0031 : MonoBehaviour
 		/* Writes to UI text */
 		// txt.text = s2;
 		/* Writes to console */
-		Debug.Log(s2);
+		// Debug.Log(s2);
 
 	}
 
@@ -1737,16 +1739,17 @@ public class SP_basic_0031 : MonoBehaviour
 		return nearest_dist;
 	}
 
-
-	// void OnDrawGizmos() // DEBUGGED CODE. REMOVE THIS.
+	// Only uncomment for debugging if I need to see the attack sphere.
+	// void OnDrawGizmos()
 	// {
-	// 	// Gizmos.color = Color.yellow;
-	// 	// Gizmos.DrawSphere(this._attacker.TargetAreaCenterpoint, 1300f);
+	// 	Gizmos.color = Color.yellow;
+	// 	Gizmos.DrawSphere(this._attacker.TargetAreaCenterpoint, this._attacker.Radius);
 	// }
 
 	// Update is called once per frame
 	void Update()
 	{
+		UnityEngine.Debug.Log("update attempt");
 
 
 		elapsed_time = last_elapsed_time + (Time.time - last_speed_change) * speed;
@@ -1797,22 +1800,15 @@ public class SP_basic_0031 : MonoBehaviour
 		// 1. get a set of groundstations.
 
 		// 2. identify a link to target.
+		// Debug.Log("Checking if the attacker exists");
 		Debug.Assert(this._attacker != null);
-		UnityEngine.Debug.DrawLine(Vector3.zero, this._attacker.TargetAreaCenterpoint, Color.yellow);
-		if (!this._attacker.HasValidVictimLink())
-		{
-			// BuildRouteGraph(this.rg, new_york, toronto, maxdist, margin); // TODO: remove the mentions of cities. Clearly that's not needed here. I need to remove the cities so that it doesn't include RF links as well.
-			// BuildSatelliteRouteGraph(this.rg); // honestly this should just be its own thing, but whatever. (at least for now)
+		// UnityEngine.Debug.DrawLine(Vector3.zero, this._attacker.TargetAreaCenterpoint, Color.yellow); // MORE DEBUGGING CODE
+
+		// BuildRouteGraph();
 
 
 
-			(Node, Node) r = this._attacker.SwitchVictimLink(this.rg);
-			Debug.Assert(r != (null, null));
-
-			Debug.Log(this._attacker.VictimSrcNode.Id);
-			Debug.Log(this._attacker.VictimDestNode.Id);
-		}
-
+		// TEMPORARILY REMOVED. BECAUSE THIS IS NOT IN MY FRAME OF WORK
 		/* 
 		* 0 - transatlantic
 		* 1 - london-joburg
@@ -1820,73 +1816,114 @@ public class SP_basic_0031 : MonoBehaviour
 		* 3 - us, sparse
 		* 4 - us, dense
 		* 5 - us, sparse, attacked.
-		*/
-		switch (route_choice)
-		{
-			case RouteChoice.TransAt:
-				MultiRoute(no_of_paths, london, new_york, "London-New York", 76f, 5576f);
-				break;
+		// */
+		// switch (route_choice)
+		// {
+		// 	case RouteChoice.TransAt:
+		// 		MultiRoute(no_of_paths, london, new_york, "London-New York", 76f, 5576f);
+		// 		break;
 
-			case RouteChoice.LonJob:
-				MultiRoute(no_of_paths, london, johannesburg, "London-Johannesburg", 164f, 9079.92f);
-				break;
+		// 	case RouteChoice.LonJob:
+		// 		MultiRoute(no_of_paths, london, johannesburg, "London-Johannesburg", 164f, 9079.92f);
+		// 		break;
 
-			case RouteChoice.TransPac:
-				MultiRoute(no_of_paths, tokyo, chicago, "Chicago-Tokyo", 143f, 10159f);
-				break;
+		// 	case RouteChoice.TransPac:
+		// 		MultiRoute(no_of_paths, tokyo, chicago, "Chicago-Tokyo", 143f, 10159f);
+		// 		break;
 
-			case RouteChoice.USdense:
-			case RouteChoice.USsparse:
-				MultiRoute(no_of_paths, new_york, redmond, "New York-Seattle", 78f, 3876f);
-				break;
+		// 	case RouteChoice.USdense:
+		// 	case RouteChoice.USsparse:
+		// 		MultiRoute(no_of_paths, new_york, redmond, "New York-Seattle", 78f, 3876f);
+		// 		break;
 
-			case RouteChoice.USsparseAttacked:
-				// parameters that don't matter: RTT, & actual dist. (last 2 arguments)
+		// 	case RouteChoice.USsparseAttacked:
+		// 		// parameters that don't matter: RTT, & actual dist. (last 2 arguments)
 
-				// TODO: for all the links, set the capacity to 0.
-				SingleRoute(0, chicago, redmond, "Chicago-Seattle", 78f, 3876f);
-				SingleRoute(1, miami, toronto, "Miami-Toronto", 78f, 3876f);
-				SingleRoute(2, new_york, redmond, "New York-Seattle", 78f, 3876f);
-				// SingleRoute(3, new_york, redmond, "New York-Seattle", 78f, 3876f);
-				// SingleRoute(4, new_york, redmond, "New York-Seattle", 78f, 3876f);
-				// SingleRoute(3, new_york, miami, "New York-Miami", 78f, 30f);
-				break;
+		// 		// TODO: for all the links, set the capacity to 0.
+		// 		SingleRoute(0, chicago, redmond, "Chicago-Seattle", 78f, 3876f);
+		// 		SingleRoute(1, miami, toronto, "Miami-Toronto", 78f, 3876f);
+		// 		SingleRoute(2, new_york, redmond, "New York-Seattle", 78f, 3876f);
+		// 		// SingleRoute(3, new_york, redmond, "New York-Seattle", 78f, 3876f);
+		// 		// SingleRoute(4, new_york, redmond, "New York-Seattle", 78f, 3876f);
+		// 		// SingleRoute(3, new_york, miami, "New York-Miami", 78f, 30f);
+		// 		break;
 
 
-			case RouteChoice.TorMia:
-				MultiRoute(no_of_paths, toronto, miami, "Toronto-Miami", 41f, 1985f);
-				break;
+		// 	case RouteChoice.TorMia:
+		// 		MultiRoute(no_of_paths, toronto, miami, "Toronto-Miami", 41f, 1985f);
+		// 		break;
 
-			case RouteChoice.Sydney_SFO:
-				MultiRoute(no_of_paths, sydney, san_francisco, "Sydney-San Francisco", 151f, 11940f);
-				break;
+		// 	case RouteChoice.Sydney_SFO:
+		// 		MultiRoute(no_of_paths, sydney, san_francisco, "Sydney-San Francisco", 151f, 11940f);
+		// 		break;
 
-			case RouteChoice.Sydney_Tokyo:
-				MultiRoute(no_of_paths, sydney, tokyo, "Sydney-Tokyo", 0f, 0f);
-				break;
+		// 	case RouteChoice.Sydney_Tokyo:
+		// 		MultiRoute(no_of_paths, sydney, tokyo, "Sydney-Tokyo", 0f, 0f);
+		// 		break;
 
-			case RouteChoice.Sydney_Lima:
-				MultiRoute(no_of_paths, sydney, lima, "Sydney-lima", 0f, 0f);
-				break;
+		// 	case RouteChoice.Sydney_Lima:
+		// 		MultiRoute(no_of_paths, sydney, lima, "Sydney-lima", 0f, 0f);
+		// 		break;
 
-			case RouteChoice.Followsat:
-				// no actual routing, just show the lasers of one satellite
-				float dist = FindNearest(followsat_id, elapsed_time);
-				if (log_choice == LogChoice.Distance)
-				{
-					logfile.WriteLine(elapsed_time.ToString() + " " + dist.ToString());
-				}
-				break;
-		}
+		// 	case RouteChoice.Followsat:
+		// 		// no actual routing, just show the lasers of one satellite
+		// 		float dist = FindNearest(followsat_id, elapsed_time);
+		// 		if (log_choice == LogChoice.Distance)
+		// 		{
+		// 			logfile.WriteLine(elapsed_time.ToString() + " " + dist.ToString());
+		// 		}
+		// 		break;
+		// }
 
 		if (!pause) countdown.text = elapsed_time.ToString("0.0");
-		//Route (london, auckland, "London-Auckland", 294f, 18357f);
-		//Route (london, san_francisco, "London-San Francisco", 146f, 8626f);
-		//Route (london, singapore, "London-Singapore", 159f, 10860f);
-		//Route (london, athens, "London-Athens", 48f, 2394f);
-		//Route (new_york, san_francisco, "New York-San Francisco", 0f, 4133f);
-		//Route (new_york, san_francisco, "New York-San Francisco", 0f, 4689f); // road route
-		//}
+		Route(1, new_york, san_francisco, "New York-San Francisco", 0f, 4689f); // road route
+																				//}
+																				// foreach (ActiveISL a in used_isl_links)
+																				// {
+																				// 	a.sat1.BeamOn();
+																				// 	a.sat2.BeamOn();
+																				// }
+																				// used_isl_links.ForEach(ActiveISL aa => a.sat1.Beam(); a.sat2.Beam());
+
+		this.rg = BuildRouteGraph(this.rg, new_york, toronto, this.maxdist, this.margin); // WOULD RATHER NOT HAVE NEW YORK & TORONTO HERE IF I DONT NEED IT
+		if (!this._attacker.HasValidVictimLink()) // this function might not work! the link isn't being updated ://
+		{
+			// BuildRouteGraph(this.rg, new_york, toronto, maxdist, margin); // TODO: remove the mentions of cities. Clearly that's not needed here. I need to remove the cities so that it doesn't include RF links as well.
+			// BuildSatelliteRouteGraph(this.rg); // honestly this should just be its own thing, but whatever. (at least for now)
+
+
+
+			(Node, Node) r = this._attacker.SwitchVictimLink(this.rg);
+			if (r == (null, null))
+			{
+				Debug.Log("No link could be selected.");
+			}
+		}
+		else
+		{
+			Debug.Log("No need to select a new link."); // I need to highlight the link.
+		}
+
+		if (this._attacker.HasValidVictimLink())
+		{
+			Debug.Log("Selected link: " + this._attacker.VictimSrcNode.Id + " - " + this._attacker.VictimDestNode.Id);
+			// Debug.Log(this._attacker.VictimDestNode.Id);
+			int pathcolour = 3;
+			Node rn = this._attacker.VictimDestNode;
+			Node prevnode = this._attacker.VictimSrcNode;
+			SatelliteSP0031 sat = satlist[this._attacker.VictimDestNode.Id];
+			SatelliteSP0031 prevsat = satlist[this._attacker.VictimSrcNode.Id];
+			sat.ColourLink(prevsat, laserMaterials[pathcolour]); // TODO: check this.
+			prevsat.ColourLink(sat, laserMaterials[pathcolour]);
+			used_isl_links.Add(new ActiveISL(sat, rn, prevsat, prevnode));
+
+			Debug.Log("HasValidVictimLink: is this assigned? " + sat.IsAssigned(prevsat));
+
+		}
+		else
+		{
+			Debug.Log("HasValidVictimLink: We don't have any assignments, unfortunately.");
+		}
 
 		/* Turn on RF links for each satellite pair found */
 		used_rf_links.ForEach(a => a.sat.LinkOn(a.city));
