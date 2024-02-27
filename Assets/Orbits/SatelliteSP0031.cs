@@ -126,7 +126,7 @@ public class SatelliteSP0031
 		links = new GameObject[2];
 
 		lasers = new GameObject[LASERS_PER_SAT];
-		laserdsts = new SatelliteSP0031[LASERS_PER_SAT];
+		laserdsts = new SatelliteSP0031[LASERS_PER_SAT]; // laser destinations
 		lasertimes = new double[LASERS_PER_SAT];
 		laseron = new bool[LASERS_PER_SAT];
 		for (int lc = 0; lc < maxlasers; lc++)
@@ -337,7 +337,7 @@ public class SatelliteSP0031
 	}
 
 
-	bool IsAssigned(SatelliteSP0031 s)
+	public bool IsAssigned(SatelliteSP0031 s) //remove the public modifier
 	{
 		for (int i = 0; i < assignedcount; i++)
 		{
@@ -610,6 +610,7 @@ public class SatelliteSP0031
 		for (int i = 0; i < assignedcount; i++)
 		{
 			SatelliteSP0031 sat = assignedsats[i];
+
 			if (!WasAssigned(sat))
 			{
 				/* destination is a new one - find a laser */
@@ -618,6 +619,8 @@ public class SatelliteSP0031
 				lasertimes[lasernum] = Time.time;
 				laserdsts[lasernum] = sat;
 				LaserScript ls = (LaserScript)lasers[lasernum].GetComponent(typeof(LaserScript));
+				ls.dest_satid = sat.satid; // remove after (MORGANE)
+				ls.src_satid = this.satid; // MORGANE: remove after
 				ls.SetMaterial(isl_material);
 			}
 		}
@@ -655,9 +658,11 @@ public class SatelliteSP0031
 		{
 			if (laseron[lc])
 			{
-				if (laserdsts[lc] == nextsat)
+				if (laserdsts[lc] == nextsat) // check all other destinations. If the laser is one of the destinations, then we're good.
 				{
 					LaserScript ls = (LaserScript)lasers[lc].GetComponent(typeof(LaserScript));
+					ls.src_satid = this.satid;
+					ls.dest_satid = nextsat.satid;
 					ls.SetMaterial(mat);
 				}
 			}

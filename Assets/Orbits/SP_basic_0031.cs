@@ -7,9 +7,6 @@ using System;
 using System.Text;
 using UnityEngine.SceneManagement;
 
-// remove later
-// using System.Diagnostics;
-
 public enum RouteChoice { TransAt, TransPac, LonJob, USsparse, USsparseAttacked, USdense, TorMia, Sydney_SFO, Sydney_Tokyo, Sydney_Lima, Followsat };
 public enum LogChoice { None, RTT, Distance, HopDists, LaserDists, Path };
 
@@ -59,9 +56,16 @@ public class SP_basic_0031 : MonoBehaviour
 	public float direction = 1f;
 	[HideInInspector]
 	public float directionChangeSpeed = 2f;
+
+	/* Latitude and longitude of the center of the attacker's target sphere */
+	public float target_latitude = 1.290270f; // new york as a default value;
+
+	public float target_longitude = -103.851959f; // new york as a default value.
 	const double earthperiod = 86400f;
 
 	public GameObject orbit;
+
+	private AreaAttacker _attacker;
 	public GameObject satellite;
 	public GameObject laser;
 	public GameObject thin_laser;
@@ -353,6 +357,8 @@ public class SP_basic_0031 : MonoBehaviour
 		//km_per_unit2 = (12756f / 2) / earthradius;
 		//Debug.Log("km_per_unit: " + km_per_unit.ToString() + " km_per_unit2: " + km_per_unit2.ToString());
 
+		// for now, only allows for Radius Attacks
+		this._attacker = new AreaAttacker(target_latitude, target_longitude, city_prefab, transform, sat0r, this.summary_logfile, 500f);
 	}
 
 	void InitCities()
@@ -1022,7 +1028,6 @@ public class SP_basic_0031 : MonoBehaviour
 		}
 	}
 
-
 	void PartiallyBuildRouteGraph(RouteGraph rgph, GameObject city1, GameObject city2, float maxdist, float margin)
 	{
 		/* Done for route creation. */
@@ -1092,8 +1097,86 @@ public class SP_basic_0031 : MonoBehaviour
 			// }
 		}
 	}
-	void BuildRouteGraph(RouteGraph rgph, GameObject city1, GameObject city2, float maxdist, float margin)
+
+	void BuildSatelliteRouteGraph(RouteGraph rgph)
 	{
+		/* Done for route creation. */
+
+		/* This function builds the route graph. Although I have no idea why it's here and not in the RouteGraph function itself. I suppose it's because the routegraph can't perform this operation on itself. But I'm not a massive fan of this design to be perfectly honest. */
+		for (int satnum = 0; satnum < maxsats; satnum++)
+		{
+			// I'm going to pass the satellite orbit information to the RouteGraph. So that it can encapsulate it properly. Makes log reading much easier.
+
+
+			for (int i = 0; i < satlist[satnum].assignedcount; i++)
+			{
+				rgph.AddNeighbour(satnum, satlist[satnum].assignedsats[i].satid, false);
+			}
+
+			// Add start city
+			// float radiodist = Vector3.Distance(satlist[satnum].gameobject.transform.position,
+			// city1.transform.position);
+			// THIS is why there's only one routegraph. or at least I think this is why.
+			// if (radiodist * km_per_unit < maxdist)
+			// {
+			/* I THINK this takes the groundstation, if the radio distance * km per unit is smaller than the maximum distance,
+			then one can add a satellite neighbour to it. */
+			/* create a link between maxsats and satnum of distance radiodist */
+			// rgph.AddNeighbour(maxsats, satnum, radiodist, true);
+			// }
+			// else if (radiodist * km_per_unit < maxdist + margin)
+			// {
+			// rgph.AddNeighbour(maxsats, satnum, Node.INFINITY, true);
+			// }
+
+			// Add end city
+			// radiodist = Vector3.Distance(satlist[satnum].gameobject.transform.position,
+			// 	city2.transform.position);
+			// if (radiodist * km_per_unit < maxdist)
+			// {
+			// 	rgph.AddNeighbour(maxsats + 1, satnum, radiodist, true);
+			// }
+			// else if (radiodist * km_per_unit < maxdist + margin)
+			// {
+			// 	rgph.AddNeighbour(maxsats + 1, satnum, Node.INFINITY, true);
+			// }
+
+			// Add relays
+			if (graph_on)
+			{
+				satlist[satnum].GraphReset();
+			}
+
+			// List<List<City>> in_range = grid.FindInRange(satlist[satnum].gameobject.transform.position);
+			// foreach (List<City> lst in in_range)
+			// {
+			// 	foreach (City relay in lst)
+			// 	{
+			// 		radiodist = Vector3.Distance(satlist[satnum].gameobject.transform.position, relay.gameobject.transform.position);
+			// 		if (radiodist * km_per_unit < maxdist)
+			// 		{
+			// 			rgph.AddNeighbour(maxsats + 2 + relay.relayid, satnum, radiodist, true);
+			// 			if (graph_on)
+			// 			{
+			// 				satlist[satnum].GraphOn(relay.gameobject, null);
+			// 			}
+			// 		}
+			// 		else if (radiodist * km_per_unit < maxdist + margin)
+			// 		{
+			// 			rgph.AddNeighbour(maxsats + 2 + relay.relayid, satnum, Node.INFINITY, true);
+			// 		}
+			// 	}
+			// }
+			if (graph_on)
+			{
+				satlist[satnum].GraphDone();
+			}
+		}
+	}
+
+	RouteGraph BuildRouteGraph(RouteGraph rgph, GameObject city1, GameObject city2, float maxdist, float margin)
+	{
+		// TODO: create a routegraph function that DOES NOT include cities!
 		/* Done for route creation. */
 
 		/* This function builds the route graph. Although I have no idea why it's here and not in the RouteGraph function itself. I suppose it's because the routegraph can't perform this operation on itself. But I'm not a massive fan of this design to be perfectly honest. */
@@ -1166,6 +1249,7 @@ public class SP_basic_0031 : MonoBehaviour
 				satlist[satnum].GraphDone();
 			}
 		}
+		return rgph;
 	}
 
 	void highlight_reachable()
@@ -1194,9 +1278,9 @@ public class SP_basic_0031 : MonoBehaviour
 		* rn = RouteNode
 		*/
 
-		Debug.Log("Problem...");
+		// Debug.Log("Problem...");
 		StringBuilder sb = new StringBuilder(string.Format("{0} - {1}, ", cityStrings[city1], cityStrings[city2])); // logging.
-		Debug.Log("After the potential problem");
+																													// Debug.Log("After the potential problem");
 		bool success = false;
 		bool reset_route = false;
 
@@ -1375,7 +1459,7 @@ public class SP_basic_0031 : MonoBehaviour
 					}
 					sat.ColourLink(prevsat, laserMaterials[pathcolour]); // TODO: check this.
 					prevsat.ColourLink(sat, laserMaterials[pathcolour]);
-					used_isl_links.Add(new ActiveISL(sat, rn, prevsat, prevnode));
+					used_isl_links.Add(new ActiveISL(sat, rn, prevsat, prevnode)); // TODO: remove this afterwards.
 				}
 				else // It's an RF (radio frequency) link
 				{
@@ -1465,7 +1549,7 @@ public class SP_basic_0031 : MonoBehaviour
 		/* Writes to UI text */
 		// txt.text = s2;
 		/* Writes to console */
-		Debug.Log(s2);
+		// Debug.Log(s2);
 
 	}
 
@@ -1541,8 +1625,8 @@ public class SP_basic_0031 : MonoBehaviour
 
 
 		/* Print this data into the summary logfile */
-		summary_logfile.WriteLine(log_filename_counter.ToString("D4") + string.Format("_{0}_{1}", cityString1, cityString2) + ":" + (success ? " success " : " fail ") + ": " + path_counter.ToString() + " path nodes. Path: " + path.ToString());
-		summary_logfile.Flush();
+		// summary_logfile.WriteLine(log_filename_counter.ToString("D4") + string.Format("_{0}_{1}", cityString1, cityString2) + ":" + (success ? " success " : " fail ") + ": " + path_counter.ToString() + " path nodes. Path: " + path.ToString());
+		// summary_logfile.Flush();
 
 		logfile.WriteLine(new String('=', 20));
 		logfile.Flush();
@@ -1655,9 +1739,19 @@ public class SP_basic_0031 : MonoBehaviour
 		return nearest_dist;
 	}
 
+	// Only uncomment for debugging if I need to see the attack sphere.
+	void OnDrawGizmos()
+	{
+		Gizmos.color = Color.yellow;
+		Gizmos.DrawSphere(this._attacker.TargetAreaCenterpoint, this._attacker.Radius);
+	}
+
 	// Update is called once per frame
 	void Update()
 	{
+		UnityEngine.Debug.Log("update attempt");
+
+
 		elapsed_time = last_elapsed_time + (Time.time - last_speed_change) * speed;
 		linkCapacity.Clear();
 
@@ -1703,6 +1797,18 @@ public class SP_basic_0031 : MonoBehaviour
 			orbits[i].transform.RotateAround(Vector3.zero, orbitaxes[i], (float)(-1f * earthperiod / orbitalperiod[i] * simspeed * direction) * Time.deltaTime);
 		}
 
+		// 1. get a set of groundstations.
+
+		// 2. identify a link to target.
+		// Debug.Log("Checking if the attacker exists");
+		Debug.Assert(this._attacker != null);
+		// UnityEngine.Debug.DrawLine(Vector3.zero, this._attacker.TargetAreaCenterpoint, Color.yellow); // MORE DEBUGGING CODE
+
+		// BuildRouteGraph();
+
+
+
+		// TEMPORARILY REMOVED. BECAUSE THIS IS NOT IN MY FRAME OF WORK
 		/* 
 		* 0 - transatlantic
 		* 1 - london-joburg
@@ -1710,73 +1816,100 @@ public class SP_basic_0031 : MonoBehaviour
 		* 3 - us, sparse
 		* 4 - us, dense
 		* 5 - us, sparse, attacked.
-		*/
-		switch (route_choice)
-		{
-			case RouteChoice.TransAt:
-				MultiRoute(no_of_paths, london, new_york, "London-New York", 76f, 5576f);
-				break;
+		// */
+		// switch (route_choice)
+		// {
+		// 	case RouteChoice.TransAt:
+		// 		MultiRoute(no_of_paths, london, new_york, "London-New York", 76f, 5576f);
+		// 		break;
 
-			case RouteChoice.LonJob:
-				MultiRoute(no_of_paths, london, johannesburg, "London-Johannesburg", 164f, 9079.92f);
-				break;
+		// 	case RouteChoice.LonJob:
+		// 		MultiRoute(no_of_paths, london, johannesburg, "London-Johannesburg", 164f, 9079.92f);
+		// 		break;
 
-			case RouteChoice.TransPac:
-				MultiRoute(no_of_paths, tokyo, chicago, "Chicago-Tokyo", 143f, 10159f);
-				break;
+		// 	case RouteChoice.TransPac:
+		// 		MultiRoute(no_of_paths, tokyo, chicago, "Chicago-Tokyo", 143f, 10159f);
+		// 		break;
 
-			case RouteChoice.USdense:
-			case RouteChoice.USsparse:
-				MultiRoute(no_of_paths, new_york, redmond, "New York-Seattle", 78f, 3876f);
-				break;
+		// 	case RouteChoice.USdense:
+		// 	case RouteChoice.USsparse:
+		// 		MultiRoute(no_of_paths, new_york, redmond, "New York-Seattle", 78f, 3876f);
+		// 		break;
 
-			case RouteChoice.USsparseAttacked:
-				// parameters that don't matter: RTT, & actual dist. (last 2 arguments)
+		// 	case RouteChoice.USsparseAttacked:
+		// 		// parameters that don't matter: RTT, & actual dist. (last 2 arguments)
 
-				// TODO: for all the links, set the capacity to 0.
-				SingleRoute(0, chicago, redmond, "Chicago-Seattle", 78f, 3876f);
-				SingleRoute(1, miami, toronto, "Miami-Toronto", 78f, 3876f);
-				SingleRoute(2, new_york, redmond, "New York-Seattle", 78f, 3876f);
-				// SingleRoute(3, new_york, redmond, "New York-Seattle", 78f, 3876f);
-				// SingleRoute(4, new_york, redmond, "New York-Seattle", 78f, 3876f);
-				// SingleRoute(3, new_york, miami, "New York-Miami", 78f, 30f);
-				break;
+		// 		// TODO: for all the links, set the capacity to 0.
+		// 		SingleRoute(0, chicago, redmond, "Chicago-Seattle", 78f, 3876f);
+		// 		SingleRoute(1, miami, toronto, "Miami-Toronto", 78f, 3876f);
+		// 		SingleRoute(2, new_york, redmond, "New York-Seattle", 78f, 3876f);
+		// 		// SingleRoute(3, new_york, redmond, "New York-Seattle", 78f, 3876f);
+		// 		// SingleRoute(4, new_york, redmond, "New York-Seattle", 78f, 3876f);
+		// 		// SingleRoute(3, new_york, miami, "New York-Miami", 78f, 30f);
+		// 		break;
 
 
-			case RouteChoice.TorMia:
-				MultiRoute(no_of_paths, toronto, miami, "Toronto-Miami", 41f, 1985f);
-				break;
+		// 	case RouteChoice.TorMia:
+		// 		MultiRoute(no_of_paths, toronto, miami, "Toronto-Miami", 41f, 1985f);
+		// 		break;
 
-			case RouteChoice.Sydney_SFO:
-				MultiRoute(no_of_paths, sydney, san_francisco, "Sydney-San Francisco", 151f, 11940f);
-				break;
+		// 	case RouteChoice.Sydney_SFO:
+		// 		MultiRoute(no_of_paths, sydney, san_francisco, "Sydney-San Francisco", 151f, 11940f);
+		// 		break;
 
-			case RouteChoice.Sydney_Tokyo:
-				MultiRoute(no_of_paths, sydney, tokyo, "Sydney-Tokyo", 0f, 0f);
-				break;
+		// 	case RouteChoice.Sydney_Tokyo:
+		// 		MultiRoute(no_of_paths, sydney, tokyo, "Sydney-Tokyo", 0f, 0f);
+		// 		break;
 
-			case RouteChoice.Sydney_Lima:
-				MultiRoute(no_of_paths, sydney, lima, "Sydney-lima", 0f, 0f);
-				break;
+		// 	case RouteChoice.Sydney_Lima:
+		// 		MultiRoute(no_of_paths, sydney, lima, "Sydney-lima", 0f, 0f);
+		// 		break;
 
-			case RouteChoice.Followsat:
-				// no actual routing, just show the lasers of one satellite
-				float dist = FindNearest(followsat_id, elapsed_time);
-				if (log_choice == LogChoice.Distance)
-				{
-					logfile.WriteLine(elapsed_time.ToString() + " " + dist.ToString());
-				}
-				break;
-		}
+		// 	case RouteChoice.Followsat:
+		// 		// no actual routing, just show the lasers of one satellite
+		// 		float dist = FindNearest(followsat_id, elapsed_time);
+		// 		if (log_choice == LogChoice.Distance)
+		// 		{
+		// 			logfile.WriteLine(elapsed_time.ToString() + " " + dist.ToString());
+		// 		}
+		// 		break;
+		// }
 
 		if (!pause) countdown.text = elapsed_time.ToString("0.0");
-		//Route (london, auckland, "London-Auckland", 294f, 18357f);
-		//Route (london, san_francisco, "London-San Francisco", 146f, 8626f);
-		//Route (london, singapore, "London-Singapore", 159f, 10860f);
-		//Route (london, athens, "London-Athens", 48f, 2394f);
-		//Route (new_york, san_francisco, "New York-San Francisco", 0f, 4133f);
-		//Route (new_york, san_francisco, "New York-San Francisco", 0f, 4689f); // road route
-		//}
+		Route(1, new_york, san_francisco, "New York-San Francisco", 0f, 4689f); // road route
+
+		this.rg = BuildRouteGraph(this.rg, new_york, toronto, this.maxdist, this.margin); // TODO: WOULD RATHER NOT HAVE NEW YORK & TORONTO HERE IF I DONT NEED IT
+
+		if (!this._attacker.HasValidVictimLink())
+		{
+			(Node, Node) r = this._attacker.SwitchVictimLink(this.rg);
+			if (r == (null, null))
+			{
+				Debug.Log("Update | Could not select a new link.");
+			}
+		}
+		else
+		{
+			Debug.Log("Update | Previous link is still valid."); // I need to highlight the link.
+		}
+
+		if (this._attacker.HasValidVictimLink())
+		{
+			Debug.Log("Update | Selected link: " + this._attacker.VictimSrcNode.Id + " - " + this._attacker.VictimDestNode.Id);
+
+			int pathcolour = 3;
+
+			SatelliteSP0031 sat = satlist[this._attacker.VictimDestNode.Id];
+			SatelliteSP0031 prevsat = satlist[this._attacker.VictimSrcNode.Id];
+
+			sat.ColourLink(prevsat, laserMaterials[pathcolour]); // TODO: check this.
+			prevsat.ColourLink(sat, laserMaterials[pathcolour]);
+			used_isl_links.Add(new ActiveISL(sat, this._attacker.VictimDestNode, prevsat, this._attacker.VictimSrcNode));
+		}
+		else
+		{
+			Debug.Log("Update | Could not find any valid links.");
+		}
 
 		/* Turn on RF links for each satellite pair found */
 		used_rf_links.ForEach(a => a.sat.LinkOn(a.city));
