@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using System.IO;
 using System; // Random
 using System.Text;
-using System.Diagnostics; //  Debug.Assert
+using System.Diagnostics; // Debug.Assert
 using UnityEngine.SceneManagement;
 using System.Linq; // for ToList();
 
@@ -15,9 +15,13 @@ abstract public class Attacker
     /* attacker source groundstations at disposal */
     public List<GameObject> SourceGroundstations { get; set; }
 
+    // TODO: maybe all of this link information should be in a nested class.
+
     public Node VictimSrcNode { get; protected set; } // victim link source node
 
     public Node VictimDestNode { get; protected set; } // victim link destination node
+
+    public int LinkCapacityLimit { get; set; } // victim link capacity TODO: should I protect this?
 
     /* select n random individual source groundstations for the attacker to use. */
     public List<GameObject> SelectNRandomSourceGSes(uint gs_count, List<GameObject> gs_list)
@@ -45,7 +49,7 @@ abstract public class Attacker
         return this.SourceGroundstations;
     }
 
-    /* update the nodes associated with the target link. */
+    /* update the nodes associated with the target link. */ // TODO: it works even without this. Is it even needed?
     public void UpdateLinkPosition(Node src_node, Node dest_node)
     {
         System.Diagnostics.Debug.Assert(this.VictimSrcNode != null);
@@ -56,6 +60,13 @@ abstract public class Attacker
 
         this.VictimSrcNode = src_node;
         this.VictimDestNode = dest_node;
+    }
+
+    /* Attempt to attack link by sending paths through the contained source nodes. If successful, returns true. Otherwise, returns false. */
+    public bool AttackLink()
+    {
+        // TODO: write this.
+
     }
 
 }
@@ -84,11 +95,12 @@ public class AreaAttacker : Attacker
     public System.IO.StreamWriter summary_logfile;
 
     /* instantiates the attacker object with a requested victim radius of specified latitude and longitude. */
-    public AreaAttacker(float latitude, float longitude, GameObject prefab, Transform transform /* try and make these last 2 vars optional as they seem kind of weird to add here as variables */, float sat0r /* satellite radius from earth centre */, System.IO.StreamWriter summary_logfile, float radius)
+    public AreaAttacker(float latitude, float longitude, GameObject prefab, Transform transform /* try and make these last 2 vars optional as they seem kind of weird to add here as variables */, float sat0r /* satellite radius from earth centre */, System.IO.StreamWriter summary_logfile, float radius, List<GameObject> src_groundstations)
     {
-        this.SourceGroundstations = new List<GameObject>();
+        this.SourceGroundstations = src_groundstations;
         this.TargetAreaCenterpoint = Vector3.zero;
         this.Radius = radius;
+        this.LinkCapacityLimit = 0; // Basically nil if it's not been set.
         this.SetVictimRadius(latitude, longitude, sat0r, prefab, transform);
         this.summary_logfile = summary_logfile;
         System.Diagnostics.Debug.Assert(this.TargetAreaCenterpoint != null);
@@ -248,21 +260,64 @@ public class AreaAttacker : Attacker
         }
     }
 
+    public String LinkName()
+    {
+        if (this.VictimSrcNode == null || this.VictimDestNode == null)
+        {
+            return null;
+        }
+        return this.VictimSrcNode.Id.ToString() + "-" + this.VictimDestNode.Id.ToString();
+
+    }
+
     /* randomly select a victim link within the target radius. If no target radius is specified, return a NoVictimError. If success, returns the victim link (src, dest) node. If failure, returns nothing. Failure may occur if no source node was found, or if the source node has no links.
   */
-    public (Node, Node) SwitchVictimLink(RouteGraph rg)
+    private void SwitchVictimLink(RouteGraph rg)
     {
         this.SelectRandomSrcNode(rg);
-        if (this.VictimSrcNode == null)
+        if (this.VictimSrcNode == null) // might want to just return the source node
         {
-            return (null, null);
+            return;
         }
-        this.SelectRandomDestinationNode(rg);
+        this.SelectRandomDestinationNode(rg); // might want to just return the destination node.
         if (this.VictimDestNode == null)
         {
-            return (null, null);
+            this.VictimSrcNode = null;
         }
-        return (this.VictimSrcNode, this.VictimDestNode);
+    }
+
+    /* Updates the selected links by switching links if the current one is invalid and updates its link capacity according to information coming from the caller */
+    public void UpdateLinks(RouteGraph rg, Dictionary<string, int> link_capacity)
+    {
+        if (!this.HasValidVictimLink())
+        {
+            this.SwitchVictimLink(rg);
+            if (this.VictimSrcNode == null || this.VictimDestNode == null)
+            {
+                UnityEngine.Debug.Log("Attacker.Update | Could not select a new link.");
+            }
+        }
+        else
+        {
+            System.Diagnostics.Debug.Log("Attacker.Update | Previous link is still valid."); // I need to highlight the link.
+        }
+
+        if (this.HasValidVictimLink())
+        {
+            if (!link_capacity.ContainsKey(this.LinkName()))
+            {
+                this.LinkCapacityLimit = SP_Basic_0031.MAX_CAPACITY;
+            }
+            else
+            {
+                this.LinkCapacityLimit = link_capacity[link_name];
+            }
+            UnityEngine.Debug.Log("Attacker.Update | Selected link: " + this.VictimSrcNode.Id + " - " + this.VictimDestNode.Id + " of remaining capacity: " + this.LinkCapacity);
+        }
+        else
+        {
+            UnityEngine.Debug.Log("Attacker.Update | Could not find any valid links.");
+        }
     }
 }
 

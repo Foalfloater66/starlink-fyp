@@ -77,7 +77,7 @@ public class SP_basic_0031 : MonoBehaviour
 
 	private Dictionary<string, int> linkCapacity = new Dictionary<string, int>(); /* (node1, node2) link mapping to capacity. Links are full duplex. */
 
-	public const int MAX_CAPACITY = 110;
+	public static int MAX_CAPACITY = 110;
 
 	GameObject[] orbits;
 	double[] orbitalperiod;
@@ -358,7 +358,8 @@ public class SP_basic_0031 : MonoBehaviour
 		//Debug.Log("km_per_unit: " + km_per_unit.ToString() + " km_per_unit2: " + km_per_unit2.ToString());
 
 		// for now, only allows for Radius Attacks
-		this._attacker = new AreaAttacker(target_latitude, target_longitude, city_prefab, transform, sat0r, this.summary_logfile, 800f);
+		this._attacker = new AreaAttacker(target_latitude, target_longitude, city_prefab, transform, sat0r, this.summary_logfile, 800f, new List<GameObject>() { redmond, miami, chicago });
+		// TODO: set groundstations.
 	}
 
 	void InitCities()
@@ -1028,75 +1029,6 @@ public class SP_basic_0031 : MonoBehaviour
 		}
 	}
 
-	void PartiallyBuildRouteGraph(RouteGraph rgph, GameObject city1, GameObject city2, float maxdist, float margin)
-	{
-		/* Done for route creation. */
-
-		/* This function builds the route graph. Although I have no idea why it's here and not in the RouteGraph function itself. I suppose it's because the routegraph can't perform this operation on itself. But I'm not a massive fan of this design to be perfectly honest. */
-		for (int satnum = 0; satnum < maxsats; satnum++)
-		{
-			// I'm going to pass the satellite orbit information to the RouteGraph. So that it can encapsulate it properly. Makes log reading much easier.
-
-			// Add start city
-			float radiodist = Vector3.Distance(satlist[satnum].gameobject.transform.position,
-				city1.transform.position);
-			// THIS is why there's only one routegraph. or at least I think this is why.
-			if (radiodist * km_per_unit < maxdist)
-			{
-				/* I THINK this takes the groundstation, if the radio distance * km per unit is smaller than the maximum distance,
-				then one can add a satellite neighbour to it. */
-				/* create a link between maxsats and satnum of distance radiodist */
-				rgph.AddNeighbour(maxsats, satnum, radiodist, true);
-			}
-			else if (radiodist * km_per_unit < maxdist + margin)
-			{
-				rgph.AddNeighbour(maxsats, satnum, Node.INFINITY, true);
-			}
-
-			// Add end city
-			radiodist = Vector3.Distance(satlist[satnum].gameobject.transform.position,
-				city2.transform.position);
-			if (radiodist * km_per_unit < maxdist)
-			{
-				rgph.AddNeighbour(maxsats + 1, satnum, radiodist, true);
-			}
-			else if (radiodist * km_per_unit < maxdist + margin)
-			{
-				rgph.AddNeighbour(maxsats + 1, satnum, Node.INFINITY, true);
-			}
-
-			// // Add relays
-			// if (graph_on)
-			// {
-			// 	satlist[satnum].GraphReset();
-			// }
-
-			// List<List<City>> in_range = grid.FindInRange(satlist[satnum].gameobject.transform.position);
-			// foreach (List<City> lst in in_range)
-			// {
-			// 	foreach (City relay in lst)
-			// 	{
-			// 		radiodist = Vector3.Distance(satlist[satnum].gameobject.transform.position, relay.gameobject.transform.position);
-			// 		if (radiodist * km_per_unit < maxdist)
-			// 		{
-			// 			rgph.AddNeighbour(maxsats + 2 + relay.relayid, satnum, radiodist, true);
-			// 			if (graph_on)
-			// 			{
-			// 				satlist[satnum].GraphOn(relay.gameobject, null);
-			// 			}
-			// 		}
-			// 		else if (radiodist * km_per_unit < maxdist + margin)
-			// 		{
-			// 			rgph.AddNeighbour(maxsats + 2 + relay.relayid, satnum, Node.INFINITY, true);
-			// 		}
-			// 	}
-			// // }
-			// if (graph_on)
-			// {
-			// 	satlist[satnum].GraphDone();
-			// }
-		}
-	}
 
 	void BuildSatelliteRouteGraph(RouteGraph rgph)
 	{
@@ -1443,7 +1375,7 @@ public class SP_basic_0031 : MonoBehaviour
 					string linkName = previd.ToString() + "-" + id.ToString();
 					if (!linkCapacity.ContainsKey(linkName))
 					{
-						linkCapacity.Add(linkName, 0);
+						linkCapacity.Add(linkName, 0); // TODO: do I want to add all nodes to link capacity?
 					}
 					linkCapacity[linkName] += 100; // Add 100 mbits
 
@@ -1817,40 +1749,85 @@ public class SP_basic_0031 : MonoBehaviour
 		if (!pause) countdown.text = elapsed_time.ToString("0.0");
 		Route(1, new_york, san_francisco, "New York-San Francisco", 0f, 4689f); // example route
 
-		// 1. get a set of groundstations.
-
 		// 2. identify a link to target.
-		this.rg = BuildRouteGraph(this.rg, new_york, toronto, this.maxdist, this.margin); // TODO: WOULD RATHER NOT HAVE NEW YORK & TORONTO HERE IF I DONT NEED IT
+		this.rg = BuildRouteGraph(this.rg, new_york, toronto, this.maxdist, this.margin); // TODO: create a BuildRouteGraph that doesn't include cities.
+		this._attacker.UpdateLinks(this.rg, this.linkCapacity);
 
-		if (!this._attacker.HasValidVictimLink())
-		{
-			(Node, Node) r = this._attacker.SwitchVictimLink(this.rg);
-			if (r == (null, null))
-			{
-				Debug.Log("Update | Could not select a new link.");
-			}
-		}
-		else
-		{
-			Debug.Log("Update | Previous link is still valid."); // I need to highlight the link.
-		}
-
+		// Update the maximum capacity of target link.
 		if (this._attacker.HasValidVictimLink())
 		{
-			Debug.Log("Update | Selected link: " + this._attacker.VictimSrcNode.Id + " - " + this._attacker.VictimDestNode.Id);
+			this.linkCapacity[this._attacker.LinkName()] = this._attacker.LinkCapacityLimit;
+		}
 
+
+		List<string> viable_paths = new List<string>();
+		// attack the link
+		foreach (GameObject src_gs in this._attacker.SourceGroundstations)
+		{
+			// LIst
+			foreach (GameObject dest_gs in this._attacker.SourceGroundstations /* TODO: change this to all other groundstations */)
+			{
+				if (dest_gs == src_gs)
+				{
+					continue;
+				}
+				BuildRouteGraph(this.rg, src_gs, dest_gs, this.maxdist, this.margin);
+				rg.ResetOnPathStatus();
+				rg.ComputeRoutes();
+
+				/* Figure out the start and end satellites IDs.
+				Start with the endnode ground station, and passes through all of the nodes in the computed route
+				until the startnode is found. If the startnode is found, then store the start satid. Otherwise,
+				return Node.INFINITY.*/
+				string path = "";
+				// List<Node
+				rn = rg.endnode;
+				int startsatid = 0, endsatid = -1;
+				id = -4;
+				while (true)
+				{
+					if (rn == rg.startnode)
+					{
+						startsatid = id;
+						break;
+					}
+					id = rn.Id;
+					// rn.OnPath = true; // this I don't care about.
+					path = path + id.ToString() + " ";
+
+					if (endsatid == -1 && id >= 0)
+					{
+						endsatid = id;
+					}
+					rn = rn.Parent;
+
+					if (rn == null) // No complete route was found. Return Node.INFINITY.
+					{
+						// just exit.
+						continue;
+					}
+				}
+
+				if (this._attacker.LinkName().Contains(path) /* AND IS THERE A CONFLICT BETWEEN THIS AND ANOTHER PATH? */)
+
+				{
+					viable_paths.Add(path); // TODO: add the routegraph instead.add the routegraph instead? or is that too much information?
+				}
+
+			}
+		}
+
+
+		// Color the target link to highlight it
+		if (this._attacker.HasValidVictimLink())
+		{
+			// highlight the target link
 			int pathcolour = 3;
-
 			SatelliteSP0031 sat = satlist[this._attacker.VictimDestNode.Id];
 			SatelliteSP0031 prevsat = satlist[this._attacker.VictimSrcNode.Id];
-
 			sat.ColourLink(prevsat, laserMaterials[pathcolour]); // TODO: check this.
 			prevsat.ColourLink(sat, laserMaterials[pathcolour]);
 			used_isl_links.Add(new ActiveISL(sat, this._attacker.VictimDestNode, prevsat, this._attacker.VictimSrcNode));
-		}
-		else
-		{
-			Debug.Log("Update | Could not find any valid links.");
 		}
 
 		/* Turn on RF links for each satellite pair found */

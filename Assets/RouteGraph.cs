@@ -161,7 +161,7 @@ public class RouteGraph
 		startnode.Dist = 0f;
 	}
 
-	public void ResetOnPathStatus()
+	public void ResetOnPathStatus() // TODO: I don't think I need this anymore.
 	{
 		// TODO: am I still using this?
 		for (int i = 0; i < nodecount; i++)
