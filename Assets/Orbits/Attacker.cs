@@ -25,11 +25,17 @@ public class Path : HeapNode
     }
 }
 
-abstract public class Attacker
+public class Attacker
 {
 
     /* attacker source groundstations at disposal */
     public List<GameObject> SourceGroundstations { get; set; }
+
+    public Vector3 TargetAreaCenterpoint { get; private set; }
+
+    public float Radius { get; private set; }
+
+    public System.IO.StreamWriter summary_logfile; // TODO: move it here.
 
     public Node VictimSrcNode { get; protected set; } // victim link source node
 
@@ -37,7 +43,7 @@ abstract public class Attacker
 
     public int LinkCapacityLimit { get; set; } // victim link capacity TODO: should I protect this?
 
-    public String LinkName()
+    public String LinkName() // TODO: move this from LinkName function to a function that it only can update the source ndoe.
     {
         if (this.VictimSrcNode == null || this.VictimDestNode == null)
         {
@@ -132,33 +138,8 @@ abstract public class Attacker
     //     PriorityQueue<RouteGraph, int> attack_routes = this.FindAttackRoutes(rg, dest_groundstations);
     // }
 
-}
-
-public class LinkAttacker : Attacker
-{
-
-    /* instantiates the attacker object while manually setting a
-    the source and destination nodes of the victim link. */
-    public LinkAttacker(Node src_node, Node dest_node)
-    {
-        this.SourceGroundstations = new List<GameObject>();
-        this.VictimSrcNode = src_node;
-        this.VictimDestNode = dest_node;
-    }
-
-}
-
-public class AreaAttacker : Attacker
-{
-
-    public Vector3 TargetAreaCenterpoint { get; private set; }
-
-    public float Radius { get; private set; }
-
-    public System.IO.StreamWriter summary_logfile;
-
     /* instantiates the attacker object with a requested victim radius of specified latitude and longitude. */
-    public AreaAttacker(float latitude, float longitude, GameObject prefab, Transform transform /* try and make these last 2 vars optional as they seem kind of weird to add here as variables */, float sat0r /* satellite radius from earth centre */, System.IO.StreamWriter summary_logfile, float radius, List<GameObject> src_groundstations)
+    public Attacker(float latitude, float longitude, GameObject prefab, Transform transform /* try and make these last 2 vars optional as they seem kind of weird to add here as variables */, float sat0r /* satellite radius from earth centre */, System.IO.StreamWriter summary_logfile, float radius, List<GameObject> src_groundstations)
     {
         this.SourceGroundstations = src_groundstations;
         this.TargetAreaCenterpoint = Vector3.zero;
@@ -186,18 +167,6 @@ public class AreaAttacker : Attacker
         System.Diagnostics.Debug.Assert(longitude > -180 && longitude < 180);
 
         // convert from lat, long, and altitude to Vector3 representation.
-        /*
-        float latRad = latitude * Mathf.Deg2Rad;
-        float longRad = longitude * Mathf.Deg2Rad;
-        float x = altitude * Mathf.Sin(latRad) * Mathf.Cos(longRad);
-        float y = altitude * Mathf.Sin(latRad) * Mathf.Sin(longRad);
-        float z = altitude * Mathf.Cos(latRad);
-*/
-
-
-
-        // GameObject target = GameObject.Instantiate(prefab /* don't know if I need to add a prefab here. I'd rather not */ , new Vector3(x, y, /*-6382.2f*/z), transform.rotation);
-
         GameObject target = GameObject.Instantiate(prefab, new Vector3(0f, 0f, /*-6382.2f*/-6371.0f - 550f /* TODO: change this distance as well */ ), transform.rotation);
         float long_offset = 20f;
         target.transform.RotateAround(Vector3.zero, Vector3.up, longitude - long_offset);
@@ -353,10 +322,6 @@ public class AreaAttacker : Attacker
     /* Updates the selected links by switching links if the current one is invalid and updates its link capacity according to information coming from the caller */
     public void UpdateLinks(RouteGraph rg, Dictionary<string, int> link_capacity, int max_capacity)
     {
-        // if (this.VictimDestNode != null && this.VictimSrcNode != null)
-        // {
-        //     UpdateLinkPosition(rg);
-        // }
 
         if (!this.HasValidVictimLink())
         {

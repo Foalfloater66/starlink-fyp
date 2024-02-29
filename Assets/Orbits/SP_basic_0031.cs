@@ -66,7 +66,7 @@ public class SP_basic_0031 : MonoBehaviour
 
 	public GameObject orbit;
 
-	private AreaAttacker _attacker;
+	private Attacker _attacker;
 	public GameObject satellite;
 	public GameObject laser;
 	public GameObject thin_laser;
@@ -360,7 +360,7 @@ public class SP_basic_0031 : MonoBehaviour
 
 		// for now, only allows for Radius Attacks
 		List<GameObject> demo_dest_groundstations = new List<GameObject>() { redmond, miami, chicago, new_york };
-		this._attacker = new AreaAttacker(target_latitude, target_longitude, city_prefab, transform, sat0r, this.summary_logfile, 800f, demo_dest_groundstations);
+		this._attacker = new Attacker(target_latitude, target_longitude, city_prefab, transform, sat0r, this.summary_logfile, 800f, demo_dest_groundstations);
 	}
 
 	void InitCities()
