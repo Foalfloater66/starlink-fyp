@@ -15,7 +15,7 @@ public class RouteGraph
 	public int rstcount = 0;
 	float maxdist = 0f;
 	float km_per_unit = 0f;
-	BinaryHeap heap;
+	BinaryHeap<Node> heap;
 
 	System.IO.StreamWriter logfile;
 
@@ -187,7 +187,7 @@ public class RouteGraph
 	{
 		/* Essentially runs Djikstra. */
 		/* Make new binary heap. Add all of the nodes. */
-		heap = new BinaryHeap(nodecount);
+		heap = new BinaryHeap<Node>(nodecount);
 		for (int i = 0; i < nodecount; i++)
 		{
 			heap.Add(nodes[i], (double)nodes[i].Dist);

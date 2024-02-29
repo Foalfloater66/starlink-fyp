@@ -50,7 +50,7 @@ public class Link
 
 }
 
-public class Node
+public class Node : HeapNode
 {
 	int _id;
 	public Vector3 _position;
@@ -63,8 +63,6 @@ public class Node
 	Node _parent_node;  // predecessor on path from src
 
 	private Dictionary<int, Link> _neighbours = new Dictionary<int, Link>(); // all node neighbours and their respective links.
-
-	public int QueuePosition;
 
 	bool _on_path = false; /* Determines if the node is on the selected path. */ // TODO: is this even used?
 

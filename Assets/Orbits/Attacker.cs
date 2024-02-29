@@ -9,13 +9,17 @@ using System.Diagnostics; // Debug.Assert
 using UnityEngine.SceneManagement;
 using System.Linq; // for ToList();
 
+public class Path : HeapNode
+{
+    // this should be in routing.
+    public List<Node> nodes = new List<Node>();
+}
+
 abstract public class Attacker
 {
 
     /* attacker source groundstations at disposal */
     public List<GameObject> SourceGroundstations { get; set; }
-
-    // TODO: maybe all of this link information should be in a nested class.
 
     public Node VictimSrcNode { get; protected set; } // victim link source node
 
@@ -23,51 +27,93 @@ abstract public class Attacker
 
     public int LinkCapacityLimit { get; set; } // victim link capacity TODO: should I protect this?
 
-    /* select n random individual source groundstations for the attacker to use. */
-    public List<GameObject> SelectNRandomSourceGSes(uint gs_count, List<GameObject> gs_list)
+    public String LinkName()
     {
-        uint i = 0;
-
-        // prevent gs_count from exceeding the number of available groundstations.
-        if (gs_count > (uint)gs_list.Count)
+        if (this.VictimSrcNode == null || this.VictimDestNode == null)
         {
-            gs_count = (uint)gs_list.Count;
+            return null;
         }
+        return this.VictimSrcNode.Id.ToString() + "-" + this.VictimDestNode.Id.ToString();
+    }
 
-        // select n random groundstations.
-        Dictionary<GameObject, char> source_gs_list = new Dictionary<GameObject, char>();
-        while (i < gs_count)
+    /* Compute the shortest route between src_gs, dest_gs pair. If a route containing the target link is found, returen the route graph with the length of the route. Otherwise, return null. */ // TODO: is there a more efficient way of computing the length? maybe through the djikstra function? not doing that now though.
+    public Path ExtractAttackRoute(RouteGraph rg, GameObject src_gs, GameObject dest_gs)
+    {
+        Path route = new Path();
+
+        Node rn = rg.endnode;
+        int startsatid = 0, endsatid = -1;
+        int id = -4;
+        bool viable_route = false; // can the target link be attacked with this route?
+
+        while (true)
         {
-            GameObject gs = gs_list[new System.Random().Next(0, gs_list.Count)];
-            if (!source_gs_list.ContainsKey(gs))
+            if (rn == rg.startnode)
             {
-                source_gs_list.Add(gs, '_');
-                i += 1;
+                startsatid = id;
+                break;
             }
+
+            id = rn.Id;
+
+            if (endsatid == -1 && id >= 0)
+            {
+                endsatid = id;
+            }
+            if (id >= 0)
+            {
+                if (String.Equals(route.nodes.Last().Id.ToString() + "-" + id.ToString(), this.LinkName()))
+                {
+                    viable_route = true;
+                }
+            }
+            rn = rn.Parent;
+
+            if (rn == null) // this route is incomplete.
+            {
+                return null;
+            }
+            route.nodes.Add(rn);
         }
-        this.SourceGroundstations = source_gs_list.Keys.ToList();
-        return this.SourceGroundstations;
+        if (viable_route)
+        {
+            return route;
+        }
+        return null;
     }
 
-    /* update the nodes associated with the target link. */ // TODO: it works even without this. Is it even needed?
-    public void UpdateLinkPosition(Node src_node, Node dest_node)
-    {
-        System.Diagnostics.Debug.Assert(this.VictimSrcNode != null);
-        System.Diagnostics.Debug.Assert(this.VictimDestNode != null);
+    // public BinaryHeap<Path> FindAttackRoutes(RouteGraph rg, List<GameObject> dest_groundstations, )
+    // {
+    //     BinaryHeap<Path> attack_routes = new BinaryHeap<Path>(dest_groundstations.Count * this.SourceGroundstations.Count); // priority queue <routegraph, routelength>
+    //     foreach (GameObject src_gs in this.SourceGroundstations)
+    //     {
+    //         foreach (GameObject dest_gs in dest_groundstations)
+    //         {
+    //             if (dest_gs == src_gs)
+    //             {
+    //                 continue;
+    //             }
+    //             // TODO: should I clear the route graph?
+    //             rg = SP_basic_0031.BuildRouteGraph(rg, src_gs, dest_gs, SP_basic_0031.maxdist, SP_basic_0031.margin);
+    //             rg.ComputeRoutes();
 
-        System.Diagnostics.Debug.Assert(src_node.Id == this.VictimSrcNode.Id);
-        System.Diagnostics.Debug.Assert(dest_node.Id == this.VictimDestNode.Id);
-
-        this.VictimSrcNode = src_node;
-        this.VictimDestNode = dest_node;
-    }
+    //             List<Path> path = this.ExtractAttackRoute(rg, src_gs, dest_gs);
+    //             if (path != null)
+    //             {
+    //                 attack_routes.Enqueue(path);
+    //             }
+    //         }
+    //     }
+    //     // TODO: add the routes in a pq
+    //     return attack_routes;
+    // }
 
     /* Attempt to attack link by sending paths through the contained source nodes. If successful, returns true. Otherwise, returns false. */
-    public bool AttackLink()
-    {
-        // TODO: write this.
-
-    }
+    // public void AttackLink(RouteGraph rg, List<GameObject> dest_groundstations)
+    // {
+    //     // TODO: write this.
+    //     PriorityQueue<RouteGraph, int> attack_routes = this.FindAttackRoutes(rg, dest_groundstations);
+    // }
 
 }
 
@@ -260,16 +306,6 @@ public class AreaAttacker : Attacker
         }
     }
 
-    public String LinkName()
-    {
-        if (this.VictimSrcNode == null || this.VictimDestNode == null)
-        {
-            return null;
-        }
-        return this.VictimSrcNode.Id.ToString() + "-" + this.VictimDestNode.Id.ToString();
-
-    }
-
     /* randomly select a victim link within the target radius. If no target radius is specified, return a NoVictimError. If success, returns the victim link (src, dest) node. If failure, returns nothing. Failure may occur if no source node was found, or if the source node has no links.
   */
     private void SwitchVictimLink(RouteGraph rg)
@@ -286,9 +322,25 @@ public class AreaAttacker : Attacker
         }
     }
 
-    /* Updates the selected links by switching links if the current one is invalid and updates its link capacity according to information coming from the caller */
-    public void UpdateLinks(RouteGraph rg, Dictionary<string, int> link_capacity)
+    /* update the nodes associated with the target link. */ // TODO: it works even without this. Is it even needed?
+    public void UpdateLinkPosition(RouteGraph rg)
     {
+        System.Diagnostics.Debug.Assert(this.VictimSrcNode != null);
+        System.Diagnostics.Debug.Assert(this.VictimDestNode != null);
+
+        this.VictimSrcNode = rg.GetNode(this.VictimSrcNode.Id);
+        this.VictimDestNode = rg.GetNode(this.VictimDestNode.Id);
+    }
+
+
+    /* Updates the selected links by switching links if the current one is invalid and updates its link capacity according to information coming from the caller */
+    public void UpdateLinks(RouteGraph rg, Dictionary<string, int> link_capacity, int max_capacity)
+    {
+        // if (this.VictimDestNode != null && this.VictimSrcNode != null)
+        // {
+        //     UpdateLinkPosition(rg);
+        // }
+
         if (!this.HasValidVictimLink())
         {
             this.SwitchVictimLink(rg);
@@ -299,20 +351,20 @@ public class AreaAttacker : Attacker
         }
         else
         {
-            System.Diagnostics.Debug.Log("Attacker.Update | Previous link is still valid."); // I need to highlight the link.
+            UnityEngine.Debug.Log("Attacker.Update | Previous link is still valid of coords " + this.VictimSrcNode.Position); // I need to highlight the link.
         }
 
         if (this.HasValidVictimLink())
         {
             if (!link_capacity.ContainsKey(this.LinkName()))
             {
-                this.LinkCapacityLimit = SP_Basic_0031.MAX_CAPACITY;
+                this.LinkCapacityLimit = max_capacity;
             }
             else
             {
-                this.LinkCapacityLimit = link_capacity[link_name];
+                this.LinkCapacityLimit = link_capacity[this.LinkName()];
             }
-            UnityEngine.Debug.Log("Attacker.Update | Selected link: " + this.VictimSrcNode.Id + " - " + this.VictimDestNode.Id + " of remaining capacity: " + this.LinkCapacity);
+            UnityEngine.Debug.Log("Attacker.Update | Selected link: " + this.VictimSrcNode.Id + " - " + this.VictimDestNode.Id + " of remaining capacity: " + this.LinkCapacityLimit);
         }
         else
         {

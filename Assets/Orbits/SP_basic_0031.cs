@@ -136,9 +136,9 @@ public class SP_basic_0031 : MonoBehaviour
 
 	System.IO.StreamWriter logfile;
 	System.IO.StreamWriter summary_logfile;
-	float maxdist = 0f;
+	public float maxdist = 0f; // TODO: make private and figure something else out. 
 	float beam_radius = 0f;
-	float margin = 100f;
+	public float margin = 100f; // TODO: make private and figure something else out for routing.
 	GroundGrid grid;
 	long elapsed_sum = 0;
 	int elapsed_count = 0;
@@ -1028,87 +1028,10 @@ public class SP_basic_0031 : MonoBehaviour
 			r.material = mat;
 		}
 	}
-
-
-	void BuildSatelliteRouteGraph(RouteGraph rgph)
-	{
-		/* Done for route creation. */
-
-		/* This function builds the route graph. Although I have no idea why it's here and not in the RouteGraph function itself. I suppose it's because the routegraph can't perform this operation on itself. But I'm not a massive fan of this design to be perfectly honest. */
-		for (int satnum = 0; satnum < maxsats; satnum++)
-		{
-			// I'm going to pass the satellite orbit information to the RouteGraph. So that it can encapsulate it properly. Makes log reading much easier.
-
-
-			for (int i = 0; i < satlist[satnum].assignedcount; i++)
-			{
-				rgph.AddNeighbour(satnum, satlist[satnum].assignedsats[i].satid, false);
-			}
-
-			// Add start city
-			// float radiodist = Vector3.Distance(satlist[satnum].gameobject.transform.position,
-			// city1.transform.position);
-			// THIS is why there's only one routegraph. or at least I think this is why.
-			// if (radiodist * km_per_unit < maxdist)
-			// {
-			/* I THINK this takes the groundstation, if the radio distance * km per unit is smaller than the maximum distance,
-			then one can add a satellite neighbour to it. */
-			/* create a link between maxsats and satnum of distance radiodist */
-			// rgph.AddNeighbour(maxsats, satnum, radiodist, true);
-			// }
-			// else if (radiodist * km_per_unit < maxdist + margin)
-			// {
-			// rgph.AddNeighbour(maxsats, satnum, Node.INFINITY, true);
-			// }
-
-			// Add end city
-			// radiodist = Vector3.Distance(satlist[satnum].gameobject.transform.position,
-			// 	city2.transform.position);
-			// if (radiodist * km_per_unit < maxdist)
-			// {
-			// 	rgph.AddNeighbour(maxsats + 1, satnum, radiodist, true);
-			// }
-			// else if (radiodist * km_per_unit < maxdist + margin)
-			// {
-			// 	rgph.AddNeighbour(maxsats + 1, satnum, Node.INFINITY, true);
-			// }
-
-			// Add relays
-			if (graph_on)
-			{
-				satlist[satnum].GraphReset();
-			}
-
-			// List<List<City>> in_range = grid.FindInRange(satlist[satnum].gameobject.transform.position);
-			// foreach (List<City> lst in in_range)
-			// {
-			// 	foreach (City relay in lst)
-			// 	{
-			// 		radiodist = Vector3.Distance(satlist[satnum].gameobject.transform.position, relay.gameobject.transform.position);
-			// 		if (radiodist * km_per_unit < maxdist)
-			// 		{
-			// 			rgph.AddNeighbour(maxsats + 2 + relay.relayid, satnum, radiodist, true);
-			// 			if (graph_on)
-			// 			{
-			// 				satlist[satnum].GraphOn(relay.gameobject, null);
-			// 			}
-			// 		}
-			// 		else if (radiodist * km_per_unit < maxdist + margin)
-			// 		{
-			// 			rgph.AddNeighbour(maxsats + 2 + relay.relayid, satnum, Node.INFINITY, true);
-			// 		}
-			// 	}
-			// }
-			if (graph_on)
-			{
-				satlist[satnum].GraphDone();
-			}
-		}
-	}
-
-	RouteGraph BuildRouteGraph(RouteGraph rgph, GameObject city1, GameObject city2, float maxdist, float margin)
+	public RouteGraph BuildRouteGraph(RouteGraph rgph, GameObject city1, GameObject city2, float maxdist, float margin)
 	{
 		// TODO: create a routegraph function that DOES NOT include cities!
+		// public for a temporary amount of time
 		/* Done for route creation. */
 
 		/* This function builds the route graph. Although I have no idea why it's here and not in the RouteGraph function itself. I suppose it's because the routegraph can't perform this operation on itself. But I'm not a massive fan of this design to be perfectly honest. */
@@ -1201,6 +1124,102 @@ public class SP_basic_0031 : MonoBehaviour
 				sat.BeamOn();
 			}
 		}
+	}
+
+	/* Draw the computed path. */
+	void DrawRoute(RouteGraph rgph, GameObject city1, GameObject city2)
+	{
+		Node rn = rgph.endnode;
+		Node prevnode = null;
+		SatelliteSP0031 sat = null;
+		SatelliteSP0031 prevsat = null;
+		int previd = -4;
+		int id = -4; /* first id */
+		double prevdist = km_per_unit * rn.Dist;
+		int hop = 0;
+		while (true)
+		{
+			previd = id;
+			id = rn.Id;
+
+			if (previd != -4)
+			{
+				if (previd >= 0 && id >= 0) // It's an ISL
+				{
+					sat = satlist[id];
+					prevsat = satlist[previd];
+
+					// Increase the load of the link
+					string linkName = previd.ToString() + "-" + id.ToString();
+					if (!linkCapacity.ContainsKey(linkName))
+					{
+						linkCapacity.Add(linkName, 0); // TODO: do I want to add all nodes to link capacity?
+					}
+					linkCapacity[linkName] += 100; // Add 100 mbits
+
+					if (linkCapacity[linkName] >= MAX_CAPACITY) // Link is flooded.
+					{
+						break;
+					}
+
+					int pathcolour = 2;
+					if (pathcolour >= laserMaterials.Length)
+					{
+						pathcolour = laserMaterials.Length - 1;
+					}
+					sat.ColourLink(prevsat, laserMaterials[pathcolour]); // TODO: check this.
+					prevsat.ColourLink(sat, laserMaterials[pathcolour]);
+					used_isl_links.Add(new ActiveISL(sat, rn, prevsat, prevnode)); // TODO: remove this afterwards.
+				}
+				else // It's an RF (radio frequency) link
+				{
+					if (id >= 0) // the current node is a satellite
+					{
+						sat = satlist[id];
+						if (previd == -2) // the previous node was a city. Add an active RF link.
+						{
+							used_rf_links.Add(new ActiveRF(city2, prevnode, sat, rn));
+						}
+						else
+						{
+							// NB. Not sure what this is either.
+							GameObject city = get_relay(previd);
+							sat.LinkOn(city);
+							used_rf_links.Add(new ActiveRF(city, prevnode, sat, rn));
+						}
+					}
+					else // the node is a city
+					{
+						sat = satlist[previd];
+						if (id == -1)
+						{
+							used_rf_links.Add(new ActiveRF(city1, rn, sat, prevnode));
+						}
+						else
+						{
+							// NB. Not entirely sure what this is.
+							GameObject city = get_relay(id);
+							sat.LinkOn(city);
+							used_rf_links.Add(new ActiveRF(city, rn, sat, prevnode));
+							ChangeCityMaterial(city, cityMaterial);
+						}
+					}
+				}
+			}
+
+			if (rn == rgph.startnode)
+			{
+				break;
+			}
+			prevnode = rn;
+			rn = rn.Parent;
+			if (rn == null)
+			{
+				highlight_reachable();
+				return;
+			}
+		}
+
 	}
 
 	float Route(int pathnum, GameObject city1, GameObject city2, string name, float rtt, float actualdist)
@@ -1671,6 +1690,32 @@ public class SP_basic_0031 : MonoBehaviour
 		return nearest_dist;
 	}
 
+	BinaryHeap<Path> FindAttackRoutes(RouteGraph rg, List<GameObject> dest_groundstations) // move somewhere else
+	{
+		BinaryHeap<Path> heap = new BinaryHeap<Path>(dest_groundstations.Count * this._attacker.SourceGroundstations.Count); // priority queue <routegraph, routelength>
+		foreach (GameObject src_gs in this._attacker.SourceGroundstations)
+		{
+			foreach (GameObject dest_gs in dest_groundstations)
+			{
+				if (dest_gs == src_gs)
+				{
+					continue;
+				}
+				// TODO: should I clear the route graph?
+				rg = BuildRouteGraph(rg, src_gs, dest_gs, this.maxdist, this.margin);
+				rg.ComputeRoutes();
+
+				Path path = this._attacker.ExtractAttackRoute(rg, src_gs, dest_gs);
+				if (path != null)
+				{
+					heap.Add(path, (double)path.nodes.Count);
+				}
+			}
+		}
+		// TODO: add the routes in a pq
+		return heap;
+	}
+
 	// Only uncomment for debugging if I need to see the attack sphere.
 	void OnDrawGizmos()
 	{
@@ -1747,88 +1792,97 @@ public class SP_basic_0031 : MonoBehaviour
 		Debug.Assert(this._attacker != null);
 
 		if (!pause) countdown.text = elapsed_time.ToString("0.0");
-		Route(1, new_york, san_francisco, "New York-San Francisco", 0f, 4689f); // example route
+		// Route(1, new_york, san_francisco, "New York-San Francisco", 0f, 4689f); // example route
 
 		// 2. identify a link to target.
 		this.rg = BuildRouteGraph(this.rg, new_york, toronto, this.maxdist, this.margin); // TODO: create a BuildRouteGraph that doesn't include cities.
-		this._attacker.UpdateLinks(this.rg, this.linkCapacity);
+		this._attacker.UpdateLinks(this.rg, this.linkCapacity, SP_basic_0031.MAX_CAPACITY);
 
-		// Update the maximum capacity of target link.
+		// if (!this._attacker.HasValidVictimLink())
+		//         {
+		//             this.SwitchVictimLink(rg);
+		//             if (this.VictimSrcNode == null || this.VictimDestNode == null)
+		//             {
+		//                 UnityEngine.Debug.Log("Attacker.Update | Could not select a new link.");
+		//             }
+		//         }
+		//         else
+		//         {
+		//             UnityEngine.Debug.Log("Attacker.Update | Previous link is still valid."); // I need to highlight the link.
+		//         }
+
+		//         if (_attacker.HasValidVictimLink())
+		//         {
+		//             if (!link_capacity.ContainsKey(_attacker.LinkName()))
+		//             {
+		//                 this.LinkCapacityLimit = SP_basic_0031.MAX_CAPACITY;
+		//             }
+		//             else
+		//             {
+		//                 this.LinkCapacityLimit = link_capacity[this.LinkName()];
+		//             }
+		//             UnityEngine.Debug.Log("Attacker.Update | Selected link: " + this.VictimSrcNode.Id + " - " + this.VictimDestNode.Id + " of remaining capacity: " + this.LinkCapacityLimit);
+		//         }
+		//         else
+		//         {
+		//             UnityEngine.Debug.Log("Attacker.Update | Could not find any valid links.");
+		//         }
+
 		if (this._attacker.HasValidVictimLink())
 		{
+			// 3. update the maximum capacity of the target link.
 			this.linkCapacity[this._attacker.LinkName()] = this._attacker.LinkCapacityLimit;
-		}
 
+			// 4. find viable attack routes.
+			BinaryHeap<Path> attack_routes = this.FindAttackRoutes(this.rg, new List<GameObject>() { new_york, toronto });
 
-		List<string> viable_paths = new List<string>();
-		// attack the link
-		foreach (GameObject src_gs in this._attacker.SourceGroundstations)
-		{
-			// LIst
-			foreach (GameObject dest_gs in this._attacker.SourceGroundstations /* TODO: change this to all other groundstations */)
+			// DEBUGGING
+			if (attack_routes.Count > 0)
 			{
-				if (dest_gs == src_gs)
-				{
-					continue;
-				}
-				BuildRouteGraph(this.rg, src_gs, dest_gs, this.maxdist, this.margin);
-				rg.ResetOnPathStatus();
-				rg.ComputeRoutes();
-
-				/* Figure out the start and end satellites IDs.
-				Start with the endnode ground station, and passes through all of the nodes in the computed route
-				until the startnode is found. If the startnode is found, then store the start satid. Otherwise,
-				return Node.INFINITY.*/
-				string path = "";
-				// List<Node
-				rn = rg.endnode;
-				int startsatid = 0, endsatid = -1;
-				id = -4;
-				while (true)
-				{
-					if (rn == rg.startnode)
-					{
-						startsatid = id;
-						break;
-					}
-					id = rn.Id;
-					// rn.OnPath = true; // this I don't care about.
-					path = path + id.ToString() + " ";
-
-					if (endsatid == -1 && id >= 0)
-					{
-						endsatid = id;
-					}
-					rn = rn.Parent;
-
-					if (rn == null) // No complete route was found. Return Node.INFINITY.
-					{
-						// just exit.
-						continue;
-					}
-				}
-
-				if (this._attacker.LinkName().Contains(path) /* AND IS THERE A CONFLICT BETWEEN THIS AND ANOTHER PATH? */)
-
-				{
-					viable_paths.Add(path); // TODO: add the routegraph instead.add the routegraph instead? or is that too much information?
-				}
-
+				attack_routes.ExtractMin();
 			}
 		}
 
 
-		// Color the target link to highlight it
+
+
+		// 5. create routes until the link's capacity has been reached.
+		// if (this._attacker.HasValidVictimLink())
+		// {
+		// 	while (linkCapacity[this._attacker.LinkName()] >= 0)
+		// 	{
+		// 		List<Node> attack_path = attack_routes.ExtractMin().nodes;
+		// 		if (attack_path == null) // no more attack routes left
+		// 		{
+		// 			break;
+		// 		}
+		// 		// DrawRoute(attack_path); // make an actual drawroute function.
+		// 	}
+		// }
+
+		// Post processing
 		if (this._attacker.HasValidVictimLink())
 		{
-			// highlight the target link
+			// highlight the target.
 			int pathcolour = 3;
 			SatelliteSP0031 sat = satlist[this._attacker.VictimDestNode.Id];
 			SatelliteSP0031 prevsat = satlist[this._attacker.VictimSrcNode.Id];
 			sat.ColourLink(prevsat, laserMaterials[pathcolour]); // TODO: check this.
 			prevsat.ColourLink(sat, laserMaterials[pathcolour]);
 			used_isl_links.Add(new ActiveISL(sat, this._attacker.VictimDestNode, prevsat, this._attacker.VictimSrcNode));
+
+			// check if the target was flooded.
+			if (this.linkCapacity[this._attacker.LinkName()] <= 0)
+			{
+				Debug.Log("Update: Link was flooded.");
+			}
+			else
+			{
+				Debug.Log("Update: Link could not be flooded.");
+			}
 		}
+
+
 
 		/* Turn on RF links for each satellite pair found */
 		used_rf_links.ForEach(a => a.sat.LinkOn(a.city));
