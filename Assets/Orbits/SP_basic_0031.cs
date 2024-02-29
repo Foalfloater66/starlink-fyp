@@ -1794,8 +1794,6 @@ public class SP_basic_0031 : MonoBehaviour
 		}
 		this.RotateCamera();
 
-		Debug.Assert(this._attacker != null);
-
 		if (!pause) countdown.text = elapsed_time.ToString("0.0");
 
 		// 2. Update the routegraph
@@ -1804,14 +1802,14 @@ public class SP_basic_0031 : MonoBehaviour
 		this.rg = BuildRouteGraph(this.rg, new_york, toronto, this.maxdist, this.margin);
 
 		// 2. identify a link to target.
-		this._attacker.UpdateLinks(this.rg, this.linkCapacity, SP_basic_0031.MAX_CAPACITY);
+		this._attacker.UpdateLinks(this.rg, SP_basic_0031.MAX_CAPACITY);
 
 		LockRoute();
 
 		if (this._attacker.HasValidVictimLink())
 		{
 			// 3. update the maximum capacity of the target link.
-			this.linkCapacity[this._attacker.LinkName()] = this._attacker.LinkCapacityLimit;
+			this.linkCapacity[this._attacker.Link.Name] = this._attacker.Link.Capacity;
 
 			// 4. find viable attack routes.
 			BinaryHeap<Path> attack_routes = FindAttackRoutes(this.rg, new List<GameObject>() { new_york, london });
@@ -1822,7 +1820,7 @@ public class SP_basic_0031 : MonoBehaviour
 				Debug.Log("NO PATHS...");
 			}
 
-			while (linkCapacity[this._attacker.LinkName()] >= 0 && attack_routes.Count > 0)
+			while (linkCapacity[this._attacker.Link.Name] >= 0 && attack_routes.Count > 0)
 			{
 				Path attack_path = attack_routes.ExtractMin();
 				if (attack_path == null) // no more attack routes left
@@ -1837,14 +1835,14 @@ public class SP_basic_0031 : MonoBehaviour
 			// 6. Post-processing
 			// highlight the target.
 			int pathcolour = 3;
-			SatelliteSP0031 sat = satlist[this._attacker.VictimDestNode.Id];
-			SatelliteSP0031 prevsat = satlist[this._attacker.VictimSrcNode.Id];
+			SatelliteSP0031 sat = satlist[this._attacker.Link.DestNode.Id];
+			SatelliteSP0031 prevsat = satlist[this._attacker.Link.SrcNode.Id];
 			sat.ColourLink(prevsat, laserMaterials[pathcolour]); // TODO: check this.
 			prevsat.ColourLink(sat, laserMaterials[pathcolour]);
-			used_isl_links.Add(new ActiveISL(sat, this._attacker.VictimDestNode, prevsat, this._attacker.VictimSrcNode));
+			used_isl_links.Add(new ActiveISL(sat, this._attacker.Link.DestNode, prevsat, this._attacker.Link.SrcNode));
 
 			// check if the target was flooded.
-			if (this.linkCapacity[this._attacker.LinkName()] <= 0)
+			if (this.linkCapacity[this._attacker.Link.Name] <= 0)
 			{
 				Debug.Log("Update: Link was flooded.");
 			}

@@ -28,6 +28,23 @@ public class Path : HeapNode
 public class Attacker
 {
 
+    public class TargetLink
+    {
+        public Node SrcNode { get; protected set; }
+        public Node DestNode { get; protected set; }
+
+        public string Name { get; private set; }
+        public int Capacity { get; set; } // victim link capacity TODO: should I protect this?
+
+        public TargetLink(Node src_node, Node dest_node, int capacity)
+        {
+            this.SrcNode = src_node;
+            this.DestNode = dest_node;
+            this.Name = SrcNode.Id.ToString() + "-" + SrcNode.Id.ToString();
+            this.Capacity = capacity;
+        }
+    }
+
     /* attacker source groundstations at disposal */
     public List<GameObject> SourceGroundstations { get; set; }
 
@@ -35,28 +52,36 @@ public class Attacker
 
     public float Radius { get; private set; }
 
+    public TargetLink Link { get; private set; }
+
     public System.IO.StreamWriter summary_logfile; // TODO: move it here.
 
-    public Node VictimSrcNode { get; protected set; } // victim link source node
-
-    public Node VictimDestNode { get; protected set; } // victim link destination node
-
-    public int LinkCapacityLimit { get; set; } // victim link capacity TODO: should I protect this?
-
-    public String LinkName() // TODO: move this from LinkName function to a function that it only can update the source ndoe.
+    /* instantiates the attacker object with a requested victim radius of specified latitude and longitude. */
+    public Attacker(float latitude, float longitude, GameObject prefab, Transform transform /* try and make these last 2 vars optional as they seem kind of weird to add here as variables */, float sat0r /* satellite radius from earth centre */, System.IO.StreamWriter summary_logfile, float radius, List<GameObject> src_groundstations)
     {
-        if (this.VictimSrcNode == null || this.VictimDestNode == null)
-        {
-            return null;
-        }
-        return this.VictimSrcNode.Id.ToString() + "-" + this.VictimDestNode.Id.ToString();
+        this.SourceGroundstations = src_groundstations;
+        this.TargetAreaCenterpoint = Vector3.zero;
+        this.Radius = radius;
+        this.SetVictimRadius(latitude, longitude, sat0r, prefab, transform);
+        this.Link = null;
+        this.summary_logfile = summary_logfile;
+        System.Diagnostics.Debug.Assert(this.TargetAreaCenterpoint != null);
     }
 
-    /* Compute the shortest route between src_gs, dest_gs pair. If a route containing the target link is found, returen the route graph with the length of the route. Otherwise, return null. */ // TODO: is there a more efficient way of computing the length? maybe through the djikstra function? not doing that now though.
+    /* Check if the currently selected victim link is still within the target area. Returns true if at least one node is in the target area,
+    false otherwise. If the victim link hasn't been set, returns false. */
+    public bool HasValidVictimLink()
+    {
+        return (this.Link != null && (this.InTargetArea(this.Link.SrcNode.Position) || this.InTargetArea(this.Link.DestNode.Position)));
+    }
+
+    /* Get the shorted route between src_gs & dest_gs. If a route containing the target link is found, returen the route graph with the length of the route. Otherwise, return null. */
     public Path ExtractAttackRoute(RouteGraph rg, GameObject src_gs, GameObject dest_gs)
     {
-        Path route = new Path(src_gs, dest_gs);
+        // TODO: Optimise the extracting of a route.
+        System.Diagnostics.Debug.Assert(this.Link != null, "ExtractAttackRoute | No attacker link has been set.");
 
+        Path route = new Path(src_gs, dest_gs);
         Node rn = rg.endnode;
         int startsatid = 0, endsatid = -1;
         int id = -4;
@@ -78,7 +103,7 @@ public class Attacker
             }
             if (id >= 0)
             {
-                if (route.nodes.Last().Id == this.VictimDestNode.Id && id == this.VictimSrcNode.Id)
+                if (route.nodes.Last().Id == this.Link.SrcNode.Id && id == this.Link.DestNode.Id)
                 {
                     viable_route = true;
                 }
@@ -103,51 +128,6 @@ public class Attacker
             return route;
         }
         return null;
-    }
-
-    // public BinaryHeap<Path> FindAttackRoutes(RouteGraph rg, List<GameObject> dest_groundstations, )
-    // {
-    //     BinaryHeap<Path> attack_routes = new BinaryHeap<Path>(dest_groundstations.Count * this.SourceGroundstations.Count); // priority queue <routegraph, routelength>
-    //     foreach (GameObject src_gs in this.SourceGroundstations)
-    //     {
-    //         foreach (GameObject dest_gs in dest_groundstations)
-    //         {
-    //             if (dest_gs == src_gs)
-    //             {
-    //                 continue;
-    //             }
-    //             // TODO: should I clear the route graph?
-    //             rg = SP_basic_0031.BuildRouteGraph(rg, src_gs, dest_gs, SP_basic_0031.maxdist, SP_basic_0031.margin);
-    //             rg.ComputeRoutes();
-
-    //             List<Path> path = this.ExtractAttackRoute(rg, src_gs, dest_gs);
-    //             if (path != null)
-    //             {
-    //                 attack_routes.Enqueue(path);
-    //             }
-    //         }
-    //     }
-    //     // TODO: add the routes in a pq
-    //     return attack_routes;
-    // }
-
-    /* Attempt to attack link by sending paths through the contained source nodes. If successful, returns true. Otherwise, returns false. */
-    // public void AttackLink(RouteGraph rg, List<GameObject> dest_groundstations)
-    // {
-    //     // TODO: write this.
-    //     PriorityQueue<RouteGraph, int> attack_routes = this.FindAttackRoutes(rg, dest_groundstations);
-    // }
-
-    /* instantiates the attacker object with a requested victim radius of specified latitude and longitude. */
-    public Attacker(float latitude, float longitude, GameObject prefab, Transform transform /* try and make these last 2 vars optional as they seem kind of weird to add here as variables */, float sat0r /* satellite radius from earth centre */, System.IO.StreamWriter summary_logfile, float radius, List<GameObject> src_groundstations)
-    {
-        this.SourceGroundstations = src_groundstations;
-        this.TargetAreaCenterpoint = Vector3.zero;
-        this.Radius = radius;
-        this.LinkCapacityLimit = 0; // Basically nil if it's not been set.
-        this.SetVictimRadius(latitude, longitude, sat0r, prefab, transform);
-        this.summary_logfile = summary_logfile;
-        System.Diagnostics.Debug.Assert(this.TargetAreaCenterpoint != null);
     }
 
     /* select a specified centerpoint for the target sphere. If latitude and longitude are 0, generates them randomly. WELL ACTUALLY I CANT DO THAT AND I HAVE TO CHANGE THIS :(*/
@@ -177,35 +157,15 @@ public class Attacker
         this.TargetAreaCenterpoint = target.transform.position;
     }
 
-
     /* checks if the input coordinates are within the sphere of attack */
     private bool InTargetArea(Vector3 position)
     {
-        summary_logfile.WriteLine(new String('=', 20));
-        summary_logfile.WriteLine("TEST POSITION: " + position.x + "; " + position.y + "; " + position.z);
-        summary_logfile.WriteLine("TARGET AREA: " + this.TargetAreaCenterpoint.x + "; " + this.TargetAreaCenterpoint.y + "; " + this.TargetAreaCenterpoint.z);
-
-        summary_logfile.WriteLine("DISTANCE BETWEEN THE TWO: " + Vector3.Distance(position, this.TargetAreaCenterpoint));
-        summary_logfile.Flush();
-
-        return (Vector3.Distance(position, this.TargetAreaCenterpoint) < this.Radius /* temporary radius */);
+        return (Vector3.Distance(position, this.TargetAreaCenterpoint) < this.Radius);
     }
 
-
-    /* Check if the currently selected victim link is still within the target area. Returns true if at least one node is in the target area,
-    false otherwise. If the victim link hasn't been set, returns false. */
-    public bool HasValidVictimLink()
+    private Node SelectRandomSrcNode(RouteGraph rg)
     {
-        if (this.VictimSrcNode != null && this.VictimDestNode != null)
-        {
-            return (this.InTargetArea(this.VictimSrcNode.Position) || this.InTargetArea(this.VictimDestNode.Position));
-        }
-        return false;
-    }
-
-    private void SelectRandomSrcNode(RouteGraph rg)
-    {
-        // Pick a random source node.
+        Node node = null;
         Dictionary<int, Node> nodes = new Dictionary<int, Node>(); // index, node 
         int remaining_nodes = rg.nodes.Count();
         for (int i = 0; i < rg.nodes.Count(); i++) nodes.Add(i, rg.nodes[i]);
@@ -213,39 +173,36 @@ public class Attacker
         while (remaining_nodes > 0)
         {
             int i = new System.Random().Next(rg.nodes.Count());
-            Node node = nodes[i];
+            node = nodes[i];
             if (node == null)
             {
                 continue; // already seen.
             }
             if (node.Id > 0 && this.InTargetArea(node.Position))
             {
-                this.VictimSrcNode = node;
+                // src_node = node;
                 break;
             }
             nodes[i] = null;
             remaining_nodes -= 1;
         }
-        if (this.VictimSrcNode != null && this.VictimSrcNode.LinkCount == 0)
-        {
-            this.VictimSrcNode = null; // the source node has no links.
-        }
+        return node; // the node might not have any links!
     }
 
-    private Node SelectRandomOutOfTargetDestinationNode(RouteGraph rg)
+    private Node SelectRandomOutOfTargetDestinationNode(Node src_node, RouteGraph rg)
     {
         Node node = null;
         HashSet<int> explored_indexes = new HashSet<int>();
         int j = 0;
 
-        while (j < this.VictimSrcNode.LinkCount)
+        while (j < src_node.LinkCount)
         {
-            int i = new System.Random().Next(this.VictimSrcNode.LinkCount);
+            int i = new System.Random().Next(src_node.LinkCount);
             if (explored_indexes.Contains(i))
             {
                 continue;
             }
-            node = this.VictimSrcNode.GetNeighbour(this.VictimSrcNode.GetLink(i));
+            node = src_node.GetNeighbour(src_node.GetLink(i));
             if (node.Id > 0)
             {
                 break;
@@ -257,17 +214,17 @@ public class Attacker
         return (node != null && node.Id > 0 ? node : null); // only return valid destination nodes.
     }
 
-    private Node SelectRandomInTargetDestinationNode(RouteGraph rg)
+    private Node SelectRandomInTargetDestinationNode(Node src_node, RouteGraph rg)
     {
 
         Dictionary<int, Node> nodes = new Dictionary<int, Node>(); // index, node 
-        int remaining_nodes = this.VictimSrcNode.LinkCount;
+        int remaining_nodes = src_node.LinkCount;
 
-        for (int i = 0; i < this.VictimSrcNode.LinkCount; i++) nodes.Add(i, this.VictimSrcNode.GetNeighbour(this.VictimSrcNode.GetLink(i)));
+        for (int i = 0; i < src_node.LinkCount; i++) nodes.Add(i, src_node.GetNeighbour(src_node.GetLink(i)));
 
         while (remaining_nodes > 0) // prioritise ISL links that are fully contained in the target radius.
         {
-            int i = new System.Random().Next(this.VictimSrcNode.LinkCount);
+            int i = new System.Random().Next(src_node.LinkCount);
             Node node = nodes[i];
             if (node == null)
             {
@@ -283,74 +240,52 @@ public class Attacker
         return null;
     }
 
-    private void SelectRandomDestinationNode(RouteGraph rg)
+    private Node SelectRandomDestinationNode(Node src_node, RouteGraph rg)
     {
-        this.VictimDestNode = this.SelectRandomInTargetDestinationNode(rg);
-        if (this.VictimDestNode == null)
+        Node dest_node = this.SelectRandomInTargetDestinationNode(src_node, rg);
+        if (dest_node == null)
         {
-            this.VictimDestNode = this.SelectRandomOutOfTargetDestinationNode(rg); // select random link which is partially in the target radius
+            return this.SelectRandomOutOfTargetDestinationNode(src_node, rg); // select random link which is partially in the target radius
         }
+        return dest_node;
     }
 
     /* randomly select a victim link within the target radius. If no target radius is specified, return a NoVictimError. If success, returns the victim link (src, dest) node. If failure, returns nothing. Failure may occur if no source node was found, or if the source node has no links.
-  */
-    private void SwitchVictimLink(RouteGraph rg)
+    */
+    private void ChangeVictimLink(RouteGraph rg, int max_capacity)
     {
-        this.SelectRandomSrcNode(rg);
-        if (this.VictimSrcNode == null) // might want to just return the source node
+        Node src_node = this.SelectRandomSrcNode(rg);
+        if (src_node != null)
         {
-            return;
+            Node dest_node = this.SelectRandomDestinationNode(src_node, rg); // TODO: just select out of neighbours. I don't really need the routegraph at this point.
+            if (dest_node != null)
+            {
+                this.Link = new Attacker.TargetLink(src_node, dest_node, max_capacity);
+                return;
+            }
         }
-        this.SelectRandomDestinationNode(rg); // might want to just return the destination node.
-        if (this.VictimDestNode == null)
-        {
-            this.VictimSrcNode = null;
-        }
+        this.Link = null;
     }
-
-    /* update the nodes associated with the target link. */ // TODO: it works even without this. Is it even needed?
-    public void UpdateLinkPosition(RouteGraph rg)
-    {
-        System.Diagnostics.Debug.Assert(this.VictimSrcNode != null);
-        System.Diagnostics.Debug.Assert(this.VictimDestNode != null);
-
-        this.VictimSrcNode = rg.GetNode(this.VictimSrcNode.Id);
-        this.VictimDestNode = rg.GetNode(this.VictimDestNode.Id);
-    }
-
 
     /* Updates the selected links by switching links if the current one is invalid and updates its link capacity according to information coming from the caller */
-    public void UpdateLinks(RouteGraph rg, Dictionary<string, int> link_capacity, int max_capacity)
+    public void UpdateLinks(RouteGraph rg, int max_capacity)
     {
 
         if (!this.HasValidVictimLink())
         {
-            this.SwitchVictimLink(rg);
-            if (this.VictimSrcNode == null || this.VictimDestNode == null)
+            this.ChangeVictimLink(rg, max_capacity);
+            if (this.Link == null)
             {
-                UnityEngine.Debug.Log("Attacker.Update | Could not select a new link.");
-            }
-        }
-        else
-        {
-            UnityEngine.Debug.Log("Attacker.Update | Previous link is still valid of coords " + this.VictimSrcNode.Position); // I need to highlight the link.
-        }
-
-        if (this.HasValidVictimLink())
-        {
-            if (!link_capacity.ContainsKey(this.LinkName()))
-            {
-                this.LinkCapacityLimit = max_capacity;
+                UnityEngine.Debug.Log("Attacker.Update | Could not find any valid link.");
             }
             else
             {
-                this.LinkCapacityLimit = link_capacity[this.LinkName()];
+                UnityEngine.Debug.Log("Attacker.Update | Changed link: " + this.Link.SrcNode.Id + " - " + this.Link.DestNode.Id + " of remaining capacity: " + this.Link.Capacity);
             }
-            UnityEngine.Debug.Log("Attacker.Update | Selected link: " + this.VictimSrcNode.Id + " - " + this.VictimDestNode.Id + " of remaining capacity: " + this.LinkCapacityLimit);
         }
         else
         {
-            UnityEngine.Debug.Log("Attacker.Update | Could not find any valid links.");
+            UnityEngine.Debug.Log("Attacker.Update | Previous link is still valid.");
         }
     }
 }
