@@ -13,6 +13,16 @@ public class Path : HeapNode
 {
     // this should be in routing.
     public List<Node> nodes = new List<Node>();
+
+    public GameObject startcity;
+
+    public GameObject endcity;
+
+    public Path(GameObject startcity, GameObject endcity)
+    {
+        this.startcity = startcity;
+        this.endcity = endcity;
+    }
 }
 
 abstract public class Attacker
@@ -39,7 +49,7 @@ abstract public class Attacker
     /* Compute the shortest route between src_gs, dest_gs pair. If a route containing the target link is found, returen the route graph with the length of the route. Otherwise, return null. */ // TODO: is there a more efficient way of computing the length? maybe through the djikstra function? not doing that now though.
     public Path ExtractAttackRoute(RouteGraph rg, GameObject src_gs, GameObject dest_gs)
     {
-        Path route = new Path();
+        Path route = new Path(src_gs, dest_gs);
 
         Node rn = rg.endnode;
         int startsatid = 0, endsatid = -1;
@@ -62,7 +72,7 @@ abstract public class Attacker
             }
             if (id >= 0)
             {
-                if (String.Equals(route.nodes.Last().Id.ToString() + "-" + id.ToString(), this.LinkName()))
+                if (route.nodes.Last().Id == this.VictimDestNode.Id && id == this.VictimSrcNode.Id)
                 {
                     viable_route = true;
                 }
@@ -75,6 +85,13 @@ abstract public class Attacker
             }
             route.nodes.Add(rn);
         }
+        List<string> path = new List<string>();
+        foreach (Node node in route.nodes)
+        {
+            path.Add(node.Id.ToString());
+        }
+        UnityEngine.Debug.Log("ExtractAttackRoute: found path of length " + route.nodes.Count + ": " + string.Join(" ", path));
+
         if (viable_route)
         {
             return route;

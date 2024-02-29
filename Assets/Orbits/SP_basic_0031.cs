@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using System.IO;
 using System;
 using System.Text;
+using System.Linq;
 using UnityEngine.SceneManagement;
 
 public enum RouteChoice { TransAt, TransPac, LonJob, USsparse, USsparseAttacked, USdense, TorMia, Sydney_SFO, Sydney_Tokyo, Sydney_Lima, Followsat };
@@ -358,8 +359,8 @@ public class SP_basic_0031 : MonoBehaviour
 		//Debug.Log("km_per_unit: " + km_per_unit.ToString() + " km_per_unit2: " + km_per_unit2.ToString());
 
 		// for now, only allows for Radius Attacks
-		this._attacker = new AreaAttacker(target_latitude, target_longitude, city_prefab, transform, sat0r, this.summary_logfile, 800f, new List<GameObject>() { redmond, miami, chicago });
-		// TODO: set groundstations.
+		List<GameObject> demo_dest_groundstations = new List<GameObject>() { redmond, miami, chicago, new_york };
+		this._attacker = new AreaAttacker(target_latitude, target_longitude, city_prefab, transform, sat0r, this.summary_logfile, 800f, demo_dest_groundstations);
 	}
 
 	void InitCities()
@@ -1127,9 +1128,9 @@ public class SP_basic_0031 : MonoBehaviour
 	}
 
 	/* Draw the computed path. */
-	void DrawRoute(RouteGraph rgph, GameObject city1, GameObject city2)
+	void DrawRoute(List<Node> path, GameObject city1, GameObject city2)
 	{
-		Node rn = rgph.endnode;
+		Node rn = path.Last();
 		Node prevnode = null;
 		SatelliteSP0031 sat = null;
 		SatelliteSP0031 prevsat = null;
@@ -1207,7 +1208,7 @@ public class SP_basic_0031 : MonoBehaviour
 				}
 			}
 
-			if (rn == rgph.startnode)
+			if (rn == path.First())
 			{
 				break;
 			}
@@ -1701,15 +1702,19 @@ public class SP_basic_0031 : MonoBehaviour
 				{
 					continue;
 				}
-				// TODO: should I clear the route graph?
+
+				ResetRoute(src_gs, dest_gs);
 				rg = BuildRouteGraph(rg, src_gs, dest_gs, this.maxdist, this.margin);
 				rg.ComputeRoutes();
+				Debug.Log(cityStrings[src_gs] + " to " + cityStrings[dest_gs]);
 
+				// BUG: the route I extracted does not work.
 				Path path = this._attacker.ExtractAttackRoute(rg, src_gs, dest_gs);
 				if (path != null)
 				{
 					heap.Add(path, (double)path.nodes.Count);
 				}
+				// LockRoute(); // TODO: lock route if the result is good.
 			}
 		}
 		// TODO: add the routes in a pq
@@ -1792,41 +1797,16 @@ public class SP_basic_0031 : MonoBehaviour
 		Debug.Assert(this._attacker != null);
 
 		if (!pause) countdown.text = elapsed_time.ToString("0.0");
-		// Route(1, new_york, san_francisco, "New York-San Francisco", 0f, 4689f); // example route
+
+		// 2. Update the routegraph
+		ClearRoute();
+		ResetRoute(new_york, toronto);
+		this.rg = BuildRouteGraph(this.rg, new_york, toronto, this.maxdist, this.margin);
 
 		// 2. identify a link to target.
-		this.rg = BuildRouteGraph(this.rg, new_york, toronto, this.maxdist, this.margin); // TODO: create a BuildRouteGraph that doesn't include cities.
 		this._attacker.UpdateLinks(this.rg, this.linkCapacity, SP_basic_0031.MAX_CAPACITY);
 
-		// if (!this._attacker.HasValidVictimLink())
-		//         {
-		//             this.SwitchVictimLink(rg);
-		//             if (this.VictimSrcNode == null || this.VictimDestNode == null)
-		//             {
-		//                 UnityEngine.Debug.Log("Attacker.Update | Could not select a new link.");
-		//             }
-		//         }
-		//         else
-		//         {
-		//             UnityEngine.Debug.Log("Attacker.Update | Previous link is still valid."); // I need to highlight the link.
-		//         }
-
-		//         if (_attacker.HasValidVictimLink())
-		//         {
-		//             if (!link_capacity.ContainsKey(_attacker.LinkName()))
-		//             {
-		//                 this.LinkCapacityLimit = SP_basic_0031.MAX_CAPACITY;
-		//             }
-		//             else
-		//             {
-		//                 this.LinkCapacityLimit = link_capacity[this.LinkName()];
-		//             }
-		//             UnityEngine.Debug.Log("Attacker.Update | Selected link: " + this.VictimSrcNode.Id + " - " + this.VictimDestNode.Id + " of remaining capacity: " + this.LinkCapacityLimit);
-		//         }
-		//         else
-		//         {
-		//             UnityEngine.Debug.Log("Attacker.Update | Could not find any valid links.");
-		//         }
+		LockRoute();
 
 		if (this._attacker.HasValidVictimLink())
 		{
@@ -1834,35 +1814,27 @@ public class SP_basic_0031 : MonoBehaviour
 			this.linkCapacity[this._attacker.LinkName()] = this._attacker.LinkCapacityLimit;
 
 			// 4. find viable attack routes.
-			BinaryHeap<Path> attack_routes = this.FindAttackRoutes(this.rg, new List<GameObject>() { new_york, toronto });
+			BinaryHeap<Path> attack_routes = FindAttackRoutes(this.rg, new List<GameObject>() { new_york, london });
 
-			// DEBUGGING
-			if (attack_routes.Count > 0)
+			// 5. create routes until the link's capacity has been reached.
+			if (attack_routes.Count == 0)
 			{
-				attack_routes.ExtractMin();
+				Debug.Log("NO PATHS...");
 			}
-		}
 
+			while (linkCapacity[this._attacker.LinkName()] >= 0 && attack_routes.Count > 0)
+			{
+				Path attack_path = attack_routes.ExtractMin();
+				if (attack_path == null) // no more attack routes left
+				{
+					Debug.Log("No paths left....");
+					break;
+				}
+				DrawRoute(attack_path.nodes, attack_path.startcity, attack_path.endcity); // make an actual drawroute function.
+				break;
+			}
 
-
-
-		// 5. create routes until the link's capacity has been reached.
-		// if (this._attacker.HasValidVictimLink())
-		// {
-		// 	while (linkCapacity[this._attacker.LinkName()] >= 0)
-		// 	{
-		// 		List<Node> attack_path = attack_routes.ExtractMin().nodes;
-		// 		if (attack_path == null) // no more attack routes left
-		// 		{
-		// 			break;
-		// 		}
-		// 		// DrawRoute(attack_path); // make an actual drawroute function.
-		// 	}
-		// }
-
-		// Post processing
-		if (this._attacker.HasValidVictimLink())
-		{
+			// 6. Post-processing
 			// highlight the target.
 			int pathcolour = 3;
 			SatelliteSP0031 sat = satlist[this._attacker.VictimDestNode.Id];
@@ -1881,8 +1853,6 @@ public class SP_basic_0031 : MonoBehaviour
 				Debug.Log("Update: Link could not be flooded.");
 			}
 		}
-
-
 
 		/* Turn on RF links for each satellite pair found */
 		used_rf_links.ForEach(a => a.sat.LinkOn(a.city));
