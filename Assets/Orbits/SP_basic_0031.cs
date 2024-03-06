@@ -82,7 +82,9 @@ public class SP_basic_0031 : MonoBehaviour
 
 	private Dictionary<string, int> linkCapacity = new Dictionary<string, int>(); /* (node1, node2) link mapping to capacity. Links are full duplex. */
 
-	public static int MAX_CAPACITY = 110;
+	private LinkCapacityMonitor _link_capacities;
+
+	public int initial_link_capacity = 1000;
 
 	GameObject[] orbits;
 	double[] orbitalperiod;
@@ -365,6 +367,7 @@ public class SP_basic_0031 : MonoBehaviour
 		// for now, only allows for Radius Attacks
 		List<GameObject> demo_dest_groundstations = new List<GameObject>() { miami, new_york };
 		this._attacker = AttackerFactory.CreateAttacker(target_latitude, target_longitude, city_prefab, transform, sat0r, this.summary_logfile, attack_radius, demo_dest_groundstations, true);
+		this._link_capacities = new LinkCapacityMonitor(initial_link_capacity);
 	}
 
 	void InitCities()
@@ -1131,32 +1134,9 @@ public class SP_basic_0031 : MonoBehaviour
 		}
 	}
 
-	/* If a link doesn't exist in the dictionary, add it. */
-	void AddMissingLink(string link_name)
-	{
-		if (!linkCapacity.ContainsKey(link_name))
-		{
-			linkCapacity.Add(link_name, 0); // TODO: do I want to first add all nodes to link capacity? (no, I don't think so. That's unecessary memory usage.);
-											// TODO: add a INITIAL_CAPACITY constant variable.
-		}
-	}
 
-	/* Decreases capacity of a link <src_id, dest_id> by mbits.*/
-	void DecreaseLinkCapacity(int src_id, int dest_id, int mbits)
-	{ // TODO: Create a link class. just makes things cleaner.
-	  // TODO: ensure capacity is a maximum thing that decreases!
-		string link_name = src_id.ToString() + "-" + dest_id.ToString();
-		AddMissingLink(link_name);
-		linkCapacity[link_name] -= mbits; // Add 100 mbits
-	}
 
-	/* Checks if a link is flooded */
-	bool IsFlooded(int src_id, int dest_id)
-	{
-		string link_name = src_id.ToString() + "-" + dest_id.ToString();
-		AddMissingLink(link_name);
-		return (linkCapacity[link_name] >= MAX_CAPACITY);
-	}
+
 
 	/* Draw the computed path. */
 	void ExecuteAttackRoute(Node endnode, GameObject city1, GameObject city2)
@@ -1192,8 +1172,8 @@ public class SP_basic_0031 : MonoBehaviour
 					// Increase the load of the link
 					// TODO: make this a function.
 					// TODO: make the link load capacity rule also hold for RF links.
-					DecreaseLinkCapacity(previd, id, 200);
-					if (IsFlooded(previd, id))
+					_link_capacities.DecreaseLinkCapacity(previd, id, 200);
+					if (_link_capacities.IsFlooded(previd, id))
 					{
 						break;
 					}
@@ -1426,17 +1406,23 @@ public class SP_basic_0031 : MonoBehaviour
 					prevsat = satlist[previd];
 
 					// Increase the load of the link
-					string linkName = previd.ToString() + "-" + id.ToString();
-					if (!linkCapacity.ContainsKey(linkName))
-					{
-						linkCapacity.Add(linkName, 0); // TODO: do I want to add all nodes to link capacity?
-					}
-					linkCapacity[linkName] += 100; // Add 100 mbits
-
-					if (linkCapacity[linkName] >= MAX_CAPACITY) // Link is flooded.
+					_link_capacities.DecreaseLinkCapacity(previd, id, 100);
+					// TODO: change _link_capacities to capacity_monitor
+					// string linkName = previd.ToString() + "-" + id.ToString();
+					// if (!linkCapacity.ContainsKey(linkName))
+					// {
+					// 	linkCapacity.Add(linkName, 0); // TODO: do I want to add all nodes to link capacity?
+					// }
+					// linkCapacity[linkName] += 100; // Add 100 mbits
+					if (_link_capacities.IsFlooded(previd, id))
 					{
 						break;
 					}
+
+					// if (linkCapacity[linkName] >= MAX_CAPACITY) // Link is flooded.
+					// {
+					// break;
+					// }
 
 					int pathcolour = pathnum;
 					if (pathcolour >= laserMaterials.Length)
@@ -1852,7 +1838,7 @@ public class SP_basic_0031 : MonoBehaviour
 			used_isl_links.Add(new ActiveISL(sat, this._attacker.Link.DestNode, prevsat, this._attacker.Link.SrcNode));
 
 			// 3. update the maximum capacity of the target link.
-			this.linkCapacity[this._attacker.Link.Name] = this._attacker.Link.Capacity;
+			this.linkCapacity[this._attacker.Link.Name] = this._attacker.Link.Capacity; // TODO: same... remove the capacity from the attacker entirely.
 
 			// 4. find viable attack routes.
 			BinaryHeap<Path> attack_routes = FindAttackRoutes(this.rg, new List<GameObject>() { new_york, miami });
@@ -1883,7 +1869,7 @@ public class SP_basic_0031 : MonoBehaviour
 			}
 
 			// check if the target was flooded.
-			if (this.linkCapacity[this._attacker.Link.Name] <= 0)
+			if (this.linkCapacity[this._attacker.Link.Name] <= 0) // need to remove this XDD
 			{
 				Debug.Log("Update: Link was flooded.");
 			}

@@ -41,7 +41,7 @@ public class Attacker
             this.SrcNode = src_node;
             this.DestNode = dest_node;
             this.Name = SrcNode.Id.ToString() + "-" + SrcNode.Id.ToString();
-            this.Capacity = capacity;
+            this.Capacity = capacity; // TO BE HONEST I DONT KNOW IF I STILL NEED THIS XDDD. TODO: remove this. the capacity should be elsewhere lol.
         }
     }
 
@@ -271,7 +271,7 @@ public class Attacker
     /* 
     randomly select a victim link within the target radius. If no target radius is specified, return a NoVictimError. If success, returns the victim link (src, dest) node. If failure, returns nothing. Failure may occur if no source node was found, or if the source node has no links.
     */
-    protected void ChangeVictimLink(RouteGraph rg, int max_capacity)
+    protected void ChangeVictimLink(RouteGraph rg, LinkCapacityMonitor capacity_monitor)
     {
         Node src_node = this.SelectSrcNode(rg);
         if (src_node != null)
@@ -279,7 +279,7 @@ public class Attacker
             Node dest_node = this.SelectDestinationNode(src_node); // TODO: just select out of neighbours. I don't really need the routegraph at this point.
             if (dest_node != null)
             {
-                this.Link = new Attacker.TargetLink(src_node, dest_node, max_capacity);
+                this.Link = new Attacker.TargetLink(src_node, dest_node, capacity_monitor.GetCapacity(src_node, dest_node));
                 return;
             }
         }
@@ -287,12 +287,12 @@ public class Attacker
     }
 
     /* Updates the selected links by switching links if the current one is invalid and updates its link capacity according to information coming from the caller */
-    public void UpdateLinks(RouteGraph rg, int max_capacity)
+    public void UpdateLinks(RouteGraph rg, LinkCapacityMonitor capacity_monitor) //int max_capacity) // FIXME: instead of passing max capacity, pass the entire link monitor.
     {
 
         if (!this.HasValidVictimLink())
         {
-            this.ChangeVictimLink(rg, max_capacity);
+            this.ChangeVictimLink(rg, capacity_monitor);
             if (this.Link == null)
             {
                 UnityEngine.Debug.Log("Attacker.Update | Could not find any valid link.");
