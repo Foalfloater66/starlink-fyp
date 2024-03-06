@@ -62,6 +62,10 @@ public class SP_basic_0031 : MonoBehaviour
 	public float target_latitude = 1.290270f; // new york as a default value;
 
 	public float target_longitude = -103.851959f; // new york as a default value.
+
+	public float attack_radius = 800f;
+
+	public bool debug = false;
 	const double earthperiod = 86400f;
 
 	public GameObject orbit;
@@ -117,7 +121,7 @@ public class SP_basic_0031 : MonoBehaviour
 	GameObject northbend, conrad, merrillan, greenville, redmond, hawthorne, bismarck, toronto,
 		thunderbay, columbus, lisbon, miami, majorca, tokyo, chicago, lima;
 
-	private Dictionary<GameObject, string> cityStrings = new Dictionary<GameObject, string>();
+	private Dictionary<GameObject, string> groundstations = new Dictionary<GameObject, string>();
 
 	//GameObject beam1 = null, beam2 = null;
 	GameObject[] lasers;
@@ -359,8 +363,8 @@ public class SP_basic_0031 : MonoBehaviour
 		//Debug.Log("km_per_unit: " + km_per_unit.ToString() + " km_per_unit2: " + km_per_unit2.ToString());
 
 		// for now, only allows for Radius Attacks
-		List<GameObject> demo_dest_groundstations = new List<GameObject>() { redmond, miami, chicago, new_york };
-		this._attacker = new Attacker(target_latitude, target_longitude, city_prefab, transform, sat0r, this.summary_logfile, 800f, demo_dest_groundstations);
+		List<GameObject> demo_dest_groundstations = new List<GameObject>() { miami, new_york };
+		this._attacker = AttackerFactory.CreateAttacker(target_latitude, target_longitude, city_prefab, transform, sat0r, this.summary_logfile, attack_radius, demo_dest_groundstations, true);
 	}
 
 	void InitCities()
@@ -381,7 +385,7 @@ public class SP_basic_0031 : MonoBehaviour
 		chicago = CreateCity(41.881832f, 87.623177f, false);
 		toronto = CreateCity(43.70011f, 79.4163f, false);
 
-		cityStrings = new Dictionary<GameObject, string>(){
+		groundstations = new Dictionary<GameObject, string>(){
 			{london, "London"},
 			{new_york, "New York"},
 			{san_francisco, "San Francisco"},
@@ -1127,10 +1131,44 @@ public class SP_basic_0031 : MonoBehaviour
 		}
 	}
 
-	/* Draw the computed path. */
-	void DrawRoute(List<Node> path, GameObject city1, GameObject city2)
+	/* If a link doesn't exist in the dictionary, add it. */
+	void AddMissingLink(string link_name)
 	{
-		Node rn = path.Last();
+		if (!linkCapacity.ContainsKey(link_name))
+		{
+			linkCapacity.Add(link_name, 0); // TODO: do I want to first add all nodes to link capacity? (no, I don't think so. That's unecessary memory usage.);
+											// TODO: add a INITIAL_CAPACITY constant variable.
+		}
+	}
+
+	/* Decreases capacity of a link <src_id, dest_id> by mbits.*/
+	void DecreaseLinkCapacity(int src_id, int dest_id, int mbits)
+	{ // TODO: Create a link class. just makes things cleaner.
+	  // TODO: ensure capacity is a maximum thing that decreases!
+		string link_name = src_id.ToString() + "-" + dest_id.ToString();
+		AddMissingLink(link_name);
+		linkCapacity[link_name] -= mbits; // Add 100 mbits
+	}
+
+	/* Checks if a link is flooded */
+	bool IsFlooded(int src_id, int dest_id)
+	{
+		string link_name = src_id.ToString() + "-" + dest_id.ToString();
+		AddMissingLink(link_name);
+		return (linkCapacity[link_name] >= MAX_CAPACITY);
+	}
+
+	/* Draw the computed path. */
+	void ExecuteAttackRoute(Node endnode, GameObject city1, GameObject city2)
+	{
+		Node rn = endnode;
+		// TODO: change the smaller drawing parts into drawing functions. 
+		// TODO: remove having the entire list as an argument. Just provide the start node.
+
+		// Safe execution.
+		Debug.Log("ExecuteAttackRoute | I want to draw this route: " + String.Join(" ", from node in path select node.Id));
+		Debug.Assert(rn != null, "ExecuteAttackRoute | The last node is empty.");
+		Debug.Assert(rn.Id == -2, "ExecuteAttackRoute | The last node is not -2. Instead, it's " + rn.Id);
 		Node prevnode = null;
 		SatelliteSP0031 sat = null;
 		SatelliteSP0031 prevsat = null;
@@ -1145,20 +1183,17 @@ public class SP_basic_0031 : MonoBehaviour
 
 			if (previd != -4)
 			{
-				if (previd >= 0 && id >= 0) // It's an ISL
+				// if it's an ISL
+				if (previd >= 0 && id >= 0)
 				{
 					sat = satlist[id];
 					prevsat = satlist[previd];
 
 					// Increase the load of the link
-					string linkName = previd.ToString() + "-" + id.ToString();
-					if (!linkCapacity.ContainsKey(linkName))
-					{
-						linkCapacity.Add(linkName, 0); // TODO: do I want to add all nodes to link capacity?
-					}
-					linkCapacity[linkName] += 100; // Add 100 mbits
-
-					if (linkCapacity[linkName] >= MAX_CAPACITY) // Link is flooded.
+					// TODO: make this a function.
+					// TODO: make the link load capacity rule also hold for RF links.
+					DecreaseLinkCapacity(previd, id, 200);
+					if (IsFlooded(previd, id))
 					{
 						break;
 					}
@@ -1168,11 +1203,12 @@ public class SP_basic_0031 : MonoBehaviour
 					{
 						pathcolour = laserMaterials.Length - 1;
 					}
-					sat.ColourLink(prevsat, laserMaterials[pathcolour]); // TODO: check this.
+					sat.ColourLink(prevsat, laserMaterials[pathcolour]);
 					prevsat.ColourLink(sat, laserMaterials[pathcolour]);
 					used_isl_links.Add(new ActiveISL(sat, rn, prevsat, prevnode)); // TODO: remove this afterwards.
 				}
-				else // It's an RF (radio frequency) link
+				// if it's an RF
+				else
 				{
 					if (id >= 0) // the current node is a satellite
 					{
@@ -1196,9 +1232,8 @@ public class SP_basic_0031 : MonoBehaviour
 						{
 							used_rf_links.Add(new ActiveRF(city1, rn, sat, prevnode));
 						}
-						else
+						else // if the id is -2
 						{
-							// NB. Not entirely sure what this is.
 							GameObject city = get_relay(id);
 							sat.LinkOn(city);
 							used_rf_links.Add(new ActiveRF(city, rn, sat, prevnode));
@@ -1208,7 +1243,7 @@ public class SP_basic_0031 : MonoBehaviour
 				}
 			}
 
-			if (rn == path.First())
+			if (rn != null && rn.Id == -1)
 			{
 				break;
 			}
@@ -1231,8 +1266,8 @@ public class SP_basic_0031 : MonoBehaviour
 		*/
 
 		// Debug.Log("Problem...");
-		StringBuilder sb = new StringBuilder(string.Format("{0} - {1}, ", cityStrings[city1], cityStrings[city2])); // logging.
-																													// Debug.Log("After the potential problem");
+		StringBuilder sb = new StringBuilder(string.Format("{0} - {1}, ", groundstations[city1], groundstations[city2])); // logging.
+																														  // Debug.Log("After the potential problem");
 		bool success = false;
 		bool reset_route = false;
 
@@ -1273,8 +1308,6 @@ public class SP_basic_0031 : MonoBehaviour
 		}
 		BuildRouteGraph(rg, city1, city2, maxdist, margin);
 
-
-
 		rg.ResetOnPathStatus(); // TODO: remove this as well
 		rg.ComputeRoutes();
 
@@ -1313,18 +1346,19 @@ public class SP_basic_0031 : MonoBehaviour
 				if (log_choice == LogChoice.Path)
 				{
 					/* Log the route */
-					LogSatelliteStates(false, cityStrings[city1], cityStrings[city2], path);
+					LogSatelliteStates(false, groundstations[city1], groundstations[city2], path);
 				}
 
 				highlight_reachable();
 				return Node.INFINITY;
 			}
 		}
+		Debug.Log("MANUAL PATH: " + path); // ignores -4!
 
 
 		/* Log the route nodes. */
 		// TODO: change this.
-		// if (log_choice == LogChoice.Path) { LogSatelliteStates(true, cityStrings[city1], cityStrings[city2], path); }
+		// if (log_choice == LogChoice.Path) { LogSatelliteStates(true, groundstations[city1], groundstations[city2], path); }
 
 
 		/* Calculate RTT information to display on the screen. */
@@ -1706,7 +1740,7 @@ public class SP_basic_0031 : MonoBehaviour
 				ResetRoute(src_gs, dest_gs);
 				rg = BuildRouteGraph(rg, src_gs, dest_gs, this.maxdist, this.margin);
 				rg.ComputeRoutes();
-				Debug.Log(cityStrings[src_gs] + " to " + cityStrings[dest_gs]);
+				Debug.Log(groundstations[src_gs] + " to " + groundstations[dest_gs]);
 
 				// BUG: the route I extracted does not work.
 				Path path = this._attacker.ExtractAttackRoute(rg, src_gs, dest_gs);
@@ -1798,6 +1832,7 @@ public class SP_basic_0031 : MonoBehaviour
 
 		// 2. Update the routegraph
 		ClearRoute();
+		// SingleRoute(0, miami, new_york, "Miami to New York", 0f, 0f); // debugging. TODO: remove this.
 		ResetRoute(new_york, toronto);
 		this.rg = BuildRouteGraph(this.rg, new_york, toronto, this.maxdist, this.margin);
 
@@ -1808,31 +1843,6 @@ public class SP_basic_0031 : MonoBehaviour
 
 		if (this._attacker.HasValidVictimLink())
 		{
-			// 3. update the maximum capacity of the target link.
-			this.linkCapacity[this._attacker.Link.Name] = this._attacker.Link.Capacity;
-
-			// 4. find viable attack routes.
-			BinaryHeap<Path> attack_routes = FindAttackRoutes(this.rg, new List<GameObject>() { new_york, london });
-
-			// 5. create routes until the link's capacity has been reached.
-			if (attack_routes.Count == 0)
-			{
-				Debug.Log("NO PATHS...");
-			}
-
-			while (linkCapacity[this._attacker.Link.Name] >= 0 && attack_routes.Count > 0)
-			{
-				Path attack_path = attack_routes.ExtractMin();
-				if (attack_path == null) // no more attack routes left
-				{
-					Debug.Log("No paths left....");
-					break;
-				}
-				DrawRoute(attack_path.nodes, attack_path.startcity, attack_path.endcity); // make an actual drawroute function.
-				break;
-			}
-
-			// 6. Post-processing
 			// highlight the target.
 			int pathcolour = 3;
 			SatelliteSP0031 sat = satlist[this._attacker.Link.DestNode.Id];
@@ -1840,6 +1850,37 @@ public class SP_basic_0031 : MonoBehaviour
 			sat.ColourLink(prevsat, laserMaterials[pathcolour]); // TODO: check this.
 			prevsat.ColourLink(sat, laserMaterials[pathcolour]);
 			used_isl_links.Add(new ActiveISL(sat, this._attacker.Link.DestNode, prevsat, this._attacker.Link.SrcNode));
+
+			// 3. update the maximum capacity of the target link.
+			this.linkCapacity[this._attacker.Link.Name] = this._attacker.Link.Capacity;
+
+			// 4. find viable attack routes.
+			BinaryHeap<Path> attack_routes = FindAttackRoutes(this.rg, new List<GameObject>() { new_york, miami });
+
+			// // 5. create routes until the link's capacity has been reached.
+			if (attack_routes.Count == 0)
+			{
+				Debug.Log("NO PATHS...");
+			}
+			else
+			{
+				Debug.Log("Update | There are " + attack_routes.Count + " paths!");
+			}
+
+			while (linkCapacity[this._attacker.Link.Name] >= 0 && attack_routes.Count > 0)
+			{
+				Debug.Log("drawing a path...");
+				Path attack_path = attack_routes.ExtractMin(); // FIXME: this might also only requires the first node!
+				if (attack_path == null) // no more attack routes left
+				{
+					Debug.Log("No paths left....");
+					break;
+				}
+				// Change to traceroute? Write path? Idk XDD
+				ExecuteAttackRoute(attack_path.nodes.First(), attack_path.startcity, attack_path.endcity); // make an actual drawroute function.
+																										   // DebugLog
+				break;
+			}
 
 			// check if the target was flooded.
 			if (this.linkCapacity[this._attacker.Link.Name] <= 0)

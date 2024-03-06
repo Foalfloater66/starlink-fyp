@@ -488,8 +488,8 @@ MonoBehaviour:
   relay_dist_step: 2
   direction: 1
   directionChangeSpeed: 2
-  target_latitude: 40.76
-  target_longitude: 73.98
+  target_latitude: 32
+  target_longitude: 82
   orbit: {fileID: 1172864837802712, guid: 3b4a1d43d21bf42d8ad02077259400de, type: 3}
   satellite: {fileID: 1842355326392174, guid: 7327322cd40cd49898f0f3e031d063e4, type: 3}
   laser: {fileID: 1648504976000122, guid: 88944ffc92ba14ec5a48961205eeab10, type: 3}

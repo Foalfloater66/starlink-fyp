@@ -11,7 +11,7 @@ using System.Linq; // for ToList();
 
 public class Path : HeapNode
 {
-    // this should be in routing.
+    // this should be in routing
     public List<Node> nodes = new List<Node>();
 
     public GameObject startcity;
@@ -52,7 +52,7 @@ public class Attacker
 
     public float Radius { get; private set; }
 
-    public TargetLink Link { get; private set; }
+    public TargetLink Link { get; set; }
 
     public System.IO.StreamWriter summary_logfile; // TODO: move it here.
 
@@ -82,50 +82,68 @@ public class Attacker
         System.Diagnostics.Debug.Assert(this.Link != null, "ExtractAttackRoute | No attacker link has been set.");
 
         Path route = new Path(src_gs, dest_gs);
+
         Node rn = rg.endnode;
+        route.nodes.Add(rn);
         int startsatid = 0, endsatid = -1;
         int id = -4;
+        int prev_id = -4;
         bool viable_route = false; // can the target link be attacked with this route?
 
         while (true)
         {
             if (rn == rg.startnode)
             {
+                route.nodes.Add(rn);
                 startsatid = id;
                 break;
             }
 
             id = rn.Id;
 
+            if (id >= 0)
+            {
+                route.nodes.Add(rn);
+            }
+
             if (endsatid == -1 && id >= 0)
             {
                 endsatid = id;
             }
-            if (id >= 0)
+
+            if (id >= 0 && prev_id >= 0)
             {
-                if (route.nodes.Last().Id == this.Link.SrcNode.Id && id == this.Link.DestNode.Id)
+                UnityEngine.Debug.Log("ExtractAttackRoute | previous node: " + prev_id + " and " + id);
+                if (prev_id == this.Link.SrcNode.Id && id == this.Link.DestNode.Id)
                 {
                     viable_route = true;
                 }
             }
+
+            prev_id = id;
+
             rn = rn.Parent;
 
             if (rn == null) // this route is incomplete.
             {
                 return null;
             }
-            route.nodes.Add(rn);
         }
         List<string> path = new List<string>();
         foreach (Node node in route.nodes)
         {
             path.Add(node.Id.ToString());
         }
-        UnityEngine.Debug.Log("ExtractAttackRoute: found path of length " + route.nodes.Count + ": " + string.Join(" ", path));
+        // UnityEngine.Debug.Log("ExtractAttackRoute: found path of length " + route.nodes.Count + ": " + string.Join(" ", path));
 
         if (viable_route)
         {
+            UnityEngine.Debug.Log("ExtractAttackRoute | This is a valid attack route!");
             return route;
+        }
+        else
+        {
+            UnityEngine.Debug.Log("ExtractAttackRoute | Couldn't find a valid attack route.");
         }
         return null;
     }
@@ -158,12 +176,12 @@ public class Attacker
     }
 
     /* checks if the input coordinates are within the sphere of attack */
-    private bool InTargetArea(Vector3 position)
+    protected bool InTargetArea(Vector3 position)
     {
         return (Vector3.Distance(position, this.TargetAreaCenterpoint) < this.Radius);
     }
 
-    private Node SelectRandomSrcNode(RouteGraph rg)
+    protected Node SelectSrcNode(RouteGraph rg)
     {
         Node node = null;
         Dictionary<int, Node> nodes = new Dictionary<int, Node>(); // index, node 
@@ -189,7 +207,7 @@ public class Attacker
         return node; // the node might not have any links!
     }
 
-    private Node SelectRandomOutOfTargetDestinationNode(Node src_node, RouteGraph rg)
+    protected Node SelectOutOfTargetDestinationNode(Node src_node)
     {
         Node node = null;
         HashSet<int> explored_indexes = new HashSet<int>();
@@ -214,7 +232,7 @@ public class Attacker
         return (node != null && node.Id > 0 ? node : null); // only return valid destination nodes.
     }
 
-    private Node SelectRandomInTargetDestinationNode(Node src_node, RouteGraph rg)
+    protected Node SelectInTargetDestinationNode(Node src_node)
     {
 
         Dictionary<int, Node> nodes = new Dictionary<int, Node>(); // index, node 
@@ -240,24 +258,25 @@ public class Attacker
         return null;
     }
 
-    private Node SelectRandomDestinationNode(Node src_node, RouteGraph rg)
+    protected Node SelectDestinationNode(Node src_node)
     {
-        Node dest_node = this.SelectRandomInTargetDestinationNode(src_node, rg);
+        Node dest_node = this.SelectInTargetDestinationNode(src_node);
         if (dest_node == null)
         {
-            return this.SelectRandomOutOfTargetDestinationNode(src_node, rg); // select random link which is partially in the target radius
+            return this.SelectOutOfTargetDestinationNode(src_node); // select random link which is partially in the target radius
         }
         return dest_node;
     }
 
-    /* randomly select a victim link within the target radius. If no target radius is specified, return a NoVictimError. If success, returns the victim link (src, dest) node. If failure, returns nothing. Failure may occur if no source node was found, or if the source node has no links.
+    /* 
+    randomly select a victim link within the target radius. If no target radius is specified, return a NoVictimError. If success, returns the victim link (src, dest) node. If failure, returns nothing. Failure may occur if no source node was found, or if the source node has no links.
     */
-    private void ChangeVictimLink(RouteGraph rg, int max_capacity)
+    protected void ChangeVictimLink(RouteGraph rg, int max_capacity)
     {
-        Node src_node = this.SelectRandomSrcNode(rg);
+        Node src_node = this.SelectSrcNode(rg);
         if (src_node != null)
         {
-            Node dest_node = this.SelectRandomDestinationNode(src_node, rg); // TODO: just select out of neighbours. I don't really need the routegraph at this point.
+            Node dest_node = this.SelectDestinationNode(src_node); // TODO: just select out of neighbours. I don't really need the routegraph at this point.
             if (dest_node != null)
             {
                 this.Link = new Attacker.TargetLink(src_node, dest_node, max_capacity);
@@ -287,6 +306,75 @@ public class Attacker
         {
             UnityEngine.Debug.Log("Attacker.Update | Previous link is still valid.");
         }
+    }
+}
+
+public class DebugAttacker : Attacker
+{
+    /* This Attacker subclass aims at always selecting the same link within a set radius. Useful for debugging. */
+
+    public DebugAttacker(float latitude, float longitude, GameObject prefab, Transform transform /* try and make these last 2 vars optional as they seem kind of weird to add here as variables */, float sat0r /* satellite radius from earth centre */, System.IO.StreamWriter summary_logfile, float radius, List<GameObject> src_groundstations) : base(latitude, longitude, prefab, transform, sat0r, summary_logfile, radius, src_groundstations)
+    {
+
+    }
+
+    protected Node SelectSrcNode(RouteGraph rg)
+    {
+        int remaining_nodes = rg.nodes.Count();
+
+        for (int i = 0; i < rg.nodes.Count(); i++)
+        {
+            Node node = rg.nodes[i];
+            if (node.Id > 0 && this.InTargetArea(node.Position))
+            {
+                return node;
+            }
+        }
+        return null;
+    }
+
+    protected Node SelectOutOfTargetDestinationNode(Node src_node)
+    {
+        for (int i = 0; i < src_node.LinkCount; i++)
+        {
+            Node node = src_node.GetNeighbour(src_node.GetLink(i));
+            if (node.Id > 0)
+            {
+                return node;
+            }
+        }
+        return null;
+    }
+
+    protected Node SelectInTargetDestinationNode(Node src_node)
+    {
+
+        for (int i = 0; i < src_node.LinkCount; i++)
+        {
+            Node node = src_node.GetNeighbour(src_node.GetLink(i));
+            if (node.Id > 0 && this.InTargetArea(node.Position))
+            {
+                return node;
+            }
+        }
+        return null;
+    }
+
+}
+
+public static class AttackerFactory
+{
+    public static Attacker CreateAttacker(float latitude, float longitude, GameObject prefab, Transform transform, float sat0r, System.IO.StreamWriter summary_logfile, float radius, List<GameObject> src_groundstations, bool debug)
+    {
+        if (debug)
+        {
+            return new DebugAttacker(latitude, longitude, prefab, transform, sat0r, summary_logfile, radius, src_groundstations);
+        }
+        else
+        {
+            return new Attacker(latitude, longitude, prefab, transform, sat0r, summary_logfile, radius, src_groundstations);
+        }
+
     }
 }
 
