@@ -48,6 +48,8 @@ public class SatelliteSP0031
 	GameObject beam_prefab1, beam_prefab2;
 	GameObject laser_prefab, thin_laser_prefab;
 	GameObject[] links;
+
+	int max_linknum = 2;
 	GameObject[] graphlinks;
 	bool graphon = false;
 	int graphcount = 0;
@@ -123,7 +125,9 @@ public class SatelliteSP0031
 		gameobject.transform.RotateAround(Vector3.zero, Vector3.up, (float)orbitalangle);
 		gameobject.transform.SetParent(orbit.transform, false);
 
-		links = new GameObject[2];
+		max_linknum = 10; // FIXME: This is only tentative.
+
+		links = new GameObject[max_linknum];
 
 		lasers = new GameObject[LASERS_PER_SAT];
 		laserdsts = new SatelliteSP0031[LASERS_PER_SAT]; // laser destinations
@@ -138,7 +142,7 @@ public class SatelliteSP0031
 			laseron[lc] = false;
 		}
 
-		for (int linknum = 0; linknum < 2; linknum++)
+		for (int linknum = 0; linknum < max_linknum; linknum++) // FIXME: MAN WHY ONLY TWO
 		{
 			links[linknum] = GameObject.Instantiate(laser_prefab, position(),
 				gameobject.transform.rotation);
@@ -155,7 +159,7 @@ public class SatelliteSP0031
 			lasers[lc] = null;
 		}
 
-		for (int linknum = 0; linknum < 2; linknum++)
+		for (int linknum = 0; linknum < max_linknum; linknum++)
 		{
 			MonoBehaviour.Destroy(links[linknum]);
 			links[linknum] = null;
@@ -249,6 +253,7 @@ public class SatelliteSP0031
 
 	public void LinkOn(GameObject city)
 	{
+		Debug.Log("LINKS ON IS THIS: " + _linkson.ToString()); // SO BASICALLY ITS DYING BECAUSE IT CAN'T HANDLE MORE THAN 2 LINKS???? WHY IS THIS LIMIT HERE...
 		LaserScript ls = (LaserScript)links[_linkson].GetComponent(typeof(LaserScript));
 		ls.SetPos(gameobject.transform.position, city.transform.position);
 		_linkson++;
@@ -258,7 +263,7 @@ public class SatelliteSP0031
 	{
 		if (_linkson > 0)
 		{
-			for (int linknum = 0; linknum < 2; linknum++)
+			for (int linknum = 0; linknum < max_linknum; linknum++)
 			{
 				LaserScript ls = (LaserScript)links[linknum].GetComponent(typeof(LaserScript));
 				ls.SetPos(position(), position());

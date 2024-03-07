@@ -34,14 +34,12 @@ public class Attacker
         public Node DestNode { get; protected set; }
 
         public string Name { get; private set; }
-        public int Capacity { get; set; } // victim link capacity TODO: should I protect this?
 
-        public TargetLink(Node src_node, Node dest_node, int capacity)
+        public TargetLink(Node src_node, Node dest_node)
         {
             this.SrcNode = src_node;
             this.DestNode = dest_node;
-            this.Name = SrcNode.Id.ToString() + "-" + SrcNode.Id.ToString();
-            this.Capacity = capacity; // TO BE HONEST I DONT KNOW IF I STILL NEED THIS XDDD. TODO: remove this. the capacity should be elsewhere lol.
+            this.Name = SrcNode.Id.ToString() + "-" + DestNode.Id.ToString();
         }
     }
 
@@ -113,7 +111,7 @@ public class Attacker
 
             if (id >= 0 && prev_id >= 0)
             {
-                UnityEngine.Debug.Log("ExtractAttackRoute | previous node: " + prev_id + " and " + id);
+                // UnityEngine.Debug.Log("ExtractAttackRoute | previous node: " + prev_id + " and " + id);
                 if (prev_id == this.Link.SrcNode.Id && id == this.Link.DestNode.Id)
                 {
                     viable_route = true;
@@ -271,7 +269,7 @@ public class Attacker
     /* 
     randomly select a victim link within the target radius. If no target radius is specified, return a NoVictimError. If success, returns the victim link (src, dest) node. If failure, returns nothing. Failure may occur if no source node was found, or if the source node has no links.
     */
-    protected void ChangeVictimLink(RouteGraph rg, LinkCapacityMonitor capacity_monitor)
+    protected void ChangeVictimLink(RouteGraph rg)
     {
         Node src_node = this.SelectSrcNode(rg);
         if (src_node != null)
@@ -279,27 +277,27 @@ public class Attacker
             Node dest_node = this.SelectDestinationNode(src_node); // TODO: just select out of neighbours. I don't really need the routegraph at this point.
             if (dest_node != null)
             {
-                this.Link = new Attacker.TargetLink(src_node, dest_node, capacity_monitor.GetCapacity(src_node, dest_node));
+                this.Link = new Attacker.TargetLink(src_node, dest_node);
                 return;
             }
         }
         this.Link = null;
     }
 
-    /* Updates the selected links by switching links if the current one is invalid and updates its link capacity according to information coming from the caller */
-    public void UpdateLinks(RouteGraph rg, LinkCapacityMonitor capacity_monitor) //int max_capacity) // FIXME: instead of passing max capacity, pass the entire link monitor.
+    /* Updates the selected links by switching links if the current one is invalid. */
+    public void UpdateLinks(RouteGraph rg)
     {
 
         if (!this.HasValidVictimLink())
         {
-            this.ChangeVictimLink(rg, capacity_monitor);
+            this.ChangeVictimLink(rg);
             if (this.Link == null)
             {
                 UnityEngine.Debug.Log("Attacker.Update | Could not find any valid link.");
             }
             else
             {
-                UnityEngine.Debug.Log("Attacker.Update | Changed link: " + this.Link.SrcNode.Id + " - " + this.Link.DestNode.Id + " of remaining capacity: " + this.Link.Capacity);
+                UnityEngine.Debug.Log("Attacker.Update | Changed link: " + this.Link.SrcNode.Id + " - " + this.Link.DestNode.Id);
             }
         }
         else

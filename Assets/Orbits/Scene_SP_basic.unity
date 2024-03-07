@@ -490,6 +490,8 @@ MonoBehaviour:
   directionChangeSpeed: 2
   target_latitude: 32
   target_longitude: 82
+  attack_radius: 500
+  debug: 0
   orbit: {fileID: 1172864837802712, guid: 3b4a1d43d21bf42d8ad02077259400de, type: 3}
   satellite: {fileID: 1842355326392174, guid: 7327322cd40cd49898f0f3e031d063e4, type: 3}
   laser: {fileID: 1648504976000122, guid: 88944ffc92ba14ec5a48961205eeab10, type: 3}
@@ -500,12 +502,16 @@ MonoBehaviour:
     type: 3}
   beam_prefab2: {fileID: 1454064570112744, guid: ae0115a2e33c24b7d92d193312575599,
     type: 3}
+  initial_link_capacity: 1000
   isl_material: {fileID: 2100000, guid: 054725efd433545d0867a6c84dd8b574, type: 2}
   laserMaterials:
   - {fileID: 2100000, guid: d6795a24fec3f4b478a2532645da09a8, type: 2}
   - {fileID: 2100000, guid: 7931bb27edd134e85b919e88f2970275, type: 2}
   - {fileID: 2100000, guid: d42fe79d9d8d44828b2d78470b7f1d93, type: 2}
   - {fileID: 2100000, guid: 4398602df8d6d4e44862bde1f4671791, type: 2}
+  targetLinkMaterial:
+  - {fileID: 2100000, guid: a5ba4d0a064734456bdca50184b5bda5, type: 2}
+  - {fileID: 2100000, guid: 7fcb457815b4542d08ddfb4f8212b4d6, type: 2}
   cityMaterial: {fileID: 2100000, guid: d6795a24fec3f4b478a2532645da09a8, type: 2}
   txt: {fileID: 2091605839}
   countdown: {fileID: 485043185}
