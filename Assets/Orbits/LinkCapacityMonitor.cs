@@ -83,5 +83,5 @@ public class LinkCapacityMonitor
     {
         _AddMissingLink(src_id, dest_id);
         return _capacities[(src_id, dest_id)];
-    } // TODO: change string names to tuples.
+    }
 }
