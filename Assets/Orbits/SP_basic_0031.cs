@@ -1860,8 +1860,6 @@ public class SP_basic_0031 : MonoBehaviour
 
 		if (_attacker.HasValidVictimLink())
 		{
-			Debug.Log("Target Link: " + _attacker.Link.Name);
-
 			// 4. find viable attack routes.
 			BinaryHeap<Path> attack_routes = FindAttackRoutes(rg, new List<GameObject>() { toronto, new_york, chicago }); // groundstations.Keys.ToList()); 
 

@@ -39,7 +39,7 @@ public class Attacker
         {
             this.SrcNode = src_node;
             this.DestNode = dest_node;
-            this.Name = SrcNode.Id.ToString() + "-" + DestNode.Id.ToString();
+            this.Name = SrcNode.Id.ToString() + "-" + DestNode.Id.ToString(); // TODO: RM USAGES OF THIS!!!
         }
     }
 

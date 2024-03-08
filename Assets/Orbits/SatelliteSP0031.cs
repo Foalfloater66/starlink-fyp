@@ -253,7 +253,6 @@ public class SatelliteSP0031
 
 	public void LinkOn(GameObject city)
 	{
-		Debug.Log("LINKS ON IS THIS: " + _linkson.ToString()); // SO BASICALLY ITS DYING BECAUSE IT CAN'T HANDLE MORE THAN 2 LINKS???? WHY IS THIS LIMIT HERE...
 		LaserScript ls = (LaserScript)links[_linkson].GetComponent(typeof(LaserScript));
 		ls.SetPos(gameobject.transform.position, city.transform.position);
 		_linkson++;
