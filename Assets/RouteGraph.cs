@@ -142,15 +142,6 @@ public class RouteGraph
 		startnode.Dist = 0f;
 	}
 
-	// CLEANUP: Remove the path status parameter.
-	public void ResetOnPathStatus() // CLEANUP: I don't think I need this anymore.
-	{
-		for (int i = 0; i < nodecount; i++)
-		{
-			nodes[i].OnPath = false;
-		}
-	}
-
 	public void AddNeighbour(int nodenum1, int nodenum2, bool dist_limited)
 	{
 		nodes[nodenum1].AddNeighbour(nodes[nodenum2], dist_limited);
