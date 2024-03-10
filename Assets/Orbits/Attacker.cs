@@ -5,125 +5,225 @@ using UnityEngine.UI;
 using System.IO;
 using System; // Random
 using System.Text;
-using System.Diagnostics; //  Debug.Assert
+using System.Diagnostics; // Debug.Assert
 using UnityEngine.SceneManagement;
 using System.Linq; // for ToList();
 
-abstract public class Attacker
-{
+/**
+ * @author Morgane Marie Ohlig
+ */
 
-    /* attacker source groundstations at disposal */
+/// <summary>
+/// Class <c>Path</c> contains a list of nodes in the path between the <c>end_city</c> and the <c>start_city</c>.
+/// </summary>
+public class Path : HeapNode
+{
+    /// <value>
+    /// List of nodes in the path.
+    /// </value>
+    public List<Node> nodes = new List<Node>();
+
+    /// <value>
+    /// GameObject for the path's origin city.
+    /// </value>
+    public GameObject start_city;
+
+    /// <value>
+    /// GameObject for the path's final destination city.
+    /// </value>
+    public GameObject end_city;
+
+    /// <summary>
+    /// Constructor initializing the <c>Path</c> object and its <c>start_city</c> and the <c>end_city</c>.
+    /// </summary>
+    /// <param name="start_city">Start city on the path.</param>
+    /// <param name="end_city">Start city on the path.</param>
+    public Path(GameObject start_city, GameObject end_city)
+    {
+        this.start_city = start_city;
+        this.end_city = end_city;
+    }
+}
+
+/// <summary>
+/// Class <c>Attacker</c> provides a set of properties and methods used to target and flood links in a geographic area of specified center and radius.
+/// </summary>
+public class Attacker
+{
+    /// <summary>
+    /// Class <c>TargetLink</c> contains information about the link that the <c>Attacker</c> object is aiming towards.
+    /// </summary>
+    public class TargetLink
+    {
+        /// <value>
+        /// Source node of the target link.
+        /// </value>
+        public Node SrcNode { get; protected set; }
+
+        /// <value>
+        /// Destination node of the target link.
+        /// </value>
+        public Node DestNode { get; protected set; }
+
+        /// <summary>
+        /// Constructor initializing the <c>TargetLink</c> object and its source and destination nodes.
+        /// </summary>
+        /// <param name="src_node"><c>TargetLink</c> source node.</param>
+        /// <param name="dest_node"><c>TargetLink</c> destination node.</param>
+        public TargetLink(Node src_node, Node dest_node)
+        {
+            this.SrcNode = src_node;
+            this.DestNode = dest_node;
+        }
+    }
+
+    /// <summary>
+    /// List of source groundstations that the attacker can send packets from.
+    /// </summary>
     public List<GameObject> SourceGroundstations { get; set; }
 
-    public Node VictimSrcNode { get; protected set; } // victim link source node
+    /// <summary>
+    /// Vector3 coordinates of the center of the attack area.
+    /// </summary>
+    public Vector3 TargetAreaCenterpoint { get; protected set; }
 
-    public Node VictimDestNode { get; protected set; } // victim link destination node
+    /// <summary>
+    /// Radius of the attack area.
+    /// </summary>
+    public float Radius { get; protected set; }
 
-    /* select n random individual source groundstations for the attacker to use. */
-    public List<GameObject> SelectNRandomSourceGSes(uint gs_count, List<GameObject> gs_list)
+    /// <summary>
+    /// Link that the <c>Attacker</c> object is targeting.
+    /// </summary>
+    public TargetLink Link { get; protected set; }
+
+    /// <summary>
+    /// File for debugging.
+    /// </summary>
+    protected System.IO.StreamWriter logfile;
+
+    /// <summary>
+    /// Constructor creating an <c>Attacker</c> object with an attack area around the provided <c>(latitude, longitude)</c> coordinates. 
+    /// </summary>
+    /// <param name="latitude">Latitude of the attack area in degrees.</param>
+    /// <param name="longitude">Longitude of the attack area in degrees.</param>
+    /// <param name="sat0r">Satellite radius from earth's center.</param>
+    /// <param name="attack_radius">Radius of the attack area.</param>
+    /// <param name="src_groundstations">List of source groundstations available to the attacker.</param>
+    /// <param name="transform">Transform object associated with Earth's center.</param>
+    /// <param name="prefab">GameObject representing the attack area center.</param>
+    public Attacker(float latitude, float longitude, float sat0r, float attack_radius, List<GameObject> src_groundstations, Transform transform, GameObject prefab)
     {
-        uint i = 0;
+        this.SourceGroundstations = src_groundstations;
+        this.TargetAreaCenterpoint = Vector3.zero;
+        this.Radius = attack_radius;
+        this.SetTargetArea(latitude, longitude, sat0r, transform, prefab);
+        this.Link = null;
+        this.logfile = new System.IO.StreamWriter(SP_basic_0031.log_directory + "/Path/attacker_summary.txt");
+        UnityEngine.Debug.Log(transform.rotation);
+    }
 
-        // prevent gs_count from exceeding the number of available groundstations.
-        if (gs_count > (uint)gs_list.Count)
-        {
-            gs_count = (uint)gs_list.Count;
-        }
+    /// <summary>
+    /// Checks if the currently selected target link is still within the target area. 
+    /// </summary>
+    /// <returns>True if at least one link node is in the target area, false otherwise. If the victim link hasn't been set, returns false.</returns>
+    public bool HasValidTargetLink()
+    {
+        return (this.Link != null && (this.InTargetArea(this.Link.SrcNode.Position) || this.InTargetArea(this.Link.DestNode.Position)));
+    }
 
-        // select n random groundstations.
-        Dictionary<GameObject, char> source_gs_list = new Dictionary<GameObject, char>();
-        while (i < gs_count)
+    /// <summary>
+    /// Finds the shortest route between two groundstations.
+    /// </summary>
+    /// <param name="rg">Built <c>Routegraph</c> object.</param>
+    /// <param name="src_gs">Source groundstation.</param>
+    /// <param name="dest_gs">Destination groundstation.</param>
+    /// <returns>If a route containing the target link is found, creates and returns the route's <c>Path</c>. Otherwise, returns null.</returns>
+    public Path FindAttackRoute(RouteGraph rg, GameObject src_gs, GameObject dest_gs)
+    {
+        // TODO: Optimise route extraction.
+        System.Diagnostics.Debug.Assert(this.Link != null, "FindAttackRoute | No attacker link has been set.");
+
+        Node rn = rg.endnode;
+        Path route = new Path(src_gs, dest_gs);
+        route.nodes.Add(rn);
+        int startsatid = 0, endsatid = -1;
+        int id = -4;
+        int prev_id = -4;
+        bool viable_route = false; // can the target link be attacked with this route?
+
+        while (true)
         {
-            GameObject gs = gs_list[new System.Random().Next(0, gs_list.Count)];
-            if (!source_gs_list.ContainsKey(gs))
+            if (rn == rg.startnode)
             {
-                source_gs_list.Add(gs, '_');
-                i += 1;
+                route.nodes.Add(rn);
+                startsatid = id;
+                break;
+            }
+
+            id = rn.Id;
+
+            if (id >= 0)
+            {
+                route.nodes.Add(rn);
+            }
+
+            if (endsatid == -1 && id >= 0)
+            {
+                endsatid = id;
+            }
+
+            if (id >= 0 && prev_id >= 0)
+            {
+                if (prev_id == this.Link.SrcNode.Id && id == this.Link.DestNode.Id)
+                {
+                    viable_route = true;
+                }
+            }
+
+            prev_id = id;
+
+            rn = rn.Parent;
+
+            if (rn == null) // this route is incomplete.
+            {
+                return null;
             }
         }
-        this.SourceGroundstations = source_gs_list.Keys.ToList();
-        return this.SourceGroundstations;
-    }
-
-    /* update the nodes associated with the target link. */
-    public void UpdateLinkPosition(Node src_node, Node dest_node)
-    {
-        System.Diagnostics.Debug.Assert(this.VictimSrcNode != null);
-        System.Diagnostics.Debug.Assert(this.VictimDestNode != null);
-
-        System.Diagnostics.Debug.Assert(src_node.Id == this.VictimSrcNode.Id);
-        System.Diagnostics.Debug.Assert(dest_node.Id == this.VictimDestNode.Id);
-
-        this.VictimSrcNode = src_node;
-        this.VictimDestNode = dest_node;
-    }
-
-}
-
-public class LinkAttacker : Attacker
-{
-
-    /* instantiates the attacker object while manually setting a
-    the source and destination nodes of the victim link. */
-    public LinkAttacker(Node src_node, Node dest_node)
-    {
-        this.SourceGroundstations = new List<GameObject>();
-        this.VictimSrcNode = src_node;
-        this.VictimDestNode = dest_node;
-    }
-
-}
-
-public class AreaAttacker : Attacker
-{
-
-    public Vector3 TargetAreaCenterpoint { get; private set; }
-
-    public float Radius { get; private set; }
-
-    public System.IO.StreamWriter summary_logfile;
-
-    /* instantiates the attacker object with a requested victim radius of specified latitude and longitude. */
-    public AreaAttacker(float latitude, float longitude, GameObject prefab, Transform transform /* try and make these last 2 vars optional as they seem kind of weird to add here as variables */, float sat0r /* satellite radius from earth centre */, System.IO.StreamWriter summary_logfile, float radius)
-    {
-        this.SourceGroundstations = new List<GameObject>();
-        this.TargetAreaCenterpoint = Vector3.zero;
-        this.Radius = radius;
-        this.SetVictimRadius(latitude, longitude, sat0r, prefab, transform);
-        this.summary_logfile = summary_logfile;
-        System.Diagnostics.Debug.Assert(this.TargetAreaCenterpoint != null);
-    }
-
-    /* select a specified centerpoint for the target sphere. If latitude and longitude are 0, generates them randomly. WELL ACTUALLY I CANT DO THAT AND I HAVE TO CHANGE THIS :(*/
-    private void SetVictimRadius(float latitude, float longitude, float altitude, GameObject prefab, Transform transform)
-    {
-        if (latitude == 0)
+        List<string> path = new List<string>();
+        foreach (Node node in route.nodes)
         {
-            latitude = (float)new System.Random().NextDouble() * 180f - 90f; // between -90f and 90f. NEEDS TESTING.
-        }
-        if (longitude == 0)
-        {
-            longitude = (float)new System.Random().NextDouble() * 360f - 180f; // between -180f and 180f. NEEDS TESTING.
+            path.Add(node.Id.ToString());
         }
 
-        // UnityEngine.Debug.Log("Are the latitude and longitude correct?");
-        System.Diagnostics.Debug.Assert(latitude > -90 && latitude < 90);
-        System.Diagnostics.Debug.Assert(longitude > -180 && longitude < 180);
+        // TODO: Remove debugging messages.
+        if (viable_route)
+        {
+            UnityEngine.Debug.Log("FindAttackRoute | This is a valid attack route!");
+            return route;
+        }
+        else
+        {
+            UnityEngine.Debug.Log("FindAttackRoute | Couldn't find a valid attack route.");
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Sets and draws a center for the target area based on provided latitude and longitude coordinates.
+    /// </summary>
+    /// <param name="latitude">Attack area center latitude coordinates. Must be between -90 and 90 degrees.</param>
+    /// <param name="longitude">Attack area center longitude coordinates. Must be between -180 and 180 degrees.</param>
+    /// <param name="sat0r">Distance of the satellite from Earth's center.</param>
+    /// <param name="transform"><c>Transform</c> object representing the center of the Earth</param>
+    /// <param name="prefab">GameObject representing the attack center.</param> 
+    protected void SetTargetArea(float latitude, float longitude, float altitude, Transform transform, GameObject prefab)
+    {
+        System.Diagnostics.Debug.Assert(latitude > -90 && latitude < 90, "Latitude must be between -90 and 90 degrees.");
+        System.Diagnostics.Debug.Assert(longitude > -180 && longitude < 180, "Longitude must be between -180 and 180 degrees.");
 
         // convert from lat, long, and altitude to Vector3 representation.
-        /*
-        float latRad = latitude * Mathf.Deg2Rad;
-        float longRad = longitude * Mathf.Deg2Rad;
-        float x = altitude * Mathf.Sin(latRad) * Mathf.Cos(longRad);
-        float y = altitude * Mathf.Sin(latRad) * Mathf.Sin(longRad);
-        float z = altitude * Mathf.Cos(latRad);
-*/
-
-
-
-        // GameObject target = GameObject.Instantiate(prefab /* don't know if I need to add a prefab here. I'd rather not */ , new Vector3(x, y, /*-6382.2f*/z), transform.rotation);
-
-        GameObject target = GameObject.Instantiate(prefab, new Vector3(0f, 0f, /*-6382.2f*/-6371.0f - 550f /* TODO: change this distance as well */ ), transform.rotation);
+        GameObject target = GameObject.Instantiate(prefab, new Vector3(0f, 0f, -altitude), transform.rotation);
         float long_offset = 20f;
         target.transform.RotateAround(Vector3.zero, Vector3.up, longitude - long_offset);
         Vector3 lat_axis = Quaternion.Euler(0f, -90f, 0f) * target.transform.position;
@@ -133,35 +233,24 @@ public class AreaAttacker : Attacker
         this.TargetAreaCenterpoint = target.transform.position;
     }
 
-
-    /* checks if the input coordinates are within the sphere of attack */
-    private bool InTargetArea(Vector3 position)
+    /// <summary>
+    /// Checks if the input coordinates are within the sphere of attack.
+    /// </summary>
+    /// <param name="position">Coordinates.</param>
+    /// <returns>Returns true if the coordinates are within the area, and false otherwise.</returns>
+    protected bool InTargetArea(Vector3 position)
     {
-        summary_logfile.WriteLine(new String('=', 20));
-        summary_logfile.WriteLine("TEST POSITION: " + position.x + "; " + position.y + "; " + position.z);
-        summary_logfile.WriteLine("TARGET AREA: " + this.TargetAreaCenterpoint.x + "; " + this.TargetAreaCenterpoint.y + "; " + this.TargetAreaCenterpoint.z);
-
-        summary_logfile.WriteLine("DISTANCE BETWEEN THE TWO: " + Vector3.Distance(position, this.TargetAreaCenterpoint));
-        summary_logfile.Flush();
-
-        return (Vector3.Distance(position, this.TargetAreaCenterpoint) < this.Radius /* temporary radius */);
+        return (Vector3.Distance(position, this.TargetAreaCenterpoint) < this.Radius);
     }
 
-
-    /* Check if the currently selected victim link is still within the target area. Returns true if at least one node is in the target area,
-    false otherwise. If the victim link hasn't been set, returns false. */
-    public bool HasValidVictimLink()
+    /// <summary>
+    /// Searches for a random node in the routegraph that is in the target area.
+    /// </summary>
+    /// <param name="rg">Built <c>Routegraph</c> object.</param>
+    /// <returns>If a valid node was found, returns it. Otherwise, returns null.</returns>
+    protected Node SelectSrcNode(RouteGraph rg)
     {
-        if (this.VictimSrcNode != null && this.VictimDestNode != null)
-        {
-            return (this.InTargetArea(this.VictimSrcNode.Position) || this.InTargetArea(this.VictimDestNode.Position));
-        }
-        return false;
-    }
-
-    private void SelectRandomSrcNode(RouteGraph rg)
-    {
-        // Pick a random source node.
+        Node node = null;
         Dictionary<int, Node> nodes = new Dictionary<int, Node>(); // index, node 
         int remaining_nodes = rg.nodes.Count();
         for (int i = 0; i < rg.nodes.Count(); i++) nodes.Add(i, rg.nodes[i]);
@@ -169,39 +258,41 @@ public class AreaAttacker : Attacker
         while (remaining_nodes > 0)
         {
             int i = new System.Random().Next(rg.nodes.Count());
-            Node node = nodes[i];
+            node = nodes[i];
             if (node == null)
             {
                 continue; // already seen.
             }
             if (node.Id > 0 && this.InTargetArea(node.Position))
             {
-                this.VictimSrcNode = node;
+                // src_node = node;
                 break;
             }
             nodes[i] = null;
             remaining_nodes -= 1;
         }
-        if (this.VictimSrcNode != null && this.VictimSrcNode.LinkCount == 0)
-        {
-            this.VictimSrcNode = null; // the source node has no links.
-        }
+        return node; // the node might not have any links!
     }
 
-    private Node SelectRandomOutOfTargetDestinationNode(RouteGraph rg)
+    /// <summary>
+    /// Searches for a random node linked to the <c>src_node</c>.
+    /// </summary>
+    /// <param name="src_node">Potential target link source node.</param>
+    /// <returns>If a valid node was found, returns it. Otherwise, returns null.</returns>
+    protected Node SelectOutOfTargetDestinationNode(Node src_node)
     {
         Node node = null;
         HashSet<int> explored_indexes = new HashSet<int>();
         int j = 0;
 
-        while (j < this.VictimSrcNode.LinkCount)
+        while (j < src_node.LinkCount)
         {
-            int i = new System.Random().Next(this.VictimSrcNode.LinkCount);
+            int i = new System.Random().Next(src_node.LinkCount);
             if (explored_indexes.Contains(i))
             {
                 continue;
             }
-            node = this.VictimSrcNode.GetNeighbour(this.VictimSrcNode.GetLink(i));
+            node = src_node.GetNeighbour(src_node.GetLink(i));
             if (node.Id > 0)
             {
                 break;
@@ -213,17 +304,22 @@ public class AreaAttacker : Attacker
         return (node != null && node.Id > 0 ? node : null); // only return valid destination nodes.
     }
 
-    private Node SelectRandomInTargetDestinationNode(RouteGraph rg)
+    /// <summary>
+    /// Searches for a random node linked to the <c>src_node</c> that is within the target area.
+    /// </summary>
+    /// <param name="src_node">Potential target link source node.</param>
+    /// <returns>A valid node if one is found. Otherwise, returns null.</returns>
+    protected Node SelectInTargetDestinationNode(Node src_node)
     {
-
+        // FIXME: I think this function never gets used. I have to decide whether to keep it or not.
         Dictionary<int, Node> nodes = new Dictionary<int, Node>(); // index, node 
-        int remaining_nodes = this.VictimSrcNode.LinkCount;
+        int remaining_nodes = src_node.LinkCount;
 
-        for (int i = 0; i < this.VictimSrcNode.LinkCount; i++) nodes.Add(i, this.VictimSrcNode.GetNeighbour(this.VictimSrcNode.GetLink(i)));
+        for (int i = 0; i < src_node.LinkCount; i++) nodes.Add(i, src_node.GetNeighbour(src_node.GetLink(i)));
 
         while (remaining_nodes > 0) // prioritise ISL links that are fully contained in the target radius.
         {
-            int i = new System.Random().Next(this.VictimSrcNode.LinkCount);
+            int i = new System.Random().Next(src_node.LinkCount);
             Node node = nodes[i];
             if (node == null)
             {
@@ -239,30 +335,150 @@ public class AreaAttacker : Attacker
         return null;
     }
 
-    private void SelectRandomDestinationNode(RouteGraph rg)
+    /// <summary>
+    /// Searches for a random destination node connected to the <c>src_node</c> to create a valid target link, prioritising destination nodes that are within the target area.
+    /// </summary>
+    /// <param name="src_node">Potential target link source node.</param>
+    /// <returns>A valid node if one is found. Otherwise, returns null.</returns>
+    protected Node SelectDestinationNode(Node src_node)
     {
-        this.VictimDestNode = this.SelectRandomInTargetDestinationNode(rg);
-        if (this.VictimDestNode == null)
+        Node dest_node = this.SelectInTargetDestinationNode(src_node);
+        if (dest_node == null)
         {
-            this.VictimDestNode = this.SelectRandomOutOfTargetDestinationNode(rg); // select random link which is partially in the target radius
+            return this.SelectOutOfTargetDestinationNode(src_node); // select random link which is partially in the target radius
         }
+        return dest_node;
     }
 
-    /* randomly select a victim link within the target radius. If no target radius is specified, return a NoVictimError. If success, returns the victim link (src, dest) node. If failure, returns nothing. Failure may occur if no source node was found, or if the source node has no links.
-  */
-    public (Node, Node) SwitchVictimLink(RouteGraph rg)
+    /// <summary>
+    /// Searches for a target link within the target area. If successful, sets the property <c>Link</c> to a new <c>Attacker.TargetLink</c> object with the new <c>src_node</c> and <c>dest_node</c> nodes. Otherwise, sets the property <c>Link</c> to null. Failure may occur if no source node was found or if the source node has no links.
+    /// </summary>
+    /// <param name="rg">Built <c>Routegraph</c> object.</param>
+    public void ChangeTargetLink(RouteGraph rg)
     {
-        this.SelectRandomSrcNode(rg);
-        if (this.VictimSrcNode == null)
+        Node src_node = this.SelectSrcNode(rg);
+        if (src_node != null)
         {
-            return (null, null);
+            Node dest_node = this.SelectDestinationNode(src_node);
+            if (dest_node != null)
+            {
+                this.Link = new Attacker.TargetLink(src_node, dest_node);
+                return;
+            }
         }
-        this.SelectRandomDestinationNode(rg);
-        if (this.VictimDestNode == null)
+        this.Link = null;
+    }
+
+}
+
+/// <summary>
+/// Class <c>DebugAttacker</c>, subclass of the <c>Attacker</c> class does not have randomized link selection. Useful for debugging or proof of concept.
+/// </summary>
+public class DebugAttacker : Attacker
+{
+
+    /// <summary>
+    /// Constructor initializing a <c>DebugAttacker</c> object with an attack area around the provided <c>(latitude, longitude)</c> coordinates. 
+    /// </summary>
+    /// <param name="latitude">Latitude of the attack area in degrees.</param>
+    /// <param name="longitude">Longitude of the attack area in degrees.</param>
+    /// <param name="sat0r">Satellite radius from earth's center.</param>
+    /// <param name="attack_radius">Radius of the attack area.</param>
+    /// <param name="src_groundstations">List of source groundstations available to the attacker.</param>
+    /// <param name="transform">Transform object associated with Earth's center.</param>
+    /// <param name="prefab">GameObject representing the attack area center.</param>
+    public DebugAttacker(float latitude, float longitude, float sat0r, float attack_radius, List<GameObject> src_groundstations, Transform transform, GameObject prefab) : base(latitude, longitude, sat0r, attack_radius, src_groundstations, transform, prefab)
+    {
+
+    }
+
+    /// <summary>
+    /// Selects the first node in the routegraph that is in the target area.
+    /// </summary>
+    /// <param name="rg">Built <c>Routegraph</c> object.</param>
+    /// <returns>If a valid node was found, returns it. Otherwise, returns null.</returns>
+    private Node SelectSrcNode(RouteGraph rg)
+    {
+        int remaining_nodes = rg.nodes.Count();
+
+        for (int i = 0; i < rg.nodes.Count(); i++)
         {
-            return (null, null);
+            Node node = rg.nodes[i];
+            if (node.Id > 0 && this.InTargetArea(node.Position))
+            {
+                return node;
+            }
         }
-        return (this.VictimSrcNode, this.VictimDestNode);
+        return null;
+    }
+
+    /// <summary>
+    /// Selects the first node linked to the <c>src_node</c>.
+    /// </summary>
+    /// <param name="src_node">Candidate source node.</param>
+    /// <returns>A valid node if one is found. Otherwise, returns null.</returns>
+    private Node SelectOutOfTargetDestinationNode(Node src_node)
+    {
+        for (int i = 0; i < src_node.LinkCount; i++)
+        {
+            Node node = src_node.GetNeighbour(src_node.GetLink(i));
+            if (node.Id > 0)
+            {
+                return node;
+            }
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Selects the first node linked to the <c>src_node</c> that is within the target area.
+    /// </summary>
+    /// <param name="src_node">Candidate source node.</param>
+    /// <returns>A valid node if one is found. Otherwise, returns null.</returns>
+    private Node SelectInTargetDestinationNode(Node src_node)
+    {
+
+        for (int i = 0; i < src_node.LinkCount; i++)
+        {
+            Node node = src_node.GetNeighbour(src_node.GetLink(i));
+            if (node.Id > 0 && this.InTargetArea(node.Position))
+            {
+                return node;
+            }
+        }
+        return null;
+    }
+
+}
+
+/// <summary>
+/// Static class <c>AttackerFactory</c> provides the method <c>CreateAttacker</c> to either create an <c>Attacker</c> or a <c>DebugAttacker</c> class.
+/// </summary>
+public static class AttackerFactory
+{
+    /// <summary>
+    /// Creates an <c>Attacker</c>/<c>DebugAttacker</c> object based on whether the <c>debug</c> option is enabled or not.
+    /// </summary>
+    /// <param name="latitude">Latitude of the attack area in degrees.</param>
+    /// <param name="longitude">Longitude of the attack area in degrees.</param>
+    /// <param name="sat0r">Satellite radius from earth's center.</param>
+    /// <param name="attack_radius">Radius of the attack area.</param>
+    /// <param name="src_groundstations">List of source groundstations available to the attacker.</param>
+    /// <param name="transform">Transform object associated with Earth's center.</param>
+    /// <param name="prefab">GameObject representing the attack area center.</param>
+    /// <param name="debug">Debugging option. If enabled, a <c>DebugAttacker</c> object is returned. Otherwise, an <c>Attacker</c> object is created.</param>
+    /// <returns>An instance of a <c>Attacker</c>/<c>DebugAttacker</c> object.</returns>
+    public static Attacker CreateAttacker(float latitude, float longitude, float sat0r, float attack_radius, List<GameObject> src_groundstations, Transform transform, GameObject prefab, bool debug)
+    {
+        if (debug)
+        {
+            return new DebugAttacker(latitude, longitude, sat0r, attack_radius, src_groundstations, transform, prefab);
+        }
+        else
+        {
+            return new Attacker(latitude, longitude, sat0r, attack_radius, src_groundstations, transform, prefab);
+        }
+
     }
 }
 
