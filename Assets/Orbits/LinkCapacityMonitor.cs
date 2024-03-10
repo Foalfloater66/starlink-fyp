@@ -1,8 +1,12 @@
 using System.Collections.Generic;
 using System;
 
+/**
+ * @author Morgane Marie Ohlig
+ */
+
 /// <summary>
-/// Class LinkCapacityMonitor maps links to their current capacity and provides methods to modify these capacities. Links are full duplex; they are unidirectional only. Therefore, for two nodes `a` and `b`, we have the following link property `(a, b) != `(b, a)`.
+/// Class <c>LinkCapacityMonitor</c> maps links to their current capacity and provides methods to modify these capacities. Links are full duplex; they are unidirectional only. Therefore, for two nodes `a` and `b`, we have the following link property `(a, b) != `(b, a)`.
 /// A link's <c>capacity</c> is the number of additional mbits it can carry. If the capacity reaches 0, then the link is considered saturated. If the capacity is strictly below 0, then the link is considered flooded.
 /// </summary>
 public class LinkCapacityMonitor

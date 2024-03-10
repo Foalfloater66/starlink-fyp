@@ -125,7 +125,7 @@ public class SatelliteSP0031
 		gameobject.transform.RotateAround(Vector3.zero, Vector3.up, (float)orbitalangle);
 		gameobject.transform.SetParent(orbit.transform, false);
 
-		max_linknum = 10; // FIXME: This is only tentative.
+		max_linknum = 10; // FIXME: Change this to the maximum number of attack paths set.
 
 		links = new GameObject[max_linknum];
 
@@ -142,7 +142,7 @@ public class SatelliteSP0031
 			laseron[lc] = false;
 		}
 
-		for (int linknum = 0; linknum < max_linknum; linknum++) // FIXME: MAN WHY ONLY TWO
+		for (int linknum = 0; linknum < max_linknum; linknum++)
 		{
 			links[linknum] = GameObject.Instantiate(laser_prefab, position(),
 				gameobject.transform.rotation);

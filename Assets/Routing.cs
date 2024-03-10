@@ -58,13 +58,13 @@ public class Node : HeapNode
 	int _linkcount = 0;
 	public const float INFINITY = 1000000f;
 
-	public int _orbit = -5; // TODO: make this private. Was it always public?
+	int _orbit = -5;
 	float _dist = INFINITY; // distance from src.
 	Node _parent_node;  // predecessor on path from src
 
 	private Dictionary<int, Link> _neighbours = new Dictionary<int, Link>(); // all node neighbours and their respective links.
 
-	bool _on_path = false; /* Determines if the node is on the selected path. */ // TODO: is this even used?
+	bool _on_path = false; /* Determines if the node is on the selected path. */ // CLEANUP: remove the _on_path parameter. No longer needed for logging.
 
 	public Node(int id, Vector3 pos)
 	{

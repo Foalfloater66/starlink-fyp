@@ -10,7 +10,7 @@ public class RouteGraph
 	GameObject[] objs;
 	public Node startnode = null;
 	public Node endnode = null;
-	int nodecount = 0; // TODO: maybe change this. this is a terrible thing to do.
+	int nodecount = 0;
 	int satcount = 0;
 	public int rstcount = 0;
 	float maxdist = 0f;
@@ -88,25 +88,6 @@ public class RouteGraph
 		return null;
 	}
 
-	// public Link GetLink(int satid1, int satid2)
-	// {
-	// 	// TODO: is this actually of any use.
-	// 	Node node1 = this.GetNode(satid1);
-	// 	Node node2 = this.GetNode(satid2);
-
-	// 	for (int index = 0; index < _links.length; index += 1)
-	// 	{
-	// 		// this is kind of a rudimentary way of doing so. Probably, what'd be better is to have some sort of hash table.
-	// 		if (_links[index].OtherNode(this).Id == id)
-	// 		{
-	// 			return _links[index];
-	// 		}
-	// 	}
-	// 	return None; // If there aren't any nodes.
-	// }
-
-
-
 	// only call AddEndNodes after you've added all the satellites
 	public void AddEndNodes()
 	{
@@ -161,9 +142,9 @@ public class RouteGraph
 		startnode.Dist = 0f;
 	}
 
-	public void ResetOnPathStatus() // TODO: I don't think I need this anymore.
+	// CLEANUP: Remove the path status parameter.
+	public void ResetOnPathStatus() // CLEANUP: I don't think I need this anymore.
 	{
-		// TODO: am I still using this?
 		for (int i = 0; i < nodecount; i++)
 		{
 			nodes[i].OnPath = false;

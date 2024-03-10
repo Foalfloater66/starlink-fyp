@@ -526,6 +526,7 @@ MonoBehaviour:
   raan0: 0
   log_choice: 5
   log_filename: /Users/morganeohlig/workspace/fyp/Starlink0031/Logs/path/
+  log_directory: /Users/morganeohlig/workspace/fyp/Starlink0031/Logs/
   beam_on: 0
   graph_on: 0
   prevscene:
