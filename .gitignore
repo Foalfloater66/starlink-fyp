@@ -16,7 +16,7 @@ ExportedObj/
 *.csproj
 *.pidb
 *.suo
-*.sln
+*.sln    
 *.user
 *.unityproj
 *.booproj
@@ -36,4 +36,5 @@ Thumbs.db
 # ======= #
 # Logging #
 # ======= #
-Logs/path/*
+Logs/*.txt
+Logs/path/*.txt
