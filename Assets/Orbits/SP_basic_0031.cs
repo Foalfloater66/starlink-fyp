@@ -11,33 +11,6 @@ using UnityEngine.SceneManagement;
 public enum RouteChoice { TransAt, TransPac, LonJob, USsparse, USsparseAttacked, USdense, TorMia, Sydney_SFO, Sydney_Tokyo, Sydney_Lima, Followsat };
 public enum LogChoice { None, RTT, Distance, HopDists, LaserDists, Path };
 
-public class ActiveISL
-{
-	public SatelliteSP0031 sat1, sat2;
-	public Node node1, node2;
-	public ActiveISL(SatelliteSP0031 sat1_, Node node1_, SatelliteSP0031 sat2_, Node node2_)
-	{
-		sat1 = sat1_;
-		sat2 = sat2_;
-		node1 = node1_;
-		node2 = node2_;
-	}
-}
-
-public class ActiveRF
-{
-	public SatelliteSP0031 sat;
-	public GameObject city;
-	public Node node1, node2;
-	public ActiveRF(GameObject city_, Node node1_, SatelliteSP0031 sat_, Node node2_)
-	{
-		city = city_;
-		sat = sat_;
-		node1 = node1_;
-		node2 = node2_;
-	}
-}
-
 public class SP_basic_0031 : MonoBehaviour
 {
 	public Camera cam;
@@ -91,7 +64,7 @@ public class SP_basic_0031 : MonoBehaviour
 	int orbitcount = 0, satcount = 0;
 	public Material isl_material;
 
-	public Material yellowMaterial;
+	public Material yellowMaterial; // CLEANUP: where is this? what is this used for? I need to move this to the ScenePainter. I don't seem to be using this anywhere. I should be able to remove this.
 	public Material[] laserMaterials;
 
 	public Material[] targetLinkMaterial; // 1st is link up, 2nd is link down.
@@ -117,7 +90,8 @@ public class SP_basic_0031 : MonoBehaviour
 	bool pause = false;
 	float pause_start_time;
 	Node[] nodes;
-	RouteGraph rg;
+	RouteGraph rg; // CLEANUP: change with underscore in front 
+	ScenePainter _painter;
 	float km_per_unit;
 	//float km_per_unit2;
 	GameObject london, new_york, san_francisco, singapore, johannesburg, athens, auckland, sydney;
@@ -135,8 +109,7 @@ public class SP_basic_0031 : MonoBehaviour
 	Vector3 sat0pos;
 
 	int lastpath; // used for multipaths
-	List<ActiveISL> used_isl_links;
-	List<ActiveRF> used_rf_links;
+
 	int followsat_id = 0;
 	float last_dist_calc = -1000f; // last time we update the set of nearest routers
 	SatelliteSP0031[] nearest_sats;  // used for calculating collision distances
@@ -348,8 +321,7 @@ public class SP_basic_0031 : MonoBehaviour
 			}
 		}
 
-		used_isl_links = new List<ActiveISL>(); // keep track of links we've highlighted
-		used_rf_links = new List<ActiveRF>();
+		_painter = new ScenePainter(isl_material, laserMaterials, targetLinkMaterial, cityMaterial);
 
 		if (route_choice == RouteChoice.Followsat)
 		{
@@ -914,34 +886,6 @@ public class SP_basic_0031 : MonoBehaviour
 		orbitcount = 0;
 	}
 
-
-	void UpdateLasers()
-	{
-		/* assign all the lasers that both sides agree on */
-		for (int satnum = 0; satnum < maxsats; satnum++)
-		{
-			satlist[satnum].ClearAssignment();
-		}
-
-		for (int satnum = 0; satnum < maxsats; satnum++)
-		{
-			satlist[satnum].UsePreAssigned();
-		}
-
-		/* finalize the choices, and draw the lasers */
-		for (int satnum = 0; satnum < maxsats; satnum++)
-		{
-			if (route_choice == RouteChoice.Followsat && followsat_id == satnum)
-			{
-				satlist[satnum].FinalizeLasers(speed, laserMaterials[0]);
-			}
-			else
-			{
-				satlist[satnum].FinalizeLasers(speed, isl_material);
-			}
-		}
-	}
-
 	GameObject get_relay(int nodeid)
 	{
 		int relaynum = -(nodeid + 1000);
@@ -984,50 +928,38 @@ public class SP_basic_0031 : MonoBehaviour
 		}
 	}
 
-	void ResetRoutePos(GameObject city1, GameObject city2)
+	void ResetRoutePos(GameObject city1, GameObject city2) // CLEANUP: remove this function. No longer needed.
 	{
-		rg.ResetNodesPos(city1, city2);
+		rg.ResetNodesPos(city1, city2); // CLEANUP: Do I still need this function?
 		for (int satnum = 0; satnum < maxsats; satnum++)
 		{
 			satlist[satnum].LinkOff();
 		}
 	}
 
-	void LockRoute()
+	void LockRoute() // CLEANUP: should this be a painter or a routegraph thing? this looks like a routegraph thing. maybe just pass them as arguments
 	{
 		/* Basically maintain all of the used ISL links. */
-		foreach (ActiveISL pair in used_isl_links)
+		foreach (ActiveISL pair in _painter.UsedISLLinks)
 		{
 			pair.node1.LockLink(pair.node2);
 			pair.node2.LockLink(pair.node1);
 		}
-		foreach (ActiveRF pair in used_rf_links)
+		foreach (ActiveRF pair in _painter.UsedRFLinks)
 		{
 			pair.node1.LockLink(pair.node2);
 			pair.node2.LockLink(pair.node1);
 		}
 	}
 
+
+	/// <summary>
+	/// Remove all of the used ISL and RF links from the routegraph.
+	/// </summary>
 	void ClearRoute()
 	{
-		/* Remove all of the used ISL links. Clear the entire route graph. */
-		while (used_isl_links.Count > 0)
-		{
-			ActiveISL isl = used_isl_links[0];
-			isl.sat1.ColourLink(isl.sat2, isl_material);
-			isl.sat2.ColourLink(isl.sat1, isl_material);
-			used_isl_links.RemoveAt(0);
-		}
-		while (used_rf_links.Count > 0)
-		{
-			// xxx remove graphic
-			ActiveRF rf = used_rf_links[0];
-			if (beam_on == BeamChoice.SrcDstOn)
-			{
-				rf.sat.BeamOff();
-			}
-			used_rf_links.RemoveAt(0);
-		}
+		_painter.EraseAllISLLinks();
+		_painter.EraseAllRFLinks();
 	}
 
 	/* Illuminate the coverge areas for first and last satellite on a route (if selected)  */
@@ -1040,14 +972,7 @@ public class SP_basic_0031 : MonoBehaviour
 		}
 	}
 
-	void ChangeCityMaterial(GameObject city, Material mat)
-	{
-		Renderer[] renderers = city.GetComponentsInChildren<Renderer>();
-		foreach (Renderer r in renderers)
-		{
-			r.material = mat;
-		}
-	}
+
 	public RouteGraph BuildRouteGraph(RouteGraph rgph, GameObject city1, GameObject city2, float maxdist, float margin)
 	{
 		// TODO: Create a BuildRouteGraph function that doesn't include cities.
@@ -1125,7 +1050,7 @@ public class SP_basic_0031 : MonoBehaviour
 		return rgph;
 	}
 
-	void highlight_reachable()
+	void highlight_reachable() // CLEANUP: Remove the highlight_reachable() function.
 	{
 		for (int satnum = 0; satnum < maxsats; satnum++)
 		{
@@ -1143,7 +1068,6 @@ public class SP_basic_0031 : MonoBehaviour
 			}
 		}
 	}
-
 
 	/* Check if sending traffic through a given path will take down an earlier shared link in the network. Returns true if there is at least one early collision, and false otherwise. */
 	bool RouteHasEarlyCollisions(Path path, int desired_mbits, Node src_node, Node dest_node)
@@ -1168,8 +1092,6 @@ public class SP_basic_0031 : MonoBehaviour
 		}
 		return false;
 	}
-
-
 
 	/* Draw the computed path and send traffic in mbits. */
 	void ExecuteAttackRoute(Path path, GameObject city1, GameObject city2, int mbits)
@@ -1202,53 +1124,44 @@ public class SP_basic_0031 : MonoBehaviour
 					prevsat = satlist[previd];
 
 					// Increase the load of the link
-					// TODO: make the link load capacity rule also hold for RF links. 
 					_link_capacities.DecreaseLinkCapacity(previd, id, mbits);
 					if (_link_capacities.IsFlooded(previd, id))
 					{
 						break;
 					}
 
-					int pathcolour = 2;
-					if (pathcolour >= laserMaterials.Length)
-					{
-						pathcolour = laserMaterials.Length - 1;
-					}
-					sat.ColourLink(prevsat, laserMaterials[pathcolour]);
-					prevsat.ColourLink(sat, laserMaterials[pathcolour]);
-					used_isl_links.Add(new ActiveISL(sat, rn, prevsat, prevnode));
+					_painter.ColorRouteISLLink(prevsat, sat, prevnode, rn);
 				}
 				// if it's an RF
 				else
 				{
+					// TODO: make the link load capacity rule also hold for RF links. 
 					if (id >= 0) // the current node is a satellite
 					{
 						sat = satlist[id];
-						if (previd == -2) // the previous node was a city. Add an active RF link.
+						if (previd == -2) // the previous node was a city. Add an active RF link. I guess just add it because it's already been done anyways. in the previous round I mean
 						{
-							used_rf_links.Add(new ActiveRF(city2, prevnode, sat, rn));
+							_painter.UsedRFLinks.Add(new ActiveRF(city2, prevnode, sat, rn));
 						}
-						else
+						else // previous ID was -1
 						{
 							// NB. Not sure what this is either.
-							GameObject city = get_relay(previd);
-							sat.LinkOn(city);
-							used_rf_links.Add(new ActiveRF(city, prevnode, sat, rn));
+							// GameObject city = get_relay(previd);
+							_painter.ColorRFLink(get_relay(previd), sat, prevnode, rn);
 						}
 					}
 					else // the node is a city
 					{
 						sat = satlist[previd];
-						if (id == -1)
+						if (id == -1) // NOTE: do we ever enter this edge case?
 						{
-							used_rf_links.Add(new ActiveRF(city1, rn, sat, prevnode));
+							_painter.UsedRFLinks.Add(new ActiveRF(city1, rn, sat, prevnode));
 						}
 						else // if the id is -2
 						{
 							GameObject city = get_relay(id);
-							sat.LinkOn(city);
-							used_rf_links.Add(new ActiveRF(city, rn, sat, prevnode));
-							ChangeCityMaterial(city, cityMaterial);
+							_painter.ColorRFLink(city, sat, prevnode, rn);
+							_painter.ChangeCityMaterial(city);
 						}
 					}
 				}
@@ -1543,29 +1456,21 @@ public class SP_basic_0031 : MonoBehaviour
 				}
 			}
 
-			// 6. Color the target link on the map. If flooded, the link is colored red. Otherwise, the link is colored pink.
-			SatelliteSP0031 sat = satlist[_attacker.Link.DestNode.Id];
-			SatelliteSP0031 prevsat = satlist[_attacker.Link.SrcNode.Id];
-			Material mat;
+			// Debugging messages.
 			if (_link_capacities.IsFlooded(_attacker.Link.SrcNode.Id, _attacker.Link.DestNode.Id))
 			{
 				Debug.Log("Update | Link was flooded.");
-				mat = targetLinkMaterial[1];
 			}
 			else
 			{
 				Debug.Log("Update | Link could not be flooded. It has capacity: " + _link_capacities.GetCapacity(_attacker.Link.SrcNode.Id, _attacker.Link.DestNode.Id));
-				mat = targetLinkMaterial[0];
 			}
-			sat.ColourLink(prevsat, mat);
-			prevsat.ColourLink(sat, mat);
-			used_isl_links.Add(new ActiveISL(sat, _attacker.Link.DestNode, prevsat, _attacker.Link.SrcNode));
+
+			// 6. Color the target link on the map. If flooded, the link is colored red. Otherwise, the link is colored pink.
+			_painter.ColorTargetISLLink(satlist[_attacker.Link.SrcNode.Id], satlist[_attacker.Link.DestNode.Id], _attacker.Link.DestNode, _attacker.Link.SrcNode, _link_capacities.IsFlooded(_attacker.Link.SrcNode.Id, _attacker.Link.DestNode.Id));
 		}
 
-		// Turn on RF links for each satellite pair found
-		used_rf_links.ForEach(a => a.sat.LinkOn(a.city));
-
-		UpdateLasers();
+		_painter.UpdateLasers(satlist, maxsats, speed);
 		framecount++;
 	}
 }

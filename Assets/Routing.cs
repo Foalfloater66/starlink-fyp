@@ -106,7 +106,6 @@ public class Node : HeapNode
 	/// <param name="peer">Node at other end of link to lock</param>
 	public void LockLink(Node peer)
 	{
-		/* What does this mean. */
 		for (int i = 0; i < _linkcount; i++)
 		{
 			if (_links[i].OtherNode(this) == peer)

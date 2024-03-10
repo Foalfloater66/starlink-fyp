@@ -656,7 +656,7 @@ public class SatelliteSP0031
 		}
 	}
 
-	public void ColourLink(SatelliteSP0031 nextsat, Material mat)
+	public void ColorLink(SatelliteSP0031 nextsat, Material mat)
 	{
 		for (int lc = 0; lc < maxlasers; lc++)
 		{
