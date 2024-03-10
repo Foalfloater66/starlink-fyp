@@ -64,8 +64,6 @@ public class Node : HeapNode
 
 	private Dictionary<int, Link> _neighbours = new Dictionary<int, Link>(); // all node neighbours and their respective links.
 
-	bool _on_path = false; /* Determines if the node is on the selected path. */ // CLEANUP: remove the _on_path parameter. No longer needed for logging.
-
 	public Node(int id, Vector3 pos)
 	{
 		_id = id;
@@ -145,19 +143,6 @@ public class Node : HeapNode
 			_orbit = value;
 		}
 	}
-
-	public bool OnPath
-	{
-		get
-		{
-			return _on_path;
-		}
-		set
-		{
-			_on_path = value;
-		}
-	}
-
 
 	public float Dist
 	{

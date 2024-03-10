@@ -8,8 +8,6 @@ using System.Text;
 using System.Linq;
 using UnityEngine.SceneManagement;
 
-// TODO: Remove the node logging feature.
-
 public enum RouteChoice { TransAt, TransPac, LonJob, USsparse, USsparseAttacked, USdense, TorMia, Sydney_SFO, Sydney_Tokyo, Sydney_Lima, Followsat };
 public enum LogChoice { None, RTT, Distance, HopDists, LaserDists, Path };
 
@@ -164,9 +162,7 @@ public class SP_basic_0031 : MonoBehaviour
 	public LogChoice log_choice = LogChoice.None;
 
 	public static string log_directory = "/Users/morganeohlig/workspace/fyp/Starlink0031/Logs/";
-	public string log_filename = "/Users/morganeohlig/workspace/fyp/Starlink0031/Logs/path/summary.txt";
 
-	private int satellite_log_counter = 0;
 	public enum BeamChoice { AllOff, AllOn, SrcDstOn };
 	public BeamChoice beam_on;
 	public bool graph_on;
@@ -1330,7 +1326,6 @@ public class SP_basic_0031 : MonoBehaviour
 		}
 		BuildRouteGraph(rg, city1, city2, maxdist, margin);
 
-		rg.ResetOnPathStatus(); // CLEANUP: Remove this, as it's tied to logging.
 		rg.ComputeRoutes();
 
 		/* Figure out the start and end satellites IDs.
@@ -1349,7 +1344,6 @@ public class SP_basic_0031 : MonoBehaviour
 				break;
 			}
 			id = rn.Id;
-			rn.OnPath = true;
 			path = path + id.ToString() + " ";
 
 			if (endsatid == -1 && id >= 0)
@@ -1365,23 +1359,11 @@ public class SP_basic_0031 : MonoBehaviour
 				{
 					logfile.WriteLine(elapsed_time.ToString() + " rtt 0 change 0 path " + pathnum.ToString());
 				}
-				if (log_choice == LogChoice.Path)
-				{
-					/* Log the route */
-					LogSatelliteStates(false, groundstations[city1], groundstations[city2], path);
-				}
 
 				highlight_reachable();
 				return Node.INFINITY;
 			}
 		}
-		Debug.Log("MANUAL PATH: " + path); // ignores -4!
-
-
-		/* Log the route nodes. */
-		// CLEAN: Remove this.
-		// if (log_choice == LogChoice.Path) { LogSatelliteStates(true, groundstations[city1], groundstations[city2], path); }
-
 
 		/* Calculate RTT information to display on the screen. */
 		int pathchange = 0;
@@ -1582,63 +1564,6 @@ public class SP_basic_0031 : MonoBehaviour
 		txt.text = s2;
 	}
 
-	// CLEANUP: Remove this logging function. I'm not using it anymore.
-	void LogSatelliteStates(bool success, string cityString1, string cityString2, string path)
-	{
-		/* Writes information about all nodes in the RouteGraph into the logfile. Specifies if the node is part of an existing computed path. */
-		if (LogChoice.Path != log_choice)
-		{
-			return;
-		}
-
-		logfile = new System.IO.StreamWriter(log_directory + satellite_log_counter.ToString("D4") + (success ? "_success_" : "_fail_") + string.Format("{0}_{1}", cityString1, cityString2) + ".txt");
-		logfile.WriteLine(new String('=', 20));
-		logfile.WriteLine(string.Format("{0} - {1}, ", cityString1, cityString2));
-		logfile.Flush();
-
-		StringBuilder sb = new StringBuilder();
-
-		int path_counter = 0;
-
-		for (int orbitnum = 0; orbitnum < maxorbits; orbitnum++)
-		{
-			/* for some reason it's not done with the maxorbits in mind but with a maxorbit argument. I'm not entirely sure but I'll check. */
-			sb.Append("ORBIT: " + orbitnum + ";");
-			logfile.WriteLine(sb.ToString());
-			sb.Clear();
-
-			foreach (int satid in orbit2sats[orbitnum])
-			{
-				Node nodes = rg.GetNode(satid);
-				sb.Append("<name> " + nodes + "; <id> " + nodes.Id + "; <pos>" + nodes._position + ";");
-
-				if (nodes.OnPath)
-				{
-					sb.Append(" ON PATH.");
-					path_counter += 1;
-				}
-				logfile.WriteLine(sb.ToString());
-				logfile.Flush();
-				sb.Clear();
-
-			}
-			logfile.WriteLine(new String('-', 10));
-		}
-
-		logfile.WriteLine("END.");
-		logfile.WriteLine(new String('=', 20));
-		logfile.Flush();
-
-
-		/* Print this data into the summary logfile */
-		// summary_logfile.WriteLine(satellite_log_counter.ToString("D4") + string.Format("_{0}_{1}", cityString1, cityString2) + ":" + (success ? " success " : " fail ") + ": " + path_counter.ToString() + " path nodes. Path: " + path.ToString());
-		// summary_logfile.Flush();
-
-		logfile.WriteLine(new String('=', 20));
-		logfile.Flush();
-
-		satellite_log_counter += 1;
-	}
 	float FindNearest(int sat_id, float now)
 	{
 		float nearest_dist = Node.INFINITY;
