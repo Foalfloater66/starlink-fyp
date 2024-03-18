@@ -2,17 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CityScript : MonoBehaviour {
+public class CityScript : MonoBehaviour
+{
 
 	public float latitude;
 	public float longitude;
+
+	public string name;
+
 	// Use this for initialization
-	void Start () {
-		
+	void Start()
+	{
+
 	}
-	
+
 	// Update is called once per frame
-	void Update () {
-		
+	void Update()
+	{
+
 	}
 }

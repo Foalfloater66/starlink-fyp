@@ -99,13 +99,11 @@ public class SP_basic_0031 : MonoBehaviour
 		thunderbay, columbus, lisbon, miami, majorca, tokyo, chicago, lima;
 
 
-	// Top 25 cities
-
-
+	// Top 10 most populated cities as of 2024 which are *not* already included.
+	GameObject delhi, shanghai, sao_paulo, mexico_city, cairo, mumbai, beijing, dhaka, osaka, karachi
 
 	private Dictionary<GameObject, string> groundstations = new Dictionary<GameObject, string>();
 
-	//GameObject beam1 = null, beam2 = null;
 	GameObject[] lasers;
 	List<GameObject> relays;
 	string prevpath = "";
