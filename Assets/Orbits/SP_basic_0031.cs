@@ -93,10 +93,15 @@ public class SP_basic_0031 : MonoBehaviour
 	RouteGraph rg; // CLEANUP: change with underscore in front 
 	ScenePainter _painter;
 	float km_per_unit;
-	//float km_per_unit2;
+
 	GameObject london, new_york, san_francisco, singapore, johannesburg, athens, auckland, sydney;
 	GameObject northbend, conrad, merrillan, greenville, redmond, hawthorne, bismarck, toronto,
 		thunderbay, columbus, lisbon, miami, majorca, tokyo, chicago, lima;
+
+
+	// Top 25 cities
+
+
 
 	private Dictionary<GameObject, string> groundstations = new Dictionary<GameObject, string>();
 
@@ -282,7 +287,7 @@ public class SP_basic_0031 : MonoBehaviour
 
 		/* Create and initialise the RouteGraph */
 		rg = new RouteGraph();
-		InitRoute(rg);
+		RouteHandler.InitRoute(rg);
 
 		Debug.Assert(satcount == maxsats);
 
@@ -763,7 +768,7 @@ public class SP_basic_0031 : MonoBehaviour
 		lima = CreateCity(-1.069440f, 80.907160f, true); // San Lorenzo, Ecuador
 	}
 
-	GameObject CreateCity(float latitude, float longitude, bool is_relay)
+	GameObject CreateCity(float latitude, float longitude, bool is_relay, string name = null /* only to take account of certain cities that don't have names */)
 	{
 		GameObject city = (GameObject)Instantiate(city_prefab, new Vector3(0f, 0f, /*-6382.2f*/-6371.0f), transform.rotation);
 		float long_offset = 20f;
@@ -774,6 +779,7 @@ public class SP_basic_0031 : MonoBehaviour
 		CityScript cs = (CityScript)city.GetComponent(typeof(CityScript));
 		cs.longitude = longitude;
 		cs.latitude = latitude;
+		cs.name = name;
 		if (is_relay)
 		{
 			grid.AddCity(latitude, longitude, relays.Count, city);
@@ -781,6 +787,8 @@ public class SP_basic_0031 : MonoBehaviour
 		}
 		return city;
 	}
+
+
 
 	// Default way to create a constellation
 	void CreateSats(int num_orbits, int sats_per_orbit, float inclination, float orbit_phase_offset,
@@ -897,71 +905,6 @@ public class SP_basic_0031 : MonoBehaviour
 		return ((-1000) - relaynum);
 	}
 
-	void InitRoute(RouteGraph rg)
-	{
-		rg.Init(maxsats, relays.Count, maxdist, km_per_unit);
-
-		// Plus 2 for start and end city
-		for (int satnum = 0; satnum < maxsats; satnum++)
-		{
-			rg.NewNode(satlist[satnum].satid, satlist[satnum].Orbit, satlist[satnum].gameobject);
-
-		}
-		rg.AddEndNodes();
-		int relaycount = 0;
-		foreach (GameObject relay in relays)
-		{
-			// APPARENTLY, NO RELAYS WERE PRINTED?...
-			/* A relay is a satellite that communicates with a groundstation. Unsure if that's exactly what it is here. However, relays do not have an orbit! So the NewNode() function must be overloaded. */
-			Console.WriteLine("RELAY: " + relaycount);
-			rg.NewNode(get_relay_id(relaycount), relay);
-			relaycount++;
-		}
-	}
-
-	void ResetRoute(GameObject city1, GameObject city2)
-	{
-		rg.ResetNodes(city1, city2);
-		for (int satnum = 0; satnum < maxsats; satnum++)
-		{
-			satlist[satnum].LinkOff();
-		}
-	}
-
-	void ResetRoutePos(GameObject city1, GameObject city2) // CLEANUP: remove this function. No longer needed.
-	{
-		rg.ResetNodesPos(city1, city2); // CLEANUP: Do I still need this function?
-		for (int satnum = 0; satnum < maxsats; satnum++)
-		{
-			satlist[satnum].LinkOff();
-		}
-	}
-
-	void LockRoute() // CLEANUP: should this be a painter or a routegraph thing? this looks like a routegraph thing. maybe just pass them as arguments
-	{
-		/* Basically maintain all of the used ISL links. */
-		foreach (ActiveISL pair in _painter.UsedISLLinks)
-		{
-			pair.node1.LockLink(pair.node2);
-			pair.node2.LockLink(pair.node1);
-		}
-		foreach (ActiveRF pair in _painter.UsedRFLinks)
-		{
-			pair.node1.LockLink(pair.node2);
-			pair.node2.LockLink(pair.node1);
-		}
-	}
-
-
-	/// <summary>
-	/// Remove all of the used ISL and RF links from the routegraph.
-	/// </summary>
-	void ClearRoute()
-	{
-		_painter.EraseAllISLLinks();
-		_painter.EraseAllRFLinks();
-	}
-
 	/* Illuminate the coverge areas for first and last satellite on a route (if selected)  */
 	void CreateSatBeams(SatelliteSP0031 sat1, GameObject city1, SatelliteSP0031 sat2, GameObject city2)
 	{
@@ -970,84 +913,6 @@ public class SP_basic_0031 : MonoBehaviour
 			sat1.BeamOn();
 			sat2.BeamOn();
 		}
-	}
-
-
-	public RouteGraph BuildRouteGraph(RouteGraph rgph, GameObject city1, GameObject city2, float maxdist, float margin)
-	{
-		// TODO: Create a BuildRouteGraph function that doesn't include cities.
-
-		/* This function builds the route graph. Although I have no idea why it's here and not in the RouteGraph function itself. I suppose it's because the routegraph can't perform this operation on itself. But I'm not a massive fan of this design to be perfectly honest. */
-		for (int satnum = 0; satnum < maxsats; satnum++)
-		{
-			// I'm going to pass the satellite orbit information to the RouteGraph. So that it can encapsulate it properly. Makes log reading much easier.
-
-
-			for (int i = 0; i < satlist[satnum].assignedcount; i++)
-			{
-				rgph.AddNeighbour(satnum, satlist[satnum].assignedsats[i].satid, false);
-			}
-
-			// Add start city
-			float radiodist = Vector3.Distance(satlist[satnum].gameobject.transform.position,
-				city1.transform.position);
-			// THIS is why there's only one routegraph. or at least I think this is why.
-			if (radiodist * km_per_unit < maxdist)
-			{
-				/* I THINK this takes the groundstation, if the radio distance * km per unit is smaller than the maximum distance,
-				then one can add a satellite neighbour to it. */
-				/* create a link between maxsats and satnum of distance radiodist */
-				rgph.AddNeighbour(maxsats, satnum, radiodist, true);
-			}
-			else if (radiodist * km_per_unit < maxdist + margin)
-			{
-				rgph.AddNeighbour(maxsats, satnum, Node.INFINITY, true);
-			}
-
-			// Add end city
-			radiodist = Vector3.Distance(satlist[satnum].gameobject.transform.position,
-				city2.transform.position);
-			if (radiodist * km_per_unit < maxdist)
-			{
-				rgph.AddNeighbour(maxsats + 1, satnum, radiodist, true);
-			}
-			else if (radiodist * km_per_unit < maxdist + margin)
-			{
-				rgph.AddNeighbour(maxsats + 1, satnum, Node.INFINITY, true);
-			}
-
-			// Add relays
-			if (graph_on)
-			{
-				satlist[satnum].GraphReset();
-			}
-
-			List<List<City>> in_range = grid.FindInRange(satlist[satnum].gameobject.transform.position);
-			foreach (List<City> lst in in_range)
-			{
-				foreach (City relay in lst)
-				{
-					radiodist = Vector3.Distance(satlist[satnum].gameobject.transform.position, relay.gameobject.transform.position);
-					if (radiodist * km_per_unit < maxdist)
-					{
-						rgph.AddNeighbour(maxsats + 2 + relay.relayid, satnum, radiodist, true);
-						if (graph_on)
-						{
-							satlist[satnum].GraphOn(relay.gameobject, null);
-						}
-					}
-					else if (radiodist * km_per_unit < maxdist + margin)
-					{
-						rgph.AddNeighbour(maxsats + 2 + relay.relayid, satnum, Node.INFINITY, true);
-					}
-				}
-			}
-			if (graph_on)
-			{
-				satlist[satnum].GraphDone();
-			}
-		}
-		return rgph;
 	}
 
 	void highlight_reachable() // CLEANUP: Remove the highlight_reachable() function.
@@ -1067,30 +932,6 @@ public class SP_basic_0031 : MonoBehaviour
 				sat.BeamOn();
 			}
 		}
-	}
-
-	/* Check if sending traffic through a given path will take down an earlier shared link in the network. Returns true if there is at least one early collision, and false otherwise. */
-	bool RouteHasEarlyCollisions(Path path, int desired_mbits, Node src_node, Node dest_node)
-	{
-		int index = 3;
-		Node prev_rn = path.nodes.First();
-		Node rn = path.nodes[2];
-		while (index < path.nodes.Count)
-		{
-			if (prev_rn == src_node && rn == dest_node) // we *want* this link to be flooded!
-			{
-				break;
-			}
-			if (_link_capacities.GetCapacity(prev_rn.Id, rn.Id) - desired_mbits < 0) // an early link would get flooded.
-			{
-				return true;
-			}
-
-			prev_rn = rn;
-			rn = path.nodes[index];
-			index++;
-		}
-		return false;
 	}
 
 	/* Draw the computed path and send traffic in mbits. */
@@ -1189,7 +1030,7 @@ public class SP_basic_0031 : MonoBehaviour
 
 	}
 
-	float FindNearest(int sat_id, float now)
+	float FindNearest(int sat_id, float now) // TODO: remove this
 	{
 		float nearest_dist = Node.INFINITY;
 		SatelliteSP0031 sat = satlist[sat_id];
@@ -1307,8 +1148,8 @@ public class SP_basic_0031 : MonoBehaviour
 					continue;
 				}
 
-				ResetRoute(src_gs, dest_gs);
-				rg = BuildRouteGraph(rg, src_gs, dest_gs, maxdist, margin);
+				RouteHandler.ResetRoute(src_gs, dest_gs);
+				rg = RouteHandler.BuildRouteGraph(rg, src_gs, dest_gs, maxdist, margin);
 				rg.ComputeRoutes();
 				Debug.Log(groundstations[src_gs] + " to " + groundstations[dest_gs]);
 
@@ -1383,6 +1224,8 @@ public class SP_basic_0031 : MonoBehaviour
 	void Update()
 	{
 		UnityEngine.Debug.Log("Update()");
+
+		// TODO: remove input processing functions.
 		if (Input.GetKeyDown("space") || Input.GetKeyDown("."))
 		{
 
@@ -1409,19 +1252,15 @@ public class SP_basic_0031 : MonoBehaviour
 		_link_capacities.Reset();
 
 		// 1. Clean and rebuild the routegraph
-		ClearRoute();
-		ResetRoute(new_york, toronto);
-		rg = BuildRouteGraph(rg, new_york, toronto, maxdist, margin);
+		RouteHandler.ClearRoute(_painter);
+		RouteHandler.ResetRoute(new_york, toronto);
+		rg = RouteHandler.BuildRouteGraph(rg, new_york, toronto, maxdist, margin);
 
 		// 2. If the current link isn't valid, select a new target link.
 		if (!_attacker.HasValidTargetLink())
 		{
 			_attacker.ChangeTargetLink(rg);
-			if (_attacker.Link == null)
-			{
-				UnityEngine.Debug.Log("Attacker.Update | Could not find any valid link.");
-			}
-			else
+			if (_attacker.Link != null)
 			{
 				UnityEngine.Debug.Log("Attacker.Update | Changed link: " + _attacker.Link.SrcNode.Id + " - " + _attacker.Link.DestNode.Id);
 			}
@@ -1445,7 +1284,7 @@ public class SP_basic_0031 : MonoBehaviour
 			{
 				Path attack_path = attack_routes.ExtractMin();
 				int mbits = 600;
-				if (!RouteHasEarlyCollisions(attack_path, mbits, _attacker.Link.SrcNode, _attacker.Link.DestNode))
+				if (!RouteHandler.RouteHasEarlyCollisions(attack_path, mbits, _attacker.Link.SrcNode, _attacker.Link.DestNode, _link_capacities))
 				{
 					Debug.Log("Update | Executing the following path: " + String.Join(" ", from node in attack_path.nodes select node.Id));
 					ExecuteAttackRoute(attack_path, attack_path.start_city, attack_path.end_city, mbits);
@@ -1468,6 +1307,10 @@ public class SP_basic_0031 : MonoBehaviour
 
 			// 6. Color the target link on the map. If flooded, the link is colored red. Otherwise, the link is colored pink.
 			_painter.ColorTargetISLLink(satlist[_attacker.Link.SrcNode.Id], satlist[_attacker.Link.DestNode.Id], _attacker.Link.DestNode, _attacker.Link.SrcNode, _link_capacities.IsFlooded(_attacker.Link.SrcNode.Id, _attacker.Link.DestNode.Id));
+		}
+		else
+		{
+			UnityEngine.Debug.Log("Attacker.Update | Could not find any valid link.");
 		}
 
 		_painter.UpdateLasers(satlist, maxsats, speed);

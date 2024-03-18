@@ -4,6 +4,156 @@ using System.Collections.Generic;
 using System;
 using System.Text;
 
+public static class RouteHandler
+{
+
+	// TODO: add docstrings
+	public static void InitRoute(RouteGraph rg, int maxsats, List<GameObject> relays, float maxdist, float km_per_unit)
+	{
+		rg.Init(maxsats, relays.Count, maxdist, km_per_unit);
+
+		// Plus 2 for start and end city
+		for (int satnum = 0; satnum < maxsats; satnum++)
+		{
+			rg.NewNode(satlist[satnum].satid, satlist[satnum].Orbit, satlist[satnum].gameobject);
+
+		}
+		rg.AddEndNodes();
+		int relaycount = 0;
+		foreach (GameObject relay in relays)
+		{
+			rg.NewNode(get_relay_id(relaycount), relay);
+			relaycount++;
+		}
+	}
+
+	/// <summary>
+	/// Remove all of the used ISL and RF links from the routegraph.
+	/// </summary>
+	public static void ClearRoutes(ScenePainter painter)
+	{
+		painter.EraseAllISLLinks();
+		painter.EraseAllRFLinks();
+	}
+
+	public static RouteGraph BuildRouteGraph(RouteGraph rgph, GameObject city1, GameObject city2, float maxdist, float margin)
+	{
+		// TODO: Create a BuildRouteGraph function that doesn't include cities.
+
+		for (int satnum = 0; satnum < maxsats; satnum++)
+		{
+			for (int i = 0; i < satlist[satnum].assignedcount; i++)
+			{
+				rgph.AddNeighbour(satnum, satlist[satnum].assignedsats[i].satid, false);
+			}
+
+			// Add start city
+			float radiodist = Vector3.Distance(satlist[satnum].gameobject.transform.position,
+				city1.transform.position);
+			if (radiodist * km_per_unit < maxdist)
+			{
+				rgph.AddNeighbour(maxsats, satnum, radiodist, true);
+			}
+			else if (radiodist * km_per_unit < maxdist + margin)
+			{
+				rgph.AddNeighbour(maxsats, satnum, Node.INFINITY, true);
+			}
+
+			// Add end city
+			radiodist = Vector3.Distance(satlist[satnum].gameobject.transform.position,
+				city2.transform.position);
+			if (radiodist * km_per_unit < maxdist)
+			{
+				rgph.AddNeighbour(maxsats + 1, satnum, radiodist, true);
+			}
+			else if (radiodist * km_per_unit < maxdist + margin)
+			{
+				rgph.AddNeighbour(maxsats + 1, satnum, Node.INFINITY, true);
+			}
+
+			// Add relays
+			if (graph_on)
+			{
+				satlist[satnum].GraphReset();
+			}
+
+			List<List<City>> in_range = grid.FindInRange(satlist[satnum].gameobject.transform.position);
+			foreach (List<City> lst in in_range)
+			{
+				foreach (City relay in lst)
+				{
+					radiodist = Vector3.Distance(satlist[satnum].gameobject.transform.position, relay.gameobject.transform.position);
+					if (radiodist * km_per_unit < maxdist)
+					{
+						rgph.AddNeighbour(maxsats + 2 + relay.relayid, satnum, radiodist, true);
+						if (graph_on)
+						{
+							satlist[satnum].GraphOn(relay.gameobject, null);
+						}
+					}
+					else if (radiodist * km_per_unit < maxdist + margin)
+					{
+						rgph.AddNeighbour(maxsats + 2 + relay.relayid, satnum, Node.INFINITY, true);
+					}
+				}
+			}
+			if (graph_on)
+			{
+				satlist[satnum].GraphDone();
+			}
+		}
+		return rgph;
+	}
+
+	// TODO: add docstrings
+	public static void ResetRoute(GameObject city1, GameObject city2)
+	{
+		rg.ResetNodes(city1, city2);
+		_painter.TurnLasersOff(satlist, maxsats);
+	}
+
+	/* Check if sending traffic through a given path will take down an earlier shared link in the network. Returns true if there is at least one early collision, and false otherwise. */
+	// TODO: add docstrings
+	public static bool RouteHasEarlyCollisions(Path path, int desired_mbits, Node src_node, Node dest_node, LinkCapacityMonitor _link_capacities)
+	{
+		int index = 3;
+		Node prev_rn = path.nodes.First();
+		Node rn = path.nodes[2];
+		while (index < path.nodes.Count)
+		{
+			if (prev_rn == src_node && rn == dest_node) // we *want* this link to be flooded!
+			{
+				break;
+			}
+			if (_link_capacities.GetCapacity(prev_rn.Id, rn.Id) - desired_mbits < 0) // an early link would get flooded.
+			{
+				return true;
+			}
+
+			prev_rn = rn;
+			rn = path.nodes[index];
+			index++;
+		}
+		return false;
+	}
+
+
+	public static void LockRoute() // NB. This is never used for some reason, but I don't know why.
+	{
+		/* Basically maintain all of the used ISL links. */
+		foreach (ActiveISL pair in _painter.UsedISLLinks)
+		{
+			pair.node1.LockLink(pair.node2);
+			pair.node2.LockLink(pair.node1);
+		}
+		foreach (ActiveRF pair in _painter.UsedRFLinks)
+		{
+			pair.node1.LockLink(pair.node2);
+			pair.node2.LockLink(pair.node1);
+		}
+	}
+}
+
 public class RouteGraph
 {
 	public Node[] nodes;
@@ -271,8 +421,6 @@ class GroundRegion
 		citycount++;
 	}
 }
-
-
 
 class GroundGrid
 {

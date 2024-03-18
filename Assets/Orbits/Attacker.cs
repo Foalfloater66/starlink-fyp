@@ -18,6 +18,7 @@ using System.Linq; // for ToList();
 /// </summary>
 public class Path : HeapNode
 {
+    // TODO: move to routing
     /// <value>
     /// List of nodes in the path.
     /// </value>
