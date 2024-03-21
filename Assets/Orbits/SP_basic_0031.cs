@@ -100,7 +100,7 @@ public class SP_basic_0031 : MonoBehaviour
 
 
 	// Top 10 most populated cities as of 2024 which are *not* already included.
-	GameObject delhi, shanghai, sao_paulo, mexico_city, cairo, mumbai, beijing, dhaka, osaka, karachi
+	GameObject delhi, shanghai, sao_paulo, mexico_city, cairo, mumbai, beijing, dhaka, osaka, karachi;
 
 	private Dictionary<GameObject, string> groundstations = new Dictionary<GameObject, string>();
 
@@ -366,6 +366,7 @@ public class SP_basic_0031 : MonoBehaviour
 		// N and W are +ve
 		relays = new List<GameObject>();
 		london = CreateCity(51.5f, 0f, false);
+		Debug.Log(london.name);
 		new_york = CreateCity(40.76f, 73.98f, false);
 		san_francisco = CreateCity(37.733795f, 122.446747f, false);
 		singapore = CreateCity(1.290270f, -103.851959f, false);
@@ -1221,26 +1222,7 @@ public class SP_basic_0031 : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		UnityEngine.Debug.Log("Update()");
-
-		// TODO: remove input processing functions.
-		if (Input.GetKeyDown("space") || Input.GetKeyDown("."))
-		{
-
-			if (pause == false)
-			{
-				pause = true;
-				pause_start_time = Time.time;
-				countdown.text = "[Paused]";
-
-			}
-			else
-			{
-				pause = false;
-				start_time += Time.time - pause_start_time;
-			}
-		}
-
+        Debug.Log("Update()");
 
 		elapsed_time = last_elapsed_time + (Time.time - last_speed_change) * speed;
 		RotateCamera();
@@ -1260,12 +1242,12 @@ public class SP_basic_0031 : MonoBehaviour
 			_attacker.ChangeTargetLink(rg);
 			if (_attacker.Link != null)
 			{
-				UnityEngine.Debug.Log("Attacker.Update | Changed link: " + _attacker.Link.SrcNode.Id + " - " + _attacker.Link.DestNode.Id);
+				Debug.Log("Attacker.Update | Changed link: " + _attacker.Link.SrcNode.Id + " - " + _attacker.Link.DestNode.Id);
 			}
 		}
 		else
 		{
-			UnityEngine.Debug.Log("Attacker.Update | Previous link is still valid.");
+			Debug.Log("Attacker.Update | Previous link is still valid.");
 		}
 
 		// 3. If the attacker has selected a valid link, attempt to attack it
@@ -1308,7 +1290,7 @@ public class SP_basic_0031 : MonoBehaviour
 		}
 		else
 		{
-			UnityEngine.Debug.Log("Attacker.Update | Could not find any valid link.");
+			Debug.Log("Attacker.Update | Could not find any valid link.");
 		}
 
 		_painter.UpdateLasers(satlist, maxsats, speed);

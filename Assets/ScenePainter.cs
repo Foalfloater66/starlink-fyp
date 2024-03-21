@@ -37,7 +37,7 @@ public class ActiveRF
     }
 }
 
-class ScenePainter
+public class ScenePainter
 {
     /// <value>
     /// Used Inter Satellite Links (ISL).
