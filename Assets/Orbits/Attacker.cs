@@ -134,16 +134,17 @@ namespace Orbits
         /// <summary>
         /// Finds the shortest route between two groundstations.
         /// </summary>
-        /// <param name="rg">Built <c>Routegraph</c> object.</param>
+        /// <param name="start_node"></param>
+        /// <param name="end_node"></param>
         /// <param name="src_gs">Source groundstation.</param>
         /// <param name="dest_gs">Destination groundstation.</param>
         /// <returns>If a route containing the target link is found, creates and returns the route's <c>Path</c>. Otherwise, returns null.</returns>
-        public Path FindAttackRoute(RouteGraph rg, GameObject src_gs, GameObject dest_gs)
+        public Path FindAttackRoute(Node start_node, Node end_node, GameObject src_gs, GameObject dest_gs)
         {
             // TODO: Optimise route extraction.
             System.Diagnostics.Debug.Assert(this.Link != null, "FindAttackRoute | No attacker link has been set.");
 
-            Node rn = rg.endnode;
+            Node rn = end_node;
             Path route = new Path(src_gs, dest_gs);
             route.nodes.Add(rn);
             int startsatid = 0, endsatid = -1;
@@ -153,10 +154,10 @@ namespace Orbits
 
             while (true)
             {
-                if (rn == rg.startnode)
+                if (rn == start_node)
                 {
                     route.nodes.Add(rn);
-                    startsatid = id;
+                    startsatid = id; // TODO: do I need to keep this?
                     break;
                 }
 

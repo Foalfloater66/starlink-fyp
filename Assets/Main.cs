@@ -1022,7 +1022,7 @@ public class Main : MonoBehaviour
 				rg.ComputeRoutes();
 				Debug.Log(groundstations[src_gs] + " to " + groundstations[dest_gs]);
 
-				Path path = _attacker.FindAttackRoute(rg, src_gs, dest_gs);
+				Path path = _attacker.FindAttackRoute(rg.startnode, rg.endnode, src_gs, dest_gs);
 				if (path != null)
 				{
 					heap.Add(path, (double)path.nodes.Count);
