@@ -2,7 +2,7 @@
 
 namespace Orbits.Satellites
 {
-	public class SatelliteSP0031
+	public class Satellite
 	{
 		int maxsats;
 		int phase1_satcount;
@@ -18,24 +18,24 @@ namespace Orbits.Satellites
 		public GameObject gameobject;
 		GameObject[] lasers;
 
-		SatelliteSP0031[] laserdsts;
+		Satellite[] laserdsts;
 		double[] lasertimes;
 		bool[] laseron;
 
-		SatelliteSP0031[] nearestsats;
+		Satellite[] nearestsats;
 		int nearestcount;
 
-		public SatelliteSP0031[] assignedsats;
+		public Satellite[] assignedsats;
 		public int assignedcount;
 
 
-		SatelliteSP0031[] preassignedsats; // pre, not prev
+		Satellite[] preassignedsats; // pre, not prev
 		int preassignedcount;
 
-		SatelliteSP0031[] prevassignedsats; // prev, not pre
+		Satellite[] prevassignedsats; // prev, not pre
 		int prevassignedcount;
 
-		SatelliteSP0031[] drawsats;
+		Satellite[] drawsats;
 		int drawcount;
 
 		bool _glow = true;
@@ -77,7 +77,7 @@ namespace Orbits.Satellites
 			}
 		}
 
-		public SatelliteSP0031(int satelliteid, int satellitenum, int orbitnumber, Transform earth_transform_,
+		public Satellite(int satelliteid, int satellitenum, int orbitnumber, Transform earth_transform_,
 			GameObject orbit_, double orbitalangle, int maxlasercount, int maxsatcount, int phase1_satcount_,
 			double sat_phase_stagger_, int sats_per_orbit_, int orbital_planes_,
 			float altitude_, int beam_angle_, float beam_radius_, GameObject sat_prefab, GameObject beam_prefab1_,
@@ -107,16 +107,16 @@ namespace Orbits.Satellites
 			sats_per_orbit = sats_per_orbit_;
 			orbital_planes = orbital_planes_;
 
-			nearestsats = new SatelliteSP0031[maxsats];
+			nearestsats = new Satellite[maxsats];
 			nearestcount = 0;
 
-			assignedsats = new SatelliteSP0031[LASERS_PER_SAT];
+			assignedsats = new Satellite[LASERS_PER_SAT];
 			assignedcount = 0;
 
-			prevassignedsats = new SatelliteSP0031[LASERS_PER_SAT];
+			prevassignedsats = new Satellite[LASERS_PER_SAT];
 			prevassignedcount = 0;
 
-			preassignedsats = new SatelliteSP0031[LASERS_PER_SAT];
+			preassignedsats = new Satellite[LASERS_PER_SAT];
 			preassignedcount = 0;
 
 			Vector3 pos = earth_transform.position;
@@ -130,7 +130,7 @@ namespace Orbits.Satellites
 			links = new GameObject[max_linknum];
 
 			lasers = new GameObject[LASERS_PER_SAT];
-			laserdsts = new SatelliteSP0031[LASERS_PER_SAT]; // laser destinations
+			laserdsts = new Satellite[LASERS_PER_SAT]; // laser destinations
 			lasertimes = new double[LASERS_PER_SAT];
 			laseron = new bool[LASERS_PER_SAT];
 			for (int lc = 0; lc < maxlasers; lc++)
@@ -320,7 +320,7 @@ namespace Orbits.Satellites
 			return gameobject.transform.position;
 		}
 
-		public void AddSat(SatelliteSP0031 newsat)
+		public void AddSat(Satellite newsat)
 		{
 			nearestsats[nearestcount] = newsat;
 			nearestcount++;
@@ -335,13 +335,13 @@ namespace Orbits.Satellites
 			}
 		}
 
-		public float Dist(SatelliteSP0031 s)
+		public float Dist(Satellite s)
 		{
 			return Vector3.Distance(position(), s.position());
 		}
 
 
-		public bool IsAssigned(SatelliteSP0031 s) //remove the public modifier
+		public bool IsAssigned(Satellite s) //remove the public modifier
 		{
 			for (int i = 0; i < assignedcount; i++)
 			{
@@ -363,7 +363,7 @@ namespace Orbits.Satellites
 			assignedcount = 0;
 		}
 
-		bool WasAssigned(SatelliteSP0031 s)
+		bool WasAssigned(Satellite s)
 		{
 			for (int i = 0; i < prevassignedcount; i++)
 			{
@@ -375,13 +375,13 @@ namespace Orbits.Satellites
 			return false;
 		}
 
-		public void SimpleAssign(SatelliteSP0031 s)
+		public void SimpleAssign(Satellite s)
 		{
 			assignedsats[assignedcount] = s;
 			assignedcount++;
 		}
 
-		bool Assign(SatelliteSP0031 s)
+		bool Assign(Satellite s)
 		{
 			if (assignedcount == LASERS_PER_SAT || s.assignedcount == LASERS_PER_SAT || IsAssigned(s))
 			{
@@ -393,13 +393,13 @@ namespace Orbits.Satellites
 			return true;
 		}
 
-		public void SimplePreAssign(SatelliteSP0031 s)
+		public void SimplePreAssign(Satellite s)
 		{
 			preassignedsats[preassignedcount] = s;
 			preassignedcount++;
 		}
 
-		bool IsPreAssigned(SatelliteSP0031 s)
+		bool IsPreAssigned(Satellite s)
 		{
 			for (int i = 0; i < preassignedcount; i++)
 			{
@@ -411,7 +411,7 @@ namespace Orbits.Satellites
 			return false;
 		}
 
-		bool PreAssign(SatelliteSP0031 s)
+		bool PreAssign(Satellite s)
 		{
 			if (preassignedcount == LASERS_PER_SAT || s.preassignedcount == LASERS_PER_SAT || IsPreAssigned(s))
 			{
@@ -613,7 +613,7 @@ namespace Orbits.Satellites
 
 			for (int i = 0; i < assignedcount; i++)
 			{
-				SatelliteSP0031 sat = assignedsats[i];
+				Satellite sat = assignedsats[i];
 
 				if (!WasAssigned(sat))
 				{
@@ -656,7 +656,7 @@ namespace Orbits.Satellites
 			}
 		}
 
-		public void ColorLink(SatelliteSP0031 nextsat, Material mat)
+		public void ColorLink(Satellite nextsat, Material mat)
 		{
 			for (int lc = 0; lc < maxlasers; lc++)
 			{

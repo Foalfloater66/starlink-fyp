@@ -4,7 +4,7 @@ using Orbits;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class CameraSP_0031 : MonoBehaviour {
+public class Camera : MonoBehaviour {
 	float timer;
 	float start_time;
 	List <Vector3> positions;
@@ -218,7 +218,7 @@ public class CameraSP_0031 : MonoBehaviour {
 		}
 
 		sun.transform.rotation = Quaternion.Euler (lightrot);
-		Camera.main.fieldOfView = FoV;
+		UnityEngine.Camera.main.fieldOfView = FoV;
 
 		current_cam = 0;
 
