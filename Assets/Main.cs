@@ -362,7 +362,7 @@ public class Main : MonoBehaviour
 
 		// for now, only allows for Radius Attacks
 		List<GameObject> demo_dest_groundstations = new List<GameObject>() { miami, new_york, chicago };
-		_attacker = AttackerFactory.CreateAttacker(target_latitude, target_longitude, sat0r, attack_radius, demo_dest_groundstations, transform, city_prefab, true);
+		_attacker = new Attacker(target_latitude, target_longitude, sat0r, attack_radius, demo_dest_groundstations, transform, city_prefab);
 		_link_capacities = new LinkCapacityMonitor(initial_link_capacity);
 	}
 
@@ -791,8 +791,7 @@ public class Main : MonoBehaviour
 		return city;
 	}
 
-
-
+	
 	// Default way to create a constellation
 	void CreateSats(int num_orbits, int sats_per_orbit, float inclination, float orbit_phase_offset,
 		float sat_phase_offset, float sat_phase_stagger, double period, float altitude,
@@ -837,6 +836,7 @@ public class Main : MonoBehaviour
 		}
 	}
 
+	
 	/* Alternative way to create a constellation (used for August 2019 constellation, as its high inter-plane 
 	 * phase offset and high numnber of orbits cause wrapping with CreateSats) */
 	void CreateSatsDirect(int num_orbits, int sats_per_orbit, float inclination, float orbit_phase_offset,
@@ -1259,7 +1259,7 @@ public class Main : MonoBehaviour
 		// 2. If the current link isn't valid, select a new target link.
 		if (!_attacker.HasValidTargetLink())
 		{
-			_attacker.ChangeTargetLink(rg);
+			_attacker.ChangeTargetLink(rg, debug_on:true);
 			if (_attacker.Link != null)
 			{
 				UnityEngine.Debug.Log("Attacker.Update | Changed link: " + _attacker.Link.SrcNode.Id + " - " + _attacker.Link.DestNode.Id);
