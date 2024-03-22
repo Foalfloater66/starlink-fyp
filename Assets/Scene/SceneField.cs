@@ -4,6 +4,7 @@ using Object = UnityEngine.Object;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
+// TODO: Delete this entire file, as it's unused.
 /*
 namespace Utilities
 {

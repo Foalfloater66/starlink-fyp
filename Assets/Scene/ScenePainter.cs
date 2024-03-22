@@ -1,20 +1,15 @@
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine.UI;
-using System.IO;
-using System;
-using System.Text;
-using System.Linq;
-using UnityEngine.SceneManagement;
+using Orbits.Satellites;
+using Routing;
 
 
 // TODO: add documentation for ActiveISL and ActiveRF
 public class ActiveISL
 {
-    public SatelliteSP0031 sat1, sat2;
+    public Satellite sat1, sat2;
     public Node node1, node2;
-    public ActiveISL(SatelliteSP0031 sat1_, Node node1_, SatelliteSP0031 sat2_, Node node2_)
+    public ActiveISL(Satellite sat1_, Node node1_, Satellite sat2_, Node node2_)
     {
         sat1 = sat1_;
         sat2 = sat2_;
@@ -25,10 +20,10 @@ public class ActiveISL
 
 public class ActiveRF
 {
-    public SatelliteSP0031 sat;
+    public Satellite sat;
     public GameObject city;
     public Node node1, node2;
-    public ActiveRF(GameObject city_, Node node1_, SatelliteSP0031 sat_, Node node2_)
+    public ActiveRF(GameObject city_, Node node1_, Satellite sat_, Node node2_)
     {
         city = city_;
         sat = sat_;
@@ -37,7 +32,7 @@ public class ActiveRF
     }
 }
 
-class ScenePainter
+public class ScenePainter
 {
     /// <value>
     /// Used Inter Satellite Links (ISL).
@@ -52,12 +47,12 @@ class ScenePainter
     /// <value>
     /// Material for unused ISL links.
     /// </value>
-    Material _isl_material;
+    private Material _isl_material;
 
     /// <value>
     /// Material for ISL links used for routing.
     /// </value>
-    Material[] _laser_materials;
+    private Material[] _laserMaterials;
 
     /// <value>
     /// Materials for target ISL links. 
@@ -66,24 +61,24 @@ class ScenePainter
     /// [0]: the link is still active.
     /// [1]: the link has been flooded.
     /// </value>
-    Material[] _target_link_materials;
+    private Material[] _target_link_materials;
 
     /// <value>
     /// Material for city objects.
     /// </value>
-    Material _city_material;
+    private Material _cityMaterial;
 
     /// <summary>
     /// Constructor creating a <c>ScenePainter</c> object with new empty of <c>UsedISLLinks</c> and <c>UsedRFLinks</c> links.
     /// </summary>
-    public ScenePainter(Material isl_material, Material[] laser_materials, Material[] target_link_materials, Material city_material)
+    public ScenePainter(Material isl_material, Material[] laserMaterials, Material[] target_link_materials, Material cityMaterial)
     {
         UsedISLLinks = new List<ActiveISL>();
         UsedRFLinks = new List<ActiveRF>();
         _isl_material = isl_material;
-        _laser_materials = laser_materials;
+        _laserMaterials = laserMaterials;
         _target_link_materials = target_link_materials;
-        _city_material = city_material;
+        _cityMaterial = cityMaterial;
     }
 
     /// <summary> // TODO: can I describe this in more detail? I don't know what the purpose of the ChangeCityMaterial element is.
@@ -95,7 +90,7 @@ class ScenePainter
         Renderer[] renderers = city.GetComponentsInChildren<Renderer>();
         foreach (Renderer r in renderers)
         {
-            r.material = _city_material;
+            r.material = _cityMaterial;
         }
     }
 
@@ -107,7 +102,7 @@ class ScenePainter
     /// <param name="prevnode">Source satellite node.</param>
     /// <param name="node">Destination satellite node.</param>
     /// <param name="mat">Material to color the link with.</param>
-    private void ColorISLLink(SatelliteSP0031 prevsat, SatelliteSP0031 sat, Node prevnode, Node node, Material mat)
+    private void ColorISLLink(Satellite prevsat, Satellite sat, Node prevnode, Node node, Material mat)
     {
         sat.ColorLink(prevsat, mat);
         prevsat.ColorLink(sat, mat);
@@ -121,9 +116,9 @@ class ScenePainter
     /// <param name="sat">Destination satellite object.</param>
     /// <param name="prevnode">Source satellite node.</param>
     /// <param name="node">Destination satellite node.</param>
-    public void ColorRouteISLLink(SatelliteSP0031 prevsat, SatelliteSP0031 sat, Node prevnode, Node node)
+    public void ColorRouteISLLink(Satellite prevsat, Satellite sat, Node prevnode, Node node)
     {
-        ColorISLLink(prevsat, sat, prevnode, node, _laser_materials[2]);
+        ColorISLLink(prevsat, sat, prevnode, node, _laserMaterials[2]);
     }
 
     /// <summary>
@@ -134,7 +129,7 @@ class ScenePainter
     /// <param name="prevnode">Source satellite node.</param>
     /// <param name="node">Destination satellite node.</param>
     /// <param name="flooded">True if the link was flooded, false otherwise.</param>
-    public void ColorTargetISLLink(SatelliteSP0031 prevsat, SatelliteSP0031 sat, Node prevnode, Node node, bool flooded)
+    public void ColorTargetISLLink(Satellite prevsat, Satellite sat, Node prevnode, Node node, bool flooded)
     {
         if (flooded)
         {
@@ -153,7 +148,7 @@ class ScenePainter
     /// <param name="sat">Satellite connected to the RF link.</param>
     /// <param name="prevnode">City node.</param>
     /// <param name="node">Satellite node.</param>
-    public void ColorRFLink(GameObject city, SatelliteSP0031 sat, Node prevnode, Node node)
+    public void ColorRFLink(GameObject city, Satellite sat, Node prevnode, Node node)
     {
         sat.LinkOn(city);
         UsedRFLinks.Add(new ActiveRF(city, node, sat, prevnode));
@@ -164,7 +159,7 @@ class ScenePainter
     /// </summary>
     /// <param name="satlist">List of satellites on the graph.</param>
     /// <param name="maxsats">Maximum number of satellites in the graph.</param>
-    public void UpdateLasers(SatelliteSP0031[] satlist, int maxsats, float speed)
+    public void UpdateLasers(Satellite[] satlist, int maxsats, float speed)
     {
         UsedRFLinks.ForEach(a => a.sat.LinkOn(a.city));
 
@@ -186,7 +181,7 @@ class ScenePainter
         }
     }
 
-    public void TurnLasersOff(SatelliteSP0031 satlist, int maxsats)
+    public void TurnLasersOff(Satellite[] satlist, int maxsats)
     {
         for (int satnum = 0; satnum < maxsats; satnum++)
         {

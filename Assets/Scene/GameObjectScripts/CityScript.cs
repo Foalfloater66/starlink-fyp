@@ -6,6 +6,8 @@ public class CityScript : MonoBehaviour {
 
 	public float latitude;
 	public float longitude;
+	// TODO: Find the other Scripts and move this file there.
+	
 	// Use this for initialization
 	void Start () {
 		

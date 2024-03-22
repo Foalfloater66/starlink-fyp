@@ -1,19 +1,19 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using UnityEngine.UI;
-using System.IO;
-using System;
-using System.Text;
 using System.Linq;
+using Orbits;
+using Orbits.Satellites;
+using Routing;
+using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public enum RouteChoice { TransAt, TransPac, LonJob, USsparse, USsparseAttacked, USdense, TorMia, Sydney_SFO, Sydney_Tokyo, Sydney_Lima, Followsat };
 public enum LogChoice { None, RTT, Distance, HopDists, LaserDists, Path };
 
-public class SP_basic_0031 : MonoBehaviour
+public class Main : MonoBehaviour
 {
-	public Camera cam;
+	public UnityEngine.Camera cam;
 	[Tooltip("Spin: Yes or No")]
 	public bool spin;
 	[Tooltip("Speed 1 is realtime")]
@@ -59,7 +59,7 @@ public class SP_basic_0031 : MonoBehaviour
 
 	GameObject[] orbits;
 	double[] orbitalperiod;
-	SatelliteSP0031[] satlist;
+	Satellite[] satlist;
 	Vector3[] orbitaxes;
 	int orbitcount = 0, satcount = 0;
 	public Material isl_material;
@@ -105,6 +105,8 @@ public class SP_basic_0031 : MonoBehaviour
 
 	private Dictionary<GameObject, string> groundstations = new Dictionary<GameObject, string>();
 
+	private RouteHandler routeHandler;
+
 	//GameObject beam1 = null, beam2 = null;
 	GameObject[] lasers;
 	List<GameObject> relays;
@@ -117,7 +119,7 @@ public class SP_basic_0031 : MonoBehaviour
 
 	int followsat_id = 0;
 	float last_dist_calc = -1000f; // last time we update the set of nearest routers
-	SatelliteSP0031[] nearest_sats;  // used for calculating collision distances
+	Satellite[] nearest_sats;  // used for calculating collision distances
 	float mindist = Node.INFINITY; // used for calculating collision distances
 
 	System.IO.StreamWriter logfile;
@@ -185,7 +187,7 @@ public class SP_basic_0031 : MonoBehaviour
 		start_time = Time.time;
 
 		/* ask the camera to view the same area as our route */
-		CameraSP_0031 camscript = (CameraSP_0031)cam.GetComponent(typeof(CameraSP_0031));
+		Camera camscript = (Camera)cam.GetComponent(typeof(Camera));
 		camscript.route_choice = route_choice;
 		camscript.InitView();
 
@@ -254,7 +256,7 @@ public class SP_basic_0031 : MonoBehaviour
 		orbitaxes = new Vector3[maxorbits];
 
 		/* new model */
-		satlist = new SatelliteSP0031[maxsats];
+		satlist = new Satellite[maxsats];
 
 		const float earth_r = 6371f; // earth radius
 		float sat0r = sat0alt + earth_r;  // sat radius from earth centre
@@ -263,19 +265,19 @@ public class SP_basic_0031 : MonoBehaviour
 		{
 			case ConstellationChoice.P24_S66_A550:
 				CreateSats(maxorbits, satsperorbit, 53f, 0f, 0f, phase_offset, orbital_period, sat0r,
-							beam_angle, beam_radius);
+					beam_angle, beam_radius);
 				break;
 
 			case ConstellationChoice.P72_S22_A550:
 				CreateSatsDirect(maxorbits, satsperorbit, 53f, 0f, phase_offset,
-								  decimator * phase_offset * 360f / 22f,
-								  decimator * 360f / 72f, 360 / 22f, orbital_period, sat0r,
-								  beam_angle, beam_radius);
+					decimator * phase_offset * 360f / 22f,
+					decimator * 360f / 72f, 360 / 22f, orbital_period, sat0r,
+					beam_angle, beam_radius);
 				break;
 
 			case ConstellationChoice.P32_S50_A1100:
 				CreateSats(maxorbits, satsperorbit, 53f, 0f, 0f, phase_offset, orbital_period, sat0r,
-							beam_angle, beam_radius);
+					beam_angle, beam_radius);
 				break;
 		}
 
@@ -287,7 +289,8 @@ public class SP_basic_0031 : MonoBehaviour
 
 		/* Create and initialise the RouteGraph */
 		rg = new RouteGraph();
-		RouteHandler.InitRoute(rg);
+		routeHandler = new RouteHandler(_painter);
+		routeHandler.InitRoute(maxsats,satlist, relays, maxdist, km_per_unit);
 
 		Debug.Assert(satcount == maxsats);
 
@@ -345,12 +348,12 @@ public class SP_basic_0031 : MonoBehaviour
 					followsat_id = 105;
 					break;
 			}
-			SatelliteSP0031 followsat = satlist[followsat_id];
+			Satellite followsat = satlist[followsat_id];
 			cam.transform.position = new Vector3(100, 0, -60);
 			cam.transform.rotation = Quaternion.Euler(0, 300, -90);
 			cam.transform.SetParent(followsat.gameobject.transform, false);
 			followsat.ChangeMaterial(laserMaterials[0]);
-			nearest_sats = new SatelliteSP0031[4];
+			nearest_sats = new Satellite[4];
 		}
 
 		//float earthradius = Vector3.Distance (transform.position, london.gameObject.transform.position);
@@ -699,7 +702,7 @@ public class SP_basic_0031 : MonoBehaviour
 		CreateCity(42.011085f, -143.150735f, true);  //Erimo-chō, Horoizumi-gun, Hokkaidō 058-0203, Japan
 		CreateCity(53.253489f, 132.117766f, true);  //Queen Charlotte F, BC, Canada
 		CreateCity(50.723849f, 127.496263f, true);  //Port Hardy, BC V0N 2P0, Canada
-													//relay_dist_step = 2.0f;
+		//relay_dist_step = 2.0f;
 		for (float lat = 30f; lat < 55f; lat += relay_dist_step)
 		{
 			longdist = (40075f / 360f) * Mathf.Cos(Mathf.Deg2Rad * (lat + relay_dist_step / 2f));
@@ -758,9 +761,9 @@ public class SP_basic_0031 : MonoBehaviour
 		CreateCity(-24.674048f, 124.777367f, true);  // Ducie, Pitcairn Islands (uninhabited)
 		CreateCity(-25.91f, 117.1f, true);  // ship
 		CreateCity(-27.149430f, 109.428944f, true);  // Easter Island
-													 //CreateCity(-22.14f, 98.75f, true); // ship
-													 //CreateCity(-17.03f, 87.7f, true); // ship
-													 //CreateCity(-21.523945f, 92.142192f, true); // ship
+		//CreateCity(-22.14f, 98.75f, true); // ship
+		//CreateCity(-17.03f, 87.7f, true); // ship
+		//CreateCity(-21.523945f, 92.142192f, true); // ship
 		CreateCity(-12.073062f, 77.065722f, true); // Lima, Peru
 		CreateCity(-18f, 103f, true); // ship
 		CreateCity(-9f, 97f, true); // ship
@@ -792,8 +795,8 @@ public class SP_basic_0031 : MonoBehaviour
 
 	// Default way to create a constellation
 	void CreateSats(int num_orbits, int sats_per_orbit, float inclination, float orbit_phase_offset,
-					float sat_phase_offset, float sat_phase_stagger, double period, float altitude,
-					int beam_angle, float beam_radius)
+		float sat_phase_offset, float sat_phase_stagger, double period, float altitude,
+		int beam_angle, float beam_radius)
 	{
 		float orbit_angle_step = 360f / num_orbits;
 		for (int i = 0; i < num_orbits; i++)
@@ -809,7 +812,7 @@ public class SP_basic_0031 : MonoBehaviour
 			{
 				double sat_angle_step = 360f / sats_per_orbit;
 				double sat_angle = (-1f * sat_phase_offset * sat_angle_step) + (i * sat_angle_step * sat_phase_stagger) + (s * sat_angle_step);
-				SatelliteSP0031 newsat = new SatelliteSP0031(satcount, s, i, transform, orbits[orbitcount],
+				Satellite newsat = new Satellite(satcount, s, i, transform, orbits[orbitcount],
 					sat_angle, maxlasers, maxsats, phase1_sats, sat_phase_stagger, sats_per_orbit, num_orbits,
 					altitude, beam_angle, beam_radius, satellite, beam_prefab, beam_prefab2, laser, thin_laser,
 					logfile, log_choice);
@@ -837,9 +840,9 @@ public class SP_basic_0031 : MonoBehaviour
 	/* Alternative way to create a constellation (used for August 2019 constellation, as its high inter-plane 
 	 * phase offset and high numnber of orbits cause wrapping with CreateSats) */
 	void CreateSatsDirect(int num_orbits, int sats_per_orbit, float inclination, float orbit_phase_offset,
-						  float sat_phase_offset, float sat_angle_stagger /* degrees */,
-						  float orbit_angle_step, float sat_angle_step, double period, float altitude,
-						  int beam_angle, float beam_radius)
+		float sat_phase_offset, float sat_angle_stagger /* degrees */,
+		float orbit_angle_step, float sat_angle_step, double period, float altitude,
+		int beam_angle, float beam_radius)
 	{
 
 		for (int i = 0; i < num_orbits; i++)
@@ -861,11 +864,11 @@ public class SP_basic_0031 : MonoBehaviour
 						sat_angle += sats_per_orbit * 360f / 22f;
 					}
 					sat_angle += 90f;
-					SatelliteSP0031 newsat =
-						new SatelliteSP0031(satcount, s, i, transform, orbits[orbitcount], sat_angle, maxlasers,
-											 maxsats, phase1_sats, sat_phase_offset, sats_per_orbit, num_orbits, altitude,
-											 beam_angle, beam_radius, satellite, beam_prefab, beam_prefab2,
-											 laser, thin_laser, logfile, log_choice);
+					Satellite newsat =
+						new Satellite(satcount, s, i, transform, orbits[orbitcount], sat_angle, maxlasers,
+							maxsats, phase1_sats, sat_phase_offset, sats_per_orbit, num_orbits, altitude,
+							beam_angle, beam_radius, satellite, beam_prefab, beam_prefab2,
+							laser, thin_laser, logfile, log_choice);
 					satlist[satcount] = newsat;
 					if (beam_on == BeamChoice.AllOn)
 					{
@@ -900,13 +903,10 @@ public class SP_basic_0031 : MonoBehaviour
 		return relays[relaynum];
 	}
 
-	int get_relay_id(int relaynum)
-	{
-		return ((-1000) - relaynum);
-	}
+
 
 	/* Illuminate the coverge areas for first and last satellite on a route (if selected)  */
-	void CreateSatBeams(SatelliteSP0031 sat1, GameObject city1, SatelliteSP0031 sat2, GameObject city2)
+	void CreateSatBeams(Satellite sat1, GameObject city1, Satellite sat2, GameObject city2)
 	{
 		if (beam_on == BeamChoice.SrcDstOn)
 		{
@@ -928,7 +928,7 @@ public class SP_basic_0031 : MonoBehaviour
 			Node rn = reachable[i];
 			if (rn.Id >= 0)
 			{
-				SatelliteSP0031 sat = satlist[rn.Id];
+				Satellite sat = satlist[rn.Id];
 				sat.BeamOn();
 			}
 		}
@@ -942,8 +942,8 @@ public class SP_basic_0031 : MonoBehaviour
 		Debug.Assert(rn != null, "ExecuteAttackRoute | The last node is empty.");
 		Debug.Assert(rn.Id == -2, "ExecuteAttackRoute | The last node is not -2. Instead, it's " + rn.Id);
 		Node prevnode = null;
-		SatelliteSP0031 sat = null;
-		SatelliteSP0031 prevsat = null;
+		Satellite sat = null;
+		Satellite prevsat = null;
 		int previd = -4;
 		int id = -4; /* first id */
 		double prevdist = km_per_unit * rn.Dist;
@@ -1033,7 +1033,7 @@ public class SP_basic_0031 : MonoBehaviour
 	float FindNearest(int sat_id, float now) // TODO: remove this
 	{
 		float nearest_dist = Node.INFINITY;
-		SatelliteSP0031 sat = satlist[sat_id];
+		Satellite sat = satlist[sat_id];
 		float[] dists = new float[4];
 		if (now - last_dist_calc > 2f || nearest_sats[0] == null)
 		{
@@ -1048,7 +1048,7 @@ public class SP_basic_0031 : MonoBehaviour
 				{
 					continue;
 				}
-				SatelliteSP0031 othersat = satlist[satnum];
+				Satellite othersat = satlist[satnum];
 				float dist = Vector3.Distance(sat.position(), othersat.position());
 				if (dist < dists[3])
 				{
@@ -1078,10 +1078,10 @@ public class SP_basic_0031 : MonoBehaviour
 		{
 			// only update dists themselves, not list
 
-			SatelliteSP0031 nearest_sat = null;
+			Satellite nearest_sat = null;
 			for (int i = 0; i < 4; i++)
 			{
-				SatelliteSP0031 othersat = nearest_sats[i];
+				Satellite othersat = nearest_sats[i];
 				dists[i] = Vector3.Distance(sat.position(), othersat.position());
 				if (dists[i] < nearest_dist)
 				{
@@ -1127,11 +1127,11 @@ public class SP_basic_0031 : MonoBehaviour
 			  ((int)(dists[2])).ToString() + " " +
 			  ((int)(dists[3])).ToString() + " (" + mindist.ToString() + ")");*/
 		txt.text = "Closest pass: " + mindist.ToString("0.00") + " km\n" +
-			"Current nearest: " +
-			  ((int)(dists[0])).ToString() + " " +
-			  ((int)(dists[1])).ToString() + " " +
-			  ((int)(dists[2])).ToString() + " " +
-			  ((int)(dists[3])).ToString();
+		           "Current nearest: " +
+		           ((int)(dists[0])).ToString() + " " +
+		           ((int)(dists[1])).ToString() + " " +
+		           ((int)(dists[2])).ToString() + " " +
+		           ((int)(dists[3])).ToString();
 
 		return nearest_dist;
 	}
@@ -1148,8 +1148,8 @@ public class SP_basic_0031 : MonoBehaviour
 					continue;
 				}
 
-				RouteHandler.ResetRoute(src_gs, dest_gs);
-				rg = RouteHandler.BuildRouteGraph(rg, src_gs, dest_gs, maxdist, margin);
+				routeHandler.ResetRoute(src_gs, dest_gs, _painter, satlist, maxsats);
+				rg = routeHandler.BuildRouteGraph(src_gs, dest_gs, maxdist, margin, maxsats, satlist, km_per_unit, graph_on, grid);
 				rg.ComputeRoutes();
 				Debug.Log(groundstations[src_gs] + " to " + groundstations[dest_gs]);
 
@@ -1252,9 +1252,9 @@ public class SP_basic_0031 : MonoBehaviour
 		_link_capacities.Reset();
 
 		// 1. Clean and rebuild the routegraph
-		RouteHandler.ClearRoute(_painter);
-		RouteHandler.ResetRoute(new_york, toronto);
-		rg = RouteHandler.BuildRouteGraph(rg, new_york, toronto, maxdist, margin);
+		RouteHandler.ClearRoutes(_painter);
+		routeHandler.ResetRoute(new_york, toronto, _painter, satlist, maxsats);
+		rg = routeHandler.BuildRouteGraph(new_york, toronto, maxdist, margin, maxsats, satlist, km_per_unit, graph_on, grid);
 
 		// 2. If the current link isn't valid, select a new target link.
 		if (!_attacker.HasValidTargetLink())
@@ -1317,5 +1317,3 @@ public class SP_basic_0031 : MonoBehaviour
 		framecount++;
 	}
 }
-
-
