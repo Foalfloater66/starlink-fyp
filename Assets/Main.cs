@@ -836,7 +836,6 @@ public class Main : MonoBehaviour
 		}
 	}
 
-	
 	/* Alternative way to create a constellation (used for August 2019 constellation, as its high inter-plane 
 	 * phase offset and high numnber of orbits cause wrapping with CreateSats) */
 	void CreateSatsDirect(int num_orbits, int sats_per_orbit, float inclination, float orbit_phase_offset,
@@ -880,39 +879,12 @@ public class Main : MonoBehaviour
 			orbitcount++;
 		}
 	}
-
-	void DeleteSats(int num_orbits)
-	{
-		for (int satnum = 0; satnum < maxsats; satnum++)
-		{
-			satlist[satnum].clearrefs();
-			satlist[satnum] = null;
-		}
-		satcount = 0;
-		for (int i = 0; i < num_orbits; i++)
-		{
-			MonoBehaviour.Destroy(orbits[i]);
-			orbits[i] = null;
-		}
-		orbitcount = 0;
-	}
+	
 
 	GameObject get_relay(int nodeid)
 	{
 		int relaynum = -(nodeid + 1000);
 		return relays[relaynum];
-	}
-
-
-
-	/* Illuminate the coverge areas for first and last satellite on a route (if selected)  */
-	void CreateSatBeams(Satellite sat1, GameObject city1, Satellite sat2, GameObject city2)
-	{
-		if (beam_on == BeamChoice.SrcDstOn)
-		{
-			sat1.BeamOn();
-			sat2.BeamOn();
-		}
 	}
 
 	void highlight_reachable() // CLEANUP: Remove the highlight_reachable() function.
@@ -1029,112 +1001,9 @@ public class Main : MonoBehaviour
 		}
 
 	}
-
-	float FindNearest(int sat_id, float now) // TODO: remove this
-	{
-		float nearest_dist = Node.INFINITY;
-		Satellite sat = satlist[sat_id];
-		float[] dists = new float[4];
-		if (now - last_dist_calc > 2f || nearest_sats[0] == null)
-		{
-			for (int i = 0; i < 4; i++)
-			{
-				dists[i] = Node.INFINITY;
-				nearest_sats[i] = null;
-			}
-			for (int satnum = 0; satnum < maxsats; satnum++)
-			{
-				if (satnum == sat_id)
-				{
-					continue;
-				}
-				Satellite othersat = satlist[satnum];
-				float dist = Vector3.Distance(sat.position(), othersat.position());
-				if (dist < dists[3])
-				{
-					dists[3] = dist;
-					nearest_sats[3] = othersat;
-					// bubble the new entry up the list
-					for (int i = 3; i >= 1; i--)
-					{
-						if (dists[i] < dists[i - 1])
-						{
-							dists[i] = dists[i - 1];
-							dists[i - 1] = dist;
-							nearest_sats[i] = nearest_sats[i - 1];
-							nearest_sats[i - 1] = othersat;
-						}
-						else
-						{
-							break;
-						}
-					}
-				}
-			}
-			nearest_dist = dists[0];
-			last_dist_calc = now;
-		}
-		else
-		{
-			// only update dists themselves, not list
-
-			Satellite nearest_sat = null;
-			for (int i = 0; i < 4; i++)
-			{
-				Satellite othersat = nearest_sats[i];
-				dists[i] = Vector3.Distance(sat.position(), othersat.position());
-				if (dists[i] < nearest_dist)
-				{
-					nearest_dist = dists[i];
-					nearest_sat = othersat;
-				}
-			}
-		}
-		// FIXME: Packets should be sent *from* the source groundstation! Otherwise it's semantically incorrect.
-		// slow down when we're close to minimum distance to improve accuracy
-		bool speed_change = false;
-		float prev_speed = speed;
-		if (nearest_dist - mindist < 10f && nearest_dist < 100f && speed == orig_speed)
-		{
-			speed = 1f;
-			simspeed = speed * 360f / 86400f; // Speed 1 is realtime
-			rightbottom.text = speed.ToString() + "x realtime";
-			speed_change = true;
-
-		}
-		else if (nearest_dist - mindist >= 10f && speed != orig_speed)
-		{
-			speed = orig_speed;
-			simspeed = speed * 360f / 86400f; // Speed 1 is realtime
-			rightbottom.text = speed.ToString() + "x realtime";
-			speed_change = true;
-		}
-
-		if (speed_change)
-		{
-			float time_now = Time.time;
-			elapsed_time = last_elapsed_time + (time_now - last_speed_change) * prev_speed;
-			last_elapsed_time = elapsed_time;
-			last_speed_change = time_now;
-		}
-
-		if (nearest_dist < mindist)
-		{
-			mindist = nearest_dist;
-		}
-		/*print(((int)(dists[0])).ToString() + " " +
-			  ((int)(dists[1])).ToString() + " " +
-			  ((int)(dists[2])).ToString() + " " +
-			  ((int)(dists[3])).ToString() + " (" + mindist.ToString() + ")");*/
-		txt.text = "Closest pass: " + mindist.ToString("0.00") + " km\n" +
-		           "Current nearest: " +
-		           ((int)(dists[0])).ToString() + " " +
-		           ((int)(dists[1])).ToString() + " " +
-		           ((int)(dists[2])).ToString() + " " +
-		           ((int)(dists[3])).ToString();
-
-		return nearest_dist;
-	}
+	
+	// FIXME: Packets should be sent *from* the source groundstation! Otherwise it's semantically incorrect.
+	// slow down when we're close to minimum distance to improve accuracy
 
 	BinaryHeap<Path> FindAttackRoutes(RouteGraph rg, List<GameObject> dest_groundstations) // TODO: Move this function to the attacker object.
 	{
@@ -1164,47 +1033,14 @@ public class Main : MonoBehaviour
 	}
 
 	// Only uncomment for debugging if I need to see the attack sphere.
-	void OnDrawGizmos()
-	{
-		Gizmos.color = Color.yellow;
-		Gizmos.DrawSphere(_attacker.TargetAreaCenterpoint, _attacker.Radius);
-	}
-
-	/* Process external input commands. If Update() is to be called once again, returns true. Otherwise, returns false. */
-	bool ProcessInput()
-	{
-		if (Input.GetKeyDown("space") || Input.GetKeyDown("."))
-		{
-			if (pause == false)
-			{
-				pause = true;
-				pause_start_time = Time.time;
-				countdown.text = "[Paused]";
-
-			}
-			else
-			{
-				pause = false;
-				start_time += Time.time - pause_start_time;
-			}
-		}
-
-		if (Input.GetKeyDown("b") || Input.GetKeyDown(KeyCode.PageUp))
-		{
-			SceneManager.LoadScene(prevscene);
-			return true;
-		}
-		if (Input.GetKeyDown("n") || Input.GetKeyDown(KeyCode.PageDown))
-		{
-			SceneManager.LoadScene(nextscene);
-			return true;
-		}
-		return false;
-	}
+	// void OnDrawGizmos()
+	// {
+	// 	Gizmos.color = Color.yellow;
+	// 	Gizmos.DrawSphere(_attacker.TargetAreaCenterpoint, _attacker.Radius);
+	// }
 
 	void RotateCamera()
 	{
-		int i = 0;
 		if (direction < 1f)
 		{
 			direction += Time.deltaTime / (directionChangeSpeed / 2);
@@ -1214,7 +1050,7 @@ public class Main : MonoBehaviour
 		{
 			transform.Rotate(-Vector3.up, (simspeed * direction) * Time.deltaTime);
 		}
-		for (i = 0; i < maxorbits; i++)
+		for (int i = 0; i < maxorbits; i++)
 		{
 			orbits[i].transform.RotateAround(Vector3.zero, orbitaxes[i], (float)(-1f * earthperiod / orbitalperiod[i] * simspeed * direction) * Time.deltaTime);
 		}
@@ -1223,63 +1059,46 @@ public class Main : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		UnityEngine.Debug.Log("Update()");
-
-		// TODO: remove input processing functions.
-		if (Input.GetKeyDown("space") || Input.GetKeyDown("."))
-		{
-
-			if (pause == false)
-			{
-				pause = true;
-				pause_start_time = Time.time;
-				countdown.text = "[Paused]";
-
-			}
-			else
-			{
-				pause = false;
-				start_time += Time.time - pause_start_time;
-			}
-		}
-
-
+		Debug.Log("Update()");
+		
+		// Update scene initial parameters
 		elapsed_time = last_elapsed_time + (Time.time - last_speed_change) * speed;
 		RotateCamera();
-		if (!pause) countdown.text = elapsed_time.ToString("0.0");
 
-		// 0. Reset link capacities.
+		// Reset link capacities.
 		_link_capacities.Reset();
 
-		// 1. Clean and rebuild the routegraph
+		// Clean and rebuild the routegraph.
 		RouteHandler.ClearRoutes(_painter);
 		routeHandler.ResetRoute(new_york, toronto, _painter, satlist, maxsats);
 		rg = routeHandler.BuildRouteGraph(new_york, toronto, maxdist, margin, maxsats, satlist, km_per_unit, graph_on, grid);
+		
+		// TODO: Do I need to return the routegraph?
 
-		// 2. If the current link isn't valid, select a new target link.
+		// If the current link isn't valid, select a new target link.
 		if (!_attacker.HasValidTargetLink())
 		{
 			_attacker.ChangeTargetLink(rg, debug_on:true);
 			if (_attacker.Link != null)
 			{
-				UnityEngine.Debug.Log("Attacker.Update | Changed link: " + _attacker.Link.SrcNode.Id + " - " + _attacker.Link.DestNode.Id);
+				Debug.Log("Attacker.Update | Changed link: " + _attacker.Link.SrcNode.Id + " - " + _attacker.Link.DestNode.Id);
 			}
 		}
 		else
 		{
-			UnityEngine.Debug.Log("Attacker.Update | Previous link is still valid.");
+			Debug.Log("Attacker.Update | Previous link is still valid.");
 		}
 
-		// 3. If the attacker has selected a valid link, attempt to attack it
+		// If the attacker has selected a valid link, attempt to attack it
 		if (_attacker.HasValidTargetLink())
 		{
-			// 4. find viable attack routes.
+			// Find viable attack routes.
 			// TODO: Provide all groundstations as input instead of the current limited list.
 			BinaryHeap<Path> attack_routes = FindAttackRoutes(rg, new List<GameObject>() { toronto, new_york, chicago });
 
 			Debug.Log("Update | There are " + attack_routes.Count + " paths.");
 
-			// 5. create routes until the link's capacity has been reached.
+			// Create routes until the link's capacity has been reached.
 			while (!_link_capacities.IsFlooded(_attacker.Link.SrcNode.Id, _attacker.Link.DestNode.Id) && attack_routes.Count > 0)
 			{
 				Path attack_path = attack_routes.ExtractMin();
@@ -1305,12 +1124,12 @@ public class Main : MonoBehaviour
 				Debug.Log("Update | Link could not be flooded. It has capacity: " + _link_capacities.GetCapacity(_attacker.Link.SrcNode.Id, _attacker.Link.DestNode.Id));
 			}
 
-			// 6. Color the target link on the map. If flooded, the link is colored red. Otherwise, the link is colored pink.
+			// Color the target link on the map. If flooded, the link is colored red. Otherwise, the link is colored pink.
 			_painter.ColorTargetISLLink(satlist[_attacker.Link.SrcNode.Id], satlist[_attacker.Link.DestNode.Id], _attacker.Link.DestNode, _attacker.Link.SrcNode, _link_capacities.IsFlooded(_attacker.Link.SrcNode.Id, _attacker.Link.DestNode.Id));
 		}
 		else
 		{
-			UnityEngine.Debug.Log("Attacker.Update | Could not find any valid link.");
+			Debug.Log("Attacker.Update | Could not find any valid link.");
 		}
 
 		_painter.UpdateLasers(satlist, maxsats, speed);
