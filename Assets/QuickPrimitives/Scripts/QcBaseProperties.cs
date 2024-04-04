@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace QuickPrimitives
+namespace QuickPrimitives.Scripts
 {
     public class QcBaseProperties
     {

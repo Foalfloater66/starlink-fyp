@@ -2,6 +2,7 @@
 using UnityEditor;
 using System;
 using QuickPrimitives;
+using QuickPrimitives.Scripts;
 
 [CustomEditor(typeof(QcTorusMesh))]
 public class QcTorusMeshEditor : Editor

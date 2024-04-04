@@ -5,15 +5,24 @@ using Orbits;
 using Orbits.Satellites;
 using Routing;
 using UnityEngine;
+// using QuickPrimitives.Scripts;
+using QuickPrimitives.Scripts;
+using Scene;
+using Scene.GameObjectScripts;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Utilities;
+using Camera = Utilities.Camera;
 
+// TODO: remove the below as well.
 public enum RouteChoice { TransAt, TransPac, LonJob, USsparse, USsparseAttacked, USdense, TorMia, Sydney_SFO, Sydney_Tokyo, Sydney_Lima, Followsat };
 public enum LogChoice { None, RTT, Distance, HopDists, LaserDists, Path };
 
+public enum AttackChoice { TranscontinentalUS, CoastalUS}
+
 public class Main : MonoBehaviour
 {
-	public UnityEngine.Camera cam;
+	public Camera cam;
 	[Tooltip("Spin: Yes or No")]
 	public bool spin;
 	[Tooltip("Speed 1 is realtime")]
@@ -285,9 +294,11 @@ public class Main : MonoBehaviour
 		km_per_unit = sat0r / earthdist;  // sim scale factor
 
 		grid = new GroundGrid(10, maxdist, margin, km_per_unit, city_prefab, transform);  // 5 degrees is 550km (in lat)
+		
+		// create cities.
 		InitCities();
-
-		/* Create and initialise the RouteGraph */
+		
+		// Create and initialise the RouteGraph
 		rg = new RouteGraph();
 		routeHandler = new RouteHandler(_painter);
 		routeHandler.InitRoute(maxsats,satlist, relays, maxdist, km_per_unit);
@@ -383,7 +394,7 @@ public class Main : MonoBehaviour
 		tokyo = CreateCity(35.652832f, -139.839478f, false);
 		chicago = CreateCity(41.881832f, 87.623177f, false);
 		toronto = CreateCity(43.70011f, 79.4163f, false);
-
+		Debug.Log("Created a couple of cities!");
 		groundstations = new Dictionary<GameObject, string>(){
 			{london, "London"},
 			{new_york, "New York"},
@@ -773,7 +784,9 @@ public class Main : MonoBehaviour
 
 	GameObject CreateCity(float latitude, float longitude, bool is_relay, string name = null /* only to take account of certain cities that don't have names */)
 	{
-		GameObject city = (GameObject)Instantiate(city_prefab, new Vector3(0f, 0f, /*-6382.2f*/-6371.0f), transform.rotation);
+		GameObject city = 
+			 (GameObject)Instantiate(city_prefab, new Vector3(0f, 0f, /*-6382.2f*/-6371.0f), transform.rotation);
+		
 		float long_offset = 20f;
 		city.transform.RotateAround(Vector3.zero, Vector3.up, longitude - long_offset);
 		Vector3 lat_axis = Quaternion.Euler(0f, -90f, 0f) * city.transform.position;
@@ -1041,6 +1054,7 @@ public class Main : MonoBehaviour
 
 	void RotateCamera()
 	{
+		int i = 0;
 		if (direction < 1f)
 		{
 			direction += Time.deltaTime / (directionChangeSpeed / 2);
@@ -1050,7 +1064,7 @@ public class Main : MonoBehaviour
 		{
 			transform.Rotate(-Vector3.up, (simspeed * direction) * Time.deltaTime);
 		}
-		for (int i = 0; i < maxorbits; i++)
+		for (i = 0; i < maxorbits; i++)
 		{
 			orbits[i].transform.RotateAround(Vector3.zero, orbitaxes[i], (float)(-1f * earthperiod / orbitalperiod[i] * simspeed * direction) * Time.deltaTime);
 		}
@@ -1064,17 +1078,15 @@ public class Main : MonoBehaviour
 		// Update scene initial parameters
 		elapsed_time = last_elapsed_time + (Time.time - last_speed_change) * speed;
 		RotateCamera();
-
-		// Reset link capacities.
 		_link_capacities.Reset();
-
+		
 		// Clean and rebuild the routegraph.
 		RouteHandler.ClearRoutes(_painter);
 		routeHandler.ResetRoute(new_york, toronto, _painter, satlist, maxsats);
 		rg = routeHandler.BuildRouteGraph(new_york, toronto, maxdist, margin, maxsats, satlist, km_per_unit, graph_on, grid);
 		
 		// TODO: Do I need to return the routegraph?
-
+		
 		// If the current link isn't valid, select a new target link.
 		if (!_attacker.HasValidTargetLink())
 		{
@@ -1088,16 +1100,16 @@ public class Main : MonoBehaviour
 		{
 			Debug.Log("Attacker.Update | Previous link is still valid.");
 		}
-
+		
 		// If the attacker has selected a valid link, attempt to attack it
 		if (_attacker.HasValidTargetLink())
 		{
 			// Find viable attack routes.
 			// TODO: Provide all groundstations as input instead of the current limited list.
 			BinaryHeap<Path> attack_routes = FindAttackRoutes(rg, new List<GameObject>() { toronto, new_york, chicago });
-
+		
 			Debug.Log("Update | There are " + attack_routes.Count + " paths.");
-
+		
 			// Create routes until the link's capacity has been reached.
 			while (!_link_capacities.IsFlooded(_attacker.Link.SrcNode.Id, _attacker.Link.DestNode.Id) && attack_routes.Count > 0)
 			{
@@ -1113,7 +1125,7 @@ public class Main : MonoBehaviour
 					Debug.Log("Update | Not executing this path, because it has has early collisions.");
 				}
 			}
-
+		
 			// Debugging messages.
 			if (_link_capacities.IsFlooded(_attacker.Link.SrcNode.Id, _attacker.Link.DestNode.Id))
 			{
@@ -1123,7 +1135,7 @@ public class Main : MonoBehaviour
 			{
 				Debug.Log("Update | Link could not be flooded. It has capacity: " + _link_capacities.GetCapacity(_attacker.Link.SrcNode.Id, _attacker.Link.DestNode.Id));
 			}
-
+		
 			// Color the target link on the map. If flooded, the link is colored red. Otherwise, the link is colored pink.
 			_painter.ColorTargetISLLink(satlist[_attacker.Link.SrcNode.Id], satlist[_attacker.Link.DestNode.Id], _attacker.Link.DestNode, _attacker.Link.SrcNode, _link_capacities.IsFlooded(_attacker.Link.SrcNode.Id, _attacker.Link.DestNode.Id));
 		}
@@ -1131,7 +1143,7 @@ public class Main : MonoBehaviour
 		{
 			Debug.Log("Attacker.Update | Could not find any valid link.");
 		}
-
+		
 		_painter.UpdateLasers(satlist, maxsats, speed);
 		framecount++;
 	}

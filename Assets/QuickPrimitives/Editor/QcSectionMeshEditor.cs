@@ -2,6 +2,7 @@
 using UnityEngine;
 using System;
 using QuickPrimitives;
+using QuickPrimitives.Scripts;
 
 [CustomEditor(typeof(QcSectionMesh))]
 public class QcSectionMeshEditor : Editor

@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace QuickPrimitives
+namespace QuickPrimitives.Scripts
 {
     [ExecuteInEditMode]
     public class QcCylinderMesh : QcPrimitivesBase

@@ -2,6 +2,7 @@
 using UnityEditor;
 using System;
 using QuickPrimitives;
+using QuickPrimitives.Scripts;
 
 [CustomEditor(typeof(QcCircleMesh))]
 public class QcCircleMeshEditor : Editor

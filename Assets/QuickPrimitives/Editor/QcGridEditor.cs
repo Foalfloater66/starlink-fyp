@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using QuickPrimitives;
+using QuickPrimitives.Scripts;
 
 [CustomEditor(typeof(QcGridMesh))]
 public class QcGridEditor : Editor

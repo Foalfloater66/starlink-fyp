@@ -1,9 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace QuickPrimitives
+namespace QuickPrimitives.Scripts
 {
     [ExecuteInEditMode]
     public class QcPlaneMesh : QcPrimitivesBase

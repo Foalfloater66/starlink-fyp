@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Routing;
 using UnityEngine;
+using Utilities;
 
 namespace Orbits
 {
@@ -223,12 +224,22 @@ namespace Orbits
                 "Longitude must be between -180 and 180 degrees.");
 
             // convert from lat, long, and altitude to Vector3 representation.
+            #warning "TRYING TO SET THE TARGET OBJECT!"
             GameObject target = Object.Instantiate(prefab, new Vector3(0f, 0f, -altitude), transform.rotation);
             float long_offset = 20f;
             target.transform.RotateAround(Vector3.zero, Vector3.up, longitude - long_offset);
             Vector3 lat_axis = Quaternion.Euler(0f, -90f, 0f) * target.transform.position;
             target.transform.RotateAround(Vector3.zero, lat_axis, latitude);
             target.transform.SetParent(transform, false);
+            
+            // Check if the cityScript is attached.
+            Component[] components = target.GetComponents<Component>();
+            foreach (Component component in components)
+            {
+                Debug.Log(component.GetType().ToString());
+            }
+            Debug.Log("Tried printing all scripts.");
+            
 
             TargetAreaCenterpoint = target.transform.position;
         }

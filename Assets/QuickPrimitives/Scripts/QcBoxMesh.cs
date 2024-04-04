@@ -1,8 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace QuickPrimitives
+namespace QuickPrimitives.Scripts
 {
     [ExecuteInEditMode]
     public class QcBoxMesh : QcPrimitivesBase
