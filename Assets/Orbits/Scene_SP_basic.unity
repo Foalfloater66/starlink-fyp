@@ -477,10 +477,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1363029057}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6a6f7b359b57849c29f8e7e7a4898447, type: 3}
+  m_Script: {fileID: 11500000, guid: e262a71538d9547419b5142e89144cb2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cam: {fileID: 1375312109}
+  cam: {fileID: 1375312111}
   spin: 1
   speed: 10
   use_isls: 1
@@ -490,8 +490,8 @@ MonoBehaviour:
   directionChangeSpeed: 2
   target_latitude: 32
   target_longitude: 82
-  attack_radius: 500
-  debug: 0
+  attack_radius: 800
+  debug: 1
   orbit: {fileID: 1172864837802712, guid: 3b4a1d43d21bf42d8ad02077259400de, type: 3}
   satellite: {fileID: 1842355326392174, guid: 7327322cd40cd49898f0f3e031d063e4, type: 3}
   laser: {fileID: 1648504976000122, guid: 88944ffc92ba14ec5a48961205eeab10, type: 3}
@@ -504,6 +504,7 @@ MonoBehaviour:
     type: 3}
   initial_link_capacity: 1000
   isl_material: {fileID: 2100000, guid: 054725efd433545d0867a6c84dd8b574, type: 2}
+  yellowMaterial: {fileID: 0}
   laserMaterials:
   - {fileID: 2100000, guid: d6795a24fec3f4b478a2532645da09a8, type: 2}
   - {fileID: 2100000, guid: 7931bb27edd134e85b919e88f2970275, type: 2}
@@ -517,24 +518,20 @@ MonoBehaviour:
   countdown: {fileID: 485043185}
   rightbottom: {fileID: 1204926847}
   maxorbits: 24
-  maxdist: 0
-  margin: 100
   route_choice: 4
   constellation: 0
   no_of_paths: 2
   decimator: 1
   raan0: 0
   log_choice: 5
-  log_filename: /Users/morganeohlig/workspace/fyp/Starlink0031/Logs/path/
-  log_directory: /Users/morganeohlig/workspace/fyp/Starlink0031/Logs/
   beam_on: 0
   graph_on: 0
   prevscene:
-    sceneAsset: {fileID: 102900000, guid: ddd76e71b555e465685fa9281714a642, type: 3}
-    sceneName: Orbits/Scene_BasicOrbitsVLEO
+    sceneAsset: {fileID: 102900000, guid: 69258ee568f6b43fc991355f3e2f8ade, type: 3}
+    sceneName: Orbits/Scene_SP_basic
   nextscene:
-    sceneAsset: {fileID: 102900000, guid: ddd76e71b555e465685fa9281714a642, type: 3}
-    sceneName: Orbits/Scene_BasicOrbitsVLEO
+    sceneAsset: {fileID: 102900000, guid: 69258ee568f6b43fc991355f3e2f8ade, type: 3}
+    sceneName: Orbits/Scene_SP_basic
 --- !u!1 &1375312105
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,38 +1,39 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class LaserScript : MonoBehaviour
+namespace Orbits
 {
-	public LineRenderer line;
-
-	public int src_satid; // REMOVE THIS AFTER
-	public int dest_satid; // REMOVE THIS AFTER
-
-	// Use this for initialization
-	void Start()
+	public class LaserScript : MonoBehaviour
 	{
-		line = GetComponent<LineRenderer>();
-	}
+		public LineRenderer line;
 
-	// Update is called once per frame
-	void Update()
-	{
-	}
+		public int src_satid; // REMOVE THIS AFTER
+		public int dest_satid; // REMOVE THIS AFTER
 
-	public void SetPos(Vector3 pos1, Vector3 pos2)
-	{
-		line.SetPosition(0, pos1);
-		line.SetPosition(1, pos2);
-	}
+		// Use this for initialization
+		void Start()
+		{
+			line = GetComponent<LineRenderer>();
+		}
 
-	public void SetMaterial(Material mat)
-	{
-		line.material = mat;
-	}
+		// Update is called once per frame
+		void Update()
+		{
+		}
 
-	public void ChangeMaterial(Material newMat)
-	{
-		line.material = newMat;
+		public void SetPos(Vector3 pos1, Vector3 pos2)
+		{
+			line.SetPosition(0, pos1);
+			line.SetPosition(1, pos2);
+		}
+
+		public void SetMaterial(Material mat)
+		{
+			line.material = mat;
+		}
+
+		public void ChangeMaterial(Material newMat)
+		{
+			line.material = newMat;
+		}
 	}
 }
