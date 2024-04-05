@@ -9,7 +9,6 @@ using Scene;
 using Scene.GameObjectScripts;
 using UnityEngine.UI;
 using Utilities;
-using Camera = Utilities.Camera;
 
 // TODO: remove the below as well.
 public enum RouteChoice { TransAt, TransPac, LonJob, USsparse, USsparseAttacked, USdense, TorMia, Sydney_SFO, Sydney_Tokyo, Sydney_Lima, Followsat };
@@ -17,7 +16,7 @@ public enum LogChoice { None, RTT, Distance, HopDists, LaserDists, Path };
 
 public class Main : MonoBehaviour
 {
-	public Camera cam;
+	public CustomCamera cam;
 	[Tooltip("Spin: Yes or No")]
 	public bool spin;
 	[Tooltip("Speed 1 is realtime")]
@@ -188,7 +187,7 @@ public class Main : MonoBehaviour
 		start_time = Time.time;
 
 		/* ask the camera to view the same area as our route */
-		Camera camscript = (Camera)cam.GetComponent(typeof(Camera));
+		CustomCamera camscript = (CustomCamera)cam.GetComponent(typeof(CustomCamera));
 		camscript.route_choice = route_choice;
 		camscript.InitView();
 
@@ -1047,7 +1046,8 @@ public class Main : MonoBehaviour
 		Gizmos.DrawSphere(_attacker.TargetAreaCenterpoint, _attacker.Radius);
 	}
 
-	void RotateCamera()
+	void 
+		RotateCamera()
 	{
 		int i = 0;
 		if (direction < 1f)
