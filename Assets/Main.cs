@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Orbits;
+using Attack;
 using Orbits.Satellites;
 using Routing;
 using UnityEngine;
-// using QuickPrimitives.Scripts;
-using QuickPrimitives.Scripts;
 using Scene;
 using Scene.GameObjectScripts;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Utilities;
 using Camera = Utilities.Camera;
@@ -17,8 +14,6 @@ using Camera = Utilities.Camera;
 // TODO: remove the below as well.
 public enum RouteChoice { TransAt, TransPac, LonJob, USsparse, USsparseAttacked, USdense, TorMia, Sydney_SFO, Sydney_Tokyo, Sydney_Lima, Followsat };
 public enum LogChoice { None, RTT, Distance, HopDists, LaserDists, Path };
-
-public enum AttackChoice { TranscontinentalUS, CoastalUS}
 
 public class Main : MonoBehaviour
 {
@@ -39,11 +34,6 @@ public class Main : MonoBehaviour
 	public float direction = 1f;
 	[HideInInspector]
 	public float directionChangeSpeed = 2f;
-
-	/* Latitude and longitude of the center of the attacker's target sphere */
-	public float target_latitude = 1.290270f; // new york as a default value;
-
-	public float target_longitude = -103.851959f; // new york as a default value.
 
 	public float attack_radius = 800f;
 
@@ -141,6 +131,8 @@ public class Main : MonoBehaviour
 	int elapsed_count = 0;
 
 	public RouteChoice route_choice;
+	public AttackChoice attack_choice;
+	
 	public enum ConstellationChoice { P24_S66_A550, P72_S22_A550, P32_S50_A1100 };
 	public ConstellationChoice constellation;
 	public int no_of_paths = 1;
@@ -371,11 +363,15 @@ public class Main : MonoBehaviour
 		//km_per_unit2 = (12756f / 2) / earthradius;
 		//Debug.Log("km_per_unit: " + km_per_unit.ToString() + " km_per_unit2: " + km_per_unit2.ToString())
 
-		// for now, only allows for Radius Attacks
 		List<GameObject> demo_dest_groundstations = new List<GameObject>() { miami, new_york, chicago };
-		_attacker = new Attacker(target_latitude, target_longitude, sat0r, attack_radius, demo_dest_groundstations, transform, city_prefab);
+
+		// TODO: Add get target cities too. 
+		AttackCases.getTargetCoordinates(attack_choice, out float target_lat, out float target_lon);
+		_attacker = new Attacker(target_lat, target_lon, sat0r, attack_radius, demo_dest_groundstations, transform, city_prefab);
 		_link_capacities = new LinkCapacityMonitor(initial_link_capacity);
 	}
+
+
 
 	void InitCities()
 	{
@@ -803,7 +799,6 @@ public class Main : MonoBehaviour
 		}
 		return city;
 	}
-
 	
 	// Default way to create a constellation
 	void CreateSats(int num_orbits, int sats_per_orbit, float inclination, float orbit_phase_offset,
@@ -1046,11 +1041,11 @@ public class Main : MonoBehaviour
 	}
 
 	// Only uncomment for debugging if I need to see the attack sphere.
-	// void OnDrawGizmos()
-	// {
-	// 	Gizmos.color = Color.yellow;
-	// 	Gizmos.DrawSphere(_attacker.TargetAreaCenterpoint, _attacker.Radius);
-	// }
+	void OnDrawGizmos()
+	{
+		Gizmos.color = Color.yellow;
+		Gizmos.DrawSphere(_attacker.TargetAreaCenterpoint, _attacker.Radius);
+	}
 
 	void RotateCamera()
 	{
