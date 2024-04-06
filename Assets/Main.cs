@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using Attack;
+using Orbits;
 using Orbits.Satellites;
 using Routing;
 using UnityEngine;
 using Scene;
 using Scene.GameObjectScripts;
+using UnityEngine.Assertions;
 using UnityEngine.UI;
 using Utilities;
 
@@ -90,51 +92,8 @@ public class Main : MonoBehaviour
 	ScenePainter _painter;
 	float km_per_unit;
 
-	GameObject london, singapore, johannesburg, athens, auckland, sydney;
-	GameObject northbend, conrad, merrillan, greenville, redmond, hawthorne, bismarck, 
-		thunderbay, lisbon, miami, majorca, tokyo, lima;
-
-	// Top 25 US cities as of 2020 census.
-	// https://en.wikipedia.org/wiki/List_of_United_States_cities_by_population
-	GameObject new_york, los_angeles,
-		chicago,
-		houston,
-		phoenix,
-		philadelphia,
-		san_antonio,
-		san_diego,
-		dallas,
-		austin,
-		jacksonville,
-		san_jose,
-		fort_worth,
-		columbus,
-		charlotte,
-		indianapolis,
-		san_francisco,
-		seattle,
-		denver,
-		oklahoma_city,
-		nashville,
-		el_paso,
-		washington_dc,
-		las_vegas,
-		boston;
+	private readonly GroundstationCollection groundstations = new GroundstationCollection();
 	
-	// Top 10 most populated Canadian cities as of 2021
-	// https://en.wikipedia.org/wiki/List_of_largest_Canadian_cities_by_census
-	private GameObject toronto,
-		montreal,
-		calgary,
-		ottawa,
-		edmonton,
-		winnipeg,
-		mississauga,
-		vancouver,
-		brampton,
-		hamilton;
-
-	private Dictionary<GameObject, string> groundstations = new Dictionary<GameObject, string>();
 	/*
 	 * TODO for groundstation support:
 	 * 1. Extract a desired set of groundstations by name.
@@ -187,10 +146,8 @@ public class Main : MonoBehaviour
 	public Utilities.SceneField prevscene;
 	public Utilities.SceneField nextscene;
 
-
 	void Start()
 	{
-
 		// handle time in a way that copes with speed change mid sim
 		last_elapsed_time = Time.time;
 		last_speed_change = last_elapsed_time;
@@ -404,9 +361,16 @@ public class Main : MonoBehaviour
 		//km_per_unit2 = (12756f / 2) / earthradius;
 		//Debug.Log("km_per_unit: " + km_per_unit.ToString() + " km_per_unit2: " + km_per_unit2.ToString())
 
-		List<GameObject> demo_dest_groundstations = new List<GameObject>() { miami, new_york, chicago, winnipeg, denver};
-		// DEMO list of groundstations.
-
+		// Demo list of groundstations.
+		List<GameObject> demo_dest_groundstations = new List<GameObject>()
+		{
+			groundstations["Miami"],
+			groundstations["New York"],
+			groundstations["Chicago"],
+			groundstations["Winnipeg"],
+			groundstations["Denver"]
+		};
+		
 		// TODO: Add get target cities too. 
 		AttackCases.getTargetCoordinates(attack_choice, out float target_lat, out float target_lon);
 		_attacker = new Attacker(target_lat, target_lon, sat0r, attack_radius, demo_dest_groundstations, transform, city_prefab);
@@ -415,50 +379,51 @@ public class Main : MonoBehaviour
 
 	private void _CANCities()
 	{
-		// Top 10 most populated Canadian cities.
-		toronto = CreateCity(43.65f, 79.38f, "Toronto");
-		montreal = CreateCity(45.50f, 73.56f, "Montreal");
-		calgary = CreateCity(51.04f, 114.07f, "Calgary");
-		ottawa = CreateCity(45.42f, 75.69f, "Ottawa");
-		edmonton = CreateCity(53.54f, 113.49f, "Edmonton");
-		winnipeg = CreateCity(49.89f, 97.13f,  "Winnipeg");
-		mississauga = CreateCity(43.58f, 79.64f,  "Mississauga");
-		vancouver = CreateCity(49.28f, 123.12f,  "Vancouver");
-		brampton = CreateCity(43.73f, 79.76f,  "Brampton");
-		hamilton = CreateCity(43.25f, 79.87f,  "Hamilton");
+		// Top 10 most populated Canadian cities as of the 2021 census
+		// https://en.wikipedia.org/wiki/List_of_largest_Canadian_cities_by_census
+		CreateCity(43.65f, 79.38f, "Toronto");
+		CreateCity(45.50f, 73.56f, "Montreal");
+		CreateCity(51.04f, 114.07f, "Calgary");
+		CreateCity(45.42f, 75.69f, "Ottawa");
+		CreateCity(53.54f, 113.49f, "Edmonton");
+		CreateCity(49.89f, 97.13f,  "Winnipeg");
+		CreateCity(43.58f, 79.64f,  "Mississauga");
+		CreateCity(49.28f, 123.12f,  "Vancouver");
+		CreateCity(43.73f, 79.76f,  "Brampton");
+		CreateCity(43.25f, 79.87f,  "Hamilton");
 	}
 
 
 	private void _USCities()
 	{
-		// Top 25 most populated US cities.
-		// REVIEW: Why should theses be stored as global variables? I would rather not.
-		new_york = CreateCity(40.76f, 73.98f, "New York");
-		los_angeles = CreateCity(34f, 118f,  "Los Angeles"); // Los Angeles
-		miami = CreateCity(25.768125f, 80.197006f,  "Miami");
-		chicago = CreateCity(41.87f, 87.62f,  "Chicago"); //;
-		houston = CreateCity(29.76f, 95.36f,  "Houston"); //;
-		phoenix = CreateCity(33.44f, 112.07f,  "Phoenix"); //;
-		philadelphia = CreateCity(39.95f, 75.16f,  "Philadelphia");
-		san_antonio = CreateCity(29.42f, 98.49f,  "San Antonio"); // Texas
-		san_diego = CreateCity(32.71f, 117.16f,  "San Diego");
-		dallas = CreateCity(32.46f, 96.47f,  "Dallas");
-		austin = CreateCity(30.26f, 97.74f,  "Austin");
-		jacksonville = CreateCity(30.33f, 81.65f,  "Jacksonville");
-		san_jose = CreateCity(37.33f, 121.88f,  "San Jose");
-		fort_worth = CreateCity(32.75f, 97.33f,  "Fort Worth");
-		columbus = CreateCity(39.96f, 82.99f,  "Columbus");
-		charlotte = CreateCity(35.22f, 80.84f,  "Charlotte");
-		indianapolis = CreateCity(39.76f, 86.15f, "Indianapolis");
-		san_francisco = CreateCity(37.77f, 122.41f,  "San Francisco");
-		seattle = CreateCity(47.60f, 122.33f,  "Seattle");
-		denver = CreateCity(39.73f, 104.99f,  "Denver");
-		oklahoma_city = CreateCity(35.46f, 97.51f,  "Oklahoma City");
-		nashville = CreateCity(36.16f, 86.78f,  "Nashville");
-		el_paso = CreateCity(31.76f, 106.48f,  "El Paso");
-		washington_dc = CreateCity(38.90f, 77.03f,  "Washington DC");
-		las_vegas = CreateCity(36.17f, 115.13f,  "Las Vegas");
-		boston = CreateCity(42.36f, 71.05f,  "Boston");
+		// Top 25 US cities as of 2020 census.
+		// https://en.wikipedia.org/wiki/List_of_United_States_cities_by_population
+		CreateCity(40.76f, 73.98f, "New York");
+		CreateCity(34f, 118f,  "Los Angeles"); // Los Angeles
+		CreateCity(25.768125f, 80.197006f,  "Miami");
+		CreateCity(41.87f, 87.62f,  "Chicago"); //;
+		CreateCity(29.76f, 95.36f,  "Houston"); //;
+		CreateCity(33.44f, 112.07f,  "Phoenix"); //;
+		CreateCity(39.95f, 75.16f,  "Philadelphia");
+		CreateCity(29.42f, 98.49f,  "San Antonio"); // Texas
+		CreateCity(32.71f, 117.16f,  "San Diego");
+		CreateCity(32.46f, 96.47f,  "Dallas");
+		CreateCity(30.26f, 97.74f,  "Austin");
+		CreateCity(30.33f, 81.65f,  "Jacksonville");
+		CreateCity(37.33f, 121.88f,  "San Jose");
+		CreateCity(32.75f, 97.33f,  "Fort Worth");
+		CreateCity(39.96f, 82.99f,  "Columbus");
+		CreateCity(35.22f, 80.84f,  "Charlotte");
+		CreateCity(39.76f, 86.15f, "Indianapolis");
+		CreateCity(37.77f, 122.41f,  "San Francisco");
+		CreateCity(47.60f, 122.33f,  "Seattle");
+		CreateCity(39.73f, 104.99f,  "Denver");
+		CreateCity(35.46f, 97.51f,  "Oklahoma City");
+		CreateCity(36.16f, 86.78f,  "Nashville");
+		CreateCity(31.76f, 106.48f,  "El Paso");
+		CreateCity(38.90f, 77.03f,  "Washington DC");
+		CreateCity(36.17f, 115.13f,  "Las Vegas");
+		CreateCity(42.36f, 71.05f,  "Boston");
 	}
 
 	private void _NACities() {
@@ -481,16 +446,17 @@ public class Main : MonoBehaviour
 				break;
 			case AttackChoice.Equatorial:
 				// TODO: add cities. (US + SA)
+				_USCities();
+				break;
 			case AttackChoice.IntraOrbital:
 				// TODO: add cities. (find a path too)
 			case AttackChoice.TransOrbital:
 				// TODO: add cities. (find a path too)
 				break;
 		}
-		Debug.Log("Created a couple of cities!");
 	}
 
-	GameObject CreateCity(float latitude, float longitude, string city_name = "" /* only to take account of certain cities that don't have names */)
+	void CreateCity(float latitude, float longitude, string city_name)
 	{
 		GameObject city = 
 			 (GameObject)Instantiate(city_prefab, new Vector3(0f, 0f, /*-6382.2f*/-6371.0f), transform.rotation);
@@ -500,16 +466,15 @@ public class Main : MonoBehaviour
 		Vector3 lat_axis = Quaternion.Euler(0f, -90f, 0f) * city.transform.position;
 		city.transform.RotateAround(Vector3.zero, lat_axis, latitude);
 		city.transform.SetParent(transform, false);
+		
+		// Assign a script to the city.
 		CityScript cs = (CityScript)city.GetComponent(typeof(CityScript));
 		cs.longitude = longitude;
 		cs.latitude = latitude;
 		cs.city_name = city_name; // TODO: make the target a different color, or not even a CityScript. (It's not correct!)
 
-		if (!string.Equals(city_name, ""))
-		{
-			groundstations.Add(city, city_name);
-		}
-		return city;
+		// Add the city as a groundstation.
+		groundstations.addGroundstation(city, city_name);
 	}
 	
 	// Default way to create a constellation
@@ -601,6 +566,11 @@ public class Main : MonoBehaviour
 	}
 	
 
+	/// <summary>
+	/// Utility function to acquire a relay object from a 
+	/// </summary>
+	/// <param name="nodeid"></param>
+	/// <returns></returns>
 	GameObject get_relay(int nodeid)
 	{
 		int relaynum = -(nodeid + 1000);
@@ -630,7 +600,7 @@ public class Main : MonoBehaviour
 	void ExecuteAttackRoute(Path path, GameObject city1, GameObject city2, int mbits)
 	{
 		Node rn = path.nodes.First();
-		// FIXME: Separate the drawing functionality from the link capacity modification.
+		// REVIEW: Separate the drawing functionality from the link capacity modification.
 		Debug.Assert(rn != null, "ExecuteAttackRoute | The last node is empty.");
 		Debug.Assert(rn.Id == -2, "ExecuteAttackRoute | The last node is not -2. Instead, it's " + rn.Id);
 		Node prevnode = null;
@@ -672,14 +642,17 @@ public class Main : MonoBehaviour
 					if (id >= 0) // the current node is a satellite
 					{
 						sat = satlist[id];
+						// Assert.AreEqual(-2, previd);
 						if (previd == -2) // the previous node was a city. Add an active RF link. I guess just add it because it's already been done anyways. in the previous round I mean
 						{
-							_painter.UsedRFLinks.Add(new ActiveRF(city2, prevnode, sat, rn));
+							_painter.ColorRFLink(city2, sat, prevnode, rn);
 						}
 						else // previous ID was -1
 						{
 							// NB. Not sure what this is either.
 							// GameObject city = get_relay(previd);
+							// NOTE: I don't think I am ever going to use this! I don't use relays at all!
+							// NOTE: TEMPORARY FIX. I NEED TO CHANGE THIS BACK!
 							_painter.ColorRFLink(get_relay(previd), sat, prevnode, rn);
 						}
 					}
@@ -692,6 +665,7 @@ public class Main : MonoBehaviour
 						}
 						else // if the id is -2
 						{
+							// Same. I don't think we every enter this edge case.
 							GameObject city = get_relay(id);
 							_painter.ColorRFLink(city, sat, prevnode, rn);
 							_painter.ChangeCityMaterial(city);
@@ -791,8 +765,8 @@ public class Main : MonoBehaviour
 		// Clean and rebuild the routegraph.
 		RouteHandler.ClearRoutes(_painter);
 		// TODO: Create a RouteGraph without needing to have new_york and toronto passed.
-		routeHandler.ResetRoute(new_york, toronto, _painter, satlist, maxsats);
-		rg = routeHandler.BuildRouteGraph(new_york, toronto, maxdist, margin, maxsats, satlist, km_per_unit, graph_on, grid);
+		routeHandler.ResetRoute(groundstations["New York"], groundstations["Toronto"], _painter, satlist, maxsats);
+		rg = routeHandler.BuildRouteGraph(groundstations["New York"], groundstations["Toronto"], maxdist, margin, maxsats, satlist, km_per_unit, graph_on, grid);
 		
 		// TODO: Do I need to return the routegraph?
 		
@@ -811,11 +785,11 @@ public class Main : MonoBehaviour
 		}
 		
 		// If the attacker has selected a valid link, attempt to attack it
-		if (_attacker.HasValidTargetLink())
+		if (_attacker.Link != null && _attacker.HasValidTargetLink())
 		{
 			// Find viable attack routes.
 			// TODO: Provide all groundstations as input instead of the current limited list.
-			BinaryHeap<Path> attack_routes = FindAttackRoutes(rg, new List<GameObject>() { toronto, new_york, chicago, denver });
+			BinaryHeap<Path> attack_routes = FindAttackRoutes(rg, new List<GameObject>() { groundstations["Toronto"], groundstations["New York"], groundstations["Chicago"], groundstations["Denver"]});
 		
 			Debug.Log("Update | There are " + attack_routes.Count + " paths.");
 		
