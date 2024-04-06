@@ -564,18 +564,6 @@ public class Main : MonoBehaviour
 			orbitcount++;
 		}
 	}
-	
-
-	/// <summary>
-	/// Utility function to acquire a relay object from a 
-	/// </summary>
-	/// <param name="nodeid"></param>
-	/// <returns></returns>
-	GameObject get_relay(int nodeid)
-	{
-		int relaynum = -(nodeid + 1000);
-		return relays[relaynum];
-	}
 
 	void highlight_reachable() // CLEANUP: Remove the highlight_reachable() function.
 	{
@@ -617,60 +605,40 @@ public class Main : MonoBehaviour
 			previd = id;
 			id = rn.Id;
 			Debug.Log("ID: " + id);
+			
+			// TODO: this process of coloring links must be reversed, because the processing order of links is reversed (it goes from last node to first node)
 
 			if (previd != -4)
 			{
-				// if it's an ISL
+				// The previous and current nodes are satellites. (ISL link)
 				if (previd >= 0 && id >= 0)
 				{
 					sat = satlist[id];
 					prevsat = satlist[previd];
 
-					// Increase the load of the link
+					// Increase the load of the link and abort if link becomes flooded.
 					_link_capacities.DecreaseLinkCapacity(previd, id, mbits);
 					if (_link_capacities.IsFlooded(previd, id))
 					{
 						break;
 					}
-
+					
 					_painter.ColorRouteISLLink(prevsat, sat, prevnode, rn);
 				}
-				// if it's an RF
-				else
+				// The current node is a satellite and the previous, a city. (RF link)
+				else if (id >= 0 && previd == -2)
 				{
+					sat = satlist[id];
+					Assert.AreEqual(-2, previd);
+					_painter.ColorRFLink(city2, sat, prevnode, rn);
 					// TODO: make the link load capacity rule also hold for RF links. 
-					if (id >= 0) // the current node is a satellite
-					{
-						sat = satlist[id];
-						// Assert.AreEqual(-2, previd);
-						if (previd == -2) // the previous node was a city. Add an active RF link. I guess just add it because it's already been done anyways. in the previous round I mean
-						{
-							_painter.ColorRFLink(city2, sat, prevnode, rn);
-						}
-						else // previous ID was -1
-						{
-							// NB. Not sure what this is either.
-							// GameObject city = get_relay(previd);
-							// NOTE: I don't think I am ever going to use this! I don't use relays at all!
-							// NOTE: TEMPORARY FIX. I NEED TO CHANGE THIS BACK!
-							_painter.ColorRFLink(get_relay(previd), sat, prevnode, rn);
-						}
-					}
-					else // the node is a city
-					{
-						sat = satlist[previd];
-						if (id == -1) // NOTE: do we ever enter this edge case?
-						{
-							_painter.UsedRFLinks.Add(new ActiveRF(city1, rn, sat, prevnode));
-						}
-						else // if the id is -2
-						{
-							// Same. I don't think we every enter this edge case.
-							GameObject city = get_relay(id);
-							_painter.ColorRFLink(city, sat, prevnode, rn);
-							_painter.ChangeCityMaterial(city);
-						}
-					}
+				}
+				// The current node is a city and the previous, a satellite. (RF link)
+				else 
+				{
+					// if (id == -1 && previd >= 0)
+					sat = satlist[previd]; 
+					_painter.UsedRFLinks.Add(new ActiveRF(city1, rn, sat, prevnode));
 				}
 			}
 
