@@ -53,6 +53,7 @@ public class Main : MonoBehaviour
 
 	private LinkCapacityMonitor _link_capacities; /* (node1, node2) link mapping to capacity. Links are full duplex. */
 
+	private CityCreator _city_creator;
 	public int initial_link_capacity = 1000;
 
 	GameObject[] orbits;
@@ -283,7 +284,7 @@ public class Main : MonoBehaviour
 
 		grid = new GroundGrid(10, maxdist, margin, km_per_unit, city_prefab, transform);  // 5 degrees is 550km (in lat)
 		
-		// create cities.
+		// create cities
 		InitCities();
 		
 		// Create and initialise the RouteGraph
@@ -376,65 +377,12 @@ public class Main : MonoBehaviour
 		_attacker = new Attacker(target_lat, target_lon, sat0r, attack_radius, demo_dest_groundstations, transform, city_prefab);
 		_link_capacities = new LinkCapacityMonitor(initial_link_capacity);
 	}
-
-	private void _CANCities()
-	{
-		// Top 10 most populated Canadian cities as of the 2021 census
-		// https://en.wikipedia.org/wiki/List_of_largest_Canadian_cities_by_census
-		CreateCity(43.65f, 79.38f, "Toronto");
-		CreateCity(45.50f, 73.56f, "Montreal");
-		CreateCity(51.04f, 114.07f, "Calgary");
-		CreateCity(45.42f, 75.69f, "Ottawa");
-		CreateCity(53.54f, 113.49f, "Edmonton");
-		CreateCity(49.89f, 97.13f,  "Winnipeg");
-		CreateCity(43.58f, 79.64f,  "Mississauga");
-		CreateCity(49.28f, 123.12f,  "Vancouver");
-		CreateCity(43.73f, 79.76f,  "Brampton");
-		CreateCity(43.25f, 79.87f,  "Hamilton");
-	}
-
-
-	private void _USCities()
-	{
-		// Top 25 US cities as of 2020 census.
-		// https://en.wikipedia.org/wiki/List_of_United_States_cities_by_population
-		CreateCity(40.76f, 73.98f, "New York");
-		CreateCity(34f, 118f,  "Los Angeles"); // Los Angeles
-		CreateCity(25.768125f, 80.197006f,  "Miami");
-		CreateCity(41.87f, 87.62f,  "Chicago"); //;
-		CreateCity(29.76f, 95.36f,  "Houston"); //;
-		CreateCity(33.44f, 112.07f,  "Phoenix"); //;
-		CreateCity(39.95f, 75.16f,  "Philadelphia");
-		CreateCity(29.42f, 98.49f,  "San Antonio"); // Texas
-		CreateCity(32.71f, 117.16f,  "San Diego");
-		CreateCity(32.46f, 96.47f,  "Dallas");
-		CreateCity(30.26f, 97.74f,  "Austin");
-		CreateCity(30.33f, 81.65f,  "Jacksonville");
-		CreateCity(37.33f, 121.88f,  "San Jose");
-		CreateCity(32.75f, 97.33f,  "Fort Worth");
-		CreateCity(39.96f, 82.99f,  "Columbus");
-		CreateCity(35.22f, 80.84f,  "Charlotte");
-		CreateCity(39.76f, 86.15f, "Indianapolis");
-		CreateCity(37.77f, 122.41f,  "San Francisco");
-		CreateCity(47.60f, 122.33f,  "Seattle");
-		CreateCity(39.73f, 104.99f,  "Denver");
-		CreateCity(35.46f, 97.51f,  "Oklahoma City");
-		CreateCity(36.16f, 86.78f,  "Nashville");
-		CreateCity(31.76f, 106.48f,  "El Paso");
-		CreateCity(38.90f, 77.03f,  "Washington DC");
-		CreateCity(36.17f, 115.13f,  "Las Vegas");
-		CreateCity(42.36f, 71.05f,  "Boston");
-	}
-
-	private void _NACities() {
-		_USCities();
-		_CANCities();
-	}
 	
 	void InitCities()
 	{
 		// N and W are +ve
-		relays = new List<GameObject>();
+		_city_creator = new CityCreator(transform, city_prefab, groundstations);
+		relays = new List<GameObject>(); // TODO: remove this.
 		
 		switch (attack_choice)
 		{
@@ -442,11 +390,11 @@ public class Main : MonoBehaviour
 			case AttackChoice.CoastalUS:
 			case AttackChoice.TranscontinentalUS:
 			case AttackChoice.Polar:
-				_NACities();
+				_city_creator.NACities();
 				break;
 			case AttackChoice.Equatorial:
 				// TODO: add cities. (US + SA)
-				_USCities();
+				_city_creator.USACities();
 				break;
 			case AttackChoice.IntraOrbital:
 				// TODO: add cities. (find a path too)
@@ -454,27 +402,6 @@ public class Main : MonoBehaviour
 				// TODO: add cities. (find a path too)
 				break;
 		}
-	}
-
-	void CreateCity(float latitude, float longitude, string city_name)
-	{
-		GameObject city = 
-			 (GameObject)Instantiate(city_prefab, new Vector3(0f, 0f, /*-6382.2f*/-6371.0f), transform.rotation);
-		
-		float long_offset = 20f;
-		city.transform.RotateAround(Vector3.zero, Vector3.up, longitude - long_offset);
-		Vector3 lat_axis = Quaternion.Euler(0f, -90f, 0f) * city.transform.position;
-		city.transform.RotateAround(Vector3.zero, lat_axis, latitude);
-		city.transform.SetParent(transform, false);
-		
-		// Assign a script to the city.
-		CityScript cs = (CityScript)city.GetComponent(typeof(CityScript));
-		cs.longitude = longitude;
-		cs.latitude = latitude;
-		cs.city_name = city_name; // TODO: make the target a different color, or not even a CityScript. (It's not correct!)
-
-		// Add the city as a groundstation.
-		groundstations.addGroundstation(city, city_name);
 	}
 	
 	// Default way to create a constellation
@@ -644,6 +571,7 @@ public class Main : MonoBehaviour
 
 			if (rn != null && rn.Id == -1)
 			{
+				// basically; we are at the end!
 				break;
 			}
 			prevnode = rn;
@@ -653,7 +581,7 @@ public class Main : MonoBehaviour
 				highlight_reachable();
 				return;
 			}
-			rn = path.nodes[index];
+			rn = path.nodes[index]; // TODO: reverse the node list and read everything in opposite order when processing link capacity!
 			if (rn == null)
 			{
 				highlight_reachable();
@@ -666,7 +594,6 @@ public class Main : MonoBehaviour
 	
 	// FIXME: Packets should be sent *from* the source groundstation! Otherwise it's semantically incorrect.
 	// slow down when we're close to minimum distance to improve accuracy
-
 	BinaryHeap<Path> FindAttackRoutes(RouteGraph rg, List<GameObject> dest_groundstations) // TODO: Move this function to the attacker object.
 	{
 		BinaryHeap<Path> heap = new BinaryHeap<Path>(dest_groundstations.Count * _attacker.SourceGroundstations.Count); // priority queue <routegraph, routelength>
