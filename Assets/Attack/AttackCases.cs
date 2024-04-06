@@ -17,9 +17,9 @@ namespace Attack
                     target_lon = 82f;
                     break;
                 case AttackChoice.TranscontinentalUS:
-                    // Minneapolis, USA
-                    target_lat = 44.9778f;
-                    target_lon = 93.2650f;
+                    // Nebraska, USA
+                    target_lat = 41.49f;
+                    target_lon = 99.90f;
                     break;
                 case AttackChoice.CoastalUS:
                     // San Francisco, USA

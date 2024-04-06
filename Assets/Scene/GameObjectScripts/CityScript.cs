@@ -7,6 +7,7 @@ namespace Scene.GameObjectScripts
 		public float latitude;
 		public float longitude;
 		// TODO: Find the other Scripts and move this file there.
+		public string city_name;
 	
 		// Use this for initialization
 		void Start () {
