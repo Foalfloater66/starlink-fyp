@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Attack;
 
@@ -16,9 +17,6 @@ namespace Utilities
 		int current_cam;
 		bool pause = false;
 		float pause_start_time;
-		
-		[HideInInspector]
-		public RouteChoice route_choice;
 
 		[HideInInspector] public AttackChoice attack_choice; // TODO: Revisit this. Does it get updated?
 		
@@ -100,190 +98,9 @@ namespace Utilities
 					_ViewUS();
 					break;
 			}
-// 			switch (route_choice)
-// 			{
-// 				case RouteChoice.TransAt:
-// 					// transatlantic view 45 degree
-// 					cam_count = 2;
-// 					positions.Add (new Vector3 (-7f, 28f, -20f));
-// 					angles.Add (new Vector3 (51f, 20f, 0f));
-// 					times.Add (0f);
-// 					speeds.Add (0.11f);
-//
-// 					positions.Add (new Vector3 (-10f, 10f, -23f));
-// 					angles.Add (new Vector3 (-30f, 20f, 0f));
-// 					times.Add (20f);
-// 					speeds.Add (0.01f);
-//
-// 					positions.Add (new Vector3 (-10f, 10f, -23f));
-// 					angles.Add (new Vector3 (-30f, 20f, 0f));
-// 					times.Add (100000f);
-// 					speeds.Add (0.01f);
-//
-// 					lightrot = new Vector3 (20f, -20f, 0f);
-// 					FoV = 45f;
-// 					break;
-// 				case RouteChoice.TransPac:
-// 					// transpacific view 45 degree
-// 					cam_count = 2;
-// 					positions.Add (new Vector3 (-20f, 28f, 25f));
-// 					angles.Add (new Vector3 (30f, 140f, 0f));
-// 					times.Add (0f);
-// 					speeds.Add (0.01f);
-//
-// 					positions.Add (new Vector3 (-13f, 23f, 22f));
-// 					angles.Add (new Vector3 (30f, 130f, 45f));
-// 					times.Add (20f);
-// 					speeds.Add (0.11f);
-//
-// 					positions.Add (new Vector3 (-13f, 23f, 22f));
-// 					angles.Add (new Vector3 (30f, 130f, 45f));
-// 					times.Add (100000f);
-// 					speeds.Add (0.01f);
-// 					lightrot = new Vector3 (20f, 130f, 0f);
-// 					FoV = 45f;
-// 					break;
-// 				case RouteChoice.USdense:
-// 				case RouteChoice.USsparseAttacked:
-// 				case RouteChoice.USsparse:
-// 					// US view 60 degree
-// 					cam_count = 2;
-// 					positions.Add (new Vector3 (-25f, 23f, -8f));
-// 					angles.Add (new Vector3 (45f, 70f, 0f));
-// 					times.Add (0f);
-// 					speeds.Add (0.01f);
-//
-// 					positions.Add (new Vector3 (-25f, 23f, -8f));
-// 					angles.Add (new Vector3 (45f, 70f, 0f));
-// 					times.Add (100000f);
-// 					speeds.Add (0.01f);
-//
-// 					lightrot = new Vector3 (20f, 130f, 0f);
-// 					FoV = 60f;
-// 					break;
-//
-// 				case RouteChoice.TorMia:
-// 					// US view 60 degree
-// 					cam_count = 2;
-// 					positions.Add (new Vector3 (-18f, 18f, -12f));
-// 					angles.Add (new Vector3 (45f, 60f, 0f));
-// 					times.Add (0f);
-// 					speeds.Add (0.01f);
-//
-// 					positions.Add (new Vector3 (-18f, 18f, -12f));
-// 					angles.Add (new Vector3 (45f, 60f, 0f));
-// 					times.Add (100000f);
-// 					speeds.Add (0.01f);
-//
-// 					lightrot = new Vector3 (20f, 130f, 0f);
-// 					FoV = 60f;
-// 					break;
-//
-// 				case RouteChoice.LonJob:
-// 					// london joburg 60 degree view
-// 					/*
-// 			    cam_count = 2;
-// 			    positions.Add (new Vector3 (20f, 15f, -40f));
-// 			    angles.Add (new Vector3 (20f, -30f, 0f));
-// 			    times.Add (0f);
-// 			    speeds.Add (0.01f);
-//
-// 			    positions.Add (new Vector3 (20f, 15f, -40f));
-// 			    angles.Add (new Vector3 (20f, -30f, 0f));
-// 			    times.Add (10000f);
-// 			    speeds.Add (0.01f);
-// 			    break;
-// 			    */
-//
-//
-// 					// london joburg 45 degree view
-// 					cam_count = 2;
-// 					positions.Add (new Vector3 (30f, 16f, -35f));
-// 					angles.Add (new Vector3 (20f, -40f, 0f));
-// 					times.Add (0f);
-// 					speeds.Add (0.01f);
-//
-// 					positions.Add (new Vector3 (30f, 16f, -35f));
-// 					angles.Add (new Vector3 (20f, -40f, 0f));
-// 					times.Add (10000f);
-// 					speeds.Add (0.01f);
-// 					FoV = 45f;
-// 					lightrot = new Vector3 (20f, 0f, 0f);
-// 					break;
-//
-// 				case RouteChoice.Sydney_SFO:
-// 					cam_count = 4;
-// 					positions.Add(new Vector3(-13000, 3000, 3000));
-// 					angles.Add(new Vector3(10f, 100f, 0f));
-// 					times.Add(0f);
-// 					speeds.Add(0.01f);
-//
-// 					positions.Add(new Vector3(-14000, -3000, 12000));
-// 					angles.Add(new Vector3(-10f, 130f, 0f));
-// 					times.Add(20f);
-// 					speeds.Add(0.01f);
-//
-// 					positions.Add(new Vector3(-2000, -4000, 12000));
-// 					angles.Add(new Vector3(-20f, 170f, 0f));
-// 					times.Add(40f);
-// 					speeds.Add(0.01f);
-//
-// 					positions.Add(new Vector3(-2000, -4000, 12000));
-// 					angles.Add(new Vector3(-20f, 170f, 0f));
-// 					times.Add(10000f);
-// 					speeds.Add(0.01f);
-//
-// 					lightrot = new Vector3(20f, 150f, 0f);
-// 					FoV = 60f;
-// 					scale = 1f;
-// 					break;
-//
-// 				case RouteChoice.Sydney_Tokyo:
-// 					cam_count = 2;
-//
-// 					positions.Add(new Vector3(5000, 0, 12000));
-// 					angles.Add(new Vector3(0f, -150f, 0f));
-// 					times.Add(0f);
-// 					speeds.Add(0.01f);
-//
-// 					positions.Add(new Vector3(5000, 0, 12000));
-// 					angles.Add(new Vector3(0f, -150f, 0f));
-// 					times.Add(10000f);
-// 					speeds.Add(0.01f);
-//
-// 					lightrot = new Vector3(20f, 150f, 0f);
-// 					FoV = 60f;
-// 					scale = 1f;
-// 					break;
-//
-// 				case RouteChoice.Sydney_Lima:
-// 					cam_count = 2;
-// 					positions.Add(new Vector3(-16000, -6000, 1000));
-// 					angles.Add(new Vector3(-20f, 100f, 0f));
-// 					times.Add(0f);
-// 					speeds.Add(0.01f);
-//
-// 					positions.Add(new Vector3(-16000, -6000, 1000));
-// 					angles.Add(new Vector3(-20f, 100f, 0f));
-// 					times.Add(10000f);
-// 					speeds.Add(0.01f);
-//      
-// 					lightrot = new Vector3(20f, 150f, 0f);
-// 					FoV = 45f;
-// 					scale = 1f;
-// 					break;
-//
-				// case RouteChoice.Followsat:
-// 					// we just follow a satellite - no need to do anything here.
-// 					cam_count = 0;
-// 					FoV = 45f;
-// 					lightrot = new Vector3 (20f, 0f, 0f);
-// 					break;
-// 			}
-
 			sun.transform.rotation = Quaternion.Euler (lightrot);
-			UnityEngine.Camera.main.fieldOfView = FoV;
-
+			Camera.main.fieldOfView = FoV;
+			
 			current_cam = 0;
 
 			if (positions.Count > 0) {
