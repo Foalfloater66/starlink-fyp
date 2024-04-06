@@ -488,8 +488,6 @@ MonoBehaviour:
   relay_dist_step: 2
   direction: 1
   directionChangeSpeed: 2
-  target_latitude: 32
-  target_longitude: 82
   attack_radius: 800
   debug: 1
   orbit: {fileID: 1172864837802712, guid: 3b4a1d43d21bf42d8ad02077259400de, type: 3}
@@ -519,7 +517,7 @@ MonoBehaviour:
   rightbottom: {fileID: 1204926847}
   maxorbits: 24
   route_choice: 4
-  attack_choice: 1
+  attack_choice: 3
   constellation: 0
   no_of_paths: 2
   decimator: 1
@@ -629,7 +627,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1375312105}
   m_LocalRotation: {x: 0.38268343, y: 0, z: 0, w: 0.92387956}
-  m_LocalPosition: {x: 0, y: 11060, z: -11060}
+  m_LocalPosition: {x: -10892, y: 964, z: -9454}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -648,6 +646,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   route_choice: 5
+  attack_choice: 0
   sun: {fileID: 191554813}
 --- !u!1 &1963209747
 GameObject:

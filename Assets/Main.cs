@@ -188,7 +188,8 @@ public class Main : MonoBehaviour
 
 		/* ask the camera to view the same area as our route */
 		CustomCamera camscript = (CustomCamera)cam.GetComponent(typeof(CustomCamera));
-		camscript.route_choice = route_choice;
+		// camscript.route_choice = route_choice;
+		camscript.attack_choice = attack_choice;
 		camscript.InitView();
 
 		int satsperorbit = 0;
@@ -333,30 +334,30 @@ public class Main : MonoBehaviour
 
 		_painter = new ScenePainter(isl_material, laserMaterials, targetLinkMaterial, cityMaterial);
 
-		if (route_choice == RouteChoice.Followsat)
-		{
-			// We're going to follow a satellite.
-			// Need to glue the camera to the satellite.
-			followsat_id = 0;
-			switch (constellation)
-			{
-				case ConstellationChoice.P24_S66_A550:
-					followsat_id = 78;
-					break;
-				case ConstellationChoice.P72_S22_A550:
-					followsat_id = 1505;
-					break;
-				case ConstellationChoice.P32_S50_A1100:
-					followsat_id = 105;
-					break;
-			}
-			Satellite followsat = satlist[followsat_id];
-			cam.transform.position = new Vector3(100, 0, -60);
-			cam.transform.rotation = Quaternion.Euler(0, 300, -90);
-			cam.transform.SetParent(followsat.gameobject.transform, false);
-			followsat.ChangeMaterial(laserMaterials[0]);
-			nearest_sats = new Satellite[4];
-		}
+		// if (route_choice == RouteChoice.Followsat)
+		// {
+		// 	// We're going to follow a satellite.
+		// 	// Need to glue the camera to the satellite.
+		// 	followsat_id = 0;
+		// 	switch (constellation)
+		// 	{
+		// 		case ConstellationChoice.P24_S66_A550:
+		// 			followsat_id = 78;
+		// 			break;
+		// 		case ConstellationChoice.P72_S22_A550:
+		// 			followsat_id = 1505;
+		// 			break;
+		// 		case ConstellationChoice.P32_S50_A1100:
+		// 			followsat_id = 105;
+		// 			break;
+		// 	}
+		// 	Satellite followsat = satlist[followsat_id];
+		// 	cam.transform.position = new Vector3(100, 0, -60);
+		// 	cam.transform.rotation = Quaternion.Euler(0, 300, -90);
+		// 	cam.transform.SetParent(followsat.gameobject.transform, false);
+		// 	followsat.ChangeMaterial(laserMaterials[0]);
+		// 	nearest_sats = new Satellite[4];
+		// }
 
 		//float earthradius = Vector3.Distance (transform.position, london.gameObject.transform.position);
 		//km_per_unit2 = (12756f / 2) / earthradius;
@@ -418,263 +419,263 @@ public class Main : MonoBehaviour
 
 		if (use_relays)
 		{
-			switch (route_choice)
-			{ // trans-atlantic
-				case RouteChoice.TransAt:
-					CreateCity(53f, 24f, true);
-					CreateCity(51f, 41f, true);
-
-					//CreateCity (42f, 39f, true);
-
-					/* Ireland, west coast */
-					CreateCity(52f, 10f, true);
-					CreateCity(53f, 10f, true);
-
-					/* Nova Scotia */
-					CreateCity(46f, 60f, true);
-					CreateCity(44f, 65f, true);
-
-					/* Maine */
-					CreateCity(44f, 70f, true);
-
-					/* Newfoundland */
-					CreateCity(48f, 58f, true);
-					CreateCity(49f, 54f, true);
-					CreateCity(51.374132f, 55.581248f, true); // St Anthony
-
-					/* Quebec City */
-					CreateCity(46.804304f, 71.212131f, true);
-					CreateCity(46.804304f, 72.212131f, true);
-
-					CreateCity(50.132574f, 61.801297f, true); // Pointe-Parent, Quebec
-
-					/* Cloridorme, New Brunswick */
-					CreateCity(49.178832f, 64.836269f, true);
-
-
-					/* Azores */
-					CreateCity(39.449375f, 31.209317f, true);
-					CreateCity(37.831072f, 25.141654f, true);
-
-					/* Madeira */
-					CreateCity(32.857646f, 17.198472f, true);
-
-					/* Finistere, Spain */
-					CreateCity(42.923941f, 9.279052f, true);
-
-					/* Marrakesh*/
-					CreateCity(31.655479f, 7.977596f, true);
-
-					/* Laayoune, Western Sahara */
-					CreateCity(27.156665f, 13.233910f, true);
-
-					/* Las Palmas, Canary Islands */
-					CreateCity(28.100000f, 15.451542f, true);
-
-					/* Lisbon */
-					lisbon = CreateCity(38.709687f, 9.485385f, true);
-					break;
-
-
-				case RouteChoice.LonJob:
-					//relay_dist_step = 2.0f;
-					/* Madeira */
-					CreateCity(32.857646f, 17.198472f, true);
-
-					/* Finistere, Spain */
-					CreateCity(42.923941f, 9.279052f, true);
-
-					/* Marrakesh*/
-					CreateCity(31.655479f, 7.977596f, true);
-
-					/* Laayoune, Western Sahara */
-					CreateCity(27.156665f, 13.233910f, true);
-
-					/* Las Palmas, Canary Islands */
-					CreateCity(28.100000f, 15.451542f, true);
-
-					/* Lisbon */
-					lisbon = CreateCity(38.709687f, 9.485385f, true);
-
-					// mediterranean
-					CreateCity(45.4655f, -9.1865f, true);
-					CreateCity(41.9028f, -12.4964f, true);
-					CreateCity(40.8518f, -14.2681f, true);
-					CreateCity(37.3979f, -14.6588f, true);
-					CreateCity(41.0128f, -8.875f, true);
-					CreateCity(35.9375f, -14.3754f, true);
-					CreateCity(39.6953f, -3.0176f, true);
-
-					// N Africa
-					CreateCity(36.8188f, -10.166f, true);  // Tunis
-					CreateCity(32.894548f, -13.182726f, true); // Tripoli
-					CreateCity(18.063929f, 15.969875f, true); //Nouakchott, Mauritania
-					CreateCity(16.953450f, 0.351920f, true); // Bourem, Mali
-					CreateCity(13.523209f, -2.120887f, true); // Niamey, Miger
-					CreateCity(16.968058f, -7.989515f, true); //Agadaz, Niger
-					CreateCity(22.889711f, -4.847936f, true); // Abalessa, Algeria
-					CreateCity(27.879648f, 0.287662f, true); // Adrar, Algeria
-					CreateCity(26.719830f, 0.170543f, true); // Reggane, Algeria
-					CreateCity(26.587697f, -12.775448f, true); // Ubari, Libya
-					CreateCity(27.036485f, -14.422205f, true); // Sabha, Libya
-					CreateCity(32.092705f, -20.087222f, true); // Benghazi, Libya
-					CreateCity(31.204647f, -16.583952f, true); // Sirte, Libya
-					CreateCity(29.030742f, -21.549600f, true); // Jalu, Libya
-					CreateCity(25.672835f, -21.074561f, true); // Tazirbu, Libya
-					CreateCity(14.423622f, -6.044345f, true); // Bouza, Niger
-					CreateCity(18.739735f, -7.392920f, true); // Arlit, Niger
-					CreateCity(16.771889f, 3.006630f, true); // Timbuktu, Mali
-					CreateCity(16.613272f, 7.256843f, true); // Nema, Mauritania
-					CreateCity(20.512436f, 13.045014f, true); //Atar, Mauritania
-					CreateCity(26.739824f, 11.680986f, true); //Samara, W. Sahara
-					CreateCity(14.253680f, -13.114089f, true); //N'Guigmi, Niger
-					CreateCity(12.632408f, 8.009227f, true); // Bamaki, Mali
-					CreateCity(14.492812f, 4.192475f, true); // Mopti, Mali
-					CreateCity(14.947206f, 3.893295f, true); // Kona, Mali
-					CreateCity(14.119974f, -15.312130f, true); // Mao, Chad
-					CreateCity(13.643129f, -16.492301f, true); // Moussoro, Chad
-					CreateCity(14.972823f, -8.880027f, true); // Tanout, Niger
-					CreateCity(16.277464f, 0.046189f, true); // Gao, Mali
-					CreateCity(15.181080f, -0.720703f, true); // Ouatagouna, Mali
-					CreateCity(30.052325f, -31.234923f, true); // Cairo
-					CreateCity(29.069891f, -31.095649f, true); // Ben Sweif, Egypt
-					CreateCity(24.088748f, -32.896148f, true); // Aswan, Egypt
-					CreateCity(22.371821f, -31.610475f, true); // Abu Simbel, Egypt
-					CreateCity(15.508254f, -32.519168f, true); // Khartoum, Sudan
-					for (float lat = 38f; lat < 44f; lat += relay_dist_step)
-					{
-						longdist = (40075f / 360f) * Mathf.Cos(Mathf.Deg2Rad * (lat + relay_dist_step / 2f));
-						float area = (latdist * relay_dist_step) * (longdist * relay_dist_step);
-						for (float lng = 2f; lng < 10f; lng += relay_dist_step)
-						{
-							CreateCity(lat, lng, true);
-							areasum += area;
-						}
-					}
-
-					for (float lng = -10f; lng < 0f; lng += relay_dist_step)
-					{
-						CreateCity(36f, lng, true);
-					}
-					for (float lat = 32f; lat < 36f; lat += relay_dist_step)
-					{
-						longdist = (40075f / 360f) * Mathf.Cos(Mathf.Deg2Rad * (lat + relay_dist_step / 2f));
-						float area = (latdist * relay_dist_step) * (longdist * relay_dist_step);
-						for (float lng = -10f; lng < 8f; lng += relay_dist_step)
-						{
-							CreateCity(lat, lng, true);
-							areasum += area;
-						}
-					}
-					for (float lat = 6f; lat < 14f; lat += relay_dist_step)
-					{
-						longdist = (40075f / 360f) * Mathf.Cos(Mathf.Deg2Rad * (lat + relay_dist_step / 2f));
-						float area = (latdist * relay_dist_step) * (longdist * relay_dist_step);
-						for (float lng = -40f; lng < 14f; lng += relay_dist_step)
-						{
-							CreateCity(lat, lng, true);
-							areasum += area;
-						}
-					}
-					for (float lat = 0f; lat < 6f; lat += relay_dist_step)
-					{
-						longdist = (40075f / 360f) * Mathf.Cos(Mathf.Deg2Rad * (lat + relay_dist_step / 2f));
-						float area = (latdist * relay_dist_step) * (longdist * relay_dist_step);
-						for (float lng = -40f; lng < -14f; lng += relay_dist_step)
-						{
-							CreateCity(lat, lng, true);
-							areasum += area;
-						}
-					}
-					for (float lat = -20f; lat < 0f; lat += relay_dist_step)
-					{
-						longdist = (40075f / 360f) * Mathf.Cos(Mathf.Deg2Rad * (lat + relay_dist_step / 2f));
-						float area = (latdist * relay_dist_step) * (longdist * relay_dist_step);
-						for (float lng = -40f; lng < -12f; lng += relay_dist_step)
-						{
-							CreateCity(lat, lng, true);
-							areasum += area;
-						}
-					}
-					break;
-
-
-				case RouteChoice.TransPac:
-					// transpacific relays
-					TransPacCities();
-					//CreateCity (51f, 145f, true);  // ship, gulf of alaska
-					break;
-				case RouteChoice.USsparseAttacked:
-				case RouteChoice.USsparse:
-					northbend = CreateCity(47.48244f, 121.76131f, true);
-					conrad = CreateCity(48.2033f, 111.94527f, true);
-					bismarck = CreateCity(46.80833f, 100.78374f, true);
-					merrillan = CreateCity(43.40633f, 90.81427f, true);
-					greenville = CreateCity(41.43355f, 80.33322f, true);
-					CreateCity(51.17622f, 115.56982f, true); // Banff
-					CreateCity(49.8844f, 97.14704f, true); // Winnipeg
-					CreateCity(52.11679f, 106.63452f, true); // Saskatoon
-					CreateCity(39.11417f, 94.62746f, true); // Kansas city
-					CreateCity(39.73915f, 104.9847f, true); // Denver
-					CreateCity(36.253368f, 115.066733f, true); // Vegas
-					toronto = CreateCity(43.70011f, 79.4163f, true);
-					thunderbay = CreateCity(48.38202f, 89.25018f, true);
-					columbus = CreateCity(39.96118f, 82.99879f, true);
-					break;
-
-				case RouteChoice.TorMia:
-				case RouteChoice.USdense:
-					int[] startrows = { 13, 13, 13, 12, 11, 9, 8, 8, 7, 6, 6, 5, 3, 3, 2 };
-					int[] endrows = { 45, 45, 49, 50, 50, 53, 54, 55, 55, 56, 56, 57, 57, 57, 57, 57, 57, 57, 57 };
-					int[] holestart = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 19, 19, 14, 0, 18, 19, 0, 0, 10, 0, 0, 0 };
-					int[] holestop = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 20, 20, 16, 0, 20, 22, 0, 0, 26, 30, 31, 35 };
-
-					//relay_dist_step = 1.0f;
-					float latcount = 0;
-					for (float lat = 30f; lat < 55f; lat += relay_dist_step)
-					{
-						longdist = (40075f / 360f) * Mathf.Cos(Mathf.Deg2Rad * (lat + relay_dist_step / 2f));
-						float area = (latdist * relay_dist_step) * (longdist * relay_dist_step);
-						float lngcount = 0;
-						for (float lng = 68f; lng < 126f; lng += relay_dist_step)
-						{
-							if (latcount >= startrows.Length || lngcount > startrows[(int)latcount])
-							{
-								if (latcount >= endrows.Length || lngcount < endrows[(int)latcount])
-								{
-									if (lngcount >= holestop[(int)latcount] || lngcount < holestart[(int)latcount])
-									{
-										CreateCity(lat, lng, true);
-										areasum += area;
-									}
-								}
-							}
-							lngcount += relay_dist_step;
-						}
-						latcount += relay_dist_step;
-					}
-					break;
-				case RouteChoice.Sydney_SFO:
-					TransPacCities();
-					WPacificCities();
-					AusCities();
-					break;
-
-				case RouteChoice.Sydney_Tokyo:
-					TransPacCities();
-					WPacificCities();
-					AusCities();
-					break;
-
-				case RouteChoice.Sydney_Lima:
-					SPacificCities();
-					AusCities();
-
-					break;
-				case RouteChoice.Followsat:
-					// we just follow a satellite - no need for cities
-					break;
-			}
+			// switch (route_choice)
+			// { // trans-atlantic
+			// 	case RouteChoice.TransAt:
+			// 		CreateCity(53f, 24f, true);
+			// 		CreateCity(51f, 41f, true);
+			//
+			// 		//CreateCity (42f, 39f, true);
+			//
+			// 		/* Ireland, west coast */
+			// 		CreateCity(52f, 10f, true);
+			// 		CreateCity(53f, 10f, true);
+			//
+			// 		/* Nova Scotia */
+			// 		CreateCity(46f, 60f, true);
+			// 		CreateCity(44f, 65f, true);
+			//
+			// 		/* Maine */
+			// 		CreateCity(44f, 70f, true);
+			//
+			// 		/* Newfoundland */
+			// 		CreateCity(48f, 58f, true);
+			// 		CreateCity(49f, 54f, true);
+			// 		CreateCity(51.374132f, 55.581248f, true); // St Anthony
+			//
+			// 		/* Quebec City */
+			// 		CreateCity(46.804304f, 71.212131f, true);
+			// 		CreateCity(46.804304f, 72.212131f, true);
+			//
+			// 		CreateCity(50.132574f, 61.801297f, true); // Pointe-Parent, Quebec
+			//
+			// 		/* Cloridorme, New Brunswick */
+			// 		CreateCity(49.178832f, 64.836269f, true);
+			//
+			//
+			// 		/* Azores */
+			// 		CreateCity(39.449375f, 31.209317f, true);
+			// 		CreateCity(37.831072f, 25.141654f, true);
+			//
+			// 		/* Madeira */
+			// 		CreateCity(32.857646f, 17.198472f, true);
+			//
+			// 		/* Finistere, Spain */
+			// 		CreateCity(42.923941f, 9.279052f, true);
+			//
+			// 		/* Marrakesh*/
+			// 		CreateCity(31.655479f, 7.977596f, true);
+			//
+			// 		/* Laayoune, Western Sahara */
+			// 		CreateCity(27.156665f, 13.233910f, true);
+			//
+			// 		/* Las Palmas, Canary Islands */
+			// 		CreateCity(28.100000f, 15.451542f, true);
+			//
+			// 		/* Lisbon */
+			// 		lisbon = CreateCity(38.709687f, 9.485385f, true);
+			// 		break;
+			//
+			//
+			// 	case RouteChoice.LonJob:
+			// 		//relay_dist_step = 2.0f;
+			// 		/* Madeira */
+			// 		CreateCity(32.857646f, 17.198472f, true);
+			//
+			// 		/* Finistere, Spain */
+			// 		CreateCity(42.923941f, 9.279052f, true);
+			//
+			// 		/* Marrakesh*/
+			// 		CreateCity(31.655479f, 7.977596f, true);
+			//
+			// 		/* Laayoune, Western Sahara */
+			// 		CreateCity(27.156665f, 13.233910f, true);
+			//
+			// 		/* Las Palmas, Canary Islands */
+			// 		CreateCity(28.100000f, 15.451542f, true);
+			//
+			// 		/* Lisbon */
+			// 		lisbon = CreateCity(38.709687f, 9.485385f, true);
+			//
+			// 		// mediterranean
+			// 		CreateCity(45.4655f, -9.1865f, true);
+			// 		CreateCity(41.9028f, -12.4964f, true);
+			// 		CreateCity(40.8518f, -14.2681f, true);
+			// 		CreateCity(37.3979f, -14.6588f, true);
+			// 		CreateCity(41.0128f, -8.875f, true);
+			// 		CreateCity(35.9375f, -14.3754f, true);
+			// 		CreateCity(39.6953f, -3.0176f, true);
+			//
+			// 		// N Africa
+			// 		CreateCity(36.8188f, -10.166f, true);  // Tunis
+			// 		CreateCity(32.894548f, -13.182726f, true); // Tripoli
+			// 		CreateCity(18.063929f, 15.969875f, true); //Nouakchott, Mauritania
+			// 		CreateCity(16.953450f, 0.351920f, true); // Bourem, Mali
+			// 		CreateCity(13.523209f, -2.120887f, true); // Niamey, Miger
+			// 		CreateCity(16.968058f, -7.989515f, true); //Agadaz, Niger
+			// 		CreateCity(22.889711f, -4.847936f, true); // Abalessa, Algeria
+			// 		CreateCity(27.879648f, 0.287662f, true); // Adrar, Algeria
+			// 		CreateCity(26.719830f, 0.170543f, true); // Reggane, Algeria
+			// 		CreateCity(26.587697f, -12.775448f, true); // Ubari, Libya
+			// 		CreateCity(27.036485f, -14.422205f, true); // Sabha, Libya
+			// 		CreateCity(32.092705f, -20.087222f, true); // Benghazi, Libya
+			// 		CreateCity(31.204647f, -16.583952f, true); // Sirte, Libya
+			// 		CreateCity(29.030742f, -21.549600f, true); // Jalu, Libya
+			// 		CreateCity(25.672835f, -21.074561f, true); // Tazirbu, Libya
+			// 		CreateCity(14.423622f, -6.044345f, true); // Bouza, Niger
+			// 		CreateCity(18.739735f, -7.392920f, true); // Arlit, Niger
+			// 		CreateCity(16.771889f, 3.006630f, true); // Timbuktu, Mali
+			// 		CreateCity(16.613272f, 7.256843f, true); // Nema, Mauritania
+			// 		CreateCity(20.512436f, 13.045014f, true); //Atar, Mauritania
+			// 		CreateCity(26.739824f, 11.680986f, true); //Samara, W. Sahara
+			// 		CreateCity(14.253680f, -13.114089f, true); //N'Guigmi, Niger
+			// 		CreateCity(12.632408f, 8.009227f, true); // Bamaki, Mali
+			// 		CreateCity(14.492812f, 4.192475f, true); // Mopti, Mali
+			// 		CreateCity(14.947206f, 3.893295f, true); // Kona, Mali
+			// 		CreateCity(14.119974f, -15.312130f, true); // Mao, Chad
+			// 		CreateCity(13.643129f, -16.492301f, true); // Moussoro, Chad
+			// 		CreateCity(14.972823f, -8.880027f, true); // Tanout, Niger
+			// 		CreateCity(16.277464f, 0.046189f, true); // Gao, Mali
+			// 		CreateCity(15.181080f, -0.720703f, true); // Ouatagouna, Mali
+			// 		CreateCity(30.052325f, -31.234923f, true); // Cairo
+			// 		CreateCity(29.069891f, -31.095649f, true); // Ben Sweif, Egypt
+			// 		CreateCity(24.088748f, -32.896148f, true); // Aswan, Egypt
+			// 		CreateCity(22.371821f, -31.610475f, true); // Abu Simbel, Egypt
+			// 		CreateCity(15.508254f, -32.519168f, true); // Khartoum, Sudan
+			// 		for (float lat = 38f; lat < 44f; lat += relay_dist_step)
+			// 		{
+			// 			longdist = (40075f / 360f) * Mathf.Cos(Mathf.Deg2Rad * (lat + relay_dist_step / 2f));
+			// 			float area = (latdist * relay_dist_step) * (longdist * relay_dist_step);
+			// 			for (float lng = 2f; lng < 10f; lng += relay_dist_step)
+			// 			{
+			// 				CreateCity(lat, lng, true);
+			// 				areasum += area;
+			// 			}
+			// 		}
+			//
+			// 		for (float lng = -10f; lng < 0f; lng += relay_dist_step)
+			// 		{
+			// 			CreateCity(36f, lng, true);
+			// 		}
+			// 		for (float lat = 32f; lat < 36f; lat += relay_dist_step)
+			// 		{
+			// 			longdist = (40075f / 360f) * Mathf.Cos(Mathf.Deg2Rad * (lat + relay_dist_step / 2f));
+			// 			float area = (latdist * relay_dist_step) * (longdist * relay_dist_step);
+			// 			for (float lng = -10f; lng < 8f; lng += relay_dist_step)
+			// 			{
+			// 				CreateCity(lat, lng, true);
+			// 				areasum += area;
+			// 			}
+			// 		}
+			// 		for (float lat = 6f; lat < 14f; lat += relay_dist_step)
+			// 		{
+			// 			longdist = (40075f / 360f) * Mathf.Cos(Mathf.Deg2Rad * (lat + relay_dist_step / 2f));
+			// 			float area = (latdist * relay_dist_step) * (longdist * relay_dist_step);
+			// 			for (float lng = -40f; lng < 14f; lng += relay_dist_step)
+			// 			{
+			// 				CreateCity(lat, lng, true);
+			// 				areasum += area;
+			// 			}
+			// 		}
+			// 		for (float lat = 0f; lat < 6f; lat += relay_dist_step)
+			// 		{
+			// 			longdist = (40075f / 360f) * Mathf.Cos(Mathf.Deg2Rad * (lat + relay_dist_step / 2f));
+			// 			float area = (latdist * relay_dist_step) * (longdist * relay_dist_step);
+			// 			for (float lng = -40f; lng < -14f; lng += relay_dist_step)
+			// 			{
+			// 				CreateCity(lat, lng, true);
+			// 				areasum += area;
+			// 			}
+			// 		}
+			// 		for (float lat = -20f; lat < 0f; lat += relay_dist_step)
+			// 		{
+			// 			longdist = (40075f / 360f) * Mathf.Cos(Mathf.Deg2Rad * (lat + relay_dist_step / 2f));
+			// 			float area = (latdist * relay_dist_step) * (longdist * relay_dist_step);
+			// 			for (float lng = -40f; lng < -12f; lng += relay_dist_step)
+			// 			{
+			// 				CreateCity(lat, lng, true);
+			// 				areasum += area;
+			// 			}
+			// 		}
+			// 		break;
+			//
+			//
+			// 	case RouteChoice.TransPac:
+			// 		// transpacific relays
+			// 		TransPacCities();
+			// 		//CreateCity (51f, 145f, true);  // ship, gulf of alaska
+			// 		break;
+			// 	case RouteChoice.USsparseAttacked:
+			// 	case RouteChoice.USsparse:
+			// 		northbend = CreateCity(47.48244f, 121.76131f, true);
+			// 		conrad = CreateCity(48.2033f, 111.94527f, true);
+			// 		bismarck = CreateCity(46.80833f, 100.78374f, true);
+			// 		merrillan = CreateCity(43.40633f, 90.81427f, true);
+			// 		greenville = CreateCity(41.43355f, 80.33322f, true);
+			// 		CreateCity(51.17622f, 115.56982f, true); // Banff
+			// 		CreateCity(49.8844f, 97.14704f, true); // Winnipeg
+			// 		CreateCity(52.11679f, 106.63452f, true); // Saskatoon
+			// 		CreateCity(39.11417f, 94.62746f, true); // Kansas city
+			// 		CreateCity(39.73915f, 104.9847f, true); // Denver
+			// 		CreateCity(36.253368f, 115.066733f, true); // Vegas
+			// 		toronto = CreateCity(43.70011f, 79.4163f, true);
+			// 		thunderbay = CreateCity(48.38202f, 89.25018f, true);
+			// 		columbus = CreateCity(39.96118f, 82.99879f, true);
+			// 		break;
+			//
+			// 	case RouteChoice.TorMia:
+			// 	case RouteChoice.USdense:
+			// 		int[] startrows = { 13, 13, 13, 12, 11, 9, 8, 8, 7, 6, 6, 5, 3, 3, 2 };
+			// 		int[] endrows = { 45, 45, 49, 50, 50, 53, 54, 55, 55, 56, 56, 57, 57, 57, 57, 57, 57, 57, 57 };
+			// 		int[] holestart = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 19, 19, 14, 0, 18, 19, 0, 0, 10, 0, 0, 0 };
+			// 		int[] holestop = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 20, 20, 16, 0, 20, 22, 0, 0, 26, 30, 31, 35 };
+			//
+			// 		//relay_dist_step = 1.0f;
+			// 		float latcount = 0;
+			// 		for (float lat = 30f; lat < 55f; lat += relay_dist_step)
+			// 		{
+			// 			longdist = (40075f / 360f) * Mathf.Cos(Mathf.Deg2Rad * (lat + relay_dist_step / 2f));
+			// 			float area = (latdist * relay_dist_step) * (longdist * relay_dist_step);
+			// 			float lngcount = 0;
+			// 			for (float lng = 68f; lng < 126f; lng += relay_dist_step)
+			// 			{
+			// 				if (latcount >= startrows.Length || lngcount > startrows[(int)latcount])
+			// 				{
+			// 					if (latcount >= endrows.Length || lngcount < endrows[(int)latcount])
+			// 					{
+			// 						if (lngcount >= holestop[(int)latcount] || lngcount < holestart[(int)latcount])
+			// 						{
+			// 							CreateCity(lat, lng, true);
+			// 							areasum += area;
+			// 						}
+			// 					}
+			// 				}
+			// 				lngcount += relay_dist_step;
+			// 			}
+			// 			latcount += relay_dist_step;
+			// 		}
+			// 		break;
+			// 	case RouteChoice.Sydney_SFO:
+			// 		TransPacCities();
+			// 		WPacificCities();
+			// 		AusCities();
+			// 		break;
+			//
+			// 	case RouteChoice.Sydney_Tokyo:
+			// 		TransPacCities();
+			// 		WPacificCities();
+			// 		AusCities();
+			// 		break;
+			//
+			// 	case RouteChoice.Sydney_Lima:
+			// 		SPacificCities();
+			// 		AusCities();
+			//
+			// 		break;
+			// 	case RouteChoice.Followsat:
+			// 		// we just follow a satellite - no need for cities
+			// 		break;
+			// }
 
 		}
 	}
