@@ -8,7 +8,7 @@ namespace Utilities
 		float timer;
 		float start_time;
 		List <Vector3> positions;
-		List <Vector3> angles;
+		List<Vector3> angles;
 		List<float> times;
 		List<float> speeds;
 		Vector3 lightrot;
@@ -40,7 +40,7 @@ namespace Utilities
 
 		private void _ViewUS()
 		{
-			// US view 60 degrees
+			// North America View
 			cam_count = 1;
 			positions.Add (new Vector3 (-25f, 23f, -8f));
 			angles.Add (new Vector3 (45f, 70f, 0f));
@@ -50,6 +50,32 @@ namespace Utilities
 			lightrot = new Vector3 (20f, 130f, 0f);
 			FoV = 60f;
 		}
+		
+		private void _ViewCoastalUS()
+		{
+			// North America View
+			cam_count = 1;
+			positions.Add (new Vector3 (-25f, 18f, 0f));
+			angles.Add (new Vector3 (30f, 70f, 0f));
+			// angles.Add (new Vector3 (45f, 70f, 0f));
+			times.Add (0f);
+			speeds.Add (0.01f);
+
+			lightrot = new Vector3 (20f, 130f, 0f);
+			FoV = 60f;
+		}
+		
+		private void _ViewAmericanEquator()
+		{
+			// Equator View 
+			cam_count = 1;
+			positions.Add(new Vector3(-30f,0f, -25f));
+			angles.Add (new Vector3(0f, 50f, 0f));
+			times.Add (0f);
+			speeds.Add (0.01f);
+			lightrot = new Vector3 (30f, 100f, 0f);
+			FoV = 44f;
+		}
 
 		public void InitView() {
 			Start ();
@@ -58,12 +84,18 @@ namespace Utilities
 				case AttackChoice.Demo:
 				case AttackChoice.Polar:
 				case AttackChoice.TranscontinentalUS:
-				case AttackChoice.CoastalUS:
 					_ViewUS(); // TODO: change this to have the coast in centreview. 
 					break;
+				case AttackChoice.CoastalUS:
+					_ViewCoastalUS();
+					break;
 				case AttackChoice.Equatorial:
-				case AttackChoice.IntraOrbital:
+					_ViewAmericanEquator();
+					break;
+				case AttackChoice.IntraOrbital: 
+				// TODO: got to do this at another point.
 				case AttackChoice.TransOrbital:
+					// TODO: find something that would work here.
 				default:
 					_ViewUS();
 					break;
