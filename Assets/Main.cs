@@ -590,9 +590,11 @@ public class Main : MonoBehaviour
 		
 		// Attempt an attack.
 		_attacker.Run(constellation_ctx, graph_on);
+		Debug.Log("After running the attacker object.");
 		
 		// Update the scene.
 		_painter.UpdateLasers(satlist, maxsats, speed);
+		Debug.Log("After Updating the Lasers");
 		
 		framecount++;
 	}
