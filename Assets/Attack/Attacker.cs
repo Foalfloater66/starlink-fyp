@@ -1,13 +1,17 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using Orbits;
+using Orbits.Satellites;
 using Routing;
+using Scene;
 using UnityEngine;
 using Utilities;
+using Object = UnityEngine.Object;
 
 namespace Attack
 {
-    // for ToList();
-
     /**
  * @author Morgane Marie Ohlig
  */
@@ -96,6 +100,10 @@ namespace Attack
         /// </summary>
         public TargetLink Link { get; private set; }
 
+        private RouteHandler _RouteHandler;
+
+        private GroundstationCollection _Groundstations;
+
         /// <summary>
         /// File for debugging.
         /// </summary>
@@ -112,11 +120,13 @@ namespace Attack
         /// <param name="transform">Transform object associated with Earth's center.</param>
         /// <param name="prefab">GameObject representing the attack area center.</param>
         public Attacker(float latitude, float longitude, float sat0r, float attack_radius,
-            List<GameObject> src_groundstations, Transform transform, GameObject prefab)
-        {
-            SourceGroundstations = src_groundstations;
+            List<GameObject> src_groundstations, Transform transform, GameObject prefab, GroundstationCollection groundstations, RouteHandler route_handler)
+        { // REVIEW: I can create an attackbuilder object? Or more like a context packet to supply.
+            SourceGroundstations = src_groundstations; // TODO: should this also be a groundstation collection object?
             TargetAreaCenterpoint = Vector3.zero;
             Radius = attack_radius;
+            _RouteHandler = route_handler;
+            _Groundstations = groundstations;
             SetTargetArea(latitude, longitude, sat0r, transform, prefab);
             Link = null;
             logfile = new System.IO.StreamWriter(Main.log_directory + "/Path/attacker_summary.txt");
@@ -366,6 +376,48 @@ namespace Attack
             }
 
             Link = null;
+        }
+        
+        // TODO: move this to the Attacker object.
+        // FIXME: Packets should be sent *from* the source groundstation! Otherwise it's semantically incorrect.
+        // slow down when we're close to minimum distance to improve accuracy
+        public BinaryHeap<Path> FindAttackRoutes(RouteGraph rg, List<GameObject> dest_groundstations, Satellite[] satlist, ScenePainter painter, int maxsats, float maxdist, float margin, float km_per_unit, bool graph_on, GroundGrid grid) // TODO: Move this function to the attacker object.
+        {
+            // REVIEW: Do I want to pass the destination groundstations at the beginning?
+            // NOTE: I would like to remove some of these parameters or pass them in a more elegant way.
+            BinaryHeap<Path> heap = new BinaryHeap<Path>(dest_groundstations.Count * SourceGroundstations.Count); // priority queue <routegraph, routelength>
+            foreach (GameObject src_gs in SourceGroundstations)
+            {
+                foreach (GameObject dest_gs in dest_groundstations)
+                {
+                    if (dest_gs == src_gs)
+                    {
+                        continue;
+                    }
+
+                    _RouteHandler.ResetRoute(src_gs, dest_gs, painter, satlist, maxsats);
+                    rg = _RouteHandler.BuildRouteGraph(src_gs, dest_gs, maxdist, margin, maxsats, satlist, km_per_unit, graph_on, grid);
+                    rg.ComputeRoutes();
+                    Debug.Log($"{_Groundstations[src_gs]} to {_Groundstations[dest_gs]}");
+
+                    Path path = FindAttackRoute(rg.startnode, rg.endnode, src_gs, dest_gs);
+                    if (path != null)
+                    {
+                        heap.Add(path, (double)path.nodes.Count);
+                    }
+                }
+            }
+            return heap;
+        }
+        
+        // TODO: Create a attacker run() function.
+        /// <summary>
+        /// Execute the attacker object.
+        /// </summary>
+        /// <exception cref="NotImplementedException"></exception>
+        public void Run()
+        {
+            throw new NotImplementedException();
         }
     }
 }

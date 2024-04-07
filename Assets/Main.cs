@@ -374,7 +374,7 @@ public class Main : MonoBehaviour
 		
 		// TODO: Add get target cities too. 
 		AttackCases.getTargetCoordinates(attack_choice, out float target_lat, out float target_lon);
-		_attacker = new Attacker(target_lat, target_lon, sat0r, attack_radius, demo_dest_groundstations, transform, city_prefab);
+		_attacker = new Attacker(target_lat, target_lon, sat0r, attack_radius, demo_dest_groundstations, transform, city_prefab, groundstations, routeHandler);
 		_link_capacities = new LinkCapacityMonitor(initial_link_capacity);
 	}
 	
@@ -511,6 +511,7 @@ public class Main : MonoBehaviour
 		}
 	}
 
+	// TODO: move this to the Attacker object.
 	/* Draw the computed path and send traffic in mbits. */
 	void ExecuteAttackRoute(Path path, GameObject city1, GameObject city2, int mbits)
 	{
@@ -592,44 +593,16 @@ public class Main : MonoBehaviour
 
 	}
 	
-	// FIXME: Packets should be sent *from* the source groundstation! Otherwise it's semantically incorrect.
-	// slow down when we're close to minimum distance to improve accuracy
-	BinaryHeap<Path> FindAttackRoutes(RouteGraph rg, List<GameObject> dest_groundstations) // TODO: Move this function to the attacker object.
-	{
-		BinaryHeap<Path> heap = new BinaryHeap<Path>(dest_groundstations.Count * _attacker.SourceGroundstations.Count); // priority queue <routegraph, routelength>
-		foreach (GameObject src_gs in _attacker.SourceGroundstations)
-		{
-			foreach (GameObject dest_gs in dest_groundstations)
-			{
-				if (dest_gs == src_gs)
-				{
-					continue;
-				}
 
-				routeHandler.ResetRoute(src_gs, dest_gs, _painter, satlist, maxsats);
-				rg = routeHandler.BuildRouteGraph(src_gs, dest_gs, maxdist, margin, maxsats, satlist, km_per_unit, graph_on, grid);
-				rg.ComputeRoutes();
-				Debug.Log(groundstations[src_gs] + " to " + groundstations[dest_gs]);
-
-				Path path = _attacker.FindAttackRoute(rg.startnode, rg.endnode, src_gs, dest_gs);
-				if (path != null)
-				{
-					heap.Add(path, (double)path.nodes.Count);
-				}
-			}
-		}
-		return heap;
-	}
 
 	// Only uncomment for debugging if I need to see the attack sphere.
 	void OnDrawGizmos()
 	{
-		Gizmos.color = Color.yellow;
+		Gizmos.color = Color.red;
 		Gizmos.DrawSphere(_attacker.TargetAreaCenterpoint, _attacker.Radius);
 	}
 
-	void 
-		RotateCamera()
+	void RotateCamera()
 	{
 		int i = 0;
 		if (direction < 1f)
@@ -684,7 +657,7 @@ public class Main : MonoBehaviour
 		{
 			// Find viable attack routes.
 			// TODO: Provide all groundstations as input instead of the current limited list.
-			BinaryHeap<Path> attack_routes = FindAttackRoutes(rg, new List<GameObject>() { groundstations["Toronto"], groundstations["New York"], groundstations["Chicago"], groundstations["Denver"]});
+			BinaryHeap<Path> attack_routes = _attacker.FindAttackRoutes(rg, new List<GameObject>() { groundstations["Toronto"], groundstations["New York"], groundstations["Chicago"], groundstations["Denver"]}, satlist, _painter, maxsats, maxdist, margin, km_per_unit, graph_on, grid);
 		
 			Debug.Log("Update | There are " + attack_routes.Count + " paths.");
 		
