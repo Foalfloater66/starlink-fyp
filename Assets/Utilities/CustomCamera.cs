@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.OleDb;
 using UnityEngine;
 using Attack;
 
@@ -39,12 +40,26 @@ namespace Utilities
 		private void _ViewUS()
 		{
 			// North America View
-			cam_count = 1;
-			positions.Add (new Vector3 (-25f, 23f, -8f));
-			angles.Add (new Vector3 (45f, 70f, 0f));
+			cam_count = 2;
+
+			void PositionCamera()
+			{
+				positions.Add(new Vector3(-25f, 23f, -8f));
+				angles.Add(new Vector3(45f, 70f, 0f));
+			}
+
+			PositionCamera();
 			times.Add (0f);
 			speeds.Add (0.01f);
+			
+			PositionCamera();
+			times.Add (20f);
+			speeds.Add (0.11f);
 
+			PositionCamera();
+			times.Add (100000f);
+			speeds.Add (0.01f);
+			
 			lightrot = new Vector3 (20f, 130f, 0f);
 			FoV = 60f;
 		}
@@ -52,27 +67,55 @@ namespace Utilities
 		private void _ViewCoastalUS()
 		{
 			// North America View
-			cam_count = 1;
-			positions.Add (new Vector3 (-25f, 18f, 0f));
-			angles.Add (new Vector3 (30f, 70f, 0f));
-			// angles.Add (new Vector3 (45f, 70f, 0f));
+			cam_count = 2;
+
+			void PositionCamera()
+			{
+				positions.Add(new Vector3(-25f, 18f, 0f));
+				angles.Add(new Vector3(30f, 70f, 0f));
+			}
+
+			PositionCamera();
 			times.Add (0f);
 			speeds.Add (0.01f);
+			
+			PositionCamera();
+			times.Add (20f);
+			speeds.Add (0.11f);
 
+			PositionCamera();
+			times.Add (100000f);
+			speeds.Add (0.01f);
+			
 			lightrot = new Vector3 (20f, 130f, 0f);
-			FoV = 60f;
+			FoV = 90f;
 		}
 		
 		private void _ViewAmericanEquator()
 		{
 			// Equator View 
-			cam_count = 1;
-			positions.Add(new Vector3(-30f,0f, -25f));
-			angles.Add (new Vector3(0f, 50f, 0f));
+			cam_count = 2;
+
+			void PositionCamera()
+			{
+				positions.Add(new Vector3(-30f, 0f, -25f));
+				angles.Add(new Vector3(0f, 50f, 0f));
+			}
+
+			PositionCamera();
 			times.Add (0f);
 			speeds.Add (0.01f);
+			
+			PositionCamera();
+			times.Add (20f);
+			speeds.Add (0.11f);
+
+			PositionCamera();
+			times.Add (100000f);
+			speeds.Add (0.01f);
+			
 			lightrot = new Vector3 (30f, 100f, 0f);
-			FoV = 44f;
+			FoV = 90f;
 		}
 
 		public void InitView() {
@@ -134,6 +177,7 @@ namespace Utilities
 				return;
 			}
 			// Have we passed the next time?
+			Debug.Log($"I THINK the bug is here. {current_cam}");
 			if (Time.time - start_time > times [current_cam + 1]) {
 				current_cam++;
 				Debug.Log ("Current cam: " + current_cam.ToString());
@@ -141,6 +185,7 @@ namespace Utilities
 			}
 			// f goes from zero at times[0] to one at times[1]
 			float elapsed_time = Time.time - start_time;
+			Debug.Log("What about the potential bug being down here.");
 			float f = (elapsed_time - times [current_cam]) / (times [current_cam + 1] - times [current_cam]);
 			pos1 = Vector3.Lerp (positions [current_cam]*scale, positions [current_cam + 1]*scale, f);
 			pdiff = pos1 - transform.position;
@@ -158,6 +203,7 @@ namespace Utilities
 				rdiff.z += 360f;
 			}
 
+			Debug.Log("I think the potential bug might be down here!");
 			rot = cur_rot + speeds[current_cam + 1] * rdiff;
 
 			transform.position = pos;
