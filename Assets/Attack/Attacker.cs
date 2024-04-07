@@ -126,10 +126,10 @@ namespace Attack
         /// <summary>
         /// Checks if the currently selected target link is still within the target area. 
         /// </summary>
-        /// <returns>True if at least one link node is in the target area, false otherwise. If the victim link hasn't been set, returns false.</returns>
+        /// <returns>True if both of the target link's nodes are in the target area, false otherwise. If the victim link hasn't been set, returns false.</returns>
         public bool HasValidTargetLink()
         {
-            return Link != null && (InTargetArea(Link.SrcNode.Position) || InTargetArea(Link.DestNode.Position));
+            return Link != null && (InTargetArea(Link.SrcNode.Position) && InTargetArea(Link.DestNode.Position));
         }
 
         /// <summary>
@@ -198,11 +198,7 @@ namespace Attack
                 UnityEngine.Debug.Log("FindAttackRoute | This is a valid attack route!");
                 return route;
             }
-            else
-            {
-                UnityEngine.Debug.Log("FindAttackRoute | Couldn't find a valid attack route.");
-            }
-
+            UnityEngine.Debug.Log("FindAttackRoute | Couldn't find a valid attack route.");
             return null;
         }
 
@@ -224,7 +220,6 @@ namespace Attack
                 "Longitude must be between -180 and 180 degrees.");
 
             // convert from lat, long, and altitude to Vector3 representation.
-            #warning "TRYING TO SET THE TARGET OBJECT!"
             GameObject target = Object.Instantiate(prefab, new Vector3(0f, 0f, -altitude), transform.rotation);
             float long_offset = 20f;
             target.transform.RotateAround(Vector3.zero, Vector3.up, longitude - long_offset);
@@ -240,7 +235,6 @@ namespace Attack
             }
             Debug.Log("Tried printing all scripts.");
             
-
             TargetAreaCenterpoint = target.transform.position;
         }
 
@@ -303,61 +297,13 @@ namespace Attack
             return node; // the node might not have any links!
         }
 
-
-        /// <summary>
-        /// Searches for a random node linked to the <c>src_node</c>.
-        /// </summary>
-        /// <param name="src_node">Potential target link source node.</param>
-        /// <param name="debug_on">If set to true, selects the first node that satisfy target node criterion instead. Useful for debugging.</param>
-        /// <returns>If a valid node was found, returns it. Otherwise, returns null.</returns>
-        private Node SelectAnyDestinationNode(Node src_node, bool debug_on)
-        {
-            Node node = null;
-            if (debug_on)
-            {
-                for (int i = 0; i < src_node.LinkCount; i++)
-                {
-                    node = src_node.GetNeighbour(src_node.GetLink(i));
-                    if (node.Id > 0)
-                    {
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                HashSet<int> explored_indexes = new HashSet<int>();
-                int j = 0;
-
-                while (j < src_node.LinkCount)
-                {
-                    int i = new System.Random().Next(src_node.LinkCount);
-                    if (explored_indexes.Contains(i))
-                    {
-                        continue;
-                    }
-
-                    node = src_node.GetNeighbour(src_node.GetLink(i));
-                    if (node.Id > 0)
-                    {
-                        break;
-                    }
-
-                    explored_indexes.Add(i);
-                    j++;
-                }
-            }
-
-            return node != null && node.Id > 0 ? node : null; // only return valid destination nodes.
-        }
-
         /// <summary>
         /// Searches for a random node linked to the <c>src_node</c> that is within the target area.
         /// </summary>
         /// <param name="src_node">Potential target link source node.</param>
         /// <param name="debug_on">If set to true, selects the first node that satisfy target node criterion instead. Useful for debugging.</param></param>
         /// <returns>A valid node if one is found. Otherwise, returns null.</returns>
-        private Node SelectInnerDestinationNode(Node src_node, bool debug_on)
+        private Node SelectDestinationNode(Node src_node, bool debug_on)
         {
             if (debug_on)
             {
@@ -398,25 +344,6 @@ namespace Attack
             }
 
             return null;
-        }
-
-        /// <summary>
-        /// Searches for a random destination node connected to the <c>src_node</c> to create a valid target link, prioritising destination nodes that are within the target area.
-        /// </summary>
-        /// <param name="src_node">Potential target link source node.</param>
-        /// <param name="debug_on">If set to true, selects the first node that satisfy target node criterion instead. Useful for debugging.</param>
-        /// <returns>A valid node if one is found. Otherwise, returns null.</returns>
-        private Node SelectDestinationNode(Node src_node, bool debug_on)
-        {
-            Node dest_node = SelectInnerDestinationNode(src_node, debug_on);
-            if (dest_node != null)
-            {
-                return dest_node;
-            }
-
-            return
-                SelectAnyDestinationNode(src_node,
-                    debug_on); // select random link which is partially in the target radius
         }
 
         /// <summary>
