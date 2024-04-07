@@ -134,7 +134,6 @@ public class Main : MonoBehaviour
 	float maxdist = 0f;
 	float beam_radius = 0f;
 	float margin = 100f;
-	GroundGrid grid;
 	long elapsed_sum = 0;
 	int elapsed_count = 0;
 
@@ -293,13 +292,10 @@ public class Main : MonoBehaviour
 		float earthdist = Vector3.Distance(satlist[0].gameobject.transform.position, transform.position);
 		km_per_unit = sat0r / earthdist;  // sim scale factor
 
-		grid = new GroundGrid(10, maxdist, margin, km_per_unit, city_prefab, transform);  // 5 degrees is 550km (in lat)
-		
-		// create cities
+		// Create cities
 		InitCities();
 		
 		// Create and initialise the RouteGraph
-		// rg = new RouteGraph();
 		routeHandler = new RouteHandler(_painter);
 		routeHandler.InitRoute(maxsats,satlist, relays, maxdist, km_per_unit);
 
@@ -493,8 +489,6 @@ public class Main : MonoBehaviour
 			orbitcount++;
 		}
 	}
-
-
 	
 	/// <summary>
 	/// Alternative way to create a constellation (used for August 2019 constellation, as its high inter-plane
@@ -595,7 +589,7 @@ public class Main : MonoBehaviour
 		RouteHandler.ClearRoutes(_painter);
 		
 		// Attempt an attack.
-		_attacker.Run(constellation_ctx, graph_on, grid);
+		_attacker.Run(constellation_ctx, graph_on);
 		
 		// Update the scene.
 		_painter.UpdateLasers(satlist, maxsats, speed);

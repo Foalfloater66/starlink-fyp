@@ -57,7 +57,7 @@ public class RouteHandler // TODO: move to a separate class
 		painter.EraseAllRFLinks();
 	}
 
-	public RouteGraph BuildRouteGraph(GameObject city1, GameObject city2, float maxdist, float margin, int maxsats, Satellite[] satlist, float kmPerUnit, bool graphOn, GroundGrid grid)
+	public RouteGraph BuildRouteGraph(GameObject city1, GameObject city2, float maxdist, float margin, int maxsats, Satellite[] satlist, float kmPerUnit, bool graphOn)
 	{
 		// TODO: Create a BuildRouteGraph function that doesn't include cities.
 
@@ -97,27 +97,6 @@ public class RouteHandler // TODO: move to a separate class
 			{
 				satlist[satnum].GraphReset();
 			}
-
-			// List<List<City>> inRange = grid.FindInRange(satlist[satnum].gameobject.transform.position);
-			// foreach (List<City> lst in inRange)
-			// {
-			// 	foreach (City relay in lst)
-			// 	{
-			// 		radiodist = Vector3.Distance(satlist[satnum].gameobject.transform.position, relay.gameobject.transform.position);
-			// 		if (radiodist * kmPerUnit < maxdist)
-			// 		{
-			// 			_rg.AddNeighbour(maxsats + 2 + relay.relayid, satnum, radiodist, true);
-			// 			if (graphOn)
-			// 			{
-			// 				satlist[satnum].GraphOn(relay.gameobject, null);
-			// 			}
-			// 		}
-			// 		else if (radiodist * kmPerUnit < maxdist + margin)
-			// 		{
-			// 			_rg.AddNeighbour(maxsats + 2 + relay.relayid, satnum, Node.INFINITY, true);
-			// 		}
-			// 	}
-			// }
 			if (graphOn)
 			{
 				satlist[satnum].GraphDone();

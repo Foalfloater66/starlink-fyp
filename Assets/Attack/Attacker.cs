@@ -388,7 +388,7 @@ namespace Attack
         
         // FIXME: Packets should be sent *from* the source groundstation! Otherwise it's semantically incorrect.
         // slow down when we're close to minimum distance to improve accuracy
-        private BinaryHeap<Path> _FindAttackRoutes(RouteGraph rg, List<GameObject> dest_groundstations, bool graph_on, GroundGrid grid, ConstellationContext constellation_ctx)
+        private BinaryHeap<Path> _FindAttackRoutes(RouteGraph rg, List<GameObject> dest_groundstations, bool graph_on, ConstellationContext constellation_ctx)
         {
             // REVIEW: Do I want to pass the destination groundstations at the beginning?
             // NOTE: I would like to remove some of these parameters or pass them in a more elegant way.
@@ -403,7 +403,7 @@ namespace Attack
                     }
 
                     _routeHandler.ResetRoute(src_gs, dest_gs, _painter, constellation_ctx.satlist, constellation_ctx.maxsats);
-                    rg = _routeHandler.BuildRouteGraph(src_gs, dest_gs, constellation_ctx.maxdist, constellation_ctx.margin, constellation_ctx.maxsats, constellation_ctx.satlist, constellation_ctx.km_per_unit, graph_on, grid);
+                    rg = _routeHandler.BuildRouteGraph(src_gs, dest_gs, constellation_ctx.maxdist, constellation_ctx.margin, constellation_ctx.maxsats, constellation_ctx.satlist, constellation_ctx.km_per_unit, graph_on);
                     rg.ComputeRoutes();
                     Debug.Log($"{_Groundstations[src_gs]} to {_Groundstations[dest_gs]}");
 
@@ -543,12 +543,12 @@ namespace Attack
         /// </summary>
         /// <exception cref="NotImplementedException"></exception>
         public void Run(ConstellationContext constellation_ctx,
-	        bool graph_on, GroundGrid grid)
+	        bool graph_on)
         {
 	        // TODO: Create a RouteGraph without needing to have new_york and toronto passed.
 	        _routeHandler.ResetRoute(_Groundstations["New York"], _Groundstations["Toronto"], _painter, constellation_ctx.satlist,constellation_ctx.maxsats);
 	        // TODO: Do I need to return the routegraph?
-	        _rg = _routeHandler.BuildRouteGraph(_Groundstations["New York"], _Groundstations["Toronto"], constellation_ctx.maxdist, constellation_ctx.margin, constellation_ctx.maxsats, constellation_ctx.satlist, constellation_ctx.km_per_unit, graph_on, grid);
+	        _rg = _routeHandler.BuildRouteGraph(_Groundstations["New York"], _Groundstations["Toronto"], constellation_ctx.maxdist, constellation_ctx.margin, constellation_ctx.maxsats, constellation_ctx.satlist, constellation_ctx.km_per_unit, graph_on);
 
 
 	        // If the current link isn't valid, select a new target link.
@@ -573,7 +573,6 @@ namespace Attack
 				        _Groundstations["Denver"]
 			        },
 			        graph_on,
-			        grid,
 			        constellation_ctx
 			        );
 
