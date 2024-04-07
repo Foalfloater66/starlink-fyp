@@ -98,26 +98,26 @@ public class RouteHandler // TODO: move to a separate class
 				satlist[satnum].GraphReset();
 			}
 
-			List<List<City>> inRange = grid.FindInRange(satlist[satnum].gameobject.transform.position);
-			foreach (List<City> lst in inRange)
-			{
-				foreach (City relay in lst)
-				{
-					radiodist = Vector3.Distance(satlist[satnum].gameobject.transform.position, relay.gameobject.transform.position);
-					if (radiodist * kmPerUnit < maxdist)
-					{
-						_rg.AddNeighbour(maxsats + 2 + relay.relayid, satnum, radiodist, true);
-						if (graphOn)
-						{
-							satlist[satnum].GraphOn(relay.gameobject, null);
-						}
-					}
-					else if (radiodist * kmPerUnit < maxdist + margin)
-					{
-						_rg.AddNeighbour(maxsats + 2 + relay.relayid, satnum, Node.INFINITY, true);
-					}
-				}
-			}
+			// List<List<City>> inRange = grid.FindInRange(satlist[satnum].gameobject.transform.position);
+			// foreach (List<City> lst in inRange)
+			// {
+			// 	foreach (City relay in lst)
+			// 	{
+			// 		radiodist = Vector3.Distance(satlist[satnum].gameobject.transform.position, relay.gameobject.transform.position);
+			// 		if (radiodist * kmPerUnit < maxdist)
+			// 		{
+			// 			_rg.AddNeighbour(maxsats + 2 + relay.relayid, satnum, radiodist, true);
+			// 			if (graphOn)
+			// 			{
+			// 				satlist[satnum].GraphOn(relay.gameobject, null);
+			// 			}
+			// 		}
+			// 		else if (radiodist * kmPerUnit < maxdist + margin)
+			// 		{
+			// 			_rg.AddNeighbour(maxsats + 2 + relay.relayid, satnum, Node.INFINITY, true);
+			// 		}
+			// 	}
+			// }
 			if (graphOn)
 			{
 				satlist[satnum].GraphDone();

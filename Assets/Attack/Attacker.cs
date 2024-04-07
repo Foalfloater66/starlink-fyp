@@ -124,7 +124,7 @@ namespace Attack
         public Attacker(float latitude, float longitude, float sat0r, float attack_radius,
             List<GameObject> src_groundstations, Transform transform, GameObject prefab, GroundstationCollection groundstations, RouteHandler route_handler, ScenePainter painter, LinkCapacityMonitor
                 linkCapacityMonitor) //, MainContext ctx)
-        { // REVIEW: I can create an attackbuilder object? Or more like a context packet to supply.
+        { 
             SourceGroundstations = src_groundstations; // TODO: should this also be a groundstation collection object?
             TargetAreaCenterpoint = Vector3.zero;
             Radius = attack_radius;
@@ -369,7 +369,7 @@ namespace Attack
         /// </summary>
         /// <param name="rg">Built <c>Routegraph</c> object.</param>
         /// <param name="debug_on">If set to true, selects the first link that satisfy target link criterion. Useful for debugging.</param>
-        public void ChangeTargetLink(RouteGraph rg, bool debug_on)
+        private void _ChangeTargetLink(RouteGraph rg, bool debug_on)
         {
             Node src_node = SelectSrcNode(rg, debug_on);
 
@@ -386,10 +386,9 @@ namespace Attack
             Link = null;
         }
         
-        // TODO: move this to the Attacker object.
         // FIXME: Packets should be sent *from* the source groundstation! Otherwise it's semantically incorrect.
         // slow down when we're close to minimum distance to improve accuracy
-        public BinaryHeap<Path> FindAttackRoutes(RouteGraph rg, List<GameObject> dest_groundstations, bool graph_on, GroundGrid grid, ConstellationContext constellation_ctx) // TODO: Move this function to the attacker object.
+        private BinaryHeap<Path> _FindAttackRoutes(RouteGraph rg, List<GameObject> dest_groundstations, bool graph_on, GroundGrid grid, ConstellationContext constellation_ctx)
         {
             // REVIEW: Do I want to pass the destination groundstations at the beginning?
             // NOTE: I would like to remove some of these parameters or pass them in a more elegant way.
@@ -498,9 +497,47 @@ namespace Attack
 			}
 
 		}
-	
+
+		/// <summary>
+		/// Create routes until the link's capacity has been reached.
+		/// </summary>
+		/// <param name="attack_routes">Potential attack routes.</param>
+		/// <param name="constellation_ctx">Constellation context.</param>
+		private void FloodLink(BinaryHeap<Path> attack_routes, ConstellationContext constellation_ctx)
+		{
+			while (!_linkCapacityMonitor.IsFlooded(Link.SrcNode.Id, Link.DestNode.Id) && attack_routes.Count > 0)
+			{
+				Path attack_path = attack_routes.ExtractMin();
+				int mbits = 600;
+				if (!RouteHandler.RouteHasEarlyCollisions(attack_path, mbits, Link.SrcNode, Link.DestNode,
+					    _linkCapacityMonitor))
+				{
+					ExecuteAttackRoute(attack_path, attack_path.start_city, attack_path.end_city, mbits,
+						_linkCapacityMonitor, _painter, constellation_ctx);
+				}
+			}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		private void UpdateTargetLinkVisuals(ConstellationContext constellation_ctx)
+		{
+			// Debugging messages.
+			// Color the target link on the map. If flooded, the link is colored red. Otherwise, the link is colored pink.
+			if (_linkCapacityMonitor.IsFlooded(Link.SrcNode.Id, Link.DestNode.Id))
+			{
+				Debug.Log("Update | Link was flooded.");
+				_painter.ColorTargetISLLink(constellation_ctx.satlist[Link.SrcNode.Id], constellation_ctx.satlist[Link.DestNode.Id], Link.DestNode, Link.SrcNode, true);
+			}
+			else
+			{
+				Debug.Log("Update | Link could not be flooded. It has capacity: " +
+				          _linkCapacityMonitor.GetCapacity(Link.SrcNode.Id, Link.DestNode.Id));
+				_painter.ColorTargetISLLink(constellation_ctx.satlist[Link.SrcNode.Id], constellation_ctx.satlist[Link.DestNode.Id], Link.DestNode, Link.SrcNode, false);
+			}
+		}
         
-        // TODO: Create a attacker run() function.
         /// <summary>
         /// Execute the attacker object.
         /// </summary>
@@ -517,65 +554,31 @@ namespace Attack
 	        // If the current link isn't valid, select a new target link.
 	        if (!HasValidTargetLink())
 	        {
-		        ChangeTargetLink(_rg, debug_on: true);
-		        if (Link != null)
-		        {
-			        Debug.Log("Attacker.Update | Changed link: " + Link.SrcNode.Id + " - " + Link.DestNode.Id);
-		        }
-	        }
-	        else
-	        {
-		        Debug.Log("Attacker.Update | Previous link is still valid.");
+		        _ChangeTargetLink(_rg, debug_on: true);
 	        }
 
 	        // If the attacker has selected a valid link, attempt to attack it
 	        if (Link != null && HasValidTargetLink())
 	        {
+				Debug.Log($"Attacker.Run | Link: {Link.SrcNode.Id} - {Link.DestNode.Id}");
 		        // Find viable attack routes.
-		        // TODO: Provide all groundstations as input instead of the current limited list.
-		        BinaryHeap<Path> attack_routes = FindAttackRoutes(_rg,
-			        new List<GameObject>()
+		        
+		        // TODO: Provide all groundstations as input instead of the current limited list. (NO! It should just be more groundstations than what I currently have!
+		        BinaryHeap<Path> attack_routes = _FindAttackRoutes(_rg,
+			        new List<GameObject>
 			        {
-				        _Groundstations["Toronto"], _Groundstations["New York"], _Groundstations["Chicago"],
+				        _Groundstations["Toronto"],
+				        _Groundstations["New York"],
+				        _Groundstations["Chicago"],
 				        _Groundstations["Denver"]
-			        }, graph_on, grid, constellation_ctx);
+			        },
+			        graph_on,
+			        grid,
+			        constellation_ctx
+			        );
 
-		        Debug.Log("Update | There are " + attack_routes.Count + " paths.");
-
-		        // Create routes until the link's capacity has been reached.
-		        while (!_linkCapacityMonitor.IsFlooded(Link.SrcNode.Id, Link.DestNode.Id) && attack_routes.Count > 0)
-		        {
-			        Path attack_path = attack_routes.ExtractMin();
-			        int mbits = 600;
-			        if (!RouteHandler.RouteHasEarlyCollisions(attack_path, mbits, Link.SrcNode, Link.DestNode,
-				            _linkCapacityMonitor))
-			        {
-				        Debug.Log("Update | Executing the following path: " +
-				                  String.Join(" ", from node in attack_path.nodes select node.Id));
-				        ExecuteAttackRoute(attack_path, attack_path.start_city, attack_path.end_city, mbits,
-					        _linkCapacityMonitor, _painter, constellation_ctx);
-			        }
-			        else
-			        {
-				        Debug.Log("Update | Not executing this path, because it has has early collisions.");
-			        }
-		        }
-
-		        // Debugging messages.
-		        if (_linkCapacityMonitor.IsFlooded(Link.SrcNode.Id, Link.DestNode.Id))
-		        {
-			        Debug.Log("Update | Link was flooded.");
-		        }
-		        else
-		        {
-			        Debug.Log("Update | Link could not be flooded. It has capacity: " +
-			                  _linkCapacityMonitor.GetCapacity(Link.SrcNode.Id, Link.DestNode.Id));
-		        }
-
-		        // Color the target link on the map. If flooded, the link is colored red. Otherwise, the link is colored pink.
-		        _painter.ColorTargetISLLink(constellation_ctx.satlist[Link.SrcNode.Id],
-			        constellation_ctx.satlist[Link.DestNode.Id], Link.DestNode, Link.SrcNode,
-			        _linkCapacityMonitor.IsFlooded(Link.SrcNode.Id, Link.DestNode.Id));
+		        FloodLink(attack_routes, constellation_ctx);
+		        UpdateTargetLinkVisuals(constellation_ctx);
 	        }
 	        else
 	        {
