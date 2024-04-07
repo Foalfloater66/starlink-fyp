@@ -56,6 +56,7 @@ namespace Attack
         /// <summary>
         /// Class <c>TargetLink</c> contains information about the link that the <c>Attacker</c> object is aiming towards.
         /// </summary>
+        /// TODO: move this somewhere else.
         public class TargetLink
         {
             /// <value>
@@ -83,7 +84,12 @@ namespace Attack
         /// <summary>
         /// List of source groundstations that the attacker can send packets from.
         /// </summary>
-        public List<GameObject> SourceGroundstations { get; set; }
+        private List<GameObject> SourceGroundstations { get; set; }
+        
+        /// <summary>
+        /// List of destination groundstations that the attacker can send packets to.
+        /// </summary>
+        private List<GameObject> DestGroundstations { get; set; }
 
         /// <summary>
         /// Vector3 coordinates of the center of the attack area.
@@ -424,8 +430,8 @@ namespace Attack
 			Node rn = path.nodes.First();
 			// REVIEW: Separate the drawing functionality from the link capacity modification.
 			
-			Debug.Assert(rn != null, "ExecuteAttackRoute | The last node is empty.");
-			Debug.Assert(rn.Id == -2, "ExecuteAttackRoute | The last node is not -2. Instead, it's " + rn.Id);
+			Debug.Assert(rn != null); //, "ExecuteAttackRoute | The last node is empty.");
+			Debug.Assert(rn.Id == -2); //, "ExecuteAttackRoute | The last node is not -2. Instead, it's " + rn.Id);
 			
 			Node prevnode = null;
 			Satellite sat = null;
@@ -519,7 +525,7 @@ namespace Attack
 		}
 
 		/// <summary>
-		/// 
+		/// Update the Target Link Visuals
 		/// </summary>
 		private void UpdateTargetLinkVisuals(ConstellationContext constellation_ctx)
 		{
@@ -543,7 +549,7 @@ namespace Attack
         /// </summary>
         /// <exception cref="NotImplementedException"></exception>
         public void Run(ConstellationContext constellation_ctx,
-	        bool graph_on)
+	        bool graph_on, List<GameObject> groundstations)
         {
 	        // TODO: Create a RouteGraph without needing to have new_york and toronto passed.
 	        _routeHandler.ResetRoute(_Groundstations["New York"], _Groundstations["Toronto"], _painter, constellation_ctx.satlist,constellation_ctx.maxsats);
@@ -563,15 +569,8 @@ namespace Attack
 				Debug.Log($"Attacker.Run | Link: {Link.SrcNode.Id} - {Link.DestNode.Id}");
 		        // Find viable attack routes.
 		        
-		        // TODO: Provide all groundstations as input instead of the current limited list. (NO! It should just be more groundstations than what I currently have!
 		        BinaryHeap<Path> attack_routes = _FindAttackRoutes(_rg,
-			        new List<GameObject>
-			        {
-				        _Groundstations["Toronto"],
-				        _Groundstations["New York"],
-				        _Groundstations["Chicago"],
-				        _Groundstations["Denver"]
-			        },
+			        groundstations,
 			        graph_on,
 			        constellation_ctx
 			        );

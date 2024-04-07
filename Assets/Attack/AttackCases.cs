@@ -1,9 +1,84 @@
+using System.Collections.Generic;
+using Orbits;
 using UnityEditor;
+using UnityEngine;
 
 namespace Attack
 {
     public static class AttackCases
     {
+        /// <summary>
+        /// Create a list of source groundstations the attacker can send packets from.
+        /// </summary>
+        /// <param name="attack_choice">Selected attack case.</param>
+        /// <param name="groundstations"></param>
+        /// <param name="src_gs_list"></param>
+        public static void getSourceGroundstations(AttackChoice attack_choice,
+            GroundstationCollection groundstations, out List<GameObject> src_gs_list)
+        {
+            List<string> src_gs_names;
+
+            switch (attack_choice)
+            {
+                case AttackChoice.Demo:
+                    src_gs_names = new List<string>
+                    {
+                        "Toronto",
+                        "New York",
+                        "Miami",
+                        "Chicago",
+                        "Denver",
+                        "Houston"
+                    };
+                    break;
+                case AttackChoice.TranscontinentalUS:
+                    src_gs_names = new List<string>
+                    {
+                        ""
+                    };
+                    break;
+                case AttackChoice.CoastalUS:
+                    src_gs_names = new List<string>
+                    {
+                        ""
+                    };
+                    break;
+                case AttackChoice.Polar:
+                    src_gs_names = new List<string>
+                    {
+                        ""
+                    };
+                    break;
+                case AttackChoice.Equatorial:
+                    src_gs_names = new List<string>
+                    {
+                        ""
+                    };
+                    break;
+                case AttackChoice.IntraOrbital:
+                    src_gs_names = new List<string>
+                    {
+                        ""
+                    };
+                    break;
+                case AttackChoice.TransOrbital:
+                    src_gs_names = new List<string>
+                    {
+                        ""
+                    };
+                    break;
+                default:
+                    src_gs_names = new List<string>();
+                    break;
+            }
+
+            src_gs_list = new List<GameObject>();
+            foreach (string src_gs_name in src_gs_names)
+            {
+                src_gs_list.Add(groundstations[src_gs_name]);
+            }
+        }
+        
         public static void getTargetCoordinates(AttackChoice attack_choice, out float target_lat, out float target_lon)
         {
             target_lat = 0f;

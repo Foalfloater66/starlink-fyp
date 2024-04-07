@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using UnityEngine;
 
 namespace Orbits
@@ -29,6 +31,15 @@ namespace Orbits
                 throw new Exception("A groundstation with the same name already exists.");
             }
             name2groundstation.Add(gs_name, gs_object);
+        }
+
+        /// <summary>
+        /// TODO: docstring.
+        /// </summary>
+        /// <returns></returns>
+        public List<GameObject> ToList()
+        { 
+            return name2groundstation.Values.ToList();
         }
 
         /// <summary>

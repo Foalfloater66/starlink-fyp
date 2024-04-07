@@ -105,7 +105,7 @@ public class Main : MonoBehaviour
 	private MainContext ctx;
 
 	private readonly GroundstationCollection groundstations = new GroundstationCollection();
-	
+
 	/*
 	 * TODO for groundstation support:
 	 * 1. Extract a desired set of groundstations by name.
@@ -340,50 +340,16 @@ public class Main : MonoBehaviour
 
 		_painter = new ScenePainter(isl_material, laserMaterials, targetLinkMaterial, cityMaterial);
 
-		// if (route_choice == RouteChoice.Followsat)
-		// {
-		// 	// We're going to follow a satellite.
-		// 	// Need to glue the camera to the satellite.
-		// 	followsat_id = 0;
-		// 	switch (constellation)
-		// 	{
-		// 		case ConstellationChoice.P24_S66_A550:
-		// 			followsat_id = 78;
-		// 			break;
-		// 		case ConstellationChoice.P72_S22_A550:
-		// 			followsat_id = 1505;
-		// 			break;
-		// 		case ConstellationChoice.P32_S50_A1100:
-		// 			followsat_id = 105;
-		// 			break;
-		// 	}
-		// 	Satellite followsat = satlist[followsat_id];
-		// 	cam.transform.position = new Vector3(100, 0, -60);
-		// 	cam.transform.rotation = Quaternion.Euler(0, 300, -90);
-		// 	cam.transform.SetParent(followsat.gameobject.transform, false);
-		// 	followsat.ChangeMaterial(laserMaterials[0]);
-		// 	nearest_sats = new Satellite[4];
-		// }
-
-		//float earthradius = Vector3.Distance (transform.position, london.gameObject.transform.position);
-		//km_per_unit2 = (12756f / 2) / earthradius;
-		//Debug.Log("km_per_unit: " + km_per_unit.ToString() + " km_per_unit2: " + km_per_unit2.ToString())
-
-		// Demo list of groundstations.
-		List<GameObject> demo_dest_groundstations = new List<GameObject>()
-		{
-			groundstations["Miami"],
-			groundstations["New York"],
-			groundstations["Chicago"],
-			groundstations["Winnipeg"],
-			groundstations["Denver"]
-		};
-		
-		// TODO: Add get target cities too. 
-		AttackCases.getTargetCoordinates(attack_choice, out float target_lat, out float target_lon);
-		// TODO: can I make an attacker object based on the attack choice instead?
 		_link_capacities = new LinkCapacityMonitor(initial_link_capacity);
-		_attacker = new Attacker(target_lat, target_lon, sat0r, attack_radius, demo_dest_groundstations, transform, city_prefab, groundstations, routeHandler, _painter, _link_capacities);
+		
+		// TODO: instead, make this return the target link!
+		// Get target link + list of source groundstations.
+		// AttackCases.getTargetLink();
+		AttackCases.getTargetCoordinates(attack_choice, out float target_lat, out float target_lon);
+		AttackCases.getSourceGroundstations(attack_choice, groundstations, out List<GameObject> src_groundstations);
+		
+		// Create attacker entity.
+		_attacker = new Attacker(target_lat, target_lon, sat0r, attack_radius, src_groundstations, transform, city_prefab, groundstations, routeHandler, _painter, _link_capacities);
 
 		createContext();
 	}
@@ -589,7 +555,7 @@ public class Main : MonoBehaviour
 		RouteHandler.ClearRoutes(_painter);
 		
 		// Attempt an attack.
-		_attacker.Run(constellation_ctx, graph_on);
+		_attacker.Run(constellation_ctx, graph_on, groundstations.ToList());
 		Debug.Log("After running the attacker object.");
 		
 		// Update the scene.
