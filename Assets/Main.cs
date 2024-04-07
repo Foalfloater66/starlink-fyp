@@ -511,88 +511,7 @@ public class Main : MonoBehaviour
 		}
 	}
 
-	// TODO: move this to the Attacker object.
-	/* Draw the computed path and send traffic in mbits. */
-	void ExecuteAttackRoute(Path path, GameObject city1, GameObject city2, int mbits)
-	{
-		Node rn = path.nodes.First();
-		// REVIEW: Separate the drawing functionality from the link capacity modification.
-		Debug.Assert(rn != null, "ExecuteAttackRoute | The last node is empty.");
-		Debug.Assert(rn.Id == -2, "ExecuteAttackRoute | The last node is not -2. Instead, it's " + rn.Id);
-		Node prevnode = null;
-		Satellite sat = null;
-		Satellite prevsat = null;
-		int previd = -4;
-		int id = -4; /* first id */
-		double prevdist = km_per_unit * rn.Dist;
-		int hop = 0;
-		int index = 1;
-		while (true)
-		{
 
-			previd = id;
-			id = rn.Id;
-			Debug.Log("ID: " + id);
-			
-			// TODO: this process of coloring links must be reversed, because the processing order of links is reversed (it goes from last node to first node)
-
-			if (previd != -4)
-			{
-				// The previous and current nodes are satellites. (ISL link)
-				if (previd >= 0 && id >= 0)
-				{
-					sat = satlist[id];
-					prevsat = satlist[previd];
-
-					// Increase the load of the link and abort if link becomes flooded.
-					_link_capacities.DecreaseLinkCapacity(previd, id, mbits);
-					if (_link_capacities.IsFlooded(previd, id))
-					{
-						break;
-					}
-					
-					_painter.ColorRouteISLLink(prevsat, sat, prevnode, rn);
-				}
-				// The current node is a satellite and the previous, a city. (RF link)
-				else if (id >= 0 && previd == -2)
-				{
-					sat = satlist[id];
-					Assert.AreEqual(-2, previd);
-					_painter.ColorRFLink(city2, sat, prevnode, rn);
-					// TODO: make the link load capacity rule also hold for RF links. 
-				}
-				// The current node is a city and the previous, a satellite. (RF link)
-				else 
-				{
-					// if (id == -1 && previd >= 0)
-					sat = satlist[previd]; 
-					_painter.UsedRFLinks.Add(new ActiveRF(city1, rn, sat, prevnode));
-				}
-			}
-
-			if (rn != null && rn.Id == -1)
-			{
-				// basically; we are at the end!
-				break;
-			}
-			prevnode = rn;
-			// rn = rn.Parent;
-			if (index == path.nodes.Count)
-			{
-				highlight_reachable();
-				return;
-			}
-			rn = path.nodes[index]; // TODO: reverse the node list and read everything in opposite order when processing link capacity!
-			if (rn == null)
-			{
-				highlight_reachable();
-				return;
-			}
-			index++;
-		}
-
-	}
-	
 
 
 	// Only uncomment for debugging if I need to see the attack sphere.
@@ -669,7 +588,7 @@ public class Main : MonoBehaviour
 				if (!RouteHandler.RouteHasEarlyCollisions(attack_path, mbits, _attacker.Link.SrcNode, _attacker.Link.DestNode, _link_capacities))
 				{
 					Debug.Log("Update | Executing the following path: " + String.Join(" ", from node in attack_path.nodes select node.Id));
-					ExecuteAttackRoute(attack_path, attack_path.start_city, attack_path.end_city, mbits);
+					_attacker.ExecuteAttackRoute(attack_path, attack_path.start_city, attack_path.end_city, mbits, km_per_unit, satlist, _link_capacities, _painter);
 				}
 				else
 				{
