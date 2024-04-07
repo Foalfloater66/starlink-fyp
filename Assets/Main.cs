@@ -15,6 +15,14 @@ using Utilities;
 // TODO: remove the below as well.
 public enum LogChoice { None, RTT, Distance, HopDists, LaserDists, Path };
 
+public struct MainContext
+{
+	// REVIEW: RENAME MAIN TO STARLINK? UNSURE? MODEL?
+	public ScenePainter painter;
+	public LinkCapacityMonitor linkCapacityMonitor;
+	public RouteGraph routeGraph;
+	public RouteHandler routeHandler;
+}
 public class Main : MonoBehaviour
 {
 	public CustomCamera cam;
@@ -89,9 +97,12 @@ public class Main : MonoBehaviour
 	bool pause = false;
 	float pause_start_time;
 	Node[] nodes;
-	RouteGraph rg; // CLEANUP: change with underscore in front 
+	// RouteGraph rg; // CLEANUP: change with underscore in front 
 	ScenePainter _painter;
 	float km_per_unit;
+
+	private ConstellationContext constellation_ctx;
+	private MainContext ctx;
 
 	private readonly GroundstationCollection groundstations = new GroundstationCollection();
 	
@@ -288,7 +299,7 @@ public class Main : MonoBehaviour
 		InitCities();
 		
 		// Create and initialise the RouteGraph
-		rg = new RouteGraph();
+		// rg = new RouteGraph();
 		routeHandler = new RouteHandler(_painter);
 		routeHandler.InitRoute(maxsats,satlist, relays, maxdist, km_per_unit);
 
@@ -374,10 +385,33 @@ public class Main : MonoBehaviour
 		
 		// TODO: Add get target cities too. 
 		AttackCases.getTargetCoordinates(attack_choice, out float target_lat, out float target_lon);
-		_attacker = new Attacker(target_lat, target_lon, sat0r, attack_radius, demo_dest_groundstations, transform, city_prefab, groundstations, routeHandler);
+		// TODO: can I make an attacker object based on the attack choice instead?
 		_link_capacities = new LinkCapacityMonitor(initial_link_capacity);
+		_attacker = new Attacker(target_lat, target_lon, sat0r, attack_radius, demo_dest_groundstations, transform, city_prefab, groundstations, routeHandler, _painter, _link_capacities);
+
+		createContext();
+	}
+
+	/// <summary>
+	/// Create any context objects tied to the code.
+	/// TODO: create a context after each section.
+	/// </summary>
+	void createContext()
+	{		
+		// Constellation context.
+		constellation_ctx = new ConstellationContext
+		{
+			satlist = satlist,
+			km_per_unit = km_per_unit,
+			maxsats = maxsats,
+			maxdist =  maxdist,
+			margin = margin,
+		};
 	}
 	
+	/// <summary>
+	/// Create cities and place them on planet Earth.
+	/// </summary>
 	void InitCities()
 	{
 		// N and W are +ve
@@ -404,7 +438,19 @@ public class Main : MonoBehaviour
 		}
 	}
 	
-	// Default way to create a constellation
+	/// <summary>
+	/// Default way to create a constellation
+	/// </summary>
+	/// <param name="num_orbits"></param>
+	/// <param name="sats_per_orbit"></param>
+	/// <param name="inclination"></param>
+	/// <param name="orbit_phase_offset"></param>
+	/// <param name="sat_phase_offset"></param>
+	/// <param name="sat_phase_stagger"></param>
+	/// <param name="period"></param>
+	/// <param name="altitude"></param>
+	/// <param name="beam_angle"></param>
+	/// <param name="beam_radius"></param>
 	void CreateSats(int num_orbits, int sats_per_orbit, float inclination, float orbit_phase_offset,
 		float sat_phase_offset, float sat_phase_stagger, double period, float altitude,
 		int beam_angle, float beam_radius)
@@ -448,8 +494,24 @@ public class Main : MonoBehaviour
 		}
 	}
 
-	/* Alternative way to create a constellation (used for August 2019 constellation, as its high inter-plane 
-	 * phase offset and high numnber of orbits cause wrapping with CreateSats) */
+
+	
+	/// <summary>
+	/// Alternative way to create a constellation (used for August 2019 constellation, as its high inter-plane
+	/// phase offset and high number of orbits cause wrapping with CreateSats)
+	/// </summary>
+	/// <param name="num_orbits"></param>
+	/// <param name="sats_per_orbit"></param>
+	/// <param name="inclination"></param>
+	/// <param name="orbit_phase_offset"></param>
+	/// <param name="sat_phase_offset"></param>
+	/// <param name="sat_angle_stagger"></param>
+	/// <param name="orbit_angle_step"></param>
+	/// <param name="sat_angle_step"></param>
+	/// <param name="period"></param>
+	/// <param name="altitude"></param>
+	/// <param name="beam_angle"></param>
+	/// <param name="beam_radius"></param>
 	void CreateSatsDirect(int num_orbits, int sats_per_orbit, float inclination, float orbit_phase_offset,
 		float sat_phase_offset, float sat_angle_stagger /* degrees */,
 		float orbit_angle_step, float sat_angle_step, double period, float altitude,
@@ -491,35 +553,13 @@ public class Main : MonoBehaviour
 			orbitcount++;
 		}
 	}
-
-	void highlight_reachable() // CLEANUP: Remove the highlight_reachable() function.
-	{
-		for (int satnum = 0; satnum < maxsats; satnum++)
-		{
-			satlist[satnum].BeamOff();
-		};
-		Node[] reachable = rg.GetReachableNodes();
-		print("reachable: " + reachable.Length.ToString());
-		for (int i = 0; i < reachable.Length; i++)
-		{
-			Node rn = reachable[i];
-			if (rn.Id >= 0)
-			{
-				Satellite sat = satlist[rn.Id];
-				sat.BeamOn();
-			}
-		}
-	}
-
-
-
-
+	
 	// Only uncomment for debugging if I need to see the attack sphere.
-	void OnDrawGizmos()
-	{
-		Gizmos.color = Color.red;
-		Gizmos.DrawSphere(_attacker.TargetAreaCenterpoint, _attacker.Radius);
-	}
+	// void OnDrawGizmos()
+	// {
+	// 	Gizmos.color = Color.red;
+	// 	Gizmos.DrawSphere(_attacker.TargetAreaCenterpoint, _attacker.Radius);
+	// }
 
 	void RotateCamera()
 	{
@@ -542,79 +582,24 @@ public class Main : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		Debug.Log("Update()");
+		Debug.Log("Update Iteration()");
 		
 		// Update scene initial parameters
 		elapsed_time = last_elapsed_time + (Time.time - last_speed_change) * speed;
 		RotateCamera();
+		
+		// Reset the link capacities. 
 		_link_capacities.Reset();
 		
-		// Clean and rebuild the routegraph.
+		// Clear the scene.
 		RouteHandler.ClearRoutes(_painter);
-		// TODO: Create a RouteGraph without needing to have new_york and toronto passed.
-		routeHandler.ResetRoute(groundstations["New York"], groundstations["Toronto"], _painter, satlist, maxsats);
-		rg = routeHandler.BuildRouteGraph(groundstations["New York"], groundstations["Toronto"], maxdist, margin, maxsats, satlist, km_per_unit, graph_on, grid);
 		
-		// TODO: Do I need to return the routegraph?
+		// Attempt an attack.
+		_attacker.Run(constellation_ctx, graph_on, grid);
 		
-		// If the current link isn't valid, select a new target link.
-		if (!_attacker.HasValidTargetLink())
-		{
-			_attacker.ChangeTargetLink(rg, debug_on:true);
-			if (_attacker.Link != null)
-			{
-				Debug.Log("Attacker.Update | Changed link: " + _attacker.Link.SrcNode.Id + " - " + _attacker.Link.DestNode.Id);
-			}
-		}
-		else
-		{
-			Debug.Log("Attacker.Update | Previous link is still valid.");
-		}
-		
-		// If the attacker has selected a valid link, attempt to attack it
-		if (_attacker.Link != null && _attacker.HasValidTargetLink())
-		{
-			// Find viable attack routes.
-			// TODO: Provide all groundstations as input instead of the current limited list.
-			BinaryHeap<Path> attack_routes = _attacker.FindAttackRoutes(rg, new List<GameObject>() { groundstations["Toronto"], groundstations["New York"], groundstations["Chicago"], groundstations["Denver"]}, satlist, _painter, maxsats, maxdist, margin, km_per_unit, graph_on, grid);
-		
-			Debug.Log("Update | There are " + attack_routes.Count + " paths.");
-		
-			// Create routes until the link's capacity has been reached.
-			while (!_link_capacities.IsFlooded(_attacker.Link.SrcNode.Id, _attacker.Link.DestNode.Id) && attack_routes.Count > 0)
-			{
-				Path attack_path = attack_routes.ExtractMin();
-				int mbits = 600;
-				if (!RouteHandler.RouteHasEarlyCollisions(attack_path, mbits, _attacker.Link.SrcNode, _attacker.Link.DestNode, _link_capacities))
-				{
-					Debug.Log("Update | Executing the following path: " + String.Join(" ", from node in attack_path.nodes select node.Id));
-					_attacker.ExecuteAttackRoute(attack_path, attack_path.start_city, attack_path.end_city, mbits, km_per_unit, satlist, _link_capacities, _painter);
-				}
-				else
-				{
-					Debug.Log("Update | Not executing this path, because it has has early collisions.");
-				}
-			}
-		
-			// Debugging messages.
-			if (_link_capacities.IsFlooded(_attacker.Link.SrcNode.Id, _attacker.Link.DestNode.Id))
-			{
-				Debug.Log("Update | Link was flooded.");
-			}
-			else
-			{
-				Debug.Log("Update | Link could not be flooded. It has capacity: " + _link_capacities.GetCapacity(_attacker.Link.SrcNode.Id, _attacker.Link.DestNode.Id));
-			}
-		
-			// Color the target link on the map. If flooded, the link is colored red. Otherwise, the link is colored pink.
-			_painter.ColorTargetISLLink(satlist[_attacker.Link.SrcNode.Id], satlist[_attacker.Link.DestNode.Id], _attacker.Link.DestNode, _attacker.Link.SrcNode, _link_capacities.IsFlooded(_attacker.Link.SrcNode.Id, _attacker.Link.DestNode.Id));
-		}
-		else
-		{
-			Debug.Log("Attacker.Update | Could not find any valid link.");
-		}
-		
+		// Update the scene.
 		_painter.UpdateLasers(satlist, maxsats, speed);
+		
 		framecount++;
 	}
 }

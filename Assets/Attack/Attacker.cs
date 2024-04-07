@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using Orbits;
 using Orbits.Satellites;
 using Routing;
@@ -101,9 +100,11 @@ namespace Attack
         /// </summary>
         public TargetLink Link { get; private set; }
 
-        private RouteHandler _RouteHandler;
-
+        private RouteHandler _routeHandler;
+        private ScenePainter _painter;
+        private LinkCapacityMonitor _linkCapacityMonitor;
         private GroundstationCollection _Groundstations;
+        private RouteGraph _rg;
 
         /// <summary>
         /// File for debugging.
@@ -121,12 +122,18 @@ namespace Attack
         /// <param name="transform">Transform object associated with Earth's center.</param>
         /// <param name="prefab">GameObject representing the attack area center.</param>
         public Attacker(float latitude, float longitude, float sat0r, float attack_radius,
-            List<GameObject> src_groundstations, Transform transform, GameObject prefab, GroundstationCollection groundstations, RouteHandler route_handler)
+            List<GameObject> src_groundstations, Transform transform, GameObject prefab, GroundstationCollection groundstations, RouteHandler route_handler, ScenePainter painter, LinkCapacityMonitor
+                linkCapacityMonitor) //, MainContext ctx)
         { // REVIEW: I can create an attackbuilder object? Or more like a context packet to supply.
             SourceGroundstations = src_groundstations; // TODO: should this also be a groundstation collection object?
             TargetAreaCenterpoint = Vector3.zero;
             Radius = attack_radius;
-            _RouteHandler = route_handler;
+            
+            _painter = painter;
+            _linkCapacityMonitor = linkCapacityMonitor;
+            _routeHandler = route_handler;
+            
+            // _RouteHandler = route_handler;
             _Groundstations = groundstations;
             SetTargetArea(latitude, longitude, sat0r, transform, prefab);
             Link = null;
@@ -382,7 +389,7 @@ namespace Attack
         // TODO: move this to the Attacker object.
         // FIXME: Packets should be sent *from* the source groundstation! Otherwise it's semantically incorrect.
         // slow down when we're close to minimum distance to improve accuracy
-        public BinaryHeap<Path> FindAttackRoutes(RouteGraph rg, List<GameObject> dest_groundstations, Satellite[] satlist, ScenePainter painter, int maxsats, float maxdist, float margin, float km_per_unit, bool graph_on, GroundGrid grid) // TODO: Move this function to the attacker object.
+        public BinaryHeap<Path> FindAttackRoutes(RouteGraph rg, List<GameObject> dest_groundstations, bool graph_on, GroundGrid grid, ConstellationContext constellation_ctx) // TODO: Move this function to the attacker object.
         {
             // REVIEW: Do I want to pass the destination groundstations at the beginning?
             // NOTE: I would like to remove some of these parameters or pass them in a more elegant way.
@@ -396,8 +403,8 @@ namespace Attack
                         continue;
                     }
 
-                    _RouteHandler.ResetRoute(src_gs, dest_gs, painter, satlist, maxsats);
-                    rg = _RouteHandler.BuildRouteGraph(src_gs, dest_gs, maxdist, margin, maxsats, satlist, km_per_unit, graph_on, grid);
+                    _routeHandler.ResetRoute(src_gs, dest_gs, _painter, constellation_ctx.satlist, constellation_ctx.maxsats);
+                    rg = _routeHandler.BuildRouteGraph(src_gs, dest_gs, constellation_ctx.maxdist, constellation_ctx.margin, constellation_ctx.maxsats, constellation_ctx.satlist, constellation_ctx.km_per_unit, graph_on, grid);
                     rg.ComputeRoutes();
                     Debug.Log($"{_Groundstations[src_gs]} to {_Groundstations[dest_gs]}");
 
@@ -411,108 +418,86 @@ namespace Attack
             return heap;
         }
         
-        	// TODO: move this to the Attacker object.
-	/* Draw the computed path and send traffic in mbits. */
-	public void ExecuteAttackRoute(Path path, GameObject city1, GameObject city2, int mbits, float km_per_unit, Satellite[] satlist, LinkCapacityMonitor _link_capacities, ScenePainter _painter)
-	{
-        // TODO: create a attributes struct.
-		Node rn = path.nodes.First();
-		// REVIEW: Separate the drawing functionality from the link capacity modification.
-		Debug.Assert(rn != null, "ExecuteAttackRoute | The last node is empty.");
-		Debug.Assert(rn.Id == -2, "ExecuteAttackRoute | The last node is not -2. Instead, it's " + rn.Id);
-		Node prevnode = null;
-		Satellite sat = null;
-		Satellite prevsat = null;
-		int previd = -4;
-		int id = -4; /* first id */
-		double prevdist = km_per_unit * rn.Dist;
-		int hop = 0;
-		int index = 1;
-		while (true)
+		/* Draw the computed path and send traffic in mbits. */
+		public void ExecuteAttackRoute(Path path, GameObject city1, GameObject city2, int mbits, LinkCapacityMonitor _linkCapacityMonitor, ScenePainter _painter, ConstellationContext constellation_ctx)
 		{
-
-			previd = id;
-			id = rn.Id;
-			Debug.Log("ID: " + id);
+	        // TODO: create a attributes struct.
+			Node rn = path.nodes.First();
+			// REVIEW: Separate the drawing functionality from the link capacity modification.
 			
-			// TODO: this process of coloring links must be reversed, because the processing order of links is reversed (it goes from last node to first node)
-
-			if (previd != -4)
+			Debug.Assert(rn != null, "ExecuteAttackRoute | The last node is empty.");
+			Debug.Assert(rn.Id == -2, "ExecuteAttackRoute | The last node is not -2. Instead, it's " + rn.Id);
+			
+			Node prevnode = null;
+			Satellite sat = null;
+			Satellite prevsat = null;
+			int previd = -4;
+			int id = -4; /* first id */
+			//double prevdist = km_per_unit * rn.Dist;
+			int hop = 0;
+			int index = 1;
+			while (true)
 			{
-				// The previous and current nodes are satellites. (ISL link)
-				if (previd >= 0 && id >= 0)
-				{
-					sat = satlist[id];
-					prevsat = satlist[previd];
+				previd = id;
+				id = rn.Id;
+				Debug.Log("ID: " + id);
+				
+				// TODO: this process of coloring links must be reversed, because the processing order of links is reversed (it goes from last node to first node)
 
-					// Increase the load of the link and abort if link becomes flooded.
-					_link_capacities.DecreaseLinkCapacity(previd, id, mbits);
-					if (_link_capacities.IsFlooded(previd, id))
+				if (previd != -4)
+				{
+					// The previous and current nodes are satellites. (ISL link)
+					if (previd >= 0 && id >= 0)
 					{
-						break;
+						sat = constellation_ctx.satlist[id];
+						prevsat = constellation_ctx.satlist[previd];
+
+						// Increase the load of the link and abort if link becomes flooded.
+						_linkCapacityMonitor.DecreaseLinkCapacity(previd, id, mbits);
+						if (_linkCapacityMonitor.IsFlooded(previd, id))
+						{
+							break;
+						}
+						
+						_painter.ColorRouteISLLink(prevsat, sat, prevnode, rn);
 					}
-					
-					_painter.ColorRouteISLLink(prevsat, sat, prevnode, rn);
+					// The current node is a satellite and the previous, a city. (RF link)
+					else if (id >= 0 && previd == -2)
+					{
+						sat = constellation_ctx.satlist[id];
+						Assert.AreEqual(-2, previd);
+						_painter.ColorRFLink(city2, sat, prevnode, rn);
+						// TODO: make the link load capacity rule also hold for RF links. 
+					}
+					// The current node is a city and the previous, a satellite. (RF link)
+					else 
+					{
+						// if (id == -1 && previd >= 0)
+						sat = constellation_ctx.satlist[previd]; 
+						_painter.UsedRFLinks.Add(new ActiveRF(city1, rn, sat, prevnode));
+					}
 				}
-				// The current node is a satellite and the previous, a city. (RF link)
-				else if (id >= 0 && previd == -2)
+
+				if (rn != null && rn.Id == -1)
 				{
-					sat = satlist[id];
-					Assert.AreEqual(-2, previd);
-					_painter.ColorRFLink(city2, sat, prevnode, rn);
-					// TODO: make the link load capacity rule also hold for RF links. 
+					// basically; we are at the end!
+					break;
 				}
-				// The current node is a city and the previous, a satellite. (RF link)
-				else 
+				prevnode = rn;
+				// rn = rn.Parent;
+				if (index == path.nodes.Count) // only show a path if it's feasible.
 				{
-					// if (id == -1 && previd >= 0)
-					sat = satlist[previd]; 
-					_painter.UsedRFLinks.Add(new ActiveRF(city1, rn, sat, prevnode));
+					return;
 				}
+				rn = path.nodes[index]; // TODO: reverse the node list and read everything in opposite order when processing link capacity!
+				if (rn == null) // only show a path if it's feasible.
+				{
+					return;
+				}
+				index++;
 			}
 
-			if (rn != null && rn.Id == -1)
-			{
-				// basically; we are at the end!
-				break;
-			}
-			prevnode = rn;
-			// rn = rn.Parent;
-			if (index == path.nodes.Count)
-			{
-				// highlight_reachable();
-				return;
-			}
-			rn = path.nodes[index]; // TODO: reverse the node list and read everything in opposite order when processing link capacity!
-			if (rn == null)
-			{
-				// highlight_reachable();
-				return;
-			}
-			index++;
 		}
-
-	}
-    
-    // TODO: check if I can remove  this function.
-    // void highlight_reachable() // CLEANUP: Remove the highlight_reachable() function.
-    // {
-    //     for (int satnum = 0; satnum < maxsats; satnum++)
-    //     {
-    //         satlist[satnum].BeamOff();
-    //     };
-    //     Node[] reachable = rg.GetReachableNodes();
-    //     print("reachable: " + reachable.Length.ToString());
-    //     for (int i = 0; i < reachable.Length; i++)
-    //     {
-    //         Node rn = reachable[i];
-    //         if (rn.Id >= 0)
-    //         {
-    //             Satellite sat = satlist[rn.Id];
-    //             sat.BeamOn();
-    //         }
-    //     }
-    // }
 	
         
         // TODO: Create a attacker run() function.
@@ -520,9 +505,82 @@ namespace Attack
         /// Execute the attacker object.
         /// </summary>
         /// <exception cref="NotImplementedException"></exception>
-        public void Run()
+        public void Run(ConstellationContext constellation_ctx,
+	        bool graph_on, GroundGrid grid)
         {
-            throw new NotImplementedException();
+	        // TODO: Create a RouteGraph without needing to have new_york and toronto passed.
+	        _routeHandler.ResetRoute(_Groundstations["New York"], _Groundstations["Toronto"], _painter, constellation_ctx.satlist,constellation_ctx.maxsats);
+	        // TODO: Do I need to return the routegraph?
+	        _rg = _routeHandler.BuildRouteGraph(_Groundstations["New York"], _Groundstations["Toronto"], constellation_ctx.maxdist, constellation_ctx.margin, constellation_ctx.maxsats, constellation_ctx.satlist, constellation_ctx.km_per_unit, graph_on, grid);
+
+
+	        // If the current link isn't valid, select a new target link.
+	        if (!HasValidTargetLink())
+	        {
+		        ChangeTargetLink(_rg, debug_on: true);
+		        if (Link != null)
+		        {
+			        Debug.Log("Attacker.Update | Changed link: " + Link.SrcNode.Id + " - " + Link.DestNode.Id);
+		        }
+	        }
+	        else
+	        {
+		        Debug.Log("Attacker.Update | Previous link is still valid.");
+	        }
+
+	        // If the attacker has selected a valid link, attempt to attack it
+	        if (Link != null && HasValidTargetLink())
+	        {
+		        // Find viable attack routes.
+		        // TODO: Provide all groundstations as input instead of the current limited list.
+		        BinaryHeap<Path> attack_routes = FindAttackRoutes(_rg,
+			        new List<GameObject>()
+			        {
+				        _Groundstations["Toronto"], _Groundstations["New York"], _Groundstations["Chicago"],
+				        _Groundstations["Denver"]
+			        }, graph_on, grid, constellation_ctx);
+
+		        Debug.Log("Update | There are " + attack_routes.Count + " paths.");
+
+		        // Create routes until the link's capacity has been reached.
+		        while (!_linkCapacityMonitor.IsFlooded(Link.SrcNode.Id, Link.DestNode.Id) && attack_routes.Count > 0)
+		        {
+			        Path attack_path = attack_routes.ExtractMin();
+			        int mbits = 600;
+			        if (!RouteHandler.RouteHasEarlyCollisions(attack_path, mbits, Link.SrcNode, Link.DestNode,
+				            _linkCapacityMonitor))
+			        {
+				        Debug.Log("Update | Executing the following path: " +
+				                  String.Join(" ", from node in attack_path.nodes select node.Id));
+				        ExecuteAttackRoute(attack_path, attack_path.start_city, attack_path.end_city, mbits,
+					        _linkCapacityMonitor, _painter, constellation_ctx);
+			        }
+			        else
+			        {
+				        Debug.Log("Update | Not executing this path, because it has has early collisions.");
+			        }
+		        }
+
+		        // Debugging messages.
+		        if (_linkCapacityMonitor.IsFlooded(Link.SrcNode.Id, Link.DestNode.Id))
+		        {
+			        Debug.Log("Update | Link was flooded.");
+		        }
+		        else
+		        {
+			        Debug.Log("Update | Link could not be flooded. It has capacity: " +
+			                  _linkCapacityMonitor.GetCapacity(Link.SrcNode.Id, Link.DestNode.Id));
+		        }
+
+		        // Color the target link on the map. If flooded, the link is colored red. Otherwise, the link is colored pink.
+		        _painter.ColorTargetISLLink(constellation_ctx.satlist[Link.SrcNode.Id],
+			        constellation_ctx.satlist[Link.DestNode.Id], Link.DestNode, Link.SrcNode,
+			        _linkCapacityMonitor.IsFlooded(Link.SrcNode.Id, Link.DestNode.Id));
+	        }
+	        else
+	        {
+		        Debug.Log("Attacker.Update | Could not find any valid link.");
+	        }
         }
     }
 }
