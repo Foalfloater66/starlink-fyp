@@ -54,63 +54,15 @@ namespace Attack
     public class Attacker
     {
         /// <summary>
-        /// Class <c>TargetLink</c> contains information about the link that the <c>Attacker</c> object is aiming towards.
-        /// </summary>
-        /// TODO: move this somewhere else.
-        public class TargetLink
-        {
-            /// <value>
-            /// Source node of the target link.
-            /// </value>
-            public Node SrcNode { get; private set; }
-
-            /// <value>
-            /// Destination node of the target link.
-            /// </value>
-            public Node DestNode { get; private set; }
-
-            /// <summary>
-            /// Constructor initializing the <c>TargetLink</c> object and its source and destination nodes.
-            /// </summary>
-            /// <param name="src_node"><c>TargetLink</c> source node.</param>
-            /// <param name="dest_node"><c>TargetLink</c> destination node.</param>
-            public TargetLink(Node src_node, Node dest_node)
-            {
-                this.SrcNode = src_node;
-                this.DestNode = dest_node;
-            }
-        }
-
-        /// <summary>
         /// List of source groundstations that the attacker can send packets from.
         /// </summary>
         private List<GameObject> SourceGroundstations { get; set; }
-        
-        /// <summary>
-        /// List of destination groundstations that the attacker can send packets to.
-        /// </summary>
-        private List<GameObject> DestGroundstations { get; set; }
-
-        /// <summary>
-        /// Vector3 coordinates of the center of the attack area.
-        /// </summary>
-        public Vector3 TargetAreaCenterpoint { get; private set; }
-
-        /// <summary>
-        /// Radius of the attack area.
-        /// </summary>
-        public float Radius { get; private set; }
-
-        /// <summary>
-        /// Link that the <c>Attacker</c> object is targeting.
-        /// </summary>
-        public TargetLink Link { get; private set; }
-
         private RouteHandler _routeHandler;
         private ScenePainter _painter;
         private LinkCapacityMonitor _linkCapacityMonitor;
         private GroundstationCollection _Groundstations;
         private RouteGraph _rg;
+        private AttackTarget Target;
 
         /// <summary>
         /// File for debugging.
@@ -129,31 +81,18 @@ namespace Attack
         /// <param name="prefab">GameObject representing the attack area center.</param>
         public Attacker(float latitude, float longitude, float sat0r, float attack_radius,
             List<GameObject> src_groundstations, Transform transform, GameObject prefab, GroundstationCollection groundstations, RouteHandler route_handler, ScenePainter painter, LinkCapacityMonitor
-                linkCapacityMonitor) //, MainContext ctx)
+                linkCapacityMonitor)
         { 
             SourceGroundstations = src_groundstations; // TODO: should this also be a groundstation collection object?
-            TargetAreaCenterpoint = Vector3.zero;
-            Radius = attack_radius;
+            Target = new AttackTarget(latitude, longitude, sat0r, attack_radius, transform, prefab);
             
             _painter = painter;
             _linkCapacityMonitor = linkCapacityMonitor;
             _routeHandler = route_handler;
             
-            // _RouteHandler = route_handler;
             _Groundstations = groundstations;
-            SetTargetArea(latitude, longitude, sat0r, transform, prefab);
-            Link = null;
+            
             logfile = new System.IO.StreamWriter(Main.log_directory + "/Path/attacker_summary.txt");
-            Debug.Log(transform.rotation);
-        }
-
-        /// <summary>
-        /// Checks if the currently selected target link is still within the target area. 
-        /// </summary>
-        /// <returns>True if both of the target link's nodes are in the target area, false otherwise. If the victim link hasn't been set, returns false.</returns>
-        public bool HasValidTargetLink()
-        {
-            return Link != null && (InTargetArea(Link.SrcNode.Position) && InTargetArea(Link.DestNode.Position));
         }
 
         /// <summary>
@@ -167,7 +106,7 @@ namespace Attack
         public Path FindAttackRoute(Node start_node, Node end_node, GameObject src_gs, GameObject dest_gs)
         {
             // TODO: Optimise route extraction.
-            System.Diagnostics.Debug.Assert(this.Link != null, "FindAttackRoute | No attacker link has been set.");
+            System.Diagnostics.Debug.Assert(Target.Link != null, "FindAttackRoute | No attacker link has been set.");
 
             Node rn = end_node;
             Path route = new Path(src_gs, dest_gs);
@@ -200,7 +139,7 @@ namespace Attack
 
                 if (id >= 0 && prev_id >= 0)
                 {
-                    if (prev_id == this.Link.SrcNode.Id && id == this.Link.DestNode.Id)
+                    if (prev_id == Target.Link.SrcNode.Id && id == Target.Link.DestNode.Id)
                     {
                         viable_route = true;
                     }
@@ -224,172 +163,6 @@ namespace Attack
             }
             UnityEngine.Debug.Log("FindAttackRoute | Couldn't find a valid attack route.");
             return null;
-        }
-
-        /// <summary>
-        /// Sets and draws a center for the target area based on provided latitude and longitude coordinates.
-        /// </summary>
-        /// <param name="latitude">Attack area center latitude coordinates. Must be between -90 and 90 degrees.</param>
-        /// <param name="longitude">Attack area center longitude coordinates. Must be between -180 and 180 degrees.</param>
-        /// <param name="sat0r">Distance of the satellite from Earth's center.</param>
-        /// <param name="altitude">Altitude of satellites from Earth's surface.</param>
-        /// <param name="transform"><c>Transform</c> object representing the center of the Earth</param>
-        /// <param name="prefab">GameObject representing the attack center.</param> 
-        private void SetTargetArea(float latitude, float longitude, float altitude, Transform transform,
-            GameObject prefab)
-        {
-            System.Diagnostics.Debug.Assert(latitude > -90 && latitude < 90,
-                "Latitude must be between -90 and 90 degrees.");
-            System.Diagnostics.Debug.Assert(longitude > -180 && longitude < 180,
-                "Longitude must be between -180 and 180 degrees.");
-
-            // convert from lat, long, and altitude to Vector3 representation.
-            GameObject target = Object.Instantiate(prefab, new Vector3(0f, 0f, -altitude), transform.rotation);
-            float long_offset = 20f;
-            target.transform.RotateAround(Vector3.zero, Vector3.up, longitude - long_offset);
-            Vector3 lat_axis = Quaternion.Euler(0f, -90f, 0f) * target.transform.position;
-            target.transform.RotateAround(Vector3.zero, lat_axis, latitude);
-            target.transform.SetParent(transform, false);
-            
-            // Check if the cityScript is attached.
-            Component[] components = target.GetComponents<Component>();
-            foreach (Component component in components)
-            {
-                Debug.Log(component.GetType().ToString());
-            }
-            Debug.Log("Tried printing all scripts.");
-            
-            TargetAreaCenterpoint = target.transform.position;
-        }
-
-        /// <summary>
-        /// Checks if the input coordinates are within the sphere of attack.
-        /// </summary>
-        /// <param name="position">Coordinates.</param>
-        /// <returns>Returns true if the coordinates are within the area, and false otherwise.</returns>
-        private bool InTargetArea(Vector3 position)
-        {
-            return (Vector3.Distance(position, this.TargetAreaCenterpoint) < this.Radius);
-        }
-
-        /// <summary>
-        /// Searches for a random node in the routegraph that is in the target area.
-        /// </summary>
-        /// <param name="rg">Built <c>Routegraph</c> object.</param>
-        /// <param name="debug_on">If set to true, selects the first node that satisfy target node criterion instead. Useful for debugging.</param>
-        /// <returns>If a valid node was found, returns it. Otherwise, returns null.</returns>
-        private Node SelectSrcNode(RouteGraph rg, bool debug_on)
-        {
-            Node node = null;
-            if (debug_on)
-            {
-                for (int i = 0; i < rg.nodes.Count(); i++)
-                {
-                    node = rg.nodes[i];
-                    if (node.Id > 0 && InTargetArea(node.Position))
-                    {
-                        return node;
-                    }
-                }
-
-                return null;
-            }
-
-            Dictionary<int, Node> nodes = new Dictionary<int, Node>(); // index, node 
-            int remaining_nodes = rg.nodes.Count();
-            for (int i = 0; i < rg.nodes.Count(); i++) nodes.Add(i, rg.nodes[i]);
-
-            while (remaining_nodes > 0)
-            {
-                int i = new System.Random().Next(rg.nodes.Count());
-                node = nodes[i];
-                if (node == null)
-                {
-                    continue; // already seen.
-                }
-
-                if (node.Id > 0 && InTargetArea(node.Position))
-                {
-                    // src_node = node;
-                    break;
-                }
-
-                nodes[i] = null;
-                remaining_nodes -= 1;
-            }
-
-            return node; // the node might not have any links!
-        }
-
-        /// <summary>
-        /// Searches for a random node linked to the <c>src_node</c> that is within the target area.
-        /// </summary>
-        /// <param name="src_node">Potential target link source node.</param>
-        /// <param name="debug_on">If set to true, selects the first node that satisfy target node criterion instead. Useful for debugging.</param></param>
-        /// <returns>A valid node if one is found. Otherwise, returns null.</returns>
-        private Node SelectDestinationNode(Node src_node, bool debug_on)
-        {
-            if (debug_on)
-            {
-                for (int i = 0; i < src_node.LinkCount; i++)
-                {
-                    Node node = src_node.GetNeighbour(src_node.GetLink(i));
-                    if (node.Id > 0 && this.InTargetArea(node.Position))
-                    {
-                        return node;
-                    }
-                }
-
-                return null;
-            }
-
-            // FIXME: I think this function never gets used. I have to decide whether to keep it or not.
-            Dictionary<int, Node> nodes = new Dictionary<int, Node>(); // index, node 
-            int remaining_nodes = src_node.LinkCount;
-
-            for (int i = 0; i < src_node.LinkCount; i++) nodes.Add(i, src_node.GetNeighbour(src_node.GetLink(i)));
-
-            while (remaining_nodes > 0) // prioritise ISL links that are fully contained in the target radius.
-            {
-                int i = new System.Random().Next(src_node.LinkCount);
-                Node node = nodes[i];
-                if (node == null)
-                {
-                    continue;
-                }
-
-                if (node.Id > 0 && this.InTargetArea(node.Position))
-                {
-                    return node;
-                }
-
-                nodes[i] = null;
-                remaining_nodes -= 1;
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Searches for a target link within the target area. If successful, sets the property <c>Link</c> to a new <c>Attacker.TargetLink</c> object with the new <c>src_node</c> and <c>dest_node</c> nodes. Otherwise, sets the property <c>Link</c> to null. Failure may occur if no source node was found or if the source node has no links.
-        /// </summary>
-        /// <param name="rg">Built <c>Routegraph</c> object.</param>
-        /// <param name="debug_on">If set to true, selects the first link that satisfy target link criterion. Useful for debugging.</param>
-        private void _ChangeTargetLink(RouteGraph rg, bool debug_on)
-        {
-            Node src_node = SelectSrcNode(rg, debug_on);
-
-            if (src_node != null)
-            {
-                Node dest_node = SelectDestinationNode(src_node, debug_on);
-                if (dest_node != null)
-                {
-                    Link = new TargetLink(src_node, dest_node);
-                    return;
-                }
-            }
-
-            Link = null;
         }
         
         // FIXME: Packets should be sent *from* the source groundstation! Otherwise it's semantically incorrect.
@@ -511,11 +284,11 @@ namespace Attack
 		/// <param name="constellation_ctx">Constellation context.</param>
 		private void FloodLink(BinaryHeap<Path> attack_routes, ConstellationContext constellation_ctx)
 		{
-			while (!_linkCapacityMonitor.IsFlooded(Link.SrcNode.Id, Link.DestNode.Id) && attack_routes.Count > 0)
+			while (!_linkCapacityMonitor.IsFlooded(Target.Link.SrcNode.Id, Target.Link.DestNode.Id) && attack_routes.Count > 0)
 			{
 				Path attack_path = attack_routes.ExtractMin();
 				int mbits = 600;
-				if (!RouteHandler.RouteHasEarlyCollisions(attack_path, mbits, Link.SrcNode, Link.DestNode,
+				if (!RouteHandler.RouteHasEarlyCollisions(attack_path, mbits, Target.Link.SrcNode, Target.Link.DestNode,
 					    _linkCapacityMonitor))
 				{
 					ExecuteAttackRoute(attack_path, attack_path.start_city, attack_path.end_city, mbits,
@@ -531,16 +304,16 @@ namespace Attack
 		{
 			// Debugging messages.
 			// Color the target link on the map. If flooded, the link is colored red. Otherwise, the link is colored pink.
-			if (_linkCapacityMonitor.IsFlooded(Link.SrcNode.Id, Link.DestNode.Id))
+			if (_linkCapacityMonitor.IsFlooded(Target.Link.SrcNode.Id, Target.Link.DestNode.Id))
 			{
 				Debug.Log("Update | Link was flooded.");
-				_painter.ColorTargetISLLink(constellation_ctx.satlist[Link.SrcNode.Id], constellation_ctx.satlist[Link.DestNode.Id], Link.DestNode, Link.SrcNode, true);
+				_painter.ColorTargetISLLink(constellation_ctx.satlist[Target.Link.SrcNode.Id], constellation_ctx.satlist[Target.Link.DestNode.Id], Target.Link.DestNode, Target.Link.SrcNode, true);
 			}
 			else
 			{
 				Debug.Log("Update | Link could not be flooded. It has capacity: " +
-				          _linkCapacityMonitor.GetCapacity(Link.SrcNode.Id, Link.DestNode.Id));
-				_painter.ColorTargetISLLink(constellation_ctx.satlist[Link.SrcNode.Id], constellation_ctx.satlist[Link.DestNode.Id], Link.DestNode, Link.SrcNode, false);
+				          _linkCapacityMonitor.GetCapacity(Target.Link.SrcNode.Id, Target.Link.DestNode.Id));
+				_painter.ColorTargetISLLink(constellation_ctx.satlist[Target.Link.SrcNode.Id], constellation_ctx.satlist[Target.Link.DestNode.Id], Target.Link.DestNode, Target.Link.SrcNode, false);
 			}
 		}
         
@@ -558,15 +331,15 @@ namespace Attack
 
 
 	        // If the current link isn't valid, select a new target link.
-	        if (!HasValidTargetLink())
+	        if (!Target.HasValidTargetLink())
 	        {
-		        _ChangeTargetLink(_rg, debug_on: true);
+		        Target.ChangeTargetLink(_rg, debug_on: true);
 	        }
 
 	        // If the attacker has selected a valid link, attempt to attack it
-	        if (Link != null && HasValidTargetLink())
+	        if (Target.Link != null && Target.HasValidTargetLink())
 	        {
-				Debug.Log($"Attacker.Run | Link: {Link.SrcNode.Id} - {Link.DestNode.Id}");
+				Debug.Log($"Attacker.Run | Link: {Target.Link.SrcNode.Id} - {Target.Link.DestNode.Id}");
 		        // Find viable attack routes.
 		        
 		        BinaryHeap<Path> attack_routes = _FindAttackRoutes(_rg,
