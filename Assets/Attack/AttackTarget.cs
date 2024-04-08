@@ -55,7 +55,6 @@ namespace Attack
         /// </summary>
         /// <param name="latitude">Attack area center latitude coordinates. Must be between -90 and 90 degrees.</param>
         /// <param name="longitude">Attack area center longitude coordinates. Must be between -180 and 180 degrees.</param>
-        /// <param name="sat0r">Distance of the satellite from Earth's center.</param>
         /// <param name="altitude">Altitude of satellites from Earth's surface.</param>
         /// <param name="transform"><c>Transform</c> object representing the center of the Earth</param>
         /// <param name="prefab">GameObject representing the attack center.</param> 
@@ -148,7 +147,7 @@ namespace Attack
         /// Searches for a random node linked to the <c>src_node</c> that is within the target area.
         /// </summary>
         /// <param name="src_node">Potential target link source node.</param>
-        /// <param name="debug_on">If set to true, selects the first node that satisfy target node criterion instead. Useful for debugging.</param></param>
+        /// <param name="debug_on">If set to true, selects the first node that satisfy target node criterion instead. Useful for debugging.</param>
         /// <returns>A valid node if one is found. Otherwise, returns null.</returns>
         private Node SelectDestinationNode(Node src_node, bool debug_on)
         {

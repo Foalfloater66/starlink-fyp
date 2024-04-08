@@ -125,6 +125,10 @@ namespace Orbits.Satellites
 			gameobject.transform.RotateAround(Vector3.zero, Vector3.up, (float)orbitalangle);
 			gameobject.transform.SetParent(orbit.transform, false);
 
+			// Create the script assigned to the Satellite object.
+			SatelliteScript ss = (SatelliteScript)gameobject.GetComponent(typeof(SatelliteScript));
+			ss.orbit_id = orbitnumber;
+
 			max_linknum = 10; // FIXME: Change this to the maximum number of attack paths set.
 
 			links = new GameObject[max_linknum];

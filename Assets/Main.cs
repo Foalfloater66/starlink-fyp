@@ -436,7 +436,7 @@ public class Main : MonoBehaviour
 					altitude, beam_angle, beam_radius, satellite, beam_prefab, beam_prefab2, laser, thin_laser,
 					logfile, log_choice);
 				satlist[satcount] = newsat;
-
+				
 				// Add the satellite to the orbit's list of satellites.
 				if (!orbit2sats.ContainsKey(i))
 				{
@@ -452,6 +452,12 @@ public class Main : MonoBehaviour
 
 
 			}
+			// TODO: add script to the orbit object.
+
+			OrbitScript os = (OrbitScript) orbits[orbitcount].GetComponent(typeof(OrbitScript));
+			os.orbit_id = i;
+			
+			// TODO: add an orbit ID to the laser object if it's on an orbit.
 			orbitcount++;
 		}
 	}
@@ -542,7 +548,7 @@ public class Main : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		Debug.Log("Update Iteration()");
+		Debug.Log("Update()");
 		
 		// Update scene initial parameters
 		elapsed_time = last_elapsed_time + (Time.time - last_speed_change) * speed;
@@ -555,12 +561,10 @@ public class Main : MonoBehaviour
 		RouteHandler.ClearRoutes(_painter);
 		
 		// Attempt an attack.
-		_attacker.Run(constellation_ctx, graph_on, groundstations.ToList());
-		Debug.Log("After running the attacker object.");
+		// _attacker.Run(constellation_ctx, graph_on, groundstations.ToList());
 		
 		// Update the scene.
 		_painter.UpdateLasers(satlist, maxsats, speed);
-		Debug.Log("After Updating the Lasers");
 		
 		framecount++;
 	}
