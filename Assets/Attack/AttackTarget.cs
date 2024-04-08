@@ -34,20 +34,24 @@ namespace Attack
             }
         }
 
-        private Vector3 Center { get; set; }
+        public Vector3 Center { get; set; }
 
-        private float Radius { get; set; }
+        public float Radius { get; set; }
 
         public TargetLink Link { get; private set; }
 
+        public readonly int OrbitId; // If the orbit Id is -1, then the target link is not restricted by its orbit.
+
         public AttackTarget(float latitude, float longitude, float sat0r, float radius, Transform transform,
-            GameObject prefab)
+            GameObject prefab, int orbit_id=-1)
         {
             Link = null;
             Center = Vector3.zero;
             Radius = radius;
+            OrbitId = orbit_id;
             SetTargetArea(latitude, longitude, sat0r, transform, prefab);
         }
+        
 
 
         /// <summary>
@@ -108,6 +112,11 @@ namespace Attack
                 for (int i = 0; i < rg.nodes.Count(); i++)
                 {
                     node = rg.nodes[i];
+                    if (OrbitId != -1 && OrbitId != node.Orbit)
+                    {
+                        // If orbit-specific links are enabled, exclude links that are not part of the desired orbit.
+                        continue;
+                    }
                     if (node.Id > 0 && InTargetArea(node.Position))
                     {
                         return node;
@@ -156,6 +165,11 @@ namespace Attack
                 for (int i = 0; i < src_node.LinkCount; i++)
                 {
                     Node node = src_node.GetNeighbour(src_node.GetLink(i));
+                    if (OrbitId != -1 && OrbitId != node.Orbit)
+                    {
+                        // If orbit-specific links are enabled, exclude links that are not part of the desired orbit.
+                        continue;
+                    }
                     if (node.Id > 0 && this.InTargetArea(node.Position))
                     {
                         return node;

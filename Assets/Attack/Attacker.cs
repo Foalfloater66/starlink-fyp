@@ -62,7 +62,7 @@ namespace Attack
         private LinkCapacityMonitor _linkCapacityMonitor;
         private GroundstationCollection _Groundstations;
         private RouteGraph _rg;
-        private AttackTarget Target;
+        public AttackTarget Target;
 
         /// <summary>
         /// File for debugging.
@@ -79,12 +79,12 @@ namespace Attack
         /// <param name="src_groundstations">List of source groundstations available to the attacker.</param>
         /// <param name="transform">Transform object associated with Earth's center.</param>
         /// <param name="prefab">GameObject representing the attack area center.</param>
-        public Attacker(float latitude, float longitude, float sat0r, float attack_radius,
+        public Attacker(float latitude, float longitude, float sat0r, float attack_radius, int orbit_id,
             List<GameObject> src_groundstations, Transform transform, GameObject prefab, GroundstationCollection groundstations, RouteHandler route_handler, ScenePainter painter, LinkCapacityMonitor
                 linkCapacityMonitor)
         { 
             SourceGroundstations = src_groundstations; // TODO: should this also be a groundstation collection object?
-            Target = new AttackTarget(latitude, longitude, sat0r, attack_radius, transform, prefab);
+            Target = new AttackTarget(latitude, longitude, sat0r, attack_radius, transform, prefab, orbit_id);
             
             _painter = painter;
             _linkCapacityMonitor = linkCapacityMonitor;
@@ -335,6 +335,7 @@ namespace Attack
 	        {
 		        Target.ChangeTargetLink(_rg, debug_on: true);
 	        }
+
 
 	        // If the attacker has selected a valid link, attempt to attack it
 	        if (Target.Link != null && Target.HasValidTargetLink())

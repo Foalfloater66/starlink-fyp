@@ -342,14 +342,12 @@ public class Main : MonoBehaviour
 
 		_link_capacities = new LinkCapacityMonitor(initial_link_capacity);
 		
-		// TODO: instead, make this return the target link!
 		// Get target link + list of source groundstations.
-		// AttackCases.getTargetLink();
-		AttackCases.getTargetCoordinates(attack_choice, out float target_lat, out float target_lon);
-		AttackCases.getSourceGroundstations(attack_choice, groundstations, out List<GameObject> src_groundstations);
+		AttackCases.setUpAttackParams(attack_choice, groundstations, out float target_lat, out float target_lon, out int orbit_id,
+			out List<GameObject> src_groundstations);
 		
 		// Create attacker entity.
-		_attacker = new Attacker(target_lat, target_lon, sat0r, attack_radius, src_groundstations, transform, city_prefab, groundstations, routeHandler, _painter, _link_capacities);
+		_attacker = new Attacker(target_lat, target_lon, sat0r, attack_radius, orbit_id, src_groundstations, transform, city_prefab, groundstations, routeHandler, _painter, _link_capacities);
 
 		createContext();
 	}
@@ -393,9 +391,8 @@ public class Main : MonoBehaviour
 				_city_creator.USACities();
 				break;
 			case AttackChoice.IntraOrbital:
-				// TODO: add cities. (find a path too)
 			case AttackChoice.TransOrbital:
-				// TODO: add cities. (find a path too)
+				_city_creator.NACities();
 				break;
 		}
 	}
@@ -403,16 +400,6 @@ public class Main : MonoBehaviour
 	/// <summary>
 	/// Default way to create a constellation
 	/// </summary>
-	/// <param name="num_orbits"></param>
-	/// <param name="sats_per_orbit"></param>
-	/// <param name="inclination"></param>
-	/// <param name="orbit_phase_offset"></param>
-	/// <param name="sat_phase_offset"></param>
-	/// <param name="sat_phase_stagger"></param>
-	/// <param name="period"></param>
-	/// <param name="altitude"></param>
-	/// <param name="beam_angle"></param>
-	/// <param name="beam_radius"></param>
 	void CreateSats(int num_orbits, int sats_per_orbit, float inclination, float orbit_phase_offset,
 		float sat_phase_offset, float sat_phase_stagger, double period, float altitude,
 		int beam_angle, float beam_radius)
@@ -519,13 +506,12 @@ public class Main : MonoBehaviour
 			orbitcount++;
 		}
 	}
-	
 	// Only uncomment for debugging if I need to see the attack sphere.
-	// void OnDrawGizmos()
-	// {
-	// 	Gizmos.color = Color.red;
-	// 	Gizmos.DrawSphere(_attacker.TargetAreaCenterpoint, _attacker.Radius);
-	// }
+	void OnDrawGizmos()
+	{
+		Gizmos.color = Color.red;
+		Gizmos.DrawSphere(_attacker.Target.Center, _attacker.Target.Radius);
+	}
 
 	void RotateCamera()
 	{
@@ -561,7 +547,7 @@ public class Main : MonoBehaviour
 		RouteHandler.ClearRoutes(_painter);
 		
 		// Attempt an attack.
-		// _attacker.Run(constellation_ctx, graph_on, groundstations.ToList());
+		_attacker.Run(constellation_ctx, graph_on, groundstations.ToList());
 		
 		// Update the scene.
 		_painter.UpdateLasers(satlist, maxsats, speed);
