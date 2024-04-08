@@ -34,19 +34,32 @@ namespace Attack
                 case AttackChoice.TranscontinentalUS:
                     src_gs_names = new List<string>
                     {
-                        ""
+                        "Toronto",
+                        "New York",
+                        "Chicago",
+                        "Los Angeles",
+                        "El Paso",
+                        "Houston"
                     };
                     break;
                 case AttackChoice.CoastalUS:
                     src_gs_names = new List<string>
                     {
-                        ""
+                        "Los Angeles",
+                        "El Paso",
+                        "San Diego",
+                        "Phoenix",
                     };
                     break;
                 case AttackChoice.Polar:
                     src_gs_names = new List<string>
                     {
-                        ""
+                        // TODO: add european cities to the map.
+                        "Winnipeg",
+                        "Seattle",
+                        "Oklahoma City",
+                        "Edmonton",
+                        
                     };
                     break;
                 case AttackChoice.Equatorial:
