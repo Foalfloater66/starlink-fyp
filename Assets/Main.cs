@@ -378,13 +378,18 @@ public class Main : MonoBehaviour
 		_city_creator = new CityCreator(transform, city_prefab, groundstations);
 		relays = new List<GameObject>(); // TODO: remove this.
 		
+		_city_creator.DefaultCities();
 		switch (attack_choice)
 		{
 			case AttackChoice.Demo:
 			case AttackChoice.CoastalUS:
 			case AttackChoice.TranscontinentalUS:
-			case AttackChoice.Polar:
 				_city_creator.NACities();
+				break;
+			case AttackChoice.Polar:
+				_city_creator.CANCities();
+				_city_creator.AFCities();
+				// _city_creator.EUCities();
 				break;
 			case AttackChoice.Equatorial:
 				// TODO: add cities. (US + SA)

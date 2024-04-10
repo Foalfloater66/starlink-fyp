@@ -214,6 +214,17 @@ namespace Attack
 			//double prevdist = km_per_unit * rn.Dist;
 			int hop = 0;
 			int index = 1;
+			
+			// color links AND process linking. # FIRST
+			// process link capacity.
+			// while (true)
+			
+			
+			
+			
+			// color links.
+			
+			
 			while (true)
 			{
 				previd = id;
@@ -324,9 +335,9 @@ namespace Attack
         public void Run(ConstellationContext constellation_ctx,
 	        bool graph_on, List<GameObject> groundstations)
         {
-	        // TODO: Create a RouteGraph without needing to have new_york and toronto passed.
+	        // REVIEW: Create a RouteGraph without needing to have new_york and toronto passed.
 	        _routeHandler.ResetRoute(_Groundstations["New York"], _Groundstations["Toronto"], _painter, constellation_ctx.satlist,constellation_ctx.maxsats);
-	        // TODO: Do I need to return the routegraph?
+	        // REVIEW: Do I need to return the routegraph?
 	        _rg = _routeHandler.BuildRouteGraph(_Groundstations["New York"], _Groundstations["Toronto"], constellation_ctx.maxdist, constellation_ctx.margin, constellation_ctx.maxsats, constellation_ctx.satlist, constellation_ctx.km_per_unit, graph_on);
 
 

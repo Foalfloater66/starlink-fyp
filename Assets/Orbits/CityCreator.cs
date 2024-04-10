@@ -21,15 +21,21 @@ namespace Orbits
             this.city_prefab = city_prefab;
             this.groundstations = groundstations;
         }
+
+        public void DefaultCities()
+        {
+            CreateCity(40.76f, 73.98f, "New York");
+            CreateCity(43.65f, 79.38f, "Toronto");
+            
+        }
         
         /// <summary>
-        /// Creates the top 25 most populated cities of USA as of the 2020 census.
+        /// Creates the top 25 most populated cities of USA as of the 2020 census, excluding New York, which is added by default.
         ///
         /// Source: https://en.wikipedia.org/wiki/List_of_United_States_cities_by_population
         /// </summary>
         public void USACities()
         {
-            CreateCity(40.76f, 73.98f, "New York");
             CreateCity(34f, 118f,  "Los Angeles"); // Los Angeles
             CreateCity(25.768125f, 80.197006f,  "Miami");
             CreateCity(41.87f, 87.62f,  "Chicago"); //;
@@ -58,12 +64,12 @@ namespace Orbits
         }
         
         /// <summary>
-        /// Creates the top 10 most populated cities of Canada as of the 2021 census.
+        /// Creates the top 10 most populated cities of Canada as of the 2021 census excluding Toronto, which is added by default.
+        /// 
         /// Source: https://en.wikipedia.org/wiki/List_of_largest_Canadian_cities_by_census
         /// </summary>
         public void CANCities()
         {
-            CreateCity(43.65f, 79.38f, "Toronto");
             CreateCity(45.50f, 73.56f, "Montreal");
             CreateCity(51.04f, 114.07f, "Calgary");
             CreateCity(45.42f, 75.69f, "Ottawa");
@@ -73,6 +79,11 @@ namespace Orbits
             CreateCity(49.28f, 123.12f,  "Vancouver");
             CreateCity(43.73f, 79.76f,  "Brampton");
             CreateCity(43.25f, 79.87f,  "Hamilton");
+            
+            // for polar demo purposes
+            CreateCity(54.44f, 70.52f, "Brisay");
+            CreateCity(47.36f, 68.32f, "Edmundston");
+            CreateCity(47.55f, 52.74f, "St. John's, Canada");
         }
 
         /// <summary>
@@ -82,6 +93,55 @@ namespace Orbits
         {
             USACities();
             CANCities();
+        }
+
+        /// <summary>
+        /// Creates cities for the top 10 most populated cities of Europe as of each country's national census.
+        /// 
+        /// Source: https://en.wikipedia.org/wiki/List_of_European_cities_by_population_within_city_limits
+        /// </summary>
+        public void EUCities()
+        {
+            CreateCity(41.00f, -28.97f, "Istanbul");
+            CreateCity(55.75f, -37.61f, "Moscow");
+            CreateCity(51.50f, 0.12f, "London");
+            CreateCity(59.93f, -30.36f, "St Petersburg");
+            CreateCity(52.52f, -13.40f, "Berlin");
+            CreateCity(40.41f, 3.70f, "Madrid");
+            CreateCity(50.45f, -30.52f, "Kyiv");
+            CreateCity(41.89f, -12.48f, "Rome");
+            CreateCity(40.40f, -49.86f, "Baku");
+            CreateCity(48.85f, -2.35f, "Paris");
+            CreateCity(48.20f, -16.37f, "Vienna");
+        }
+
+        /// <summary>
+        /// Creates cities for the top 20 most populated cities of Africa as of each country's national census.
+        ///
+        /// Source: https://en.wikipedia.org/wiki/List_of_cities_in_Africa_by_population
+        /// </summary>
+        public void AFCities()
+        {
+            CreateCity(-4.30f, -15.31f, "Kinshasa");
+            CreateCity(6.52f, -3.37f, "Lagos");
+            CreateCity(30.04f, -31.23f, "Cairo");
+            CreateCity(30.03f, -31.20f, "Giza");
+            CreateCity(-8.81f, -13.23f, "Luanda");
+            CreateCity(-6.81f, -39.28f, "Dar es Salaam");
+            CreateCity(15.59f, -32.53f, "Khartoum");
+            CreateCity(-26.20f, -28.03f, "Johannesburg");
+            CreateCity(5.36f, 4.00f, "Abidjan");
+            CreateCity(31.20f, -29.91f, "Alexandria");
+            CreateCity(9.01f, -38.75f, "Addis Ababa");
+            CreateCity(-1.29f, -36.82f, "Nairobi");
+            CreateCity(-33.92f, -18.42f, "Cape Town");
+            CreateCity(3.86f, -11.52f, "Yaounde");
+            CreateCity(12.00f, -8.59f, "Kano");
+            CreateCity(-26.17f, -28.34f, "Ekurhuleni"); // (East Rand, Municipality)
+            CreateCity(-29.85f, -31.02f, "Durban");
+            CreateCity(4.05f, -9.76f, "Douala");
+            CreateCity(33.57f, 7.5f, "Casablanca");
+            CreateCity(7.3f, -3.9f, "Ibadan");
         }
         
         /// <summary>

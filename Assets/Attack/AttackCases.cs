@@ -64,16 +64,17 @@ namespace Attack
                     });
                     break;
                 case AttackChoice.Polar:
-                    // Lake River, Canada
-                    target_lat = 54f;
+                    // South of Lake River, Canada
+                    target_lat = 50f;
                     target_lon = 82f;
+                    orbit_id = 11;
                     
                     src_gs_names.AddRange(new List<string>{
-                        // TODO: add european cities to the map.
+                        // Canadian cities
                         "Winnipeg",
-                        "Seattle",
-                        "Oklahoma City",
                         "Edmonton",
+                        "Calgary"
+                        // TODO: put some african cities here.
                     });
                     break;
                 case AttackChoice.Equatorial:
