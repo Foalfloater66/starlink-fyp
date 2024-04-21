@@ -515,7 +515,7 @@ MonoBehaviour:
   countdown: {fileID: 485043185}
   rightbottom: {fileID: 1204926847}
   maxorbits: 24
-  attack_choice: 3
+  attack_choice: 0
   constellation: 0
   no_of_paths: 2
   decimator: 1

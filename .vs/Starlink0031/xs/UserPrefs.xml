@@ -1,0 +1,58 @@
+﻿<Properties StartupConfiguration="{C3B557CA-1D87-D940-D3FC-905169FE698F}|Unit Tests">
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.ItemProperties.Unity.VSCode.Editor PreferredExecutionTarget="MonoDevelop.Default" />
+  <Debugger.DebugSourceFolders />
+  <MultiItemStartupConfigurations />
+  <MonoDevelop.Ide.ItemProperties.UnityEngine.TestRunner PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Orbits/LinkCapacityMonitor.cs">
+    <Files>
+      <File FileName="Assets/Orbits/SP_basic_0031.cs" />
+      <File FileName="Assets/Routing/RouteGraph.cs" />
+      <File FileName="Assets/Orbits/LinkCapacityMonitor.cs" Line="7" Column="1" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="Starlink0031" expanded="True">
+            <Node name="Assembly-CSharp" expanded="True" selected="True">
+              <Node name="Assets" expanded="True">
+                <Node name="Orbits" expanded="True" />
+              </Node>
+            </Node>
+            <Node name="Unity.Rider.Editor" expanded="True">
+              <Node name="Library" expanded="True">
+                <Node name="PackageCache" expanded="True">
+                  <Node name="com.unity.ide.rider@1.1.0" expanded="True">
+                    <Node name="Rider" expanded="True">
+                      <Node name="Editor" expanded="True" />
+                    </Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+      <Pad Id="ClassPad">
+        <State name="__root__">
+          <Node name="Starlink0031" expanded="True" selected="True">
+            <Node name="Unity.Rider.Editor" expanded="True">
+              <Node name="References" expanded="True" />
+              <Node name="Packages" expanded="True" />
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+      <Pad Id="MonoDevelop.UnitTesting.TestPad">
+        <State name="__root__">
+          <Node name="Starlink0031" expanded="True" selected="True" />
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.ItemProperties.Assembly-CSharp-Editor PreferredExecutionTarget="MonoDevelop.Default" />
+</Properties>

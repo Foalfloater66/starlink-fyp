@@ -20,18 +20,15 @@ namespace Attack
                 // TODO: add default case. (the Miami attack)
                 case AttackChoice.Demo:
                     // Simple example demo between Miami & Chicago
-                    target_lat = 32f;
-                    target_lon = 82f;
+                    target_lat = 32.85f;
+                    target_lon = 80.79f;
+                    // 32.851087, -80.797884
                     
                     // Attacker source groundstations.
                     src_gs_names.AddRange(new List<string>()
                     {
-                        "Toronto",
-                        "New York",
                         "Miami",
-                        "Chicago",
-                        "Denver",
-                        "Houston"
+                        "Havana"
                     });
                     break;
                 case AttackChoice.TranscontinentalUS:

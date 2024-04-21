@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Orbits.Satellites
 {
@@ -128,8 +129,10 @@ namespace Orbits.Satellites
 			// Create the script assigned to the Satellite object.
 			SatelliteScript ss = (SatelliteScript)gameobject.GetComponent(typeof(SatelliteScript));
 			ss.orbit_id = orbitnumber;
+			ss.id = satelliteid;
 
-			max_linknum = 10; // FIXME: Change this to the maximum number of attack paths set.
+			max_linknum = 100; // NOTE: Change this to the maximum number of attack paths set.
+			// REVIEW: Change I change this to a dynamic list? This is actually a problem now.
 
 			links = new GameObject[max_linknum];
 
@@ -257,9 +260,17 @@ namespace Orbits.Satellites
 
 		public void LinkOn(GameObject city)
 		{
-			LaserScript ls = (LaserScript)links[_linkson].GetComponent(typeof(LaserScript));
-			ls.SetPos(gameobject.transform.position, city.transform.position);
-			_linkson++;
+			try
+			{
+				LaserScript ls = (LaserScript)links[_linkson].GetComponent(typeof(LaserScript));
+				ls.SetPos(gameobject.transform.position, city.transform.position);
+				_linkson++;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogWarning($"Link index is {_linkson} for links {links.Length}");
+			}
 		}
 
 		public void LinkOff()

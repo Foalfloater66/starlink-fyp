@@ -1,0 +1,32 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace />
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Routing.cs">
+    <Files>
+      <File FileName="Assets/Routing.cs" Line="9" Column="15" />
+      <File FileName="Assets/ScenePainter.cs" Line="104" Column="18" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="fyp-2024" expanded="True">
+            <Node name="Solution Items" expanded="True">
+              <Node name="/Users/morganeohlig/workspace/fyp/Starlink0031/Assets/CameraSP_0031.cs" selected="True" />
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+      <Pad Id="ClassPad">
+        <State name="__root__">
+          <Node name="fyp-2024" expanded="True">
+            <Node name="Solution Items" selected="True" />
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+</Properties>

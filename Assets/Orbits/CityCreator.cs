@@ -30,19 +30,30 @@ namespace Orbits
         }
         
         /// <summary>
+        /// Creates a small collection of cities needed to run the demonstration code.
+        /// </summary>
+        public void DemoCities()
+        {
+            CreateCity(25.768125f, 80.197006f,  "Miami");   // Miami, USA
+            // CreateCity(41.87f, 87.62f,  "Chicago");         // Chicago, USA
+            // CreateCity(38.90f, 77.03f,  "Washington DC");   // Washington DC, USA
+            CreateCity(23.11f, 82.36f, "Havana");           // Havana, Cuba
+        }
+        
+        /// <summary>
         /// Creates the top 25 most populated cities of USA as of the 2020 census, excluding New York, which is added by default.
         ///
         /// Source: https://en.wikipedia.org/wiki/List_of_United_States_cities_by_population
         /// </summary>
         public void USACities()
         {
-            CreateCity(34f, 118f,  "Los Angeles"); // Los Angeles
+            CreateCity(34f, 118f,  "Los Angeles");          // Los Angeles
             CreateCity(25.768125f, 80.197006f,  "Miami");
-            CreateCity(41.87f, 87.62f,  "Chicago"); //;
-            CreateCity(29.76f, 95.36f,  "Houston"); //;
-            CreateCity(33.44f, 112.07f,  "Phoenix"); //;
+            CreateCity(41.87f, 87.62f,  "Chicago"); 
+            CreateCity(29.76f, 95.36f,  "Houston"); 
+            CreateCity(33.44f, 112.07f,  "Phoenix"); 
             CreateCity(39.95f, 75.16f,  "Philadelphia");
-            CreateCity(29.42f, 98.49f,  "San Antonio"); // Texas
+            CreateCity(29.42f, 98.49f,  "San Antonio");     // San Antonio, Texas
             CreateCity(32.71f, 117.16f,  "San Diego");
             CreateCity(32.46f, 96.47f,  "Dallas");
             CreateCity(30.26f, 97.74f,  "Austin");

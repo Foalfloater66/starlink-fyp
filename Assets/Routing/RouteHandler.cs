@@ -5,6 +5,7 @@ using Orbits;
 using Orbits.Satellites;
 using Scene;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Routing
 {
@@ -111,21 +112,49 @@ public class RouteHandler // TODO: move to a separate class
 		_rg.ResetNodes(city1, city2);
 		painter.TurnLasersOff(satlist, maxsats);
 	}
+	
+	// TODO: add docstring
+	public void ResetRoutePos(GameObject city1, GameObject city2, ScenePainter painter, Satellite[] satlist, int maxsats) {
+		_rg.ResetNodesPos(city1, city2);
+		painter.TurnLasersOff(satlist, maxsats);
+	}
 
 	/* Check if sending traffic through a given path will take down an earlier shared link in the network. Returns true if there is at least one early collision, and false otherwise. */
 	// TODO: add docstrings
-	public static bool RouteHasEarlyCollisions(Path path, int desiredMbits, Node srcNode, Node destNode, LinkCapacityMonitor linkCapacities)
+	public static bool RouteHasEarlyCollisions(Path path, int desiredMbits, Node srcNode, Node destNode, LinkCapacityMonitor linkCapacities, string startCityName, string endCityName)
 	{
-		int index = 3;
+		// REVIEW: I think this code might be going from the end node to the start node! I'm not sure
+		int index = 0;
 		Node prevRn = path.nodes.First();
-		Node rn = path.nodes[2];
+		Debug.Assert(path.nodes.Count > 2);
+		Node rn = path.nodes[index+1];
+		// TODO: I need to find a way to log RF link capacities as well. (format source city, destination satellite OR format source satellite, destination city)
+		Debug.Log($"RouteHasEarlyCollision: Node that I start checking this stuff at {rn.Id}");
 		while (index < path.nodes.Count)
 		{
-			if (prevRn == srcNode && rn == destNode) // we *want* this link to be flooded!
+			// Target link is reachable. Exit the checker.
+			if (prevRn == srcNode && rn == destNode) 
 			{
 				break;
 			}
-			if (linkCapacities.GetCapacity(prevRn.Id, rn.Id) - desiredMbits < 0) // an early link would get flooded.
+
+			// TODO: move the city names into the path object too.
+			// Check if an early link gets flooded.
+			if (prevRn.Id == -2)
+			{
+				if (linkCapacities.GetCapacity(startCityName, rn.Id.ToString()) - desiredMbits < 0) // RF link (source ground station, destination satellite)
+				{
+					return true;
+				}
+			}
+			else if (rn.Id == -1)
+			{
+				if (linkCapacities.GetCapacity(prevRn.Id.ToString(), endCityName) - desiredMbits < 0) // RF link (source satellite, destination ground station)
+				{
+					return true;
+				}
+			}
+			else if (linkCapacities.GetCapacity(prevRn.Id, rn.Id) - desiredMbits < 0) // ISL link.
 			{
 				return true;
 			}
@@ -138,7 +167,7 @@ public class RouteHandler // TODO: move to a separate class
 	}
 
 
-	public static void LockRoute(ScenePainter painter) // NB. This is never used for some reason, but I don't know why.
+	public static void LockRoute(ScenePainter painter) // REVIEW: This is never used for some reason, but I don't know why.
 	{
 		/* Basically maintain all of the used ISL links. */
 		foreach (ActiveISL pair in painter.UsedISLLinks)

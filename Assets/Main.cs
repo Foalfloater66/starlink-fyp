@@ -382,6 +382,8 @@ public class Main : MonoBehaviour
 		switch (attack_choice)
 		{
 			case AttackChoice.Demo:
+				_city_creator.DemoCities();
+				break;
 			case AttackChoice.CoastalUS:
 			case AttackChoice.TranscontinentalUS:
 				_city_creator.NACities();

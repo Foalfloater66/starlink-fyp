@@ -130,7 +130,7 @@ namespace Routing
 			{
 				nodes[i].UpdateDists(maxdist / km_per_unit); // IT COULD BE THIS!!! THATS CAUSING A PROBLEM!!! maybe its making them unreachable, etc.
 			}
-			startnode.Dist = 0f;
+			startnode.Dist = 0f; // TODO: maybe I should use this instead of ResetNodes.
 		}
 
 		public void ResetNodeDistances()
@@ -140,7 +140,7 @@ namespace Routing
 				nodes[i].Dist = Node.INFINITY;
 			}
 			startnode.Dist = 0f;
-		}
+		} // TODO: maybe I should use this as well right after?
 
 		public void AddNeighbour(int nodenum1, int nodenum2, bool dist_limited)
 		{
@@ -157,7 +157,7 @@ namespace Routing
 
 		public void ComputeRoutes()
 		{
-			/* Essentially runs Djikstra. */
+			/* Essentially runs Dijkstra. */
 			/* Make new binary heap. Add all of the nodes. */
 			heap = new BinaryHeap<Node>(nodecount);
 			for (int i = 0; i < nodecount; i++)
