@@ -269,7 +269,7 @@ namespace Orbits.Satellites
 			}
 			catch (Exception e)
 			{
-				Debug.LogWarning($"Link index is {_linkson} for links {links.Length}");
+				Debug.LogWarning($"Exception thrown: {e}");
 			}
 		}
 
@@ -652,12 +652,6 @@ namespace Orbits.Satellites
 					oncount++;
 					LaserScript ls = (LaserScript)lasers[lc].GetComponent(typeof(LaserScript));
 					Debug.Assert(this != laserdsts[lc]);
-					if (position() == laserdsts[lc].position())
-					{
-						Debug.Log("Same pos");
-						Debug.Log("Me: " + satid.ToString() + " Him: " + laserdsts[lc].satid.ToString());
-						Debug.Log("My pos: " + position().ToString() + " His pos: " + laserdsts[lc].position().ToString());
-					}
 					Debug.Assert(position() != laserdsts[lc].position());
 
 					ls.SetPos(position(), laserdsts[lc].position());

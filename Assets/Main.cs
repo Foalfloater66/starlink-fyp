@@ -542,8 +542,6 @@ public class Main : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		Debug.Log("Update()");
-		
 		// Update scene initial parameters
 		elapsed_time = last_elapsed_time + (Time.time - last_speed_change) * speed;
 		RotateCamera();

@@ -180,7 +180,6 @@ namespace Utilities
 			// Have we passed the next time?
 			if (Time.time - start_time > times [current_cam + 1]) {
 				current_cam++;
-				Debug.Log ("Current cam: " + current_cam.ToString());
 				cam_count--;
 			}
 			// f goes from zero at times[0] to one at times[1]

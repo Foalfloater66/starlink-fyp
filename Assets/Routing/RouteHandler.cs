@@ -126,10 +126,8 @@ public class RouteHandler // TODO: move to a separate class
 		// REVIEW: I think this code might be going from the end node to the start node! I'm not sure
 		int index = 0;
 		Node prevRn = path.nodes.First();
-		Debug.Assert(path.nodes.Count > 2);
 		Node rn = path.nodes[index+1];
 		// TODO: I need to find a way to log RF link capacities as well. (format source city, destination satellite OR format source satellite, destination city)
-		// Debug.Log($"RouteHasEarlyCollision: Node that I start checking this stuff at {rn.Id}");
 		while (index < path.nodes.Count)
 		{
 			// Target link is reachable. Exit the checker.

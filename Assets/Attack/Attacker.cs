@@ -161,10 +161,8 @@ namespace Attack
             // TODO: Remove debugging messages.
             if (viable_route)
             {
-                // UnityEngine.Debug.Log("FindAttackRoute | This is a valid attack route!");
                 return route;
             }
-            // UnityEngine.Debug.Log("FindAttackRoute | Couldn't find a valid attack route.");
             return null;
         }
 
@@ -237,16 +235,12 @@ namespace Attack
 		/* Draw the computed path and send traffic in mbits. */
 		public void ExecuteAttackRoute(Path path, GameObject city1 /* TODO: remove this */, GameObject city2 /* TODO: remove this */, int mbits, LinkCapacityMonitor _linkCapacityMonitor, ScenePainter _painter, ConstellationContext constellation_ctx)
 		{
-	        // TODO: create a attributes struct.
-			Debug.Log(string.Join("=", from a in path.nodes select a.Id));
 			Node rn = path.nodes.Last();
 			
 			// REVIEW: Separate the drawing functionality from the link capacity modification.
 			
 			Debug.Assert(rn != null); //, "ExecuteAttackRoute | The last node is empty.");
 			Debug.Assert(rn.Id == -1, $"Execute AttackRoute | The last node isn't -1. Instead, got {rn.Id}"); //, "ExecuteAttackRoute | The last node is not -2. Instead, it's " + rn.Id);
-			
-			Debug.Log("Did the asserts.");
 			
 			Node prevnode = null;
 			Satellite sat = null;
@@ -261,25 +255,6 @@ namespace Attack
 			}
 			
 			int index = path.nodes.Count - 2;
-			
-			
-			// color links AND process linking. # FIRST
-			// process link capacity.
-			// while (true)
-
-			// int index2 = path.nodes.Count - 1;
-
-			// while (index2 >= 0)
-			// {
-				// Debug.Log($"NODES OUTPUT: {path.nodes[index2].Id}");
-				// index2 -= 1;
-			// }
-				
-			// ENDING....
-			// Debug.DebugBreak();
-			// return;
-			
-			
 
 			// process links from start (id: -2) to end (id: -1)
 			while (true)
@@ -354,78 +329,6 @@ namespace Attack
 				index--;
 				
 			}
-
-			return;
-			
-			
-			
-			
-			// TODO: color links.
-			
-			
-			while (true)
-			{
-				previd = id;
-				id = rn.Id;
-				Debug.Log("ID: " + id);
-				
-				// TODO: this process of coloring links must be reversed, because the processing order of links is reversed (it goes from last node to first node)
-
-				if (previd != -4)
-				{
-					// The previous and current nodes are satellites. (ISL link)
-					if (previd >= 0 && id >= 0)
-					{
-						sat = constellation_ctx.satlist[id];
-						prevsat = constellation_ctx.satlist[previd];
-
-						// Increase the load of the link and abort if link becomes flooded.
-						_linkCapacityMonitor.DecreaseLinkCapacity(previd, id, mbits);
-						if (_linkCapacityMonitor.IsFlooded(previd, id))
-						{
-							break;
-						}
-						
-						_painter.ColorRouteISLLink(prevsat, sat, prevnode, rn);
-					}
-					// The current node is a satellite and the previous, a city. (RF link)
-					else if (id >= 0 && previd == -1)
-					{
-						sat = constellation_ctx.satlist[id];
-						// Assert.AreEqual(-2, previd);
-						Assert.AreEqual(-1, previd);
-						_painter.ColorRFLink(city2, sat, prevnode, rn);
-						// TODO: make the link load capacity rule also hold for RF links. 
-					}
-					// The current node is a city and the previous, a satellite. (RF link)
-					else 
-					{
-						// if (id == -1 && previd >= 0)
-						Assert.AreEqual(-2, id);
-						sat = constellation_ctx.satlist[previd]; 
-						_painter.UsedRFLinks.Add(new ActiveRF(city1, rn, sat, prevnode));
-					}
-				}
-
-				if (rn != null && rn.Id == -2)
-				{
-					// basically; we are at the end!
-					break;
-				}
-				prevnode = rn;
-				// rn = rn.Parent;
-				if (index == path.nodes.Count) // only show a path if it's feasible.
-				{
-					return;
-				}
-				rn = path.nodes[index]; // TODO: reverse the node list and read everything in opposite order when processing link capacity!
-				if (rn == null) // only show a path if it's feasible.
-				{
-					return;
-				}
-				index--;
-			}
-
 		}
 
 		/// <summary>
@@ -444,7 +347,6 @@ namespace Attack
 				{
 					ExecuteAttackRoute(attack_path, attack_path.start_city, attack_path.end_city, mbits,
 						_linkCapacityMonitor, _painter, constellation_ctx);
-					Debug.Log("Print the route ");
 				}
 			}
 		}
@@ -458,12 +360,12 @@ namespace Attack
 			// Color the target link on the map. If flooded, the link is colored red. Otherwise, the link is colored pink.
 			if (_linkCapacityMonitor.IsFlooded(Target.Link.SrcNode.Id, Target.Link.DestNode.Id))
 			{
-				Debug.Log("Update | Link was flooded.");
+				Debug.Log("UpdateTargetLinkVisuals | Link was flooded.");
 				_painter.ColorTargetISLLink(constellation_ctx.satlist[Target.Link.SrcNode.Id], constellation_ctx.satlist[Target.Link.DestNode.Id], Target.Link.DestNode, Target.Link.SrcNode, true);
 			}
 			else
 			{
-				Debug.Log("Update | Link could not be flooded. It has capacity: " +
+				Debug.Log("UpdateTargetLinkVisuals | Link could not be flooded. It has capacity: " +
 				          _linkCapacityMonitor.GetCapacity(Target.Link.SrcNode.Id, Target.Link.DestNode.Id));
 				_painter.ColorTargetISLLink(constellation_ctx.satlist[Target.Link.SrcNode.Id], constellation_ctx.satlist[Target.Link.DestNode.Id], Target.Link.DestNode, Target.Link.SrcNode, false);
 			}
@@ -476,12 +378,8 @@ namespace Attack
         public void Run(ConstellationContext constellation_ctx,
 	        bool graph_on, List<GameObject> groundstations)
         {
-	        // REVIEW: Create a RouteGraph without needing to have new_york and toronto passed.
 	        _routeHandler.ResetRoute(_Groundstations["New York"], _Groundstations["Toronto"], _painter, constellation_ctx.satlist,constellation_ctx.maxsats);
-	        // REVIEW: Do I need to return the routegraph?
-	        // _routeHandler.ResetRoutePos(());
 	        _rg = _routeHandler.BuildRouteGraph(_Groundstations["New York"], _Groundstations["Toronto"], constellation_ctx.maxdist, constellation_ctx.margin, constellation_ctx.maxsats, constellation_ctx.satlist, constellation_ctx.km_per_unit, graph_on);
-
 
 	        // If the current link isn't valid, select a new target link.
 	        if (!Target.HasValidTargetLink())
@@ -489,13 +387,12 @@ namespace Attack
 		        Target.ChangeTargetLink(_rg, debug_on: true);
 	        }
 
-
 	        // If the attacker has selected a valid link, attempt to attack it
 	        if (Target.Link != null && Target.HasValidTargetLink())
 	        {
-				Debug.Log($"Attacker.Run | Link: {Target.Link.SrcNode.Id} - {Target.Link.DestNode.Id}");
+				Debug.Log($"Attacker.Run | Target Link: {Target.Link.SrcNode.Id} - {Target.Link.DestNode.Id}");
+				
 		        // Find viable attack routes.
-		        
 		        BinaryHeap<Path> attack_routes = _FindAttackRoutes(_rg,
 			        groundstations,
 			        graph_on,
@@ -507,7 +404,7 @@ namespace Attack
 	        }
 	        else
 	        {
-		        Debug.Log("Attacker.Update | Could not find any valid link.");
+		        Debug.Log("Attacker.Run | Could not find any valid link.");
 	        }
         }
     }
