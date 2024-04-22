@@ -98,7 +98,8 @@ namespace Utilities
 
 			void PositionCamera()
 			{
-				positions.Add(new Vector3(-30f, 0f, -25f));
+				// positions.Add(new Vector3(-30f, 0f, -25f));
+				positions.Add(new Vector3(-25f, 3f, -20f));
 				angles.Add(new Vector3(0f, 50f, 0f));
 			}
 
@@ -115,7 +116,7 @@ namespace Utilities
 			speeds.Add (0.01f);
 			
 			lightrot = new Vector3 (30f, 100f, 0f);
-			FoV = 90f;
+			FoV = 60f;
 		}
 
 		public void InitView() {

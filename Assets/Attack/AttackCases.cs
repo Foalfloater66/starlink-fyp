@@ -52,7 +52,6 @@ namespace Attack
                     orbit_id = 16;
                     
                     src_gs_names.AddRange(new List<string>{
-                    
                         "Los Angeles",
                         "El Paso",
                         "San Diego",
@@ -67,20 +66,34 @@ namespace Attack
                     orbit_id = 11;
                     
                     src_gs_names.AddRange(new List<string>{
-                        // Canadian cities
+                        // Canadian cities (extremity 1)
                         "Winnipeg",
                         "Edmonton",
                         "Calgary"
-                        // TODO: put some african cities here.
+                        // TODO: put some african cities here. (extremity 2)
                     });
                     break;
                 case AttackChoice.Equatorial:
                     // Quito, Equador
                     target_lat = 0f;
-                    target_lon = 78f;
-                    // TODO: add a set of groundstations for SA
+                    target_lon = 78f; // good coastal example
                     
-                    src_gs_names = new List<string>();
+                    // 6°10'02"N 72°38'14"W
+                    target_lat = 6.10f;
+                    target_lon = 72.38f;
+                    
+                    
+                    src_gs_names.AddRange(new List<string>{
+                        // South
+                        "Guayaquil",
+                        "Lima",
+                        "Medellin",
+                        "Quito",
+                        "Cali"
+                        // North
+                        // "Caracas",
+                        // "Maracaibo"
+                        });
                     break;
                 case AttackChoice.IntraOrbital:
                     // Denver, USA

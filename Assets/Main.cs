@@ -187,7 +187,7 @@ public class Main : MonoBehaviour
 			default: // for LogChoice.None and LogChoice.Path
 				break;
 		}
-		summary_logfile = new System.IO.StreamWriter(log_directory + "summary.txt");
+		// summary_logfile = new System.IO.StreamWriter(log_directory + "summary.txt");
 
 		start_time = Time.time;
 
@@ -346,6 +346,8 @@ public class Main : MonoBehaviour
 		AttackCases.setUpAttackParams(attack_choice, groundstations, out float target_lat, out float target_lon, out int orbit_id,
 			out List<GameObject> src_groundstations);
 		
+		// TODO: maek the attack radius parameterizabnle based on the case too!
+		
 		// Create attacker entity.
 		_attacker = new Attacker(target_lat, target_lon, sat0r, attack_radius, orbit_id, src_groundstations, transform, city_prefab, groundstations, routeHandler, _painter, _link_capacities);
 
@@ -391,11 +393,10 @@ public class Main : MonoBehaviour
 			case AttackChoice.Polar:
 				_city_creator.CANCities();
 				_city_creator.AFCities();
-				// _city_creator.EUCities();
 				break;
 			case AttackChoice.Equatorial:
-				// TODO: add cities. (US + SA)
 				_city_creator.USACities();
+				_city_creator.SACities();
 				break;
 			case AttackChoice.IntraOrbital:
 			case AttackChoice.TransOrbital:

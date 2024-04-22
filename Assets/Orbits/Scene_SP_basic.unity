@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 191554813}
-  m_IndirectSpecularColor: {r: 0.00021454219, g: 0.00043713034, b: 0.00021454219,
+  m_IndirectSpecularColor: {r: 0.00021291373, g: 0.00043713034, b: 0.00021291373,
     a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
@@ -487,7 +487,7 @@ MonoBehaviour:
   relay_dist_step: 2
   direction: 1
   directionChangeSpeed: 2
-  attack_radius: 800
+  attack_radius: 1000
   debug: 1
   orbit: {fileID: 1172864837802712, guid: 3b4a1d43d21bf42d8ad02077259400de, type: 3}
   satellite: {fileID: 1842355326392174, guid: 7327322cd40cd49898f0f3e031d063e4, type: 3}
@@ -515,7 +515,7 @@ MonoBehaviour:
   countdown: {fileID: 485043185}
   rightbottom: {fileID: 1204926847}
   maxorbits: 24
-  attack_choice: 0
+  attack_choice: 4
   constellation: 0
   no_of_paths: 2
   decimator: 1

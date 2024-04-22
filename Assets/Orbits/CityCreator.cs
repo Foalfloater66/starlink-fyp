@@ -154,6 +154,36 @@ namespace Orbits
             CreateCity(33.57f, 7.5f, "Casablanca");
             CreateCity(7.3f, -3.9f, "Ibadan");
         }
+
+        /// <summary>
+        /// Creates cities for the top 20 most populated cities of South America as of each country's national census.
+        /// The original source refers to the population around 2015.
+        ///
+        /// Source: https://en.wikipedia.org/wiki/List_of_cities_in_South_America
+        /// </summary>
+        public void SACities()
+        {
+            CreateCity(-23.33f, 46.38f, "Sao Paulo");               // Sao Paulo, Brazil
+            CreateCity(-12.03f, 77.02f, "Lima");                    // Lima, Peru
+            CreateCity(4.42f, 74.04f, "Bogota");                    // Bogota, Colombia
+            CreateCity(-22.54f, 43.12f, "Rio de Janeiro");          // Rio de Janeiro, Brazil
+            CreateCity(-33.26f, 70.39f, "Santiago");                // Santiago, Chile
+            CreateCity(10.28f, 66.54f, "Caracas");                  // Caracas, Venezuela
+            CreateCity(-34.36f, 58.22f, "Buenos Aires");            // Buenos Aires, Argentina
+            CreateCity(-12.58f, 38.28f, "Salvador");                // Salvador, Brazil
+            CreateCity(-15.46f, 47.55f, "Brasilia");                // Brasilia, Brazil
+            CreateCity(-3.43f, 38.31f, "Fortaleza");                // Fortaleza, Brazil
+            CreateCity(-02.11f, 79.53f, "Guayaquil");               // Guayaquil, Ecuador
+            CreateCity(-00.13f, 78.30f, "Quito");                   // Quito, Ecuador
+            CreateCity(-19.55f, 43.56f, "Belo Horizonte");          // Belo Horizonte, Brazil
+            CreateCity(6.13f, 75.35f, "Medellin");                  // Medellin, Colombia
+            CreateCity(3.25f, 76.31f, "Cali");                      // Cali, Colombia
+            CreateCity(-3.07f, 60.01f, "Manaus");                   // Manaus, Brazil
+            CreateCity(-25.25f, 49.16f, "Curitiba");                // Curitiba, Brazil
+            CreateCity(10.38f, 71.38f, "Maracaibo");                // Maracaibo, Venezuela
+            CreateCity(-8.03f, 34.54f, "Recife");                   // Recife, Brazil
+            CreateCity(-17.48f, 63.11f, "Santa Cruz de la Sierra"); // Santa Cruz de la Sierra, Bolivia
+    }
         
         /// <summary>
         /// Creates a city GameObject and stores it as a groundstation.

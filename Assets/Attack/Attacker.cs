@@ -95,7 +95,7 @@ namespace Attack
             
             _Groundstations = groundstations;
             
-            logfile = new System.IO.StreamWriter(Main.log_directory + "/Path/attacker_summary.txt");
+            // logfile = new System.IO.StreamWriter(Main.log_directory + "/Path/attacker_summary.txt");
         }
 
         /// <summary>
