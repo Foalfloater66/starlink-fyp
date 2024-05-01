@@ -5,6 +5,19 @@ using UnityEngine;
 
 namespace Attack
 {
+    
+    // public enum AttackChoice
+    // {
+    //     Demo, // Small Example Case
+    //     LandlockedUS, // Intra-continental
+    //     CoastalUS, // Continental coast
+    //     // TODO: add insular example.
+    //     Polar, // High link density
+    //     Equatorial, // Low link density
+    //     TransOrbital, // Across orbits
+    //     IntraOrbital, // Within the same orbit
+    // };
+    
     public static class AttackCases
     {
 
@@ -31,7 +44,7 @@ namespace Attack
                         "Havana"
                     });
                     break;
-                case AttackChoice.TranscontinentalUS:
+                case AttackChoice.LandlockedUS:
                     // Nebraska, USA
                     target_lat = 41.49f;
                     target_lon = 99.90f;
@@ -47,8 +60,8 @@ namespace Attack
                     break;
                 case AttackChoice.CoastalUS:
                     // Las Vegas, USA
-                    target_lat = 36f;
-                    target_lon = 115f;
+                    target_lat = 36.17f;
+                    target_lon = 115.14f;
                     orbit_id = 16;
                     
                     src_gs_names.AddRange(new List<string>{

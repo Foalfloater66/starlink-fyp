@@ -62,8 +62,9 @@ public class Main : MonoBehaviour
 	private LinkCapacityMonitor _link_capacities; /* (node1, node2) link mapping to capacity. Links are full duplex. */
 
 	private CityCreator _city_creator;
-	public int initial_link_capacity = 1000;
-
+	public int initial_link_capacity = 20000; // official FCC link capacity filing for ISLs34
+	// TODO: ground station capacity is NOT the same as ISL capacity! need to read the FCC filings
+	
 	GameObject[] orbits;
 	double[] orbitalperiod;
 	Satellite[] satlist;
@@ -387,7 +388,7 @@ public class Main : MonoBehaviour
 				_city_creator.DemoCities();
 				break;
 			case AttackChoice.CoastalUS:
-			case AttackChoice.TranscontinentalUS:
+			case AttackChoice.LandlockedUS:
 				_city_creator.NACities();
 				break;
 			case AttackChoice.Polar:
@@ -538,7 +539,7 @@ public class Main : MonoBehaviour
 			orbits[i].transform.RotateAround(Vector3.zero, orbitaxes[i], (float)(-1f * earthperiod / orbitalperiod[i] * simspeed * direction) * Time.deltaTime);
 		}
 	}
-
+	
 	// Update is called once per frame
 	void Update()
 	{

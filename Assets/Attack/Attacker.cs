@@ -338,6 +338,7 @@ namespace Attack
 		/// <param name="constellation_ctx">Constellation context.</param>
 		private void FloodLink(BinaryHeap<Path> attack_routes, ConstellationContext constellation_ctx)
 		{
+			int counter = 0;
 			while (!_linkCapacityMonitor.IsFlooded(Target.Link.SrcNode.Id, Target.Link.DestNode.Id) && attack_routes.Count > 0)
 			{
 				Path attack_path = attack_routes.ExtractMin();
@@ -347,8 +348,10 @@ namespace Attack
 				{
 					ExecuteAttackRoute(attack_path, attack_path.start_city, attack_path.end_city, mbits,
 						_linkCapacityMonitor, _painter, constellation_ctx);
+					counter += 1;
 				}
 			}
+			Debug.Log($"I have created {counter} attack routes.");
 		}
 
 		/// <summary>

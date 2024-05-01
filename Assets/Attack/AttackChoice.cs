@@ -3,8 +3,9 @@ namespace Attack
     public enum AttackChoice
     {
         Demo, // Small Example Case
-        TranscontinentalUS, // Intra-continental
+        LandlockedUS, // Intra-continental
         CoastalUS, // Continental coast
+        // TODO: add insular example.
         Polar, // High link density
         Equatorial, // Low link density
         TransOrbital, // Across orbits

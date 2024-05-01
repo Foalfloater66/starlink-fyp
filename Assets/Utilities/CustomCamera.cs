@@ -125,7 +125,7 @@ namespace Utilities
 			{
 				case AttackChoice.Demo:
 				case AttackChoice.Polar:
-				case AttackChoice.TranscontinentalUS:
+				case AttackChoice.LandlockedUS:
 					_ViewUS(); // TODO: change this to have the coast in centreview. 
 					break;
 				case AttackChoice.CoastalUS:

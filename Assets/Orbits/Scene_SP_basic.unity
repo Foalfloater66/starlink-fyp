@@ -481,7 +481,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 1375312111}
-  spin: 1
+  spin: 0
   speed: 10
   use_isls: 1
   relay_dist_step: 2
@@ -499,7 +499,7 @@ MonoBehaviour:
     type: 3}
   beam_prefab2: {fileID: 1454064570112744, guid: ae0115a2e33c24b7d92d193312575599,
     type: 3}
-  initial_link_capacity: 1000
+  initial_link_capacity: 20000
   isl_material: {fileID: 2100000, guid: 054725efd433545d0867a6c84dd8b574, type: 2}
   yellowMaterial: {fileID: 0}
   laserMaterials:
@@ -515,7 +515,7 @@ MonoBehaviour:
   countdown: {fileID: 485043185}
   rightbottom: {fileID: 1204926847}
   maxorbits: 24
-  attack_choice: 4
+  attack_choice: 1
   constellation: 0
   no_of_paths: 2
   decimator: 1
