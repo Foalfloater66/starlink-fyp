@@ -92,11 +92,11 @@ namespace Routing
 		public void AddEndNodes()
 		{
 			satcount = nodecount;
-			nodes[nodecount] = new Node(-1, Vector3.zero);
+			nodes[nodecount] = new Node(-1, Vector3.zero);	// Start node.
 			startnode = nodes[nodecount];
 			startnode.Dist = 0f;
 			nodecount++;
-			nodes[nodecount] = new Node(-2, Vector3.zero);
+			nodes[nodecount] = new Node(-2, Vector3.zero);	// End node.
 			endnode = nodes[nodecount];
 			nodecount++;
 		}

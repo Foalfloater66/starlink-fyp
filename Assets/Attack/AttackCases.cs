@@ -1,42 +1,368 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Orbits;
 using UnityEditor;
 using UnityEngine;
 
 namespace Attack
 {
-    
-    // public enum AttackChoice
-    // {
-    //     Demo, // Small Example Case
-    //     LandlockedUS, // Intra-continental
-    //     CoastalUS, // Continental coast
-    //     // TODO: add insular example.
-    //     Polar, // High link density
-    //     Equatorial, // Low link density
-    //     TransOrbital, // Across orbits
-    //     IntraOrbital, // Within the same orbit
-    // };
-    
-    public static class AttackCases
+    public enum QualitativeCase
     {
+        SimpleDemo, // Small Example Case
+        Landlocked, // Intra-continental
+        Coastal, // Continental coast
 
-        public static void setUpAttackParams(AttackChoice attack_choice, GroundstationCollection groundstations, out float target_lat, out float target_lon, out int orbit_id, out List<GameObject> src_gs_list)
+        // TODO: add insular example.
+        Polar, // High link density
+        Equatorial, // Low link density
+        TransOrbital, // Across orbits
+        IntraOrbital // Within the same orbit
+    };
+
+    /// <summary>
+    /// Defines the general orientation of the attack link (horizontal or vertical)
+    /// and the position of the source node in relation to the destination link.
+    /// </summary>
+    public enum TargetLinkOrientation // DONT NEED THIS. JUST NEED DIRECTION.
+    {
+        // TODO: rename these parameters.
+        Horizontal, // horizontal
+        Vertical, // vertical 
+        Any // No preference
+    }
+
+    /// <summary>
+    /// Defines the position of the source node in relation to the destination link.
+    /// Depends on the general orientation of the attack link. If none is specified,
+    /// then the position of the source node should not be selectable.
+    /// </summary>
+    public enum Direction // DIRECTION
+    {
+        East, // if target link is horizontal, source node is eastern.
+        West, // if target link is horizontal, source node is western.
+        North, // if target link is vertical, source node is northern.
+        South, // if target link is vertical, source node is southern.
+        Any // no preference
+    }
+
+    public struct AttackParams
+    {
+        public static AttackParams Default =>
+            new AttackParams(0f, 0f, -1, Direction.Any,
+                new List<GameObject>());
+
+        private AttackParams(float latitude, float longitude, int orbitId, Direction direction,
+            List<GameObject> srcGroundstations)
+        {
+            Latitude = latitude;
+            Longitude = longitude;
+            OrbitId = orbitId;
+            // TargetLinkOrientation = targetLinkOrientation; 
+            // SourceNodePosition = sourceNodePosition; 
+            Direction = direction;
+            SrcGroundstations = srcGroundstations;
+        }
+
+        public float Latitude; // target area latitude.
+        public float Longitude; // target area longitude.
+
+        public int OrbitId; // if -1, then there's no specific orbit.
+
+        // public TargetLinkOrientation TargetLinkOrientation;                     // preferred target link orientation.
+        public Direction Direction; // preferred source node position.
+        public List<GameObject> SrcGroundstations; // attacker source ground stations.
+    }
+
+    public class AttackCases
+    {
+        // public void 
+        private AttackParams _ctx;
+
+        public AttackCases()
+        {
+            _ctx = AttackParams.Default;
+        }
+
+        /// <summary>
+        /// Specify coordinates of the target area based on the attack type choice.
+        /// </summary>
+        /// <param name="qualitativeCase">Attack case choice.</param>
+        public AttackCases SetTargetCoordinates(QualitativeCase qualitativeCase)
+        {
+            switch (qualitativeCase)
+            {
+                // TODO: add default case. (the Miami attack)
+                case QualitativeCase.SimpleDemo:
+                    // Simple example demo
+                    _ctx.Latitude = 32.85f;
+                    _ctx.Longitude = 80.79f;
+                    break;
+                case QualitativeCase.Landlocked:
+                    // Nebraska, USA
+                    _ctx.Latitude = 41.49f;
+                    _ctx.Longitude = 99.90f;
+                    break;
+                case QualitativeCase.Coastal:
+                    // Las Vegas, USA
+                    _ctx.Latitude = 36.17f;
+                    _ctx.Longitude = 115.14f;
+                    _ctx.OrbitId = 16;
+                    break;
+                case QualitativeCase.Polar:
+                    // South of Lake River, Canada
+                    _ctx.Latitude = 50f;
+                    _ctx.Longitude = 82f;
+                    _ctx.OrbitId = 11;
+                    break;
+                case QualitativeCase.Equatorial:
+                    // Quito, Equador
+                    // target_lat = 0f;
+                    // target_lon = 78f; // good coastal example
+
+                    // 6°10'02"N 72°38'14"W
+                    _ctx.Latitude = 6.10f;
+                    _ctx.Longitude = 72.38f;
+                    break;
+                case QualitativeCase.IntraOrbital:
+                    // Denver, USA
+                    _ctx.Latitude = 39.73f;
+                    _ctx.Longitude = 104.99f;
+                    _ctx.OrbitId = 8;
+                    break;
+                case QualitativeCase.TransOrbital:
+                    // Denver, USA
+                    _ctx.Latitude = 39.73f;
+                    _ctx.Longitude = 104.99f;
+                    break;
+            }
+
+            return this;
+        }
+
+        private List<string>
+            LandLocked() //TargetLinkOrientation orientation, SourceNodePosition position)
+        {
+            switch (_ctx.Direction)
+            {
+                case Direction.East:
+                    // TODO: finish this.
+                    return new List<string>
+                    {
+                        "Las Vegas",
+                        "Phoenix",
+                        "Los Angeles",
+                        "El Paso",
+                        "Houston"
+                    };
+                case Direction.West:
+                {
+                    return new List<string>
+                    {
+                        "Toronto",
+                        "New York",
+                        "Chicago",
+                        "Winnipeg",
+                        "Edmundston",
+                        "Montreal",
+                    };
+                }
+                case Direction.North:
+                {
+                    return new List<string>
+                    {
+                        "Las Vegas",
+                        "Phoenix",
+                        "Los Angeles",
+                        "El Paso",
+                        "Houston"
+                    };
+                }
+                case Direction.South:
+                {
+                    return new List<string>
+                    {
+                        "Toronto",
+                        "New York",
+                        "Chicago",
+                        "Winnipeg",
+                        "Edmundston",
+                        "Montreal",
+                    };
+                }
+
+
+                    break;
+                // else // WE CAN'T ALLOW ANY IF ELSE HERE!!! NO ANY ALLOWED!
+                // {
+
+                // }
+
+                case Direction.Any: 
+                default:
+                    return new List<string>
+                    {
+                        "Toronto",
+                        "New York",
+                        "Chicago",
+                        "Los Angeles",
+                        "El Paso",
+                        "Houston"
+                    };
+            }
+        }
+
+
+        private List<string> Coastal()
+            // TargetLinkOrientation orientation, SourceNodePosition position)
+        {
+            return new List<string>
+            {
+                "Los Angeles",
+                "El Paso",
+                "San Diego",
+                "Phoenix",
+                "Seattle"
+            };
+        }
+
+        private List<string> Polar()
+        {
+            return new List<string>
+            {
+                // Canadian cities (extremity 1)
+                "Winnipeg",
+                "Edmonton",
+                "Calgary"
+                // TODO: put some african cities here. (extremity 2)
+            };
+        }
+
+        private List<string> Equatorial()
+        {
+            return new List<string>
+            {
+                // South
+                "Guayaquil",
+                "Lima",
+                "Medellin",
+                "Quito",
+                "Cali"
+                // North
+                // "Caracas",
+                // "Maracaibo"
+            };
+        }
+
+        private List<string> IntraOrbital()
+        {
+            return new List<string>
+            {
+                // top
+                "Chicago",
+                "Winnipeg",
+                // bottom
+                "El Paso",
+                "Phoenix"
+            };
+        }
+
+        private List<string> TransOrbital()
+        {
+            return new List<string>
+            {
+                // south
+                "Fort Worth",
+                "Austin",
+                // north
+                "Denver",
+                "San Jose"
+            };
+        }
+
+        public AttackCases SetLinkDirection(Direction direction)
+        {
+            _ctx.Direction = direction;
+
+            return this;
+        }
+        public AttackCases SetSourceGroundstations(QualitativeCase qualitativeCase, 
+            GroundstationCollection groundstations)
+        {
+            var src_gs_names = new List<string>();
+
+            // toDO: Create cities here instead.
+            switch (qualitativeCase)
+            {
+                case QualitativeCase.Landlocked:
+                    src_gs_names = LandLocked();
+                    break;
+                case QualitativeCase.Coastal:
+                    src_gs_names = Coastal();
+                    break;
+                case QualitativeCase.Polar:
+                    src_gs_names = Polar();
+                    break;
+                case QualitativeCase.Equatorial:
+                    src_gs_names = Equatorial();
+                    break;
+                case QualitativeCase.IntraOrbital:
+                    src_gs_names = IntraOrbital();
+                    break;
+                case QualitativeCase.TransOrbital:
+                    src_gs_names = TransOrbital();
+                    // Attacker source groundstations.
+                    break;
+                // TODO: add default case. (the Miami attack)
+                case QualitativeCase.SimpleDemo:
+                default:
+                    src_gs_names.AddRange(new List<string>()
+                    {
+                        "Miami",
+                        "Havana"
+                    });
+                    break;
+            }
+            foreach (var src_gs_name in src_gs_names) _ctx.SrcGroundstations.Add(groundstations[src_gs_name]);
+            return this;
+        }
+
+        /// <summary>
+        /// Build and return the full attack parameters object.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="Exception">Throws an exception if the list of source ground stations is empty.</exception>
+        public AttackParams Build()
+        {
+            
+            if (!_ctx.SrcGroundstations.Any())
+            {
+
+                throw new Exception(
+                    "An attacker can't be created without any source ground stations to send traffic from.");
+            }
+
+            return _ctx;
+        }
+
+        public static void setUpAttackParams(QualitativeCase qualitativeCase, Direction direction,
+            GroundstationCollection groundstations, out float target_lat, out float target_lon, out int orbit_id,
+            out List<GameObject> src_gs_list)
         {
             target_lat = 0f;
             target_lon = 0f;
             orbit_id = -1;
-            List<string> src_gs_names = new List<string>();
+            var src_gs_names = new List<string>();
             // toDO: Create cities here instead.
-            switch (attack_choice)
+            switch (qualitativeCase)
             {
                 // TODO: add default case. (the Miami attack)
-                case AttackChoice.Demo:
+                case QualitativeCase.SimpleDemo:
                     // Simple example demo between Miami & Chicago
                     target_lat = 32.85f;
                     target_lon = 80.79f;
                     // 32.851087, -80.797884
-                    
+
                     // Attacker source groundstations.
                     src_gs_names.AddRange(new List<string>()
                     {
@@ -44,27 +370,29 @@ namespace Attack
                         "Havana"
                     });
                     break;
-                case AttackChoice.LandlockedUS:
+                case QualitativeCase.Landlocked:
                     // Nebraska, USA
                     target_lat = 41.49f;
                     target_lon = 99.90f;
-                    
-                src_gs_names.AddRange(new List<string>{
-                    "Toronto",
-                    "New York",
-                    "Chicago",
-                    "Los Angeles",
-                    "El Paso",
-                    "Houston"
-                });
+
+                    src_gs_names.AddRange(new List<string>
+                    {
+                        "Toronto",
+                        "New York",
+                        "Chicago",
+                        "Los Angeles",
+                        "El Paso",
+                        "Houston"
+                    });
                     break;
-                case AttackChoice.CoastalUS:
+                case QualitativeCase.Coastal:
                     // Las Vegas, USA
                     target_lat = 36.17f;
                     target_lon = 115.14f;
                     orbit_id = 16;
-                    
-                    src_gs_names.AddRange(new List<string>{
+
+                    src_gs_names.AddRange(new List<string>
+                    {
                         "Los Angeles",
                         "El Paso",
                         "San Diego",
@@ -72,13 +400,14 @@ namespace Attack
                         "Seattle"
                     });
                     break;
-                case AttackChoice.Polar:
+                case QualitativeCase.Polar:
                     // South of Lake River, Canada
                     target_lat = 50f;
                     target_lon = 82f;
                     orbit_id = 11;
-                    
-                    src_gs_names.AddRange(new List<string>{
+
+                    src_gs_names.AddRange(new List<string>
+                    {
                         // Canadian cities (extremity 1)
                         "Winnipeg",
                         "Edmonton",
@@ -86,17 +415,18 @@ namespace Attack
                         // TODO: put some african cities here. (extremity 2)
                     });
                     break;
-                case AttackChoice.Equatorial:
+                case QualitativeCase.Equatorial:
                     // Quito, Equador
                     target_lat = 0f;
                     target_lon = 78f; // good coastal example
-                    
+
                     // 6°10'02"N 72°38'14"W
                     target_lat = 6.10f;
                     target_lon = 72.38f;
-                    
-                    
-                    src_gs_names.AddRange(new List<string>{
+
+
+                    src_gs_names.AddRange(new List<string>
+                    {
                         // South
                         "Guayaquil",
                         "Lima",
@@ -106,47 +436,47 @@ namespace Attack
                         // North
                         // "Caracas",
                         // "Maracaibo"
-                        });
+                    });
                     break;
-                case AttackChoice.IntraOrbital:
+                case QualitativeCase.IntraOrbital:
                     // Denver, USA
                     target_lat = 39.73f;
                     target_lon = 104.99f;
                     orbit_id = 8;
-                    src_gs_names.AddRange(new List<string>{
+                    src_gs_names.AddRange(new List<string>
+                    {
                         // top
                         "Chicago",
                         "Winnipeg",
                         // bottom
-                        "El Paso", 
+                        "El Paso",
                         "Phoenix"
                     });
                     break;
-                case AttackChoice.TransOrbital:
+                case QualitativeCase.TransOrbital:
                     // Denver, USA
                     target_lat = 39.73f;
                     target_lon = 104.99f;
-                    
+
                     // TODO: Create a set of groundstations that would force trans orbital routing.
                     // TODO: place source groundstations that are perpendicular to this orbit.
                     orbit_id = 8;
-                    
+
                     // Attacker source groundstations.
-                    src_gs_names.AddRange(new List<string>{
+                    src_gs_names.AddRange(new List<string>
+                    {
                         // south
                         "Fort Worth",
                         "Austin",
                         // north
                         "Denver",
-                        "San Jose",
-                        });
+                        "San Jose"
+                    });
                     break;
             }
+
             src_gs_list = new List<GameObject>();
-            foreach (string src_gs_name in src_gs_names)
-            {
-                src_gs_list.Add(groundstations[src_gs_name]);
-            }
+            foreach (var src_gs_name in src_gs_names) src_gs_list.Add(groundstations[src_gs_name]);
         }
     }
 }

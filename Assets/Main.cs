@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Attack;
 using Orbits;
 using Orbits.Satellites;
@@ -9,6 +10,7 @@ using UnityEngine;
 using Scene;
 using Scene.GameObjectScripts;
 using UnityEngine.Assertions;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Utilities;
 
@@ -138,7 +140,10 @@ public class Main : MonoBehaviour
 	long elapsed_sum = 0;
 	int elapsed_count = 0;
 
-	public AttackChoice attack_choice;
+	[FormerlySerializedAs("attackArea")] [FormerlySerializedAs("attack_choice")] public QualitativeCase qualitativeCase;
+	public Direction targetLinkDirection;
+	// public TargetLinkOrientation targetLinkOrientation;
+	// public SourceNodePosition sourceNodePosition;
 	
 	public enum ConstellationChoice { P24_S66_A550, P72_S22_A550, P32_S50_A1100 };
 	public ConstellationChoice constellation;
@@ -195,7 +200,7 @@ public class Main : MonoBehaviour
 		/* ask the camera to view the same area as our route */
 		CustomCamera camscript = (CustomCamera)cam.GetComponent(typeof(CustomCamera));
 		// camscript.route_choice = route_choice;
-		camscript.attack_choice = attack_choice;
+		camscript.qualitativeCase = qualitativeCase;
 		camscript.InitView();
 
 		int satsperorbit = 0;
@@ -344,13 +349,21 @@ public class Main : MonoBehaviour
 		_link_capacities = new LinkCapacityMonitor(initial_link_capacity);
 		
 		// Get target link + list of source groundstations.
-		AttackCases.setUpAttackParams(attack_choice, groundstations, out float target_lat, out float target_lon, out int orbit_id,
-			out List<GameObject> src_groundstations);
+		AttackParams attackParams = new AttackCases()
+			.SetTargetCoordinates(qualitativeCase)
+			.SetLinkDirection(targetLinkDirection)
+			.SetSourceGroundstations(qualitativeCase, groundstations)
+			.Build();
+		// AttackCases.setUpAttackParams(attackArea, groundstations, out float target_lat, out float target_lon, out int orbit_id,
+		// 	out List<GameObject> src_groundstations);
+		StringBuilder builder = new StringBuilder();
+		builder.Append($"PARAMETERS: direction: {targetLinkDirection}");
+		Debug.Log(builder.ToString());
 		
-		// TODO: maek the attack radius parameterizabnle based on the case too!
+		// TODO: make the attack radius parameterizabnle based on the case too!
 		
 		// Create attacker entity.
-		_attacker = new Attacker(target_lat, target_lon, sat0r, attack_radius, orbit_id, src_groundstations, transform, city_prefab, groundstations, routeHandler, _painter, _link_capacities);
+		_attacker = new Attacker(attackParams, sat0r, attack_radius, transform, city_prefab, groundstations, routeHandler, _painter, _link_capacities);
 
 		createContext();
 	}
@@ -382,25 +395,25 @@ public class Main : MonoBehaviour
 		relays = new List<GameObject>(); // TODO: remove this.
 		
 		_city_creator.DefaultCities();
-		switch (attack_choice)
+		switch (qualitativeCase)
 		{
-			case AttackChoice.Demo:
+			case QualitativeCase.SimpleDemo:
 				_city_creator.DemoCities();
 				break;
-			case AttackChoice.CoastalUS:
-			case AttackChoice.LandlockedUS:
+			case QualitativeCase.Coastal:
+			case QualitativeCase.Landlocked:
 				_city_creator.NACities();
 				break;
-			case AttackChoice.Polar:
+			case QualitativeCase.Polar:
 				_city_creator.CANCities();
 				_city_creator.AFCities();
 				break;
-			case AttackChoice.Equatorial:
+			case QualitativeCase.Equatorial:
 				_city_creator.USACities();
 				_city_creator.SACities();
 				break;
-			case AttackChoice.IntraOrbital:
-			case AttackChoice.TransOrbital:
+			case QualitativeCase.IntraOrbital:
+			case QualitativeCase.TransOrbital:
 				_city_creator.NACities();
 				break;
 		}

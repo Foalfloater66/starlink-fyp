@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.OleDb;
 using UnityEngine;
 using Attack;
+using UnityEngine.Serialization;
 
 namespace Utilities
 {
@@ -19,7 +20,7 @@ namespace Utilities
 		bool pause = false;
 		float pause_start_time;
 
-		[HideInInspector] public AttackChoice attack_choice; // TODO: Revisit this. Does it get updated?
+		[FormerlySerializedAs("attackArea")] [FormerlySerializedAs("attack_choice")] [HideInInspector] public QualitativeCase qualitativeCase; // TODO: Revisit this. Does it get updated?
 		
 		public Light sun;
 		float FoV = 60f;
@@ -121,22 +122,22 @@ namespace Utilities
 
 		public void InitView() {
 			Start ();
-			switch (attack_choice)
+			switch (qualitativeCase)
 			{
-				case AttackChoice.Demo:
-				case AttackChoice.Polar:
-				case AttackChoice.LandlockedUS:
+				case QualitativeCase.SimpleDemo:
+				case QualitativeCase.Polar:
+				case QualitativeCase.Landlocked:
 					_ViewUS(); // TODO: change this to have the coast in centreview. 
 					break;
-				case AttackChoice.CoastalUS:
+				case QualitativeCase.Coastal:
 					_ViewCoastalUS();
 					break;
-				case AttackChoice.Equatorial:
+				case QualitativeCase.Equatorial:
 					_ViewAmericanEquator();
 					break;
-				case AttackChoice.IntraOrbital: 
+				case QualitativeCase.IntraOrbital: 
 				// TODO: got to do this at another point.
-				case AttackChoice.TransOrbital:
+				case QualitativeCase.TransOrbital:
 					// TODO: find something that would work here.
 				default:
 					_ViewUS();

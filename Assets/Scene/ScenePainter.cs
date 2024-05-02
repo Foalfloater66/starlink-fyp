@@ -162,7 +162,7 @@ namespace Scene
         /// <param name="maxsats">Maximum number of satellites in the graph.</param>
         public void UpdateLasers(Satellite[] satlist, int maxsats, float speed)
         {
-            UsedRFLinks.ForEach(a => a.sat.LinkOn(a.city));
+            // UsedRFLinks.ForEach(a => a.sat.LinkOn(a.city));
 
             /* assign all the lasers that both sides agree on */
             for (int satnum = 0; satnum < maxsats; satnum++)

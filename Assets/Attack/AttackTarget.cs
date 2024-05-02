@@ -1,7 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 using Routing;
 using UnityEngine;
+using UnityEngineInternal;
+using Object = UnityEngine.Object;
 
 namespace Attack
 {
@@ -40,19 +44,22 @@ namespace Attack
 
         public TargetLink Link { get; private set; }
 
+        private AttackParams _attackParams;
+
+        // private 
         public readonly int OrbitId; // If the orbit Id is -1, then the target link is not restricted by its orbit.
 
-        public AttackTarget(float latitude, float longitude, float sat0r, float radius, Transform transform,
-            GameObject prefab, int orbit_id=-1)
+        public AttackTarget(AttackParams attackParams, float sat0r, float radius, Transform transform,
+            GameObject prefab)
         {
             Link = null;
             Center = Vector3.zero;
             Radius = radius;
-            OrbitId = orbit_id;
-            SetTargetArea(latitude, longitude, sat0r, transform, prefab);
+            OrbitId = attackParams.OrbitId;
+            
+            _attackParams = attackParams;
+            SetTargetArea(attackParams.Latitude, attackParams.Longitude, sat0r, transform, prefab);
         }
-        
-
 
         /// <summary>
         /// Sets and draws a center for the target area based on provided latitude and longitude coordinates.
@@ -69,10 +76,10 @@ namespace Attack
             System.Diagnostics.Debug.Assert(longitude > -180 && longitude < 180);
 
             // convert from lat, long, and altitude to Vector3 representation.
-            GameObject target = Object.Instantiate(prefab, new Vector3(0f, 0f, -altitude), transform.rotation);
-            float long_offset = 20f;
+            var target = Object.Instantiate(prefab, new Vector3(0f, 0f, -altitude), transform.rotation);
+            var long_offset = 20f;
             target.transform.RotateAround(Vector3.zero, Vector3.up, longitude - long_offset);
-            Vector3 lat_axis = Quaternion.Euler(0f, -90f, 0f) * target.transform.position;
+            var lat_axis = Quaternion.Euler(0f, -90f, 0f) * target.transform.position;
             target.transform.RotateAround(Vector3.zero, lat_axis, latitude);
             target.transform.SetParent(transform, false);
 
@@ -85,9 +92,9 @@ namespace Attack
         /// <returns>True if both of the target link's nodes are in the target area, false otherwise. If the victim link hasn't been set, returns false.</returns>
         public bool HasValidTargetLink()
         {
-            return Link != null && (InTargetArea(Link.SrcNode.Position) && InTargetArea(Link.DestNode.Position));
+            return Link != null && InTargetArea(Link.SrcNode.Position) && InTargetArea(Link.DestNode.Position);
         }
-        
+
         /// <summary>
         /// Checks if the input coordinates are within the sphere of attack.
         /// </summary>
@@ -99,57 +106,92 @@ namespace Attack
         }
 
         /// <summary>
+        /// Checks if the target link is of the desired orientation.
+        /// </summary>
+        /// <param name="srcPosition">Source node position.</param>
+        /// <param name="destPosition">Destination node position.</param>
+        /// <returns></returns>
+        private bool IsHorizontal(Node srcNode, Node destNode) //srcPosition, Vector3 destPosition)
+        {
+            var srcPosition = srcNode.Position;
+            var destPosition = destNode.Position;
+            var northVector = new Vector3(0.0f, 1.0f, 0.0f); // Reference unit northern vector
+            var candidateVector = destPosition - srcPosition; // Candidate vector
+            var angle = Vector3.Angle(northVector, candidateVector);
+            if (45 < angle && angle < 135) return true; // link is horizontally inclined.
+            return false; // link is vertically inclined.
+        }
+
+        private bool IsDirectedNorth(Node srcNode, Node destNode)
+        {
+            var srcPosition = srcNode.Position;
+            var destPosition = destNode.Position;
+            var candidateVector = (destPosition - srcPosition).normalized;
+            if (candidateVector.y >= 0) return true;
+            return false;
+        }
+
+        private bool IsDirectedEast(Node srcNode, Node destNode)
+        {
+            var candidateVector = (destNode.Position - srcNode.Position).normalized;
+            if (candidateVector.x >= 0) return true;
+            return false;
+        }
+
+        private Vector3 GetLinkDirection(Node srcNode, Node destNode)
+        {
+            return (destNode.Position - srcNode.Position).normalized;
+        }
+
+        /// <summary>
         /// Searches for a random node in the routegraph that is in the target area.
         /// </summary>
         /// <param name="rg">Built <c>Routegraph</c> object.</param>
         /// <param name="debug_on">If set to true, selects the first node that satisfy target node criterion instead. Useful for debugging.</param>
         /// <returns>If a valid node was found, returns it. Otherwise, returns null.</returns>
-        private Node SelectSrcNode(RouteGraph rg, bool debug_on)
+        private Tuple<Node, Node> SelectLink(RouteGraph rg, bool debug_on)
         {
-            Node node = null;
-            if (debug_on)
+            for (var i = 0; i < rg.nodes.Count(); i++)
             {
-                for (int i = 0; i < rg.nodes.Count(); i++)
-                {
-                    node = rg.nodes[i];
-                    if (OrbitId != -1 && OrbitId != node.Orbit)
-                    {
-                        // If orbit-specific links are enabled, exclude links that are not part of the desired orbit.
-                        continue;
-                    }
-                    if (node.Id > 0 && InTargetArea(node.Position))
-                    {
-                        return node;
-                    }
-                }
-
-                return null;
-            }
-
-            Dictionary<int, Node> nodes = new Dictionary<int, Node>(); // index, node 
-            int remaining_nodes = rg.nodes.Count();
-            for (int i = 0; i < rg.nodes.Count(); i++) nodes.Add(i, rg.nodes[i]);
-
-            while (remaining_nodes > 0)
-            {
-                int i = new System.Random().Next(rg.nodes.Count());
-                node = nodes[i];
-                if (node == null)
-                {
-                    continue; // already seen.
-                }
-
+                Node node = rg.nodes[i];
+                if (OrbitId != -1 && OrbitId != node.Orbit)
+                    // If orbit-specific links are enabled, exclude links that are not part of the desired orbit.
+                    continue;
                 if (node.Id > 0 && InTargetArea(node.Position))
                 {
-                    // src_node = node;
-                    break;
+                    var link = SelectDestinationNode(node, debug_on);
+                    if (link == null) continue;
+                    return link;
                 }
-
-                nodes[i] = null;
-                remaining_nodes -= 1;
             }
+            return null;
+            // }
 
-            return node; // the node might not have any links!
+            // // this is the randomization code. It's never used. I should be able to remove it.
+            // Dictionary<int, Node> nodes = new Dictionary<int, Node>(); // index, node 
+            // int remaining_nodes = rg.nodes.Count();
+            // for (int i = 0; i < rg.nodes.Count(); i++) nodes.Add(i, rg.nodes[i]);
+            //
+            // while (remaining_nodes > 0)
+            // {
+            //     int i = new System.Random().Next(rg.nodes.Count());
+            //     node = nodes[i];
+            //     if (node == null)
+            //     {
+            //         continue; // already seen.
+            //     }
+            //
+            //     if (node.Id > 0 && InTargetArea(node.Position))
+            //     {
+            //         // src_node = node;
+            //         break;
+            //     }
+            //
+            //     nodes[i] = null;
+            //     remaining_nodes -= 1;
+            // }
+            //
+            // return node; // the node might not have any links!
         }
 
         /// <summary>
@@ -158,51 +200,59 @@ namespace Attack
         /// <param name="src_node">Potential target link source node.</param>
         /// <param name="debug_on">If set to true, selects the first node that satisfy target node criterion instead. Useful for debugging.</param>
         /// <returns>A valid node if one is found. Otherwise, returns null.</returns>
-        private Node SelectDestinationNode(Node src_node, bool debug_on)
+        private Tuple<Node, Node> SelectDestinationNode(Node src_node, bool debug_on)
         {
-            if (debug_on)
+            // if (debug_on)ds
+            // {
+            for (var i = 0; i < src_node.LinkCount; i++)
             {
-                for (int i = 0; i < src_node.LinkCount; i++)
-                {
-                    Node node = src_node.GetNeighbour(src_node.GetLink(i));
-                    if (OrbitId != -1 && OrbitId != node.Orbit)
-                    {
-                        // If orbit-specific links are enabled, exclude links that are not part of the desired orbit.
-                        continue;
-                    }
-                    if (node.Id > 0 && this.InTargetArea(node.Position))
-                    {
-                        return node;
-                    }
-                }
-
-                return null;
-            }
-
-            // FIXME: I think this function never gets used. I have to decide whether to keep it or not.
-            Dictionary<int, Node> nodes = new Dictionary<int, Node>(); // index, node 
-            int remaining_nodes = src_node.LinkCount;
-
-            for (int i = 0; i < src_node.LinkCount; i++) nodes.Add(i, src_node.GetNeighbour(src_node.GetLink(i)));
-
-            while (remaining_nodes > 0) // prioritise ISL links that are fully contained in the target radius.
-            {
-                int i = new System.Random().Next(src_node.LinkCount);
-                Node node = nodes[i];
-                if (node == null)
-                {
+                var node = src_node.GetNeighbour(src_node.GetLink(i));
+                if (OrbitId != -1 && OrbitId != node.Orbit)
+                    // If orbit-specific links are enabled, exclude links that are not part of the desired orbit.
                     continue;
-                }
-
                 if (node.Id > 0 && InTargetArea(node.Position))
                 {
-                    return node;
+                    var direction = GetLinkDirection(src_node, node);
+                    if (_attackParams.Direction == Direction.Any
+                        || (_attackParams.Direction == Direction.East && direction.x >= 0)
+                        || (_attackParams.Direction == Direction.West && direction.x < 0)
+                        || (_attackParams.Direction == Direction.North && direction.y >= 0)
+                        || (_attackParams.Direction == Direction.South && direction.y < 0))
+                    {
+                        // goto Success;
+                        Debug.Log($"Direction: {direction.x}, {direction.y}");
+                        return new Tuple<Node, Node>(src_node, node);
+                    }
                 }
-
-                nodes[i] = null;
-                remaining_nodes -= 1;
             }
+
             return null;
+            // }
+
+            // FIXME: I think this function never gets used. I have to decide whether to keep it or not.
+            // Dictionary<int, Node> nodes = new Dictionary<int, Node>(); // index, node 
+            // int remaining_nodes = src_node.LinkCount;
+            //
+            // for (int i = 0; i < src_node.LinkCount; i++) nodes.Add(i, src_node.GetNeighbour(src_node.GetLink(i)));
+            //
+            // while (remaining_nodes > 0) // prioritise ISL links that are fully contained in the target radius.
+            // {
+            //     int i = new System.Random().Next(src_node.LinkCount);
+            //     Node node = nodes[i];
+            //     if (node == null)
+            //     {
+            //         continue;
+            //     }
+            //
+            //     if (node.Id > 0 && InTargetArea(node.Position))
+            //     {
+            //         return node;
+            //     }
+            //
+            //     nodes[i] = null;
+            //     remaining_nodes -= 1;
+            // }
+            // return null;
         }
 
         /// <summary>
@@ -215,19 +265,12 @@ namespace Attack
         /// <param name="debug_on">If set to true, selects the first link that satisfy target link criterion. Useful for debugging.</param>
         public void ChangeTargetLink(RouteGraph rg, bool debug_on)
         {
-            Node src_node = SelectSrcNode(rg, debug_on);
+            var nodes = SelectLink(rg, debug_on);
 
-            if (src_node != null)
-            {
-                Node dest_node = SelectDestinationNode(src_node, debug_on);
-                if (dest_node != null)
-                {
-                    Link = new TargetLink(src_node, dest_node);
-                    return;
-                }
-            }
-
-            Link = null;
+            if (nodes != null)
+                Link = new TargetLink(nodes.Item1, nodes.Item2);
+            else
+                Link = null;
         }
     }
 }
