@@ -73,7 +73,7 @@ namespace Utilities
 			void PositionCamera()
 			{
 				positions.Add(new Vector3(-25f, 18f, 0f));
-				angles.Add(new Vector3(30f, 70f, 0f));
+				angles.Add(new Vector3(20f, 90f, 0f));
 			}
 
 			PositionCamera();
@@ -92,16 +92,14 @@ namespace Utilities
 			FoV = 90f;
 		}
 		
-		private void _ViewAmericanEquator()
+		private void _ViewPolar()
 		{
-			// Equator View 
 			cam_count = 2;
 
 			void PositionCamera()
 			{
-				// positions.Add(new Vector3(-30f, 0f, -25f));
-				positions.Add(new Vector3(-25f, 3f, -20f));
-				angles.Add(new Vector3(0f, 50f, 0f));
+				positions.Add(new Vector3(-18f, 20f, -18f));
+				angles.Add(new Vector3(35f, 47f, 0f));
 			}
 
 			PositionCamera();
@@ -116,16 +114,45 @@ namespace Utilities
 			times.Add (100000f);
 			speeds.Add (0.01f);
 			
-			lightrot = new Vector3 (30f, 100f, 0f);
-			FoV = 60f;
+			lightrot = new Vector3 (20f, 130f, 0f);
+			FoV = 85f;
+		}
+		
+		private void _ViewAmericanEquator()
+		{
+			// Equator View 
+			cam_count = 2;
+
+			void PositionCamera()
+			{
+				positions.Add(new Vector3(-25f, 10f, -22f));
+				angles.Add(new Vector3(15, 50f, 0f));
+			}
+
+			PositionCamera();
+			times.Add (0f);
+			speeds.Add (0.01f);
+			
+			PositionCamera();
+			times.Add (20f);
+			speeds.Add (0.11f);
+
+			PositionCamera();
+			times.Add (100000f);
+			speeds.Add (0.01f);
+			
+			lightrot = new Vector3 (-5f, 20f, 20f);
+			FoV = 80f;
 		}
 
 		public void InitView() {
 			Start ();
 			switch (qualitativeCase)
 			{
-				case QualitativeCase.SimpleDemo:
 				case QualitativeCase.Polar:
+					_ViewPolar();
+					break;
+				case QualitativeCase.SimpleDemo:
 				case QualitativeCase.Landlocked:
 					_ViewUS(); // TODO: change this to have the coast in centreview. 
 					break;
@@ -169,6 +196,32 @@ namespace Utilities
 					print ("space key was pressed");
 				}
 			}
+			
+			// test code from chatgpt
+			// Camera cam = GetComponent<Camera>();
+			// float screenAspect = (float)Screen.width / (float)Screen.height;
+			// float targetAspect = 1.0f;  // Square aspect ratio
+			//
+			// float scaleHeight = screenAspect / targetAspect;
+			// Rect rect = cam.rect;
+			//
+			// if (scaleHeight < 1.0f)
+			// {
+			// 	rect.width = 1.0f;
+			// 	rect.height = scaleHeight;
+			// 	rect.x = 0;
+			// 	rect.y = (1.0f - scaleHeight) / 2.0f;
+			// }
+			// else
+			// {
+			// 	float scaleWidth = 1.0f / scaleHeight;
+			// 	rect.width = scaleWidth;
+			// 	rect.height = 1.0f;
+			// 	rect.x = (1.0f - scaleWidth) / 2.0f;
+			// 	rect.y = 0;
+			// }
+			//
+			// cam.rect = rect;
 		}
 
 		// Update is called once per frame

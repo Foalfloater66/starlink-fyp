@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Text;
 using Attack;
 using Orbits;
@@ -8,8 +6,6 @@ using Orbits.Satellites;
 using Routing;
 using UnityEngine;
 using Scene;
-using Scene.GameObjectScripts;
-using UnityEngine.Assertions;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Utilities;
@@ -64,7 +60,6 @@ public class Main : MonoBehaviour
 	private LinkCapacityMonitor _link_capacities; /* (node1, node2) link mapping to capacity. Links are full duplex. */
 
 	private CityCreator _city_creator;
-	public int initial_link_capacity = 20000; // official FCC link capacity filing for ISLs34
 	// TODO: ground station capacity is NOT the same as ISL capacity! need to read the FCC filings
 	
 	GameObject[] orbits;
@@ -79,8 +74,7 @@ public class Main : MonoBehaviour
 
 	public Material[] targetLinkMaterial; // 1st is link up, 2nd is link down.
 	public Material cityMaterial;
-	public Text txt;
-	public Text countdown;
+	[FormerlySerializedAs("countdown")] public Text leftbottom;
 	public Text rightbottom;
 	float elapsed_time;
 	float last_speed_change;
@@ -106,6 +100,7 @@ public class Main : MonoBehaviour
 
 	private ConstellationContext constellation_ctx;
 	private MainContext ctx;
+	private FileWriter _fileWriter;
 
 	private readonly GroundstationCollection groundstations = new GroundstationCollection();
 
@@ -140,13 +135,15 @@ public class Main : MonoBehaviour
 	long elapsed_sum = 0;
 	int elapsed_count = 0;
 
+	private string capturesDirectory;
+
 	[FormerlySerializedAs("attackArea")] [FormerlySerializedAs("attack_choice")] public QualitativeCase qualitativeCase;
 	public Direction targetLinkDirection;
 	// public TargetLinkOrientation targetLinkOrientation;
 	// public SourceNodePosition sourceNodePosition;
 	
-	public enum ConstellationChoice { P24_S66_A550, P72_S22_A550, P32_S50_A1100 };
-	public ConstellationChoice constellation;
+	// public enum ConstellationChoice { P24_S66_A550, P72_S22_A550, P32_S50_A1100 };
+	// public ConstellationChoice constellation;
 	public int no_of_paths = 1;
 
 	public int decimator;
@@ -210,53 +207,18 @@ public class Main : MonoBehaviour
 		float phase_offset = 0f;
 
 		// Choose a constellation.
-		switch (constellation)
-		{
-			case ConstellationChoice.P24_S66_A550:
-				// phase 1 from 2019 FCC filing
-				maxorbits = 24 / decimator;
-				satsperorbit = 66;
-				sat0alt = 550f;
-				beam_angle = 25;
-				maxdist = 1123f; // max RF distance from sat to ground station
-				beam_radius = 940f;
-				orbital_period = 5739; // seconds
-				isl_connect_plane = true;
-				isl_plane_shift = -1;  // isl offset to next plane
-				isl_plane_step = 1;
-				phase_offset = 13f / 24f;
-				break;
-			case ConstellationChoice.P72_S22_A550:
-				// phase 1 from 2018 FCC filing
-				maxorbits = 72 / decimator;
-				satsperorbit = 22;
-				sat0alt = 550f;
-				beam_angle = 25;
-				maxdist = 1123f;
-				beam_radius = 940f;
-				orbital_period = 5739; // seconds	
-				isl_connect_plane = false;
-				isl_plane_shift = -1;
-				isl_plane_step = 1;
-				isl_plane2_shift = -1;
-				isl_plane2_step = 2;
-				phase_offset = 39f / 72f;
-				break;
-			case ConstellationChoice.P32_S50_A1100:
-				// phase 1 from 2016 FCC filing
-				maxorbits = 32 / decimator;
-				satsperorbit = 50;
-				sat0alt = 1150f;
-				beam_angle = 40;
-				maxdist = 1600f;  // rough guess 1150*sqrt(2), but check this value
-				beam_radius = 1060f;
-				orbital_period = 6500; // seconds
-				isl_connect_plane = true;
-				isl_plane_shift = 0;
-				isl_plane_step = 1;
-				phase_offset = 11f / 32f;
-				break;
-		}
+		maxorbits = 24 / decimator;
+		satsperorbit = 66;
+		sat0alt = 550f;
+		beam_angle = 25;
+		maxdist = 1123f; // max RF distance from sat to ground station
+		beam_radius = 940f;
+		orbital_period = 5739; // seconds
+		isl_connect_plane = true;
+		isl_plane_shift = -1;  // isl offset to next plane
+		isl_plane_step = 1;
+		phase_offset = 13f / 24f;
+
 		maxsats = maxorbits * satsperorbit;
 		phase1_sats = maxsats;  // will differ if simulating multiple phases
 
@@ -275,25 +237,8 @@ public class Main : MonoBehaviour
 		float sat0r = sat0alt + earth_r;  // sat radius from earth centre
 
 		// More constellation configurations
-		switch (constellation)
-		{
-			case ConstellationChoice.P24_S66_A550:
-				CreateSats(maxorbits, satsperorbit, 53f, 0f, 0f, phase_offset, orbital_period, sat0r,
+		CreateSats(maxorbits, satsperorbit, 53f, 0f, 0f, phase_offset, orbital_period, sat0r,
 					beam_angle, beam_radius);
-				break;
-
-			case ConstellationChoice.P72_S22_A550:
-				CreateSatsDirect(maxorbits, satsperorbit, 53f, 0f, phase_offset,
-					decimator * phase_offset * 360f / 22f,
-					decimator * 360f / 72f, 360 / 22f, orbital_period, sat0r,
-					beam_angle, beam_radius);
-				break;
-
-			case ConstellationChoice.P32_S50_A1100:
-				CreateSats(maxorbits, satsperorbit, 53f, 0f, 0f, phase_offset, orbital_period, sat0r,
-					beam_angle, beam_radius);
-				break;
-		}
 
 		float earthdist = Vector3.Distance(satlist[0].gameobject.transform.position, transform.position);
 		km_per_unit = sat0r / earthdist;  // sim scale factor
@@ -346,7 +291,7 @@ public class Main : MonoBehaviour
 
 		_painter = new ScenePainter(isl_material, laserMaterials, targetLinkMaterial, cityMaterial);
 
-		_link_capacities = new LinkCapacityMonitor(initial_link_capacity);
+		_link_capacities = new LinkCapacityMonitor();
 		
 		// Get target link + list of source groundstations.
 		AttackParams attackParams = new AttackCases()
@@ -354,16 +299,15 @@ public class Main : MonoBehaviour
 			.SetLinkDirection(targetLinkDirection)
 			.SetSourceGroundstations(qualitativeCase, groundstations)
 			.Build();
-		// AttackCases.setUpAttackParams(attackArea, groundstations, out float target_lat, out float target_lon, out int orbit_id,
-		// 	out List<GameObject> src_groundstations);
-		StringBuilder builder = new StringBuilder();
-		builder.Append($"PARAMETERS: direction: {targetLinkDirection}");
-		Debug.Log(builder.ToString());
-		
 		// TODO: make the attack radius parameterizabnle based on the case too!
 		
+		capturesDirectory = $"{qualitativeCase}_{targetLinkDirection}";
+		Captures.Setup(capturesDirectory);
+		_fileWriter = new FileWriter($"Logs/Captures/{capturesDirectory}", "paths");
+		_fileWriter.WriteLine("FRAME, TARGET LINK, ATTACK ROUTE COUNT, TARGET LINK FINAL CAPACITY, PATHS");
+		
 		// Create attacker entity.
-		_attacker = new Attacker(attackParams, sat0r, attack_radius, transform, city_prefab, groundstations, routeHandler, _painter, _link_capacities);
+		_attacker = new Attacker(attackParams, sat0r, attack_radius, transform, city_prefab, groundstations, routeHandler, _painter, _link_capacities, _fileWriter);
 
 		createContext();
 	}
@@ -401,6 +345,9 @@ public class Main : MonoBehaviour
 				_city_creator.DemoCities();
 				break;
 			case QualitativeCase.Coastal:
+				_city_creator.WPacificCities();
+				_city_creator.NACities();
+				break;
 			case QualitativeCase.Landlocked:
 				_city_creator.NACities();
 				break;
@@ -409,8 +356,16 @@ public class Main : MonoBehaviour
 				_city_creator.AFCities();
 				break;
 			case QualitativeCase.Equatorial:
-				_city_creator.USACities();
-				_city_creator.SACities();
+				if (new HashSet<Direction> { Direction.North, Direction.South }.Contains(targetLinkDirection))
+				{
+					_city_creator.USACities();
+					_city_creator.SACities();
+				}
+				if (new HashSet<Direction> { Direction.East, Direction.West, Direction.Any}.Contains(targetLinkDirection))
+				{
+					_city_creator.WPacificCities();
+					_city_creator.AFCities();
+				}
 				break;
 			case QualitativeCase.IntraOrbital:
 			case QualitativeCase.TransOrbital:
@@ -552,6 +507,8 @@ public class Main : MonoBehaviour
 			orbits[i].transform.RotateAround(Vector3.zero, orbitaxes[i], (float)(-1f * earthperiod / orbitalperiod[i] * simspeed * direction) * Time.deltaTime);
 		}
 	}
+
+
 	
 	// Update is called once per frame
 	void Update()
@@ -565,13 +522,19 @@ public class Main : MonoBehaviour
 		
 		// Clear the scene.
 		RouteHandler.ClearRoutes(_painter);
+		_fileWriter.Write($"{framecount}");
 		
 		// Attempt an attack.
 		_attacker.Run(constellation_ctx, graph_on, groundstations.ToList());
 		
 		// Update the scene.
 		_painter.UpdateLasers(satlist, maxsats, speed);
-		
+		leftbottom.text = $"Frame {framecount}"; // REVIEW: this is a test.
+		_fileWriter.Write($"\n");
+		_fileWriter.Flush();
+
+		// TODO: can I screenshot different angles? That would help a lot with special cases (polar, equatorial, coastal).
+		Captures.CaptureState(capturesDirectory, $"{qualitativeCase}_{targetLinkDirection}_{framecount}");
 		framecount++;
 	}
 }

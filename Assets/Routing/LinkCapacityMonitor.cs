@@ -29,17 +29,17 @@ namespace Routing
         /// <value>
         /// Initial maximum capacity of any link in the network.
         /// </value>
-        private int _initial_capacity;
+        private int _initialISLCapacity = 20000;  // 20 Gbps
+        private int _initialRFCapacity = 4000;           // 4 Gbps
 
         /// <summary>
         /// Constructor initializing the <c>LinkCapacityMonitor</c> object and its`_initial_capacity` and `_capacities`.
         /// </summary>
         /// <param name="initial_capacity">Initial maximum capacity of any link in the network.</param>
-        public LinkCapacityMonitor(int initial_capacity)
+        public LinkCapacityMonitor()
         {
             _ISLcapacities = new Dictionary<(int, int), int>();
             _RFcapacities = new Dictionary<(string, string), int>();
-            _initial_capacity = initial_capacity;
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace Routing
         {
             if (!_ISLcapacities.ContainsKey((src_id, dest_id)))
             {
-                _ISLcapacities.Add((src_id, dest_id), _initial_capacity);
+                _ISLcapacities.Add((src_id, dest_id), _initialISLCapacity);
             }
         }
 
@@ -73,7 +73,7 @@ namespace Routing
         {
             if (!_RFcapacities.ContainsKey((src_name, dest_name)))
             {
-                _RFcapacities.Add((src_name, dest_name), _initial_capacity);
+                _RFcapacities.Add((src_name, dest_name), _initialRFCapacity);
             }
         }
 
@@ -83,10 +83,10 @@ namespace Routing
         /// <param name="src_id">Link source ID</param>
         /// <param name="dest_id">Link destination ID</param>
         /// <returns>True if the link is flooded. False otherwise.</returns>
-        public bool IsFlooded(int src_id, int dest_id)
+        public bool IsCongested(int src_id, int dest_id)
         {
             _AddMissingLink(src_id, dest_id);
-            return _ISLcapacities[(src_id, dest_id)] < 0;
+            return _ISLcapacities[(src_id, dest_id)] <= 0;
         }
 
         /// <summary>
@@ -95,10 +95,10 @@ namespace Routing
         /// <param name="src_name">Link source groundstation name/satellite ID</param>
         /// <param name="dest_name">Link destination groundstation name/satellite ID</param>
         /// <returns>True if the RF link is flooded. False otherwise.</returns>
-        public bool IsFlooded(string src_name, string dest_name)
+        public bool IsCongested(string src_name, string dest_name)
         {
             _AddMissingLink(src_name, dest_name);
-            return _RFcapacities[(src_name, dest_name)] < 0;
+            return _RFcapacities[(src_name, dest_name)] <= 0;
         }
 
         /// <summary>

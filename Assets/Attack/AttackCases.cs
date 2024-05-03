@@ -107,7 +107,7 @@ namespace Attack
                     // Las Vegas, USA
                     _ctx.Latitude = 36.17f;
                     _ctx.Longitude = 115.14f;
-                    _ctx.OrbitId = 16;
+                    // _ctx.OrbitId = 16;
                     break;
                 case QualitativeCase.Polar:
                     // South of Lake River, Canada
@@ -120,9 +120,12 @@ namespace Attack
                     // target_lat = 0f;
                     // target_lon = 78f; // good coastal example
 
-                    // 6°10'02"N 72°38'14"W
-                    _ctx.Latitude = 6.10f;
-                    _ctx.Longitude = 72.38f;
+                    // // 6°10'02"N 72°38'14"W
+                    // _ctx.Latitude = 6.10f;
+                    // _ctx.Longitude = 72.38f;
+                    _ctx.Latitude = 10.41f;
+                    _ctx.Longitude = 67.39f;
+                    // 10°41'12"N 67°39'57"W
                     break;
                 case QualitativeCase.IntraOrbital:
                     // Denver, USA
@@ -141,12 +144,11 @@ namespace Attack
         }
 
         private List<string>
-            LandLocked() //TargetLinkOrientation orientation, SourceNodePosition position)
+            LandLocked() 
         {
             switch (_ctx.Direction)
             {
                 case Direction.East:
-                    // TODO: finish this.
                     return new List<string>
                     {
                         "Las Vegas",
@@ -190,14 +192,6 @@ namespace Attack
                         "Montreal",
                     };
                 }
-
-
-                    break;
-                // else // WE CAN'T ALLOW ANY IF ELSE HERE!!! NO ANY ALLOWED!
-                // {
-
-                // }
-
                 case Direction.Any: 
                 default:
                     return new List<string>
@@ -214,44 +208,191 @@ namespace Attack
 
 
         private List<string> Coastal()
-            // TargetLinkOrientation orientation, SourceNodePosition position)
         {
-            return new List<string>
+            switch (_ctx.Direction)
             {
-                "Los Angeles",
-                "El Paso",
-                "San Diego",
-                "Phoenix",
-                "Seattle"
-            };
+                case Direction.West:
+                    return new List<string>
+                    {
+                        "New York",
+                        "Chicago",
+                        "Boston",
+                        "Washington DC",
+                        "Toronto",
+                        "Brisay",
+                    };
+                case Direction.East: 
+                    return new List<string>
+                    {
+                        "San Francisco",
+                        "Ternate City",
+                        "Kagoshima City",
+                        "Wellington",
+                        "El Paso",
+                        "Phoenix",
+                    };
+                case Direction.North:
+                    _ctx.OrbitId = 16;
+                    return new List<string>
+                    {
+                        "Los Angeles",
+                        "El Paso",
+                        "San Diego",
+                        "Phoenix",
+                        "San Antonio",
+                        "Denver",
+                    };
+                case Direction.South:
+                    _ctx.OrbitId = 16;
+                    return new List<string>
+                    {
+                        "Seattle",
+                        "Vancouver",
+                        "San Francisco",
+                        "Calgary",
+                        "Kagoshima City",
+                        "Nishino, Kagoshima"
+                    };
+                case Direction.Any:
+                default:
+                    return new List<string>
+                    {
+                        "Los Angeles",
+                        "El Paso",
+                        "San Diego",
+                        "Phoenix",
+                        "Seattle"
+                    };
+            }
         }
 
         private List<string> Polar()
         {
-            return new List<string>
+            switch (_ctx.Direction)
             {
-                // Canadian cities (extremity 1)
-                "Winnipeg",
-                "Edmonton",
-                "Calgary"
-                // TODO: put some african cities here. (extremity 2)
-            };
+                case Direction.East:
+                    return new List<string>
+                    {
+                        // Canadian cities
+                        "Winnipeg",
+                        "Edmonton",
+                        "Calgary",
+                        "Ottawa",
+                        "Vancouver",
+                        "Brampton",
+                    };
+                case Direction.West:
+                    return new List<string>
+                    {
+                        // African cities (Southern/Western region)
+                        "Ibadan",
+                        "Johannesburg",
+                        "Abidjan",
+                        "Douala",
+                        // Canadian cities
+                        "St. John's, Canada",
+                        "Edmonton"
+                    };
+                case Direction.North:
+                    return new List<string>
+                    {
+                        // African cities (Southern/Western region)
+                        "Ibadan",
+                        "Johannesburg",
+                        "Cape Town",
+                        "Durban",
+                        "Douala",
+                        // Canadian cities
+                        "St. John's, Canada"
+                    };
+                case Direction.South:
+                    return new List<string>
+                    {
+                        // Canadian cities
+                        "Winnipeg",
+                        "Edmonton",
+                        "Calgary",
+                        "Ottawa",
+                        "Vancouver",
+                        "Brampton",
+                    };
+                case Direction.Any:
+                default:
+                    return new List<string>
+                    {
+                        // Canadian cities
+                        "Winnipeg",
+                        "Edmonton",
+                        "Calgary",
+                        // African cities (Southern region)
+                        "Johannesburg",
+                        "Cape Town",
+                        "Durban",
+                    };
+            }
         }
 
         private List<string> Equatorial()
         {
-            return new List<string>
+            switch (_ctx.Direction)
             {
-                // South
-                "Guayaquil",
-                "Lima",
-                "Medellin",
-                "Quito",
-                "Cali"
-                // North
-                // "Caracas",
-                // "Maracaibo"
-            };
+                case Direction.South:
+                    return new List<string>
+                    {
+                        // Northern countries (mostly NA)
+                        "New York",
+                        "Miami",
+                        "Caracas",
+                        "Maracaibo",
+                        "Boston",
+                        "Chicago",
+                    };
+                case Direction.North:
+                    return new List<string>
+                    {
+                        // Southern countries (SA)
+                        "Guayaquil",
+                        "Lima",
+                        "Medellin",
+                        "Quito",
+                        "Cali"
+                    };
+                case Direction.East:
+                    return new List<string>
+                    {
+                        "Nishino, Kagoshima",
+                        "Hengchung",
+                        "Caracas",
+                        "Maracaibo",
+                        "Medellin",
+                        "Quito",
+                    };
+                    
+                case Direction.West:
+                    return new List<string>
+                    {
+                        // Northern countries (mostly NA)
+                        "New York",
+                        // "Miami",
+                        "Caracas",
+                        "Maracaibo",
+                        // "Boston",
+                        // "Chicago",
+                    };
+                case Direction.Any:
+                default:
+                    return new List<string>
+                    {
+                        // South
+                        "Guayaquil",
+                        "Lima",
+                        "Quito",
+                        // North
+                        "New York",
+                        "Miami",
+                        "Caracas",
+                    };
+            }
         }
 
         private List<string> IntraOrbital()

@@ -213,14 +213,27 @@ namespace Attack
                 if (node.Id > 0 && InTargetArea(node.Position))
                 {
                     var direction = GetLinkDirection(src_node, node);
-                    if (_attackParams.Direction == Direction.Any
-                        || (_attackParams.Direction == Direction.East && direction.x >= 0)
-                        || (_attackParams.Direction == Direction.West && direction.x < 0)
-                        || (_attackParams.Direction == Direction.North && direction.y >= 0)
-                        || (_attackParams.Direction == Direction.South && direction.y < 0))
+                    if (OrbitId == -1) // If the orbit is not specified, switch the orientation!
                     {
-                        // goto Success;
-                        Debug.Log($"Direction: {direction.x}, {direction.y}");
+                        if (new HashSet<Direction>{ Direction.East, Direction.West }.Contains(_attackParams.Direction) &&
+                            !IsHorizontal(src_node, node))
+                        {
+                            continue;
+                        }
+                        else if (new HashSet<Direction>
+                                { Direction.South, Direction.North }.Contains(_attackParams.Direction) &&
+                            IsHorizontal(src_node, node))
+                        {
+                            continue;
+                        }
+                    }
+                    if (_attackParams.Direction == Direction.Any
+                        // TODO: make sure that the horizontal/vertical variation DOES NOT occur
+                        || (_attackParams.Direction == Direction.East && direction.x >= 0) // && IsHorizontal(src_node, node))
+                        || (_attackParams.Direction == Direction.West && direction.x < 0) // && IsHorizontal(src_node, node))
+                        || (_attackParams.Direction == Direction.North && direction.y >= 0) // && !IsHorizontal(src_node, node))
+                        || (_attackParams.Direction == Direction.South && direction.y < 0)) //  && !IsHorizontal(src_node, node)))
+                    {
                         return new Tuple<Node, Node>(src_node, node);
                     }
                 }

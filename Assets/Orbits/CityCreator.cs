@@ -184,7 +184,69 @@ namespace Orbits
             CreateCity(-8.03f, 34.54f, "Recife");                   // Recife, Brazil
             CreateCity(-17.48f, 63.11f, "Santa Cruz de la Sierra"); // Santa Cruz de la Sierra, Bolivia
     }
-        
+
+        public void WPacificCities()
+        {
+        CreateCity(-9.459888f, -147.187468f, "Port Morsby");  // Port Morsby, PNG
+        CreateCity(-0.875620f, -131.246103f, "Sorong");  // Sorong, West Papua
+        CreateCity(-8.511734f, -126.015478f, "Manatuto"); // Manatuto, Timor-Leste
+        CreateCity(-2.605694f, -140.677133f, "Jayapura");  // Jayapura, Indonesia
+        CreateCity(0.787670f, -127.386715f, "Ternate City");  // Ternate City, Indonesia
+        CreateCity(7.079770f, -125.618577f, "Davao");  // Davao, Phillipines
+        CreateCity(14.587267f, -120.992825f, "Manilla");  // Manilla, Phillipines
+        CreateCity(18.582077f, -120.785173f, "Burayoc");  // Burayoc, Phillipines
+        CreateCity(22.002509f, -120.743952f, "Hengchung");  // Hengchung, Taiwan
+        CreateCity(25.153802f, -121.747830f, "Keelung");  // Keelung, Taiwan
+        CreateCity(30.370269f, -130.882104f, "Nishino, Kagoshima");  // Nishino, Kagoshima, Japan
+        CreateCity(31.563340f, -130.553916f, "Kagoshima City");  // Kagoshima City, Japan
+        CreateCity(-41.29f, -174.77f, "Wellington");                // Wellington, New Zealand
+            
+        }
+
+    //     public void EPacificCities()
+    //     {
+    //         
+    //     }
+    //         void WPacificCities() {
+    // }
+    //
+    // void AusCities() {
+    //     CreateCity(-12.463968f, -130.842777f, true);  // Darwin, AUS
+    //     CreateCity(-16.920180f, -145.769174f, true);  // Cairns, AUS
+    //     CreateCity(-27.501833f, -153.060355f, true);  // Brisbane, AUS
+    //     CreateCity(-12.185451f, -136.788007f, true);  // Nuhlunbuy, AUS
+    //     CreateCity(-17.671119f, -141.078417f, true);  // Normanton, QND, AUS
+    //     CreateCity(-23.704273f, -133.875712f, true);  // Alice Springs, AUS
+    //     CreateCity(-31.525911f, -159.065333f, true);  // Lord Howe Island, AUS
+    // }
+    //
+    // void SPacificCities() {
+    //     CreateCity(-29.031895f, -167.946841f, true);  // Burnt Pine, Norfolk Island
+    //     CreateCity(-22.274674f, -166.452682f, true); // Noumea, New Caledonia
+    //     CreateCity(-18.143231f, -178.435968f, true); // Suva, Fiji
+    //     CreateCity(-13.834423f, 171.760831f, true);  // Apia, Samoa
+    //     CreateCity(-14.220016f, 169.423424f, true);  // Maia, Manu'a, American Samoa
+    //     CreateCity(-21.207587f, 159.783645f, true);  // Cook Islands
+    //     CreateCity(-21.926098f, 157.955635f, true);  // Oneroa, Cook Islands
+    //     CreateCity(-17.558133f, 149.600364f, true);  // F'a'a', French Polynesia
+    //     CreateCity(-14.959108f, 147.646249f, true);  // Rangiroa, French Polynesia
+    //     CreateCity(-16.067234f, 145.614420f, true);  // Rotoava, French Polynesia
+    //     CreateCity(-17.354274f, 138.444553f, true);  // Tatakoto, French Polynesia
+    //     CreateCity(-23.122389f, 134.968636f, true);  // Rikitea, French Polynesia
+    //     CreateCity(-25.066740f, 130.099011f, true);  // Adamstown, Pitcairn Islands
+    //     CreateCity(-24.333670f, 128.303854f, true);  // Henderson Island, Pitcairn Islands (uninhabited)
+    //     CreateCity(-24.674048f, 124.777367f, true);  // Ducie, Pitcairn Islands (uninhabited)
+    //     CreateCity(-25.91f, 117.1f, true);  // ship
+    //     CreateCity(-27.149430f, 109.428944f, true);  // Easter Island
+    //     //CreateCity(-22.14f, 98.75f, true); // ship
+    //     //CreateCity(-17.03f, 87.7f, true); // ship
+    //     //CreateCity(-21.523945f, 92.142192f, true); // ship
+    //     CreateCity(-12.073062f, 77.065722f, true); // Lima, Peru
+    //     CreateCity(-18f, 103f, true); // ship
+    //     CreateCity(-9f, 97f, true); // ship
+    //     CreateCity(-0.956546f, 90.968258f, true); // Puerto Villamil, Galapagos, Ecuador
+    //     lima = CreateCity(-1.069440f, 80.907160f, true); // San Lorenzo, Ecuador
+    //     
         /// <summary>
         /// Creates a city GameObject and stores it as a groundstation.
         /// </summary>

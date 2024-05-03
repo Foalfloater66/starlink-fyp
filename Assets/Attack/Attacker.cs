@@ -1,18 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 using Orbits;
 using Orbits.Satellites;
 using Routing;
 using Scene;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.Assertions;
 using Utilities;
-using Object = UnityEngine.Object;
 
 namespace Attack
 {
@@ -24,7 +19,6 @@ namespace Attack
     /// </summary>
     public class Path : HeapNode
     {
-        // TODO: move to routing
         /// <value>
         /// List of nodes in the path.
         /// </value>
@@ -68,11 +62,17 @@ namespace Attack
         private GroundstationCollection _Groundstations;
         private RouteGraph _rg;
         public AttackTarget Target;
+        private StringBuilder _generalSb;
 
         /// <summary>
         /// File for debugging.
         /// </summary>
-        private System.IO.StreamWriter logfile;
+        // private System.IO.StreamWriter logfile;
+
+        /// <summary>
+        /// Path logging.
+        /// </summary>
+        private FileWriter _fileWriter;
 
         /// <summary>
         /// Constructor creating an <c>Attacker</c> object with an attack area around the provided <c>(latitude, longitude)</c> coordinates. 
@@ -87,7 +87,7 @@ namespace Attack
         public Attacker(AttackParams attackParams, float sat0r, float attack_radius, Transform transform,
             GameObject prefab, GroundstationCollection groundstations, RouteHandler route_handler, ScenePainter painter,
             LinkCapacityMonitor
-                linkCapacityMonitor)
+                linkCapacityMonitor, FileWriter fileWriter)
         {
             // AttackParams
             SourceGroundstations =
@@ -99,8 +99,7 @@ namespace Attack
             _routeHandler = route_handler;
 
             _Groundstations = groundstations;
-
-            // logfile = new System.IO.StreamWriter(Main.log_directory + "/Path/attacker_summary.txt");
+            _fileWriter = fileWriter;
         }
 
         /// <summary>
@@ -169,26 +168,8 @@ namespace Attack
                 }
             }
 
-            // TODO: Remove debugging messages.
-            // viable_route = true;
             if (viable_route)
             {
-                string name1 = _Groundstations[src_gs];
-                string name2 = _Groundstations[dest_gs];
-                // Debug.Log($"IN: {name1} OUT: {name2}");
-                StringBuilder builder = new StringBuilder();
-                builder.Append($"IN: {name1} of id {start_node.Id} OUT: {name2} of id {end_node.Id} ");
-                foreach (Node node in route.nodes)
-                {
-                    builder.Append($"- {node.Id} ");
-                }
-
-                // if (viable_route)
-                // {
-                    builder.Append($" = VALID NODE");
-                // }
-
-                Debug.Log(builder.ToString());
                 return route;
             }
 
@@ -309,7 +290,6 @@ namespace Attack
             {
                 previd = id;
                 id = rn.Id;
-                // Debug.Log($"ID: {id}");
 
                 if (previd != -4)
                 {
@@ -321,63 +301,51 @@ namespace Attack
 
                         // Increase the load of the link and abort if link becomes flooded.
                         // TODO: becauise im processing this backwards, I need to process the links by previd to id! not the other way around!
-                        _linkCapacityMonitor.DecreaseLinkCapacity(previd, id, mbits);
-                        if (_linkCapacityMonitor.IsFlooded(previd, id))
+                        if (_linkCapacityMonitor.IsCongested(previd, id))
                         {
                             return;
                         }
-
+                        _linkCapacityMonitor.DecreaseLinkCapacity(previd, id, mbits);
                         _painter.ColorRouteISLLink(prevsat, sat, prevnode, rn);
+
                     }
                     // The current node is a satellite and the previous, a city. (RF link)
                     else if (id >= 0 && previd == -1)
                     {
-                        _linkCapacityMonitor.DecreaseLinkCapacity(_Groundstations[path.end_city], id.ToString(), mbits);
-                        if (_linkCapacityMonitor.IsFlooded(_Groundstations[path.end_city], id.ToString()))
+                        if (_linkCapacityMonitor.IsCongested(_Groundstations[path.end_city], id.ToString()))
                         {
                             return;
                         }
-
+                        _linkCapacityMonitor.DecreaseLinkCapacity(_Groundstations[path.end_city], id.ToString(), mbits);
                         sat = constellation_ctx.satlist[id];
                         _painter.ColorRFLink(city1, sat, prevnode, rn);
-                        // TODO: make the link load capacity rule also hold for RF links. 
                     }
                     // The current node is a city and the previous, a satellite. (RF link)
                     else if (id == -2 && previd >= 0)
                     {
-                        _linkCapacityMonitor.DecreaseLinkCapacity(previd.ToString(), _Groundstations[path.start_city],
-                            mbits);
-                        if (_linkCapacityMonitor.IsFlooded(previd.ToString(), _Groundstations[path.start_city]))
+                        if (_linkCapacityMonitor.IsCongested(previd.ToString(), _Groundstations[path.start_city]))
                         {
                             return;
                         }
-
+                        _linkCapacityMonitor.DecreaseLinkCapacity(previd.ToString(), _Groundstations[path.start_city],
+                            mbits);
                         sat = constellation_ctx.satlist[previd];
                         _painter.ColorRFLink(city2, sat, prevnode, rn);
-                        break;                                                  // We've reached the end node. Time to exit the loop.
-                        // _painter.UsedRFLinks.Add(new ActiveRF(city2, rn, sat, prevnode));
+                        break;          // We've reached the end node. Time to exit the loop.
                     }
                 }
 
                 // Update referred links
-
-                // We've reached the end node. Time to exit the loop!
-                // if (rn.Id == -2)
-                // {
-                //     break;
-                // }
-
                 prevnode = rn;
 
                 // If we've gone through the entire path, return.
-                if (index == -1) // only show a path if it's feasible.
+                if (index == -1)        // only show a path if it's feasible.
                 {
                     return;
                 }
 
                 rn = path.nodes[index]; 
-                // TODO: reverse the node list and read everything in opposite order when processing link capacity!
-                if (rn == null) // only show a path if it's feasible.
+                if (rn == null)         // only show a path if it's feasible.
                 {
                     return;
                 }
@@ -394,11 +362,12 @@ namespace Attack
         private void FloodLink(BinaryHeap<Path> attack_routes, ConstellationContext constellation_ctx)
         {
             int counter = 0;
-            while (!_linkCapacityMonitor.IsFlooded(Target.Link.SrcNode.Id, Target.Link.DestNode.Id) &&
+            _generalSb = new StringBuilder();
+            while (!_linkCapacityMonitor.IsCongested(Target.Link.SrcNode.Id, Target.Link.DestNode.Id) &&
                    attack_routes.Count > 0)
             {
                 Path attack_path = attack_routes.ExtractMin();
-                int mbits = 600; // TODO: make this a variable.
+                int mbits = 4000; // sends the maximum capacity of an RF link.
                 if (!RouteHandler.RouteHasEarlyCollisions(attack_path, mbits, Target.Link.SrcNode, Target.Link.DestNode,
                         _linkCapacityMonitor, _Groundstations[attack_path.start_city],
                         _Groundstations[attack_path.end_city]))
@@ -406,10 +375,11 @@ namespace Attack
                     ExecuteAttackRoute(attack_path, attack_path.start_city, attack_path.end_city, mbits,
                         _linkCapacityMonitor, _painter, constellation_ctx);
                     counter += 1;
+                    // save this attack route.
+                    _generalSb.Append($", {_Groundstations[attack_path.start_city]} -> {_Groundstations[attack_path.end_city]}");
                 }
             }
-
-            Debug.Log($"I have created {counter} attack routes.");
+            _fileWriter.Write($", {counter}");
         }
 
         /// <summary>
@@ -419,17 +389,15 @@ namespace Attack
         {
             // Debugging messages.
             // Color the target link on the map. If flooded, the link is colored red. Otherwise, the link is colored pink.
-            if (_linkCapacityMonitor.IsFlooded(Target.Link.SrcNode.Id, Target.Link.DestNode.Id))
+            // Checks if the link has any capacity left
+            if (_linkCapacityMonitor.IsCongested(Target.Link.SrcNode.Id, Target.Link.DestNode.Id))
             {
-                Debug.Log("UpdateTargetLinkVisuals | Link was flooded.");
                 _painter.ColorTargetISLLink(constellation_ctx.satlist[Target.Link.SrcNode.Id],
                     constellation_ctx.satlist[Target.Link.DestNode.Id], Target.Link.DestNode, Target.Link.SrcNode,
                     true);
             }
             else
             {
-                Debug.Log("UpdateTargetLinkVisuals | Link could not be flooded. It has capacity: " +
-                          _linkCapacityMonitor.GetCapacity(Target.Link.SrcNode.Id, Target.Link.DestNode.Id));
                 _painter.ColorTargetISLLink(constellation_ctx.satlist[Target.Link.SrcNode.Id],
                     constellation_ctx.satlist[Target.Link.DestNode.Id], Target.Link.DestNode, Target.Link.SrcNode,
                     false);
@@ -459,7 +427,7 @@ namespace Attack
             // If the attacker has selected a valid link, attempt to attack it
             if (Target.Link != null && Target.HasValidTargetLink())
             {
-                Debug.Log($"Attacker.Run | Target Link: {Target.Link.SrcNode.Id} - {Target.Link.DestNode.Id}");
+                _fileWriter.Write($", {Target.Link.SrcNode.Id.ToString()} -> {Target.Link.DestNode.Id.ToString()}");
 
                 // Find viable attack routes.
                 BinaryHeap<Path> attack_routes = _FindAttackRoutes(_rg,
@@ -470,10 +438,8 @@ namespace Attack
 
                 FloodLink(attack_routes, constellation_ctx);
                 UpdateTargetLinkVisuals(constellation_ctx);
-            }
-            else
-            {
-                Debug.Log("Attacker.Run | Could not find any valid link.");
+                _fileWriter.Write($", {_linkCapacityMonitor.GetCapacity(Target.Link.SrcNode.Id, Target.Link.DestNode.Id)}");
+                _fileWriter.Write(_generalSb.ToString());
             }
         }
     }
