@@ -62,7 +62,6 @@ namespace Attack
         private GroundstationCollection _Groundstations;
         private RouteGraph _rg;
         public AttackTarget Target;
-        private StringBuilder _generalSb;
 
         /// <summary>
         /// File for debugging.
@@ -73,6 +72,11 @@ namespace Attack
         /// Path logging.
         /// </summary>
         private FileWriter _fileWriter;
+
+        /// <summary>
+        /// Logs specific paths that were chosen.
+        /// </summary>
+        private FileWriter _pathWriter; 
 
         /// <summary>
         /// Constructor creating an <c>Attacker</c> object with an attack area around the provided <c>(latitude, longitude)</c> coordinates. 
@@ -87,7 +91,7 @@ namespace Attack
         public Attacker(AttackParams attackParams, float sat0r, float attack_radius, Transform transform,
             GameObject prefab, GroundstationCollection groundstations, RouteHandler route_handler, ScenePainter painter,
             LinkCapacityMonitor
-                linkCapacityMonitor, FileWriter fileWriter)
+                linkCapacityMonitor, FileWriter fileWriter, FileWriter pathWriter)
         {
             // AttackParams
             SourceGroundstations =
@@ -100,6 +104,7 @@ namespace Attack
 
             _Groundstations = groundstations;
             _fileWriter = fileWriter;
+            _pathWriter = pathWriter;
         }
 
         /// <summary>
@@ -147,14 +152,10 @@ namespace Attack
 
                 if (id >= 0 && prev_id >= 0)
                 {
-                    // if (prev_id == Target.Link.SrcNode.Id && id == Target.Link.DestNode.Id)
-                    // {
-                    //     viable_route = true;
-                    // }
 
                     if (prev_id == Target.Link.DestNode.Id && id == Target.Link.SrcNode.Id)
                     {
-                        viable_route = true; // REMOVE THIS!
+                        viable_route = true;
                     }
                 }
 
@@ -284,7 +285,6 @@ namespace Attack
 
             int index = path.nodes.Count - 2;
 
-            // process links from start (id: -2) to end (id: -1)
             // process links from start (id: -1) to end (id: -2)
             while (true)
             {
@@ -312,22 +312,22 @@ namespace Attack
                     // The current node is a satellite and the previous, a city. (RF link)
                     else if (id >= 0 && previd == -1)
                     {
-                        if (_linkCapacityMonitor.IsCongested(_Groundstations[path.end_city], id.ToString()))
+                        if (_linkCapacityMonitor.IsCongested(_Groundstations[path.start_city], id.ToString()))
                         {
                             return;
                         }
-                        _linkCapacityMonitor.DecreaseLinkCapacity(_Groundstations[path.end_city], id.ToString(), mbits);
+                        _linkCapacityMonitor.DecreaseLinkCapacity(_Groundstations[path.start_city], id.ToString(), mbits);
                         sat = constellation_ctx.satlist[id];
                         _painter.ColorRFLink(city1, sat, prevnode, rn);
                     }
                     // The current node is a city and the previous, a satellite. (RF link)
                     else if (id == -2 && previd >= 0)
                     {
-                        if (_linkCapacityMonitor.IsCongested(previd.ToString(), _Groundstations[path.start_city]))
+                        if (_linkCapacityMonitor.IsCongested(previd.ToString(), _Groundstations[path.end_city]))
                         {
                             return;
                         }
-                        _linkCapacityMonitor.DecreaseLinkCapacity(previd.ToString(), _Groundstations[path.start_city],
+                        _linkCapacityMonitor.DecreaseLinkCapacity(previd.ToString(), _Groundstations[path.end_city],
                             mbits);
                         sat = constellation_ctx.satlist[previd];
                         _painter.ColorRFLink(city2, sat, prevnode, rn);
@@ -362,7 +362,7 @@ namespace Attack
         private void FloodLink(BinaryHeap<Path> attack_routes, ConstellationContext constellation_ctx)
         {
             int counter = 0;
-            _generalSb = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
             while (!_linkCapacityMonitor.IsCongested(Target.Link.SrcNode.Id, Target.Link.DestNode.Id) &&
                    attack_routes.Count > 0)
             {
@@ -374,12 +374,13 @@ namespace Attack
                 {
                     ExecuteAttackRoute(attack_path, attack_path.start_city, attack_path.end_city, mbits,
                         _linkCapacityMonitor, _painter, constellation_ctx);
+                    
+                    sb.Append($",{_Groundstations[attack_path.start_city]} -> {_Groundstations[attack_path.end_city]}");
                     counter += 1;
-                    // save this attack route.
-                    _generalSb.Append($", {_Groundstations[attack_path.start_city]} -> {_Groundstations[attack_path.end_city]}");
                 }
             }
-            _fileWriter.Write($", {counter}");
+            _fileWriter.Write($",{counter}");
+            _pathWriter.Write(sb.ToString());
         }
 
         /// <summary>
@@ -427,7 +428,7 @@ namespace Attack
             // If the attacker has selected a valid link, attempt to attack it
             if (Target.Link != null && Target.HasValidTargetLink())
             {
-                _fileWriter.Write($", {Target.Link.SrcNode.Id.ToString()} -> {Target.Link.DestNode.Id.ToString()}");
+                _fileWriter.Write($",{Target.Link.SrcNode.Id.ToString()} -> {Target.Link.DestNode.Id.ToString()}");
 
                 // Find viable attack routes.
                 BinaryHeap<Path> attack_routes = _FindAttackRoutes(_rg,
@@ -438,8 +439,12 @@ namespace Attack
 
                 FloodLink(attack_routes, constellation_ctx);
                 UpdateTargetLinkVisuals(constellation_ctx);
-                _fileWriter.Write($", {_linkCapacityMonitor.GetCapacity(Target.Link.SrcNode.Id, Target.Link.DestNode.Id)}");
-                _fileWriter.Write(_generalSb.ToString());
+                _fileWriter.Write($",{_linkCapacityMonitor.GetCapacity(Target.Link.SrcNode.Id, Target.Link.DestNode.Id)}");
+            }
+            else
+            {
+                _fileWriter.Write(",,0,nan");
+                _pathWriter.Write(",nan");
             }
         }
     }

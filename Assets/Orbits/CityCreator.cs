@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using Attack;
 using Scene.GameObjectScripts;
 using UnityEngine;
 
@@ -27,6 +29,62 @@ namespace Orbits
             CreateCity(40.76f, 73.98f, "New York");
             CreateCity(43.65f, 79.38f, "Toronto");
             
+        }
+        
+        /// <summary>
+        /// Create cities and place them on planet Earth.
+        /// </summary>
+        public void AddCities(QualitativeCase qualitativeCase, Direction targetLinkDirection)
+        {
+
+            switch (qualitativeCase)
+            {
+                case QualitativeCase.SimpleDemo:
+                    DemoCities();
+                    break;
+                case QualitativeCase.Coastal:
+                    // add depending on the angle.
+                    NonASEANCities();
+                    ASEANCities();
+                    WPacific();
+                    if (targetLinkDirection == Direction.East)
+                    {
+                        NorthAsiaCities();
+                    }
+                    else
+                    //if (new HashSet<Direction> {Direction.West, Direction.South, Direction.North}.Contains(targetLinkDirection))
+                    {
+                        OceaniaCities();
+                    }
+                    NACities();
+                    break;
+                case QualitativeCase.Landlocked:
+                    NACities();
+                    break;
+                case QualitativeCase.Polar:
+                    CANCities();
+                    AFCities();
+                    break;
+                case QualitativeCase.Equatorial:
+                    if (new HashSet<Direction> { Direction.North, Direction.South }.Contains(targetLinkDirection))
+                    {
+                        USACities();
+                        SACities();
+                    }
+                    if (new HashSet<Direction> { Direction.East, Direction.West, Direction.Any}.Contains(targetLinkDirection))
+                    {
+                        
+                        // WPacificCities();
+                        ASEANCities();
+                        OceaniaCities();
+                        AFCities();
+                    }
+                    break;
+                case QualitativeCase.IntraOrbital:
+                case QualitativeCase.TransOrbital:
+                    NACities();
+                    break;
+            }
         }
         
         /// <summary>
@@ -107,6 +165,28 @@ namespace Orbits
         }
 
         /// <summary>
+        /// Creates cities for the top 10 most populated cities of Oceania as of each country's national census.
+        /// Note: Due to the comparatively high population of Australia, only the top 5 most populated cities of
+        /// Australia were kept.
+        /// 
+        /// Source: https://en.wikipedia.org/wiki/List_of_cities_in_Oceania_by_population
+        /// </summary>
+        public void OceaniaCities()
+        {
+            CreateCity(-33.87f, -151.21f, "Sydney");            // Australia
+            CreateCity(-37.81f, -144.96f, "Melbourne");         // Australia
+            CreateCity(-27.47f, -153.02f, "Brisbane");          // Australia
+            CreateCity(-31.95f, -115.86f, "Perth");             // Australia
+            CreateCity(-34.93f, -138.60f, "Adelaide");          // Australia
+            CreateCity(-36.85f, -174.76f, "Auckland");          // New Zealand
+            CreateCity(21.31f, -157.86f, "Honolulu");           // United States
+            CreateCity(-41.29f, -174.78f, "Wellington");        // New Zealand
+            CreateCity(-43.53f, -172.63f, "Christchurch");      // New Zealand
+            CreateCity(-9.47f, -147.19f, "Port Moresby");       // Papua New Guinea
+        }
+
+
+        /// <summary>
         /// Creates cities for the top 10 most populated cities of Europe as of each country's national census.
         /// 
         /// Source: https://en.wikipedia.org/wiki/List_of_European_cities_by_population_within_city_limits
@@ -124,6 +204,67 @@ namespace Orbits
             CreateCity(40.40f, -49.86f, "Baku");
             CreateCity(48.85f, -2.35f, "Paris");
             CreateCity(48.20f, -16.37f, "Vienna");
+        }
+
+        /// <summary>
+        /// Create cities for the top 20 most populated cities of Asia as of each country's national census.
+        /// Note: Due to the large populations within mainly China and India, a separate list for ASEAN countries
+        /// was made. ASEAN cities have been removed from this list.
+        /// 
+        /// Source: https://en.wikipedia.org/wiki/List_of_Asian_cities_by_population_within_city_limits
+        /// </summary>
+        public void NonASEANCities()
+        {
+            CreateCity(31.23f, -121.47f, "Shanghai");             // China
+            CreateCity(39.90f, -116.41f, "Beijing");              // China
+            CreateCity(24.86f, -67.00f, "Karachi");               // Pakistan
+            CreateCity(23.13f, -113.26f, "Guangzhou");            // China
+            CreateCity(19.08f, -72.88f, "Mumbai");                // India
+            CreateCity(22.54f, -114.06f, "Shenzhen");             // China
+            CreateCity(28.70f, -77.10f, "Delhi");                 // India
+            CreateCity(23.80f, -90.42f, "Dhaka");                 // Bangladesh
+            CreateCity(35.68f, -139.65f, "Tokyo");                // Japan
+            // CreateCity(14.60f, -120.98f, "Manila");             // Philippines, ASEAN
+            CreateCity(31.52f, -74.36f, "Lahore");                // Pakistan
+            // CreateCity(13.76f, -100.50f, "Bangkok");            // Thailand, ASEAN
+            CreateCity(31.30f, -120.58f, "Suzhou");               // China
+            // CreateCity(-6.19f, -106.82f, "Jakarta");            // Indonesia, ASEAN
+            CreateCity(37.55f, -126.99f, "Seoul");                // South Korea
+            // CreateCity(10.82f, -106.63f, "Ho Chi Minh City");   // Vietnam, ASEAN
+            CreateCity(12.97f, -77.59f, "Bengaluru");             // India
+            CreateCity(23.02f, -113.75f, "Dongguan");             // China
+            CreateCity(29.57f, -106.55f, "Chongqing");            // China
+            CreateCity(32.06f, -118.80f, "Nanjing");              // China
+        }
+
+
+        /// <summary>
+        /// Create cities for the top 20 most populated proper cities of ASEAN as of each country's national census.
+        /// 
+        /// Source: https://en.wikipedia.org/wiki/List_of_cities_in_ASEAN_by_population#Largest_cities_proper
+        /// </summary>
+        public void ASEANCities()
+        {
+            CreateCity(-6.20f, -106.85f, "Jakarta");           // Indonesia
+            CreateCity(13.75f, -100.50f, "Bangkok");           // Thailand
+            CreateCity(10.82f, -106.63f, "Ho Chi Minh City");  // Vietnam
+            CreateCity(21.03f, -105.85f, "Hanoi");             // Vietnam
+            CreateCity(16.84f, -96.17f, "Yangon");             // Myanmar
+            CreateCity(1.35f, -103.82f, "Singapore");          // Singapore
+            CreateCity(-7.25f, -112.74f, "Surabaya");          // Indonesia
+            CreateCity(14.68f, -121.03f, "Quezon City");       // Philippines
+            CreateCity(-6.91f, -107.61f, "Bandung");           // Indonesia
+            CreateCity(-6.23f, -107.00f, "Bekasi");            // Indonesia
+            CreateCity(11.56f, -104.92f, "Phnom Penh");        // Cambodia
+            CreateCity(3.59f, -98.67f, "Medan");               // Indonesia
+            CreateCity(20.85f, -106.68f, "Haiphong");          // Vietnam
+            CreateCity(-6.18f, -106.63f, "Tangerang");         // Indonesia
+            CreateCity(-6.41f, -106.83f, "Depok");             // Indonesia
+            CreateCity(3.14f, -101.69f, "Kuala Lumpur");       // Malaysia
+            CreateCity(14.60f, -120.98f, "Manila");            // Philippines
+            CreateCity(7.19f, -125.56f, "Davao City");         // Philippines
+            CreateCity(14.65f, -120.98f, "Caloocan");          // Philippines
+            CreateCity(-7.00f, -110.42f, "Semarang");          // Indonesia
         }
 
         /// <summary>
@@ -185,23 +326,50 @@ namespace Orbits
             CreateCity(-17.48f, 63.11f, "Santa Cruz de la Sierra"); // Santa Cruz de la Sierra, Bolivia
     }
 
-        public void WPacificCities()
+        
+        public void NorthAsiaCities()
         {
-        CreateCity(-9.459888f, -147.187468f, "Port Morsby");  // Port Morsby, PNG
-        CreateCity(-0.875620f, -131.246103f, "Sorong");  // Sorong, West Papua
-        CreateCity(-8.511734f, -126.015478f, "Manatuto"); // Manatuto, Timor-Leste
-        CreateCity(-2.605694f, -140.677133f, "Jayapura");  // Jayapura, Indonesia
-        CreateCity(0.787670f, -127.386715f, "Ternate City");  // Ternate City, Indonesia
-        CreateCity(7.079770f, -125.618577f, "Davao");  // Davao, Phillipines
-        CreateCity(14.587267f, -120.992825f, "Manilla");  // Manilla, Phillipines
-        CreateCity(18.582077f, -120.785173f, "Burayoc");  // Burayoc, Phillipines
-        CreateCity(22.002509f, -120.743952f, "Hengchung");  // Hengchung, Taiwan
-        CreateCity(25.153802f, -121.747830f, "Keelung");  // Keelung, Taiwan
-        CreateCity(30.370269f, -130.882104f, "Nishino, Kagoshima");  // Nishino, Kagoshima, Japan
-        CreateCity(31.563340f, -130.553916f, "Kagoshima City");  // Kagoshima City, Japan
-        CreateCity(-41.29f, -174.77f, "Wellington");                // Wellington, New Zealand
-            
+            CreateCity(55.75f, -37.62f, "Moscow");             // Russia
+            CreateCity(61.78f, -34.36f, "Saint Petersburg");   // Russia
+            CreateCity(55.04f, -82.93f, "Novosibirsk");        // Russia
+            CreateCity(56.01f, -92.86f, "Krasnoyarsk");        // Russia
+            CreateCity(56.83f, -60.61f, "Yekaterinburg");      // Russia
+            CreateCity(48.48f, -135.08f, "Vladivostok");       // Russia
+            CreateCity(51.72f, -36.23f, "Omsk");               // Russia
+            CreateCity(52.27f, -104.30f, "Irkutsk");           // Russia
+            CreateCity(56.50f, -84.99f, "Perm");               // Russia
+            CreateCity(51.53f, -46.02f, "Samara");             // Russia
         }
+        
+        /// <summary>
+        ///  Some west pacific (coastal-ish) cities, since these are less populated, but still geographically well-
+        ///  placed.
+        ///
+        /// Source: https://github.com/mhandley/Starlink0031/blob/master/Assets/Orbits/SP_basic_0031.cs
+        /// </summary>
+        public void WPacific()
+        {
+            CreateCity(-0.875620f, -131.246103f, "Sorong");                // Sorong, West Papua
+            CreateCity(-8.511734f, -126.015478f, "Manatuto");              // Manatuto, Timor-Leste
+            CreateCity(-2.605694f, -140.677133f, "Jayapura");              // Jayapura, Indonesia
+            CreateCity(0.787670f, -127.386715f, "Ternate City");           // Ternate City, Indonesia
+            CreateCity(18.582077f, -120.785173f, "Burayoc");               // Burayoc, Philippines
+            CreateCity(22.002509f, -120.743952f, "Hengchung");             // Hengchung, Taiwan
+            CreateCity(25.153802f, -121.747830f, "Keelung");               // Keelung, Taiwan
+            CreateCity(30.370269f, -130.882104f, "Nishino, Kagoshima");    // Nishino, Kagoshima, Japan
+            CreateCity(31.563340f, -130.553916f, "Kagoshima City");        // Kagoshima City, Japan
+        }
+
+        // public void OceaniaCities()
+        // {
+        //     // Top cities in Oceania
+        //     CreateCity(-33.87f, -151.21f, "Sydney");         // Sydney, Australia
+        //     CreateCity(-37.81f, -144.96f, "Melbourne");      // Melbourne, Australia
+        //     CreateCity(-27.47f, -153.03f, "Brisbane");       // Brisbane, Australia
+        //     CreateCity(-31.95f, -115.86f, "Perth");          // Perth, Australia
+        //     CreateCity(-36.85f, -174.76f, "Auckland");       // Auckland, New Zealand
+        //     CreateCity(-41.29f, -174.78f, "Wellington");     // Wellington, New Zealand
+        // }
 
     //     public void EPacificCities()
     //     {
@@ -249,11 +417,12 @@ namespace Orbits
     //     
         /// <summary>
         /// Creates a city GameObject and stores it as a groundstation.
+        /// Note: N and W are +ve
         /// </summary>
         /// <param name="latitude">City latitude coordinates.</param>
         /// <param name="longitude">City longitude coordinates.</param>
         /// <param name="city_name">City name.</param>
-        public void CreateCity(float latitude, float longitude, string city_name)
+        private void CreateCity(float latitude, float longitude, string city_name)
         {
             GameObject city = 
                 (GameObject) Object.Instantiate(city_prefab, new Vector3(0f, 0f, /*-6382.2f*/-6371.0f), global_transform.rotation);

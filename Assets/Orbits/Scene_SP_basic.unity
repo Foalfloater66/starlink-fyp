@@ -481,14 +481,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 1375312111}
-  spin: 0
-  speed: 10
+  speed: 20
   use_isls: 1
-  relay_dist_step: 2
   direction: 1
   directionChangeSpeed: 2
   attack_radius: 1000
-  debug: 1
+  captureMode: 1
   orbit: {fileID: 1172864837802712, guid: 3b4a1d43d21bf42d8ad02077259400de, type: 3}
   satellite: {fileID: 1842355326392174, guid: 7327322cd40cd49898f0f3e031d063e4, type: 3}
   laser: {fileID: 1648504976000122, guid: 88944ffc92ba14ec5a48961205eeab10, type: 3}
@@ -500,7 +498,6 @@ MonoBehaviour:
   beam_prefab2: {fileID: 1454064570112744, guid: ae0115a2e33c24b7d92d193312575599,
     type: 3}
   isl_material: {fileID: 2100000, guid: 054725efd433545d0867a6c84dd8b574, type: 2}
-  yellowMaterial: {fileID: 0}
   laserMaterials:
   - {fileID: 2100000, guid: d6795a24fec3f4b478a2532645da09a8, type: 2}
   - {fileID: 2100000, guid: 7931bb27edd134e85b919e88f2970275, type: 2}
@@ -510,25 +507,16 @@ MonoBehaviour:
   - {fileID: 2100000, guid: a5ba4d0a064734456bdca50184b5bda5, type: 2}
   - {fileID: 2100000, guid: 7fcb457815b4542d08ddfb4f8212b4d6, type: 2}
   cityMaterial: {fileID: 2100000, guid: d6795a24fec3f4b478a2532645da09a8, type: 2}
-  txt: {fileID: 2091605839}
-  countdown: {fileID: 485043185}
+  leftbottom: {fileID: 485043185}
   rightbottom: {fileID: 1204926847}
   maxorbits: 24
-  qualitativeCase: 1
+  qualitativeCase: 2
   targetLinkDirection: 0
-  constellation: 0
-  no_of_paths: 2
   decimator: 1
   raan0: 0
   log_choice: 5
   beam_on: 0
   graph_on: 0
-  prevscene:
-    sceneAsset: {fileID: 102900000, guid: 69258ee568f6b43fc991355f3e2f8ade, type: 3}
-    sceneName: Orbits/Scene_SP_basic
-  nextscene:
-    sceneAsset: {fileID: 102900000, guid: 69258ee568f6b43fc991355f3e2f8ade, type: 3}
-    sceneName: Orbits/Scene_SP_basic
 --- !u!1 &1375312105
 GameObject:
   m_ObjectHideFlags: 0

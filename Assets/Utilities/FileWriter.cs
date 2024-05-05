@@ -8,7 +8,8 @@ namespace Utilities
 
         public FileWriter(string directory, string filename)
         {
-            string fullFilename = $"{directory}/{filename}.txt";
+            // TODO: remove this and replace usage with a StreamWriter
+            string fullFilename = $"{directory}/{filename}.csv";
             if (File.Exists(fullFilename))
             {
                 File.Delete(fullFilename);

@@ -21,18 +21,6 @@ namespace Attack
     };
 
     /// <summary>
-    /// Defines the general orientation of the attack link (horizontal or vertical)
-    /// and the position of the source node in relation to the destination link.
-    /// </summary>
-    public enum TargetLinkOrientation // DONT NEED THIS. JUST NEED DIRECTION.
-    {
-        // TODO: rename these parameters.
-        Horizontal, // horizontal
-        Vertical, // vertical 
-        Any // No preference
-    }
-
-    /// <summary>
     /// Defines the position of the source node in relation to the destination link.
     /// Depends on the general orientation of the attack link. If none is specified,
     /// then the position of the source node should not be selectable.
@@ -58,8 +46,6 @@ namespace Attack
             Latitude = latitude;
             Longitude = longitude;
             OrbitId = orbitId;
-            // TargetLinkOrientation = targetLinkOrientation; 
-            // SourceNodePosition = sourceNodePosition; 
             Direction = direction;
             SrcGroundstations = srcGroundstations;
         }
@@ -69,7 +55,6 @@ namespace Attack
 
         public int OrbitId; // if -1, then there's no specific orbit.
 
-        // public TargetLinkOrientation TargetLinkOrientation;                     // preferred target link orientation.
         public Direction Direction; // preferred source node position.
         public List<GameObject> SrcGroundstations; // attacker source ground stations.
     }
@@ -151,11 +136,12 @@ namespace Attack
                 case Direction.East:
                     return new List<string>
                     {
-                        "Las Vegas",
+                        "Oklahoma City",
                         "Phoenix",
                         "Los Angeles",
                         "El Paso",
-                        "Houston"
+                        "Houston",
+                        "Denver",
                     };
                 case Direction.West:
                 {
@@ -224,12 +210,31 @@ namespace Attack
                 case Direction.East: 
                     return new List<string>
                     {
+                        // West Coast States
                         "San Francisco",
-                        "Ternate City",
+                        
+                        // West Pacific
                         "Kagoshima City",
-                        "Wellington",
-                        "El Paso",
-                        "Phoenix",
+                        "Nishino, Kagoshima",
+                        "Ternate City",
+                        
+                        // Northeast Asia
+                        "Saint Petersburg",
+                        "Vladivostok"
+                        // "Keelung",
+                        
+                        // Oceania Cities
+                        // "Wellington",
+                        // "El Paso",
+                        // "Phoenix",
+                        // "Auckland",
+                        // "Honolulu",
+                        
+                        // ASEAN cities
+                        // "Jakarta",
+                        // "Manila",
+                        // "Quezon City"
+                        
                     };
                 case Direction.North:
                     _ctx.OrbitId = 16;

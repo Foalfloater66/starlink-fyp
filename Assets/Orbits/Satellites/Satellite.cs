@@ -131,8 +131,7 @@ namespace Orbits.Satellites
 			ss.orbit_id = orbitnumber;
 			ss.id = satelliteid;
 
-			max_linknum = 100; // NOTE: Change this to the maximum number of attack paths set.
-			// REVIEW: Change I change this to a dynamic list? This is actually a problem now.
+			max_linknum = 100; // maximum number of links that a satellite can handle. 
 
 			links = new GameObject[max_linknum];
 

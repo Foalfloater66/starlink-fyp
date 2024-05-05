@@ -23,16 +23,10 @@ public class RouteHandler // TODO: move to a separate class
 		_painter = painter;
 	}
 	
-	// TODO: Can I move this somewhere else?
-	static int get_relay_id(int relaynum)
-	{
-		return ((-1000) - relaynum);
-	}
-
 	// TODO: add docstrings
-	public void InitRoute(int maxsats, Satellite[] satlist, List<GameObject> relays, float maxdist, float kmPerUnit)
+	public void InitRoute(int maxsats, Satellite[] satlist, float maxdist, float kmPerUnit)
 	{
-		_rg.Init(maxsats, relays.Count, maxdist, kmPerUnit);
+		_rg.Init(maxsats, maxdist, kmPerUnit);
 
 		// Plus 2 for start and end city
 		for (int satnum = 0; satnum < maxsats; satnum++)
@@ -41,12 +35,6 @@ public class RouteHandler // TODO: move to a separate class
 
 		}
 		_rg.AddEndNodes();
-		int relaycount = 0;
-		foreach (GameObject relay in relays)
-		{
-			_rg.NewNode(get_relay_id(relaycount), relay);
-			relaycount++;
-		}
 	}
 
 	/// <summary>
@@ -93,7 +81,6 @@ public class RouteHandler // TODO: move to a separate class
 				_rg.AddNeighbour(maxsats + 1, satnum, Node.INFINITY, true);
 			}
 
-			// Add relays
 			if (graphOn)
 			{
 				satlist[satnum].GraphReset();

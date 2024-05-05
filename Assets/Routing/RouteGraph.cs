@@ -39,14 +39,10 @@ namespace Routing
 		{
 		}
 
-		public void Init(int maxsat, int maxrelay, float maxdist_, float km_per_unit_)
+		public void Init(int maxsat, float maxdist_, float km_per_unit_)
 		{
-			// if (log_choice != LogChoice.None)
-			// {
-			// logfile = new System.IO.StreamWriter(@log_filename); // gotta remove this after for safety.
-			// }
-			nodes = new Node[maxsat + 2 + maxrelay];
-			objs = new GameObject[maxsat + 2 + maxrelay];
+			nodes = new Node[maxsat + 2];
+			objs = new GameObject[maxsat + 2];
 			nodecount = 0;
 			maxdist = maxdist_;
 			km_per_unit = km_per_unit_;
