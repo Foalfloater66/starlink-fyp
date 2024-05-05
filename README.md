@@ -1,4 +1,4 @@
-# Link Flooding Starlink Simulator for Unity
+# Starlink Link Flooding Attack Simulator for Unity
 This is a link flooding attack simulator on the SpaceX Starlink network based on [Mark Handley's SpaceX Starlink simulator](https://github.com/mhandley/Starlink0031).
 
 It simulates singular link flooding attacks on inter-satellite network (ISN) links located within a 1000km radius of a specified center point.
