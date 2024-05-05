@@ -64,6 +64,7 @@ More precisely, the combined creation of city game objects and forced scene rend
 If this does occur, there are a couple of possible venues which you may apply individually or together.
 
 For reference, the experiments were run on a Windows device equipped with an Intel Core i9 CPU and NVIDIA GeForce RTX 3070 Ti laptop GPU.
+Devices running this simulation with a low-performance CPU or one whose architecture is not supported by Unity 2019.2.1f1 (e.g, Apple M* chips which use delay-inducing Rosetta ISA translation) are more likely to encounter this issue.
 ### Enable Debugging Mode
 From a Unity-supporting IDE like Rider or Visual Studio, add a breakpoint to the [`Main.Update()`](https://github.com/Foalfloater66/starlink-fyp/blob/4881396f83662f559eaf89ddb3e5df7abeb6d089/Assets/Main.cs#L333) method.
 Then, attach the Unity editor and run the program in debugging mode with breakpoints enabled.
@@ -75,4 +76,3 @@ Select a set of `qualitativeCase`and `targetLinkDirection`parameters that you _d
 Save the Unity scene.
 Then, change the parameters to the intended parameters and run the program. _Do not save the Scene before running the program_.
 
-Devices running this simulation with a low-performance CPU or one whose architecture is not supported by Unity 2019.2.1f1 (e.g, Apple M* chips which use delay-inducing Rosetta ISA translation) are more likely to encounter this issue.
