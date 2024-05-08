@@ -486,7 +486,7 @@ MonoBehaviour:
   direction: 1
   directionChangeSpeed: 2
   attack_radius: 1000
-  captureMode: 1
+  captureMode: 0
   orbit: {fileID: 1172864837802712, guid: 3b4a1d43d21bf42d8ad02077259400de, type: 3}
   satellite: {fileID: 1842355326392174, guid: 7327322cd40cd49898f0f3e031d063e4, type: 3}
   laser: {fileID: 1648504976000122, guid: 88944ffc92ba14ec5a48961205eeab10, type: 3}
@@ -510,8 +510,8 @@ MonoBehaviour:
   leftbottom: {fileID: 485043185}
   rightbottom: {fileID: 1204926847}
   maxorbits: 24
-  qualitativeCase: 2
-  targetLinkDirection: 0
+  caseChoice: 2
+  targetLinkDirection: 3
   decimator: 1
   raan0: 0
   log_choice: 5
@@ -631,7 +631,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b9467e62c70d4a3883c50b993de3280, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  qualitativeCase: 0
+  caseChoice: 0
   sun: {fileID: 191554813}
 --- !u!1 &1963209747
 GameObject:

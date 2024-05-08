@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Attack;
+using Attack.Cases;
 using Scene.GameObjectScripts;
 using UnityEngine;
 
@@ -30,63 +31,68 @@ namespace Orbits
             CreateCity(43.65f, 79.38f, "Toronto");
             
         }
-        
-        /// <summary>
-        /// Create cities and place them on planet Earth.
-        /// </summary>
-        public void AddCities(QualitativeCase qualitativeCase, Direction targetLinkDirection)
-        {
-
-            switch (qualitativeCase)
-            {
-                case QualitativeCase.SimpleDemo:
-                    DemoCities();
-                    break;
-                case QualitativeCase.Coastal:
-                    // add depending on the angle.
-                    NonASEANCities();
-                    ASEANCities();
-                    WPacific();
-                    if (targetLinkDirection == Direction.East)
-                    {
-                        NorthAsiaCities();
-                    }
-                    else
-                    //if (new HashSet<Direction> {Direction.West, Direction.South, Direction.North}.Contains(targetLinkDirection))
-                    {
-                        OceaniaCities();
-                    }
-                    NACities();
-                    break;
-                case QualitativeCase.Landlocked:
-                    NACities();
-                    break;
-                case QualitativeCase.Polar:
-                    CANCities();
-                    AFCities();
-                    break;
-                case QualitativeCase.Equatorial:
-                    if (new HashSet<Direction> { Direction.North, Direction.South }.Contains(targetLinkDirection))
-                    {
-                        USACities();
-                        SACities();
-                    }
-                    if (new HashSet<Direction> { Direction.East, Direction.West, Direction.Any}.Contains(targetLinkDirection))
-                    {
-                        
-                        // WPacificCities();
-                        ASEANCities();
-                        OceaniaCities();
-                        AFCities();
-                    }
-                    break;
-                case QualitativeCase.IntraOrbital:
-                case QualitativeCase.TransOrbital:
-                    NACities();
-                    break;
-            }
-        }
-        
+//         
+//         /// <summary>
+//         /// Create cities and place them on planet Earth.
+//         /// </summary>
+//         public void AddCities(CaseChoice caseChoice, Direction targetLinkDirection)
+//         {
+// // TODO: this is more of an attackCases thing.
+//             switch (caseChoice)
+//             {
+//                 case CaseChoice.SimpleDemo:
+//                     DemoCities();
+//                     break;
+//                 case CaseChoice.Coastal:
+//                     // add depending on the angle.
+//                     NonASEANCities();
+//                     ASEANCities();
+//                     WPacific();
+//                     if (targetLinkDirection == Direction.East)
+//                     {
+//                         NorthAsiaCities();
+//                     }
+//                     else
+//                     {
+//                         OceaniaCities();
+//                     }
+//                     NACities();
+//                     break;
+//                 case CaseChoice.Landlocked:
+//                     NACities();
+//                     break;
+//                 case CaseChoice.Insular:
+//                     NACities();
+//                     NonASEANCities();
+//                     WPacific();
+//                     PacificCities();
+//                     break;
+//                 case CaseChoice.Polar:
+//                     CANCities();
+//                     AFCities();
+//                     break;
+//                 case CaseChoice.Equatorial:
+//                     if (new HashSet<Direction> { Direction.North, Direction.South }.Contains(targetLinkDirection))
+//                     {
+//                         USACities();
+//                         SACities();
+//                     }
+//                     if (new HashSet<Direction> { Direction.East, Direction.West, Direction.Any}.Contains(targetLinkDirection))
+//                     {
+//                         
+//                         // WPacificCities();
+//                         ASEANCities();
+//                         OceaniaCities();
+//                         AFCities();
+//                     }
+//                     break;
+//                 case CaseChoice.IntraOrbital:
+//                 case CaseChoice.TransOrbital:
+//                     NACities();
+//                     break;
+//             }
+//         }
+//         
         /// <summary>
         /// Creates a small collection of cities needed to run the demonstration code.
         /// </summary>
@@ -185,6 +191,40 @@ namespace Orbits
             CreateCity(-9.47f, -147.19f, "Port Moresby");       // Papua New Guinea
         }
 
+
+        /// <summary>
+        ///  Some pacific cities, since these are less populated, but still geographically well-placed.
+        ///
+        /// Source: https://github.com/mhandley/Starlink0031/blob/master/Assets/Orbits/SP_basic_0031.cs
+        /// </summary>
+        public void PacificCities()
+        {
+            CreateCity(52.83f, -173.17f, "Attu Station");  // Attu Station, AK, USA
+            CreateCity(51.87f, 176.64f, "Adak");  // Adak, Alaska, USA
+            CreateCity(52.21f, 174.21f, "Atka");  // Atka, AK 99547, USA
+            CreateCity(52.94f, 168.86f, "Nikolski");  // Nikolski, AK 99638, USA
+            CreateCity(53.89f, 166.54f, "Amaknak Island");  // Amaknak Island, Unalaska, AK, USA
+            CreateCity(54.13f, 165.78f, "Akutan");  // Akutan, AK 99553, USA
+            CreateCity(55.06f, 162.31f, "King Cove");  // King Cove, AK, USA
+            CreateCity(56.94f, 154.17f, "Akhiok");  // Akhiok, AK 99615, USA
+            CreateCity(57.20f, 153.30f, "Old Harbor");  // Old Harbor, AK, USA
+            CreateCity(57.75f, 152.49f, "Kodiak Station");  // Kodiak Station, AK 99615, USA
+            CreateCity(59.35f, 151.83f, "Homer");  // Homer, AK 99603, USA
+            CreateCity(59.80f, 144.60f, "Kayak Island");  // Kayak Island State Marine Park, Alaska, USA
+            CreateCity(59.51f, 139.67f, "Yakutat");  // Yakutat, AK 99689, USA
+            CreateCity(57.96f, 136.23f, "Pelican");  // Pelican, AK 99832, USA
+            CreateCity(56.25f, 134.65f, "Port Alexander");  // Port Alexander, AK 99836, USA
+            CreateCity(54.31f, 130.32f, "Prince Rupert");  // Prince Rupert, BC V8J 3K8, Canada
+            CreateCity(43.38f, -145.81f, "Nosappu");  // Nosappu, Nemuro, Hokkaido 087-0165, Japan
+            CreateCity(43.87f, -146.83f, "Shikotan");  // Shikotan-mura 694520
+            CreateCity(50.68f, -156.14f, "Severo-Kurilsky");  // Severo-Kurilsky District, Sakhalin Oblast, Russia
+            CreateCity(42.01f, -143.15f, "Erimo-cho");  // Erimo-chō, Horoizumi-gun, Hokkaidō 058-0203, Japan
+            CreateCity(53.25f, 132.12f, "Queen Charlotte");  // Queen Charlotte F, BC, Canada
+            CreateCity(50.72f, 127.50f, "Port Hardy");  // Port Hardy, BC V0N 2P0, Canada
+            
+            // Added Hawaii
+            CreateCity(19.89f, 155.66f, "Hawaii");  // Port Hardy, BC V0N 2P0, Canada
+        }
 
         /// <summary>
         /// Creates cities for the top 10 most populated cities of Europe as of each country's national census.
@@ -342,7 +382,7 @@ namespace Orbits
         }
         
         /// <summary>
-        ///  Some west pacific (coastal-ish) cities, since these are less populated, but still geographically well-
+        ///  Some west pacific cities, since these are less populated, but still geographically well-
         ///  placed.
         ///
         /// Source: https://github.com/mhandley/Starlink0031/blob/master/Assets/Orbits/SP_basic_0031.cs

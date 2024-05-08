@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.OleDb;
+﻿using System.Collections.Generic;
+using Attack.Cases;
 using UnityEngine;
-using Attack;
-using UnityEditor;
-using UnityEditor.Experimental.SceneManagement;
 using UnityEngine.Assertions;
 using UnityEngine.Serialization;
 
@@ -23,7 +19,7 @@ namespace Utilities
 		int current_cam;
 		float pause_start_time;
 
-		[FormerlySerializedAs("attackArea")] [FormerlySerializedAs("attack_choice")] [HideInInspector] public QualitativeCase qualitativeCase; 
+		[FormerlySerializedAs("qualitativeCase")] [FormerlySerializedAs("attackArea")] [FormerlySerializedAs("attack_choice")] [HideInInspector] public CaseChoice caseChoice; 
 		
 		public Light sun;
 		bool initialized = false;
@@ -45,7 +41,7 @@ namespace Utilities
 		/// <summary>
 		/// Camera view for the qualitative Landlocked and Demo examples.
 		/// </summary>
-		private void _ViewLandlocked()
+		public void ViewLandlocked()
 		{
 			cam_count = 1;
 
@@ -62,7 +58,7 @@ namespace Utilities
 		/// <summary>
 		/// Camera views for the qualitative Coastal example.
 		/// </summary>
-		private void _ViewCoastal(Direction targetLinkDirection)
+		public void ViewCoastal(Direction targetLinkDirection)
 		{
 			cam_count = 2;
 
@@ -105,11 +101,43 @@ namespace Utilities
 				lightrots.Add(new Vector3(0f, -150f, 0f));
 			}
 		}
+		
+		/// <summary>
+		/// Camera views for the qualitative Coastal example.
+		/// </summary>
+		public void ViewInsular()
+		{
+			cam_count = 3;
+
+			// America view
+			positions.Add(new Vector3(-30f, 18f, -3f)); 
+			angles.Add(new Vector3(30f, 90f, 0f));
+			times.Add (0f);
+			speeds.Add (0.01f);
+			FoVs.Add(60f);
+			lightrots.Add(new Vector3 (20f, 130f, 0f));
+			
+				// Middle Pacific view
+				positions.Add(new Vector3(-25f, 10f, 30f));
+				angles.Add(new Vector3(10f, 135f, 0f));
+				times.Add (0f);
+				speeds.Add (0.01f);
+				FoVs.Add(60f);
+				lightrots.Add(new Vector3(40f, 160f, 0f));
+				
+				// Oceania view
+				positions.Add(new Vector3(-6.3f, -12.6f, 37.9f));
+				angles.Add(new Vector3(-20f, 170f, 0f));
+				times.Add (0f);
+				speeds.Add (0.01f);
+				FoVs.Add(60f);
+				lightrots.Add(new Vector3(-20f, 170f, 0f));
+		}
 
 		/// <summary>
 		/// Camera view for the illustrative Polar example.
 		/// </summary>
-		private void _ViewPolar()
+		public void ViewPolar()
 		{
 			cam_count = 1;
 
@@ -125,7 +153,7 @@ namespace Utilities
 		/// <summary>
 		/// Camera view for the illustrative Equator example.
 		/// </summary>
-		private void _ViewAmericanEquator()
+		public void ViewAmericanEquator()
 		{
 			cam_count = 1;
 
@@ -137,32 +165,15 @@ namespace Utilities
 			FoVs.Add(80f);
 		}
 
+		public void SetupView()
+		{
+			Start();
+		}
+
 		/// <summary>
 		/// Initialize the view for the specified qualitative case.
 		/// </summary>
-		public void InitView(Direction targetLinkDirection) {
-			Start ();
-			switch (qualitativeCase)
-			{
-				case QualitativeCase.Polar:
-					_ViewPolar();
-					break;
-				case QualitativeCase.Coastal:
-					_ViewCoastal(targetLinkDirection);
-					break;
-				case QualitativeCase.Equatorial:
-					_ViewAmericanEquator();
-					break;
-				case QualitativeCase.IntraOrbital: 
-					// TODO
-				case QualitativeCase.TransOrbital:
-					// TODO
-				case QualitativeCase.SimpleDemo:
-				case QualitativeCase.Landlocked:
-				default:
-					_ViewLandlocked();
-					break;
-			}
+		public void InitView() {
 			sun.transform.rotation = Quaternion.Euler (lightrots[0]);
 			current_cam = 0;
 			transform.position = positions[0] * scale; 

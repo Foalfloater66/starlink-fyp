@@ -1,8 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Threading;
 using Attack;
+using Attack.Cases;
 using Orbits;
 using Orbits.Satellites;
 using Routing;
@@ -13,11 +17,14 @@ using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Utilities;
 using Debug = UnityEngine.Debug;
+using Path = System.IO.Path;
 
 public enum LogChoice { None, RTT, Distance, HopDists, LaserDists, Path };
 
 public class Main : MonoBehaviour
 {
+	[Header("Environment Parameters")]
+	// TODO: Add headers and spaces here.
 	public CustomCamera cam;
 	
 	[Tooltip("Speed 1 is realtime")]
@@ -65,13 +72,14 @@ public class Main : MonoBehaviour
 	public Material cityMaterial;
 	[FormerlySerializedAs("countdown")] public Text leftbottom;
 	public Text rightbottom;
+	
 	float elapsed_time;
 	float last_speed_change;
 	float last_elapsed_time;
 	int framecount = 0;
 	int maxsats; // total number of satellites
 	int phase1_sats;  // number of satellites in phase 1
-	public int maxorbits;
+	int maxorbits;
 	const int maxlasers = 4;
 	int isl_plane_shift = 0;
 	int isl_plane_step = 0;
@@ -82,22 +90,14 @@ public class Main : MonoBehaviour
 	Node[] nodes;
 	ScenePainter _painter;
 	float km_per_unit;
-
 	private ConstellationContext constellation_ctx;
-	private FileWriter _fileWriter;
-	private FileWriter _pathLogger;
-
+	private StreamWriter _fileWriter;
+	private StreamWriter _pathLogger;
 	private readonly GroundstationCollection groundstations = new GroundstationCollection();
-
 	private RouteHandler _routeHandler;
-
-	//GameObject beam1 = null, beam2 = null;
 	GameObject[] lasers;
-
 	int lastpath; // used for multipaths
-
 	Satellite[] nearest_sats;  // used for calculating collision distances
-
 	StreamWriter logfile;
 	float maxdist = 0f;
 	float beam_radius = 0f;
@@ -105,17 +105,29 @@ public class Main : MonoBehaviour
 
 	private string _loggingDirectory;
 
-	[FormerlySerializedAs("attackArea")] [FormerlySerializedAs("attack_choice")] public QualitativeCase qualitativeCase;
+	[Header("Attack Parameters")]
+	[FormerlySerializedAs("qualitativeCase")] [FormerlySerializedAs("attackArea")] [FormerlySerializedAs("attack_choice")] public CaseChoice caseChoice;
 	public Direction targetLinkDirection;
-	public int decimator;
-	public float raan0 = 0f;
+	[Space]
+	
+	int decimator = 1;
+	float raan0 = 0f;
 
-	public LogChoice log_choice = LogChoice.None;
+	// Deprecated log choice.
+	LogChoice log_choice = LogChoice.None;
 
+	// TODO: is this ever used?
 	public enum BeamChoice { AllOff, AllOn, SrcDstOn };
+	
+	// TODO: is this ever used?
 	public BeamChoice beam_on;
+	
+	// TODO: is this ever used?
 	public bool graph_on;
 
+	[Header("Defence Parameters")]
+	public bool defence_on;
+	
 	void Start()
 	{
 		// handle time in a way that copes with speed change mid sim
@@ -126,11 +138,18 @@ public class Main : MonoBehaviour
 		orbitcount = 0;
 		satcount = 0;
 		Application.runInBackground = true;
+		
+		// Create cities
+		_city_creator = new CityCreator(transform, city_prefab, groundstations);
+		_city_creator.DefaultCities();
+		
 
 		/* ask the camera to view the same area as our route */
 		CustomCamera camscript = (CustomCamera)cam.GetComponent(typeof(CustomCamera));
-		camscript.qualitativeCase = qualitativeCase;
-		camscript.InitView(targetLinkDirection);
+		camscript.SetupView();
+		AttackerParams attackerParams = CasesFactory.GetCase(caseChoice, _city_creator, targetLinkDirection, groundstations, camscript).GetParams();
+		camscript.InitView();
+		//
 
 		// Set the constellation.
 		maxorbits = 24 / decimator;
@@ -157,19 +176,16 @@ public class Main : MonoBehaviour
 		satlist = new Satellite[maxsats];
 		const float earth_r = 6371f; // earth radius
 		float sat0r = sat0alt + earth_r;  // sat radius from earth centre
+					// beam_angle, beam_radius);
 		CreateSats(maxorbits, satsperorbit, 53f, 0f, 0f, phase_offset, orbital_period, sat0r,
 					beam_angle, beam_radius);
 		float earthdist = Vector3.Distance(satlist[0].gameobject.transform.position, transform.position);
 		km_per_unit = sat0r / earthdist;  // sim scale factor
 
-		// Create cities
-		_city_creator = new CityCreator(transform, city_prefab, groundstations);
-		_city_creator.DefaultCities();
-		_city_creator.AddCities(qualitativeCase, targetLinkDirection);
+
 		
 		// Initialize RouteGraph
 		_routeHandler = new RouteHandler(_painter);
-		// EditorApplication.Exit(0);
 		_routeHandler.InitRoute(maxsats,satlist, maxdist, km_per_unit);
 
 		Debug.Assert(satcount == maxsats);
@@ -204,37 +220,65 @@ public class Main : MonoBehaviour
 				satlist[satnum].PreAssignLasersBetweenPlanes(isl_plane_shift, isl_plane_step);
 			}
 		}
+		Thread.Sleep(10000);	// give the program enough time to generate all game objects.
 
 		// attacker environment set up
 		_painter = new ScenePainter(isl_material, laserMaterials, targetLinkMaterial, cityMaterial);
 		_link_capacities = new LinkCapacityMonitor();
-		AttackParams attackParams = new AttackCases()
-			.SetTargetCoordinates(qualitativeCase)
-			.SetLinkDirection(targetLinkDirection)
-			.SetSourceGroundstations(qualitativeCase, groundstations)
-			.Build();
 		
+		// Set up logging
+		_loggingDirectory = $"{Directory.GetCurrentDirectory()}/Logs/Captures/{caseChoice}_{targetLinkDirection}";
+		InitLoggingDirectory();
+		if (captureMode)
+		{
+			CreateFrameScreenshotter();
+		}
 		CreateFrameLogger();
 		CreatePathLogger();
 		
 		// Create attacker entity.
-		_attacker = new Attacker(attackParams, sat0r, attack_radius, transform, city_prefab, groundstations, _routeHandler, _painter, _link_capacities, _fileWriter, _pathLogger);
+		_attacker = new Attacker(attackerParams, sat0r, attack_radius, transform, city_prefab, groundstations, _routeHandler, _painter, _link_capacities, _fileWriter, _pathLogger);
 
 		CreateContext();
 	}
 
+	/// <summary>
+	/// Reinitialize the logging directory.
+	/// </summary>
+	void InitLoggingDirectory()
+	{
+		if (Directory.Exists(_loggingDirectory))
+		{
+			Directory.Delete(_loggingDirectory, true);
+		}
+		Directory.CreateDirectory(_loggingDirectory);
+	}
+
+	/// <summary>
+	/// Create logger to record information about the frames.
+	/// </summary>
 	void CreateFrameLogger()
 	{
-		_loggingDirectory = $"{qualitativeCase}_{targetLinkDirection}";
-		captures = new Captures();
-		Captures.Setup(_loggingDirectory);
-		_fileWriter = new FileWriter($"Logs/Captures/{_loggingDirectory}", $"{qualitativeCase}_{targetLinkDirection}");
+		string path = Path.Combine(_loggingDirectory, $"{caseChoice}_{targetLinkDirection}.csv");
+		_fileWriter = new StreamWriter(path);
 		_fileWriter.WriteLine("FRAME,TARGET LINK,ROUTE COUNT,FINAL CAPACITY"); 
 	}
+
+	/// <summary>
+	/// Create logger to save a screenshot of each frame.
+	/// </summary>
+	void CreateFrameScreenshotter()
+	{
+		captures = new Captures(_loggingDirectory, $"{caseChoice}_{targetLinkDirection}");
+	}
 	
+	/// <summary>
+	/// Create logger to record information about the attack routes selected for each frame.
+	/// </summary>
 	void CreatePathLogger()
 	{
-		_pathLogger= new FileWriter($"Logs/Captures/{_loggingDirectory}", "paths");
+		string path = Path.Combine(_loggingDirectory, "paths.csv");
+		_pathLogger = new StreamWriter(path);
 		_pathLogger.WriteLine("FRAME,PATHS");
 	}
 
@@ -253,8 +297,6 @@ public class Main : MonoBehaviour
 			margin = margin,
 		};
 	}
-	
-
 	
 	/// <summary>
 	/// Default way to create a constellation
@@ -332,76 +374,73 @@ public class Main : MonoBehaviour
 	/// </summary>
 	void Update()
 	{
-		// TODO: DEMO MODE NEEDS TO PAUSE FOR EACH STEP/TAKE A SCREENSHOT.
-		// Update scene initial parameters
-		elapsed_time = last_elapsed_time + (Time.time - last_speed_change) * speed;
-		RotateCamera();
-		
-		// Reset the link capacities. 
-		_link_capacities.Reset();
-		
-		// Clear the scene.
-		RouteHandler.ClearRoutes(_painter);
+			// TODO: DEMO MODE NEEDS TO PAUSE FOR EACH STEP/TAKE A SCREENSHOT.
+			// Update scene initial parameters
+			elapsed_time = last_elapsed_time + (Time.time - last_speed_change) * speed;
+			RotateCamera();
 
-		// Start logging for this frame.
-		_fileWriter.Write($"{framecount}");
-		_pathLogger.Write($"{framecount}");
-		
-		// Attempt an attack.
-		_attacker.Run(constellation_ctx, graph_on, groundstations.ToList());
-		
-		// Finish logging for this frame.
-		_fileWriter.Write($"\n");
-		_pathLogger.Write("\n");
-		_fileWriter.Flush();
-		_pathLogger.Flush();
-		
-		// Update the scene.
-		_painter.UpdateLasers(satlist, maxsats, speed);
-		leftbottom.text = $"Frame {framecount}";
+			// Reset the link capacities. 
+			_link_capacities.Reset();
 
+			// Clear the scene.
+			RouteHandler.ClearRoutes(_painter);
+
+			// Start logging for this frame.
+			_fileWriter.Write($"{framecount}");
+			_pathLogger.Write($"{framecount}");
+
+			// Attempt an attack.
+			_attacker.Run(constellation_ctx, graph_on, groundstations.ToList());
+
+			// Finish logging for this frame.
+			_fileWriter.Write($"\n");
+			_pathLogger.Write("\n");
+			_fileWriter.Flush();
+			_pathLogger.Flush();
+
+			// Update the scene.
+			_painter.UpdateLasers(satlist, maxsats, speed);
+			leftbottom.text = $"Frame {framecount}";
+
+			// Take a screenshot (if captureMode is enabled)
+			if (captureMode)
+			{
+				captures.CaptureState(cam, leftbottom, framecount); //, leftbottom);
+			if (framecount == 50)
+			{
+				Terminate();
+			}
+			}
+
+
+			framecount++;
+	}
+
+	private void Terminate()
+	{
 		if (captureMode)
 		{
-			Canvas.ForceUpdateCanvases(); 
-			leftbottom.canvas.renderMode = RenderMode.ScreenSpaceCamera;
-			leftbottom.canvas.worldCamera = Camera.main;
-			captures.CaptureState(_loggingDirectory, $"{qualitativeCase}_{targetLinkDirection}_{framecount:00}", cam,
-				leftbottom);
-
-			if (framecount == 50) // 16 seconds' worth of video for 3 fps
-			{
-				// TODO: need to turn off logging if capturemode is off.
-				SaveVideo();
-				PlotData();
-				EditorApplication.Exit(0);
-			}
+			SaveVideo();
 		}
-
-		framecount++;
+		PlotData();
+		EditorApplication.Exit(0);
 	}
 
 	private void SaveVideo()
 	{
 		int imgHeight = 748 * cam.cam_count;
 		int imgWidth = 1504;
-		
-		// switch (qualitativeCase)
-		// {
-		// 	case QualitativeCase.Coastal:
-		// 		imgHeight = 14;
-		// 		// multiply it by the amera count instead
-		// 		break;
-		// }
 
 		string command =
-			$"ffmpeg -framerate 3 -i {Directory.GetCurrentDirectory()}/Logs/Captures/{_loggingDirectory}/{qualitativeCase}_{targetLinkDirection}_%02d.png -vf \"scale={imgWidth}:{imgHeight}\" -c:v libx265 -preset fast -crf 20 -pix_fmt yuv420p {Directory.GetCurrentDirectory()}/Logs/Captures/{_loggingDirectory}/output.mp4";
+			// $"ffmpeg -framerate 3 -i {Directory.GetCurrentDirectory()}/Logs/Captures/{_loggingDirectory}/{qualitativeCase}_{targetLinkDirection}_%02d.png -vf \"scale={imgWidth}:{imgHeight}\" -c:v libx265 -preset fast -crf 20 -pix_fmt yuv420p {Directory.GetCurrentDirectory()}/Logs/Captures/{_loggingDirectory}/output.mp4";
+			$"ffmpeg -framerate 3 -i {_loggingDirectory}/{caseChoice}_{targetLinkDirection}_%02d.png -vf \"scale={imgWidth}:{imgHeight}\" -c:v libx265 -preset fast -crf 20 -pix_fmt yuv420p {_loggingDirectory}/output.mp4";
 		ExecutePowershellCommand(command);
 	}
 
 	private void PlotData()
 	{
 
-		string command = $"python generate_graph.py {Directory.GetCurrentDirectory()}/Logs/Captures/{_loggingDirectory}/{qualitativeCase}_{targetLinkDirection}.csv {Directory.GetCurrentDirectory()}/Logs/Captures/{_loggingDirectory}/{qualitativeCase}_{targetLinkDirection}_graph.svg";
+		string command = $"python generate_graph.py {_loggingDirectory}/{caseChoice}_{targetLinkDirection}.csv {_loggingDirectory}/{caseChoice}_{targetLinkDirection}_graph.svg";
 		ExecutePowershellCommand(command);
 	}
 

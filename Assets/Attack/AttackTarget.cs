@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
+using Attack.Cases;
 using Routing;
 using UnityEngine;
 using UnityEngineInternal;
@@ -44,12 +45,12 @@ namespace Attack
 
         public TargetLink Link { get; private set; }
 
-        private AttackParams _attackParams;
+        private AttackerParams _attackParams;
 
         // private 
         public readonly int OrbitId; // If the orbit Id is -1, then the target link is not restricted by its orbit.
 
-        public AttackTarget(AttackParams attackParams, float sat0r, float radius, Transform transform,
+        public AttackTarget(AttackerParams attackParams, float sat0r, float radius, Transform transform,
             GameObject prefab)
         {
             Link = null;
@@ -165,33 +166,6 @@ namespace Attack
                 }
             }
             return null;
-            // }
-
-            // // this is the randomization code. It's never used. I should be able to remove it.
-            // Dictionary<int, Node> nodes = new Dictionary<int, Node>(); // index, node 
-            // int remaining_nodes = rg.nodes.Count();
-            // for (int i = 0; i < rg.nodes.Count(); i++) nodes.Add(i, rg.nodes[i]);
-            //
-            // while (remaining_nodes > 0)
-            // {
-            //     int i = new System.Random().Next(rg.nodes.Count());
-            //     node = nodes[i];
-            //     if (node == null)
-            //     {
-            //         continue; // already seen.
-            //     }
-            //
-            //     if (node.Id > 0 && InTargetArea(node.Position))
-            //     {
-            //         // src_node = node;
-            //         break;
-            //     }
-            //
-            //     nodes[i] = null;
-            //     remaining_nodes -= 1;
-            // }
-            //
-            // return node; // the node might not have any links!
         }
 
         /// <summary>
@@ -240,32 +214,6 @@ namespace Attack
             }
 
             return null;
-            // }
-
-            // FIXME: I think this function never gets used. I have to decide whether to keep it or not.
-            // Dictionary<int, Node> nodes = new Dictionary<int, Node>(); // index, node 
-            // int remaining_nodes = src_node.LinkCount;
-            //
-            // for (int i = 0; i < src_node.LinkCount; i++) nodes.Add(i, src_node.GetNeighbour(src_node.GetLink(i)));
-            //
-            // while (remaining_nodes > 0) // prioritise ISL links that are fully contained in the target radius.
-            // {
-            //     int i = new System.Random().Next(src_node.LinkCount);
-            //     Node node = nodes[i];
-            //     if (node == null)
-            //     {
-            //         continue;
-            //     }
-            //
-            //     if (node.Id > 0 && InTargetArea(node.Position))
-            //     {
-            //         return node;
-            //     }
-            //
-            //     nodes[i] = null;
-            //     remaining_nodes -= 1;
-            // }
-            // return null;
         }
 
         /// <summary>

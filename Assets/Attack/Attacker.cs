@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using Attack.Cases;
 using Orbits;
 using Orbits.Satellites;
 using Routing;
@@ -68,15 +70,8 @@ namespace Attack
         /// </summary>
         // private System.IO.StreamWriter logfile;
 
-        /// <summary>
-        /// Path logging.
-        /// </summary>
-        private FileWriter _fileWriter;
-
-        /// <summary>
-        /// Logs specific paths that were chosen.
-        /// </summary>
-        private FileWriter _pathWriter; 
+        private StreamWriter _attackLogger;
+        private StreamWriter _pathLogger; 
 
         /// <summary>
         /// Constructor creating an <c>Attacker</c> object with an attack area around the provided <c>(latitude, longitude)</c> coordinates. 
@@ -88,10 +83,10 @@ namespace Attack
         /// <param name="src_groundstations">List of source groundstations available to the attacker.</param>
         /// <param name="transform">Transform object associated with Earth's center.</param>
         /// <param name="prefab">GameObject representing the attack area center.</param>
-        public Attacker(AttackParams attackParams, float sat0r, float attack_radius, Transform transform,
+        public Attacker(AttackerParams attackParams, float sat0r, float attack_radius, Transform transform,
             GameObject prefab, GroundstationCollection groundstations, RouteHandler route_handler, ScenePainter painter,
             LinkCapacityMonitor
-                linkCapacityMonitor, FileWriter fileWriter, FileWriter pathWriter)
+                linkCapacityMonitor, StreamWriter fileWriter, StreamWriter pathWriter)
         {
             // AttackParams
             SourceGroundstations =
@@ -103,8 +98,8 @@ namespace Attack
             _routeHandler = route_handler;
 
             _Groundstations = groundstations;
-            _fileWriter = fileWriter;
-            _pathWriter = pathWriter;
+            _attackLogger = fileWriter;
+            _pathLogger = pathWriter;
         }
 
         /// <summary>
@@ -252,6 +247,7 @@ namespace Attack
 
             return heap;
         }
+        
 
         /* Draw the computed path and send traffic in mbits. */
         public void ExecuteAttackRoute(Path path, GameObject city1 /* TODO: remove this */,
@@ -372,6 +368,10 @@ namespace Attack
                         _linkCapacityMonitor, _Groundstations[attack_path.start_city],
                         _Groundstations[attack_path.end_city]))
                 {
+                    // If the defender is enabled, the attack routes are replaced by the mitigation algorithm.
+                    // attack_path = defender_routing
+                    
+                    // pick a random value between a set number of possible values.
                     ExecuteAttackRoute(attack_path, attack_path.start_city, attack_path.end_city, mbits,
                         _linkCapacityMonitor, _painter, constellation_ctx);
                     
@@ -379,8 +379,8 @@ namespace Attack
                     counter += 1;
                 }
             }
-            _fileWriter.Write($",{counter}");
-            _pathWriter.Write(sb.ToString());
+            _attackLogger.Write($",{counter}");
+            _pathLogger.Write(sb.ToString());
         }
 
         /// <summary>
@@ -428,7 +428,7 @@ namespace Attack
             // If the attacker has selected a valid link, attempt to attack it
             if (Target.Link != null && Target.HasValidTargetLink())
             {
-                _fileWriter.Write($",{Target.Link.SrcNode.Id.ToString()} -> {Target.Link.DestNode.Id.ToString()}");
+                _attackLogger.Write($",{Target.Link.SrcNode.Id.ToString()} -> {Target.Link.DestNode.Id.ToString()}");
 
                 // Find viable attack routes.
                 BinaryHeap<Path> attack_routes = _FindAttackRoutes(_rg,
@@ -436,15 +436,16 @@ namespace Attack
                     graph_on,
                     constellation_ctx
                 );
-
+                
+                // The routes are executed
                 FloodLink(attack_routes, constellation_ctx);
                 UpdateTargetLinkVisuals(constellation_ctx);
-                _fileWriter.Write($",{_linkCapacityMonitor.GetCapacity(Target.Link.SrcNode.Id, Target.Link.DestNode.Id)}");
+                _attackLogger.Write($",{_linkCapacityMonitor.GetCapacity(Target.Link.SrcNode.Id, Target.Link.DestNode.Id)}");
             }
             else
             {
-                _fileWriter.Write(",,0,nan");
-                _pathWriter.Write(",nan");
+                _attackLogger.Write(",,0,nan");
+                _pathLogger.Write(",nan");
             }
         }
     }
