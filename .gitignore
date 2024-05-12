@@ -21,6 +21,8 @@ ExportedObj/
 *.unityproj
 *.booproj
 .idea/
+UserSettings/
+App.config
 
 # ============ #
 # OS generated #
