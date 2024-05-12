@@ -7,9 +7,9 @@ UnityGenerated/
 Library/
 Assets/AssetStoreTools*
 
-# ===================================== #
-# Visual Studio / MonoDevelop generated #
-# ===================================== #
+# ============================================= #
+# Visual Studio / MonoDevelop / Rider generated #
+# ============================================= #
 ExportedObj/
 *.svd
 *.userprefs
@@ -20,6 +20,7 @@ ExportedObj/
 *.user
 *.unityproj
 *.booproj
+.idea/
 
 # ============ #
 # OS generated #
@@ -36,6 +37,7 @@ Thumbs.db
 # ======= #
 # Logging #
 # ======= #
-Logs/*.txt
-Logs/path/*.txt
-.idea/
+Logs/Captures/*
+
+
+
