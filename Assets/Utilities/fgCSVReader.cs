@@ -21,17 +21,17 @@ namespace Utilities
 
         public static void LoadFromString(string file_contents, ReadLineDelegate line_reader)
         {
-            int file_length = file_contents.Length;
+            var file_length = file_contents.Length;
             //Debug.Log (file_length);
             // read char by char and when a , or \n, perform appropriate action
-            int cur_file_index = 0; // index in the file
-            List<string> cur_line = new List<string>(); // current line of data
-            int cur_line_number = 0;
-            StringBuilder cur_item = new StringBuilder("");
-            bool inside_quotes = false; // managing quotes
+            var cur_file_index = 0; // index in the file
+            var cur_line = new List<string>(); // current line of data
+            var cur_line_number = 0;
+            var cur_item = new StringBuilder("");
+            var inside_quotes = false; // managing quotes
             while (cur_file_index < file_length)
             {
-                char c = file_contents[cur_file_index++];
+                var c = file_contents[cur_file_index++];
 
                 switch (c)
                 {
@@ -60,6 +60,7 @@ namespace Utilities
                                 inside_quotes = false;
                             }
                         }
+
                         break;
                     case '\r':
                         // ignore it completely
@@ -84,6 +85,7 @@ namespace Utilities
                                 cur_line.Clear();
                             }
                         }
+
                         break;
                     default:
                         // other cases, add char

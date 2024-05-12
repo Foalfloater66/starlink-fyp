@@ -6,9 +6,10 @@ namespace Attack.Cases
 {
     public class CoastalCase : BaseCase
     {
-        public CoastalCase(CityCreator cityCreator, Direction targetLinkDirection, GroundstationCollection groundstations, CustomCamera cam) : base(cityCreator, targetLinkDirection, groundstations, cam)
+        public CoastalCase(CityCreator cityCreator, Direction targetLinkDirection,
+            GroundstationCollection groundstations, CustomCamera cam) : base(cityCreator, targetLinkDirection,
+            groundstations, cam)
         {
-            
         }
 
         protected override void SetupCameras(CustomCamera cam)
@@ -22,13 +23,9 @@ namespace Attack.Cases
             Cities.ASEANCities();
             Cities.WPacific();
             if (Ctx.Direction == Direction.East)
-            {
                 Cities.NorthAsiaCities();
-            }
             else
-            {
                 Cities.OceaniaCities();
-            }
             Cities.NACities();
         }
 
@@ -51,19 +48,19 @@ namespace Attack.Cases
                         "Boston",
                         "Washington DC",
                         "Toronto",
-                        "Brisay",
+                        "Brisay"
                     };
-                case Direction.East: 
+                case Direction.East:
                     return new List<string>
                     {
                         // West Coast States
                         "San Francisco",
-                        
+
                         // West Pacific
                         "Kagoshima City",
                         "Nishino, Kagoshima",
                         "Ternate City",
-                        
+
                         // Northeast Asia
                         "Saint Petersburg",
                         "Vladivostok"
@@ -77,7 +74,7 @@ namespace Attack.Cases
                         "San Diego",
                         "Phoenix",
                         "San Antonio",
-                        "Denver",
+                        "Denver"
                     };
                 case Direction.South:
                     Ctx.OrbitId = 16;

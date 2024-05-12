@@ -57,7 +57,7 @@ namespace Attack
             Center = Vector3.zero;
             Radius = radius;
             OrbitId = attackParams.OrbitId;
-            
+
             _attackParams = attackParams;
             SetTargetArea(attackParams.Latitude, attackParams.Longitude, sat0r, transform, prefab);
         }
@@ -154,7 +154,7 @@ namespace Attack
         {
             for (var i = 0; i < rg.nodes.Count(); i++)
             {
-                Node node = rg.nodes[i];
+                var node = rg.nodes[i];
                 if (OrbitId != -1 && OrbitId != node.Orbit)
                     // If orbit-specific links are enabled, exclude links that are not part of the desired orbit.
                     continue;
@@ -165,6 +165,7 @@ namespace Attack
                     return link;
                 }
             }
+
             return null;
         }
 
@@ -189,27 +190,27 @@ namespace Attack
                     var direction = GetLinkDirection(src_node, node);
                     if (OrbitId == -1) // If the orbit is not specified, switch the orientation!
                     {
-                        if (new HashSet<Direction>{ Direction.East, Direction.West }.Contains(_attackParams.Direction) &&
+                        if (new HashSet<Direction>
+                                { Direction.East, Direction.West }.Contains(_attackParams.Direction) &&
                             !IsHorizontal(src_node, node))
-                        {
                             continue;
-                        }
                         else if (new HashSet<Direction>
-                                { Direction.South, Direction.North }.Contains(_attackParams.Direction) &&
-                            IsHorizontal(src_node, node))
-                        {
+                                     { Direction.South, Direction.North }.Contains(_attackParams.Direction) &&
+                                 IsHorizontal(src_node, node))
                             continue;
-                        }
                     }
+
                     if (_attackParams.Direction == Direction.Any
                         // TODO: make sure that the horizontal/vertical variation DOES NOT occur
-                        || (_attackParams.Direction == Direction.East && direction.x >= 0) // && IsHorizontal(src_node, node))
-                        || (_attackParams.Direction == Direction.West && direction.x < 0) // && IsHorizontal(src_node, node))
-                        || (_attackParams.Direction == Direction.North && direction.y >= 0) // && !IsHorizontal(src_node, node))
-                        || (_attackParams.Direction == Direction.South && direction.y < 0)) //  && !IsHorizontal(src_node, node)))
-                    {
+                        || (_attackParams.Direction == Direction.East &&
+                            direction.x >= 0) // && IsHorizontal(src_node, node))
+                        || (_attackParams.Direction == Direction.West &&
+                            direction.x < 0) // && IsHorizontal(src_node, node))
+                        || (_attackParams.Direction == Direction.North &&
+                            direction.y >= 0) // && !IsHorizontal(src_node, node))
+                        || (_attackParams.Direction == Direction.South &&
+                            direction.y < 0)) //  && !IsHorizontal(src_node, node)))
                         return new Tuple<Node, Node>(src_node, node);
-                    }
                 }
             }
 

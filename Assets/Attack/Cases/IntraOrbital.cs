@@ -6,7 +6,9 @@ namespace Attack.Cases
 {
     public class IntraOrbital : BaseCase
     {
-        public IntraOrbital(CityCreator cityCreator, Direction targetLinkDirection, GroundstationCollection groundstations, CustomCamera cam) : base(cityCreator, targetLinkDirection, groundstations, cam)
+        public IntraOrbital(CityCreator cityCreator, Direction targetLinkDirection,
+            GroundstationCollection groundstations, CustomCamera cam) : base(cityCreator, targetLinkDirection,
+            groundstations, cam)
         {
         }
 

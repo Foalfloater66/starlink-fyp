@@ -72,24 +72,26 @@ namespace QuickPrimitives.Scripts
 
         protected void AddOffset(Vector3 offsetPosition)
         {
-            for (int i = 0; i < vertices.Count; ++i)
-            {
-                vertices[i] += offsetPosition;
-            }
+            for (var i = 0; i < vertices.Count; ++i) vertices[i] += offsetPosition;
         }
 
         protected Vector3 ComputeNormal(Vector3 a, Vector3 b, Vector3 c)
         {
-            Vector3 side1 = b - a;
-            Vector3 side2 = c - a;
-            Vector3 perp = Vector3.Cross(side1, side2);
+            var side1 = b - a;
+            var side2 = c - a;
+            var perp = Vector3.Cross(side1, side2);
             var perpLength = perp.magnitude;
             perp /= perpLength;
 
             return perp;
         }
 
-        protected virtual void BuildGeometry() { }
-        public virtual void RebuildGeometry() { }
+        protected virtual void BuildGeometry()
+        {
+        }
+
+        public virtual void RebuildGeometry()
+        {
+        }
     }
 }

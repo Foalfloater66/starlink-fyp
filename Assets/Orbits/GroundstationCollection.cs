@@ -21,15 +21,11 @@ namespace Orbits
         public void addGroundstation(GameObject gs_object, string gs_name)
         {
             if (groundstation2name.ContainsKey(gs_object))
-            {
                 throw new Exception("A groundstation with the same GameObject already exists.");
-            }
             groundstation2name.Add(gs_object, gs_name);
-            
+
             if (name2groundstation.ContainsKey(gs_name))
-            {
                 throw new Exception("A groundstation with the same name already exists.");
-            }
             name2groundstation.Add(gs_name, gs_object);
         }
 
@@ -38,7 +34,7 @@ namespace Orbits
         /// </summary>
         /// <returns></returns>
         public List<GameObject> ToList()
-        { 
+        {
             return name2groundstation.Values.ToList();
         }
 

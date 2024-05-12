@@ -10,9 +10,9 @@ public class QcGridEditor : Editor
 {
     private QcGridMesh.QcGridProperties oldProp = new QcGridMesh.QcGridProperties();
 
-    override public void OnInspectorGUI()
+    public override void OnInspectorGUI()
     {
-        QcGridMesh mesh = target as QcGridMesh;
+        var mesh = target as QcGridMesh;
 
         mesh.properties.width = EditorGUILayout.Slider("Width", mesh.properties.width, 0.01f, 10);
         mesh.properties.height = EditorGUILayout.Slider("Height", mesh.properties.height, 0.01f, 10);
@@ -25,11 +25,12 @@ public class QcGridEditor : Editor
         mesh.properties.borderHeight = EditorGUILayout.Slider("Border Height", mesh.properties.borderHeight, 0.01f, 5);
 
         mesh.properties.offset =
-                    EditorGUILayout.Vector3Field("Offset", mesh.properties.offset);
+            EditorGUILayout.Vector3Field("Offset", mesh.properties.offset);
 
         EditorGUILayout.Space();
 
-        mesh.properties.genTextureCoords = EditorGUILayout.Toggle("Gen Texture Coords", mesh.properties.genTextureCoords);
+        mesh.properties.genTextureCoords =
+            EditorGUILayout.Toggle("Gen Texture Coords", mesh.properties.genTextureCoords);
         //using (new EditorGUI.DisabledScope(!mesh.properties.genTextureCoords))
         //{
         //    mesh.properties.textureWrapped = EditorGUILayout.Toggle("Wrap Texture", mesh.properties.textureWrapped);
@@ -63,12 +64,15 @@ public class QcGridEditor : Editor
         if (gridMesh.properties.borderHeight < 0) gridMesh.properties.borderHeight = 0.1f;
 
         if (gridMesh.properties.borderWidth * (gridMesh.properties.columnCount + 1) > gridMesh.properties.width)
-            gridMesh.properties.borderWidth = gridMesh.properties.width / ((gridMesh.properties.columnCount + 1) * 2.0f);
+            gridMesh.properties.borderWidth =
+                gridMesh.properties.width / ((gridMesh.properties.columnCount + 1) * 2.0f);
         if (gridMesh.properties.borderHeight * (gridMesh.properties.rowCount + 1) > gridMesh.properties.height)
             gridMesh.properties.borderHeight = gridMesh.properties.height / ((gridMesh.properties.rowCount + 1) * 2.0f);
     }
+
     private void ShowVertexCount(QcGridMesh mesh)
     {
-        EditorGUILayout.HelpBox(mesh.vertices.Count + " vertices\r\n" + mesh.faces.Count + " triangles", MessageType.Info);
+        EditorGUILayout.HelpBox(mesh.vertices.Count + " vertices\r\n" + mesh.faces.Count + " triangles",
+            MessageType.Info);
     }
 }

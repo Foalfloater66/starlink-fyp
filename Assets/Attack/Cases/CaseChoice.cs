@@ -2,19 +2,19 @@
 {
     public enum CaseChoice
     {
-        SimpleDemo,     // Small Example Case
-        
+        SimpleDemo, // Small Example Case
+
         // Geographic
-        Landlocked,     // Intra-continental
-        Coastal,        // Continental coast
-        Insular,        // Islands
+        Landlocked, // Intra-continental
+        Coastal, // Continental coast
+        Insular, // Islands
 
         // Latitudinal
-        Polar,          // High link density
-        Equatorial,     // Low link density
-        
+        Polar, // High link density
+        Equatorial, // Low link density
+
         // Orbital
-        TransOrbital,   // Across orbits
-        IntraOrbital    // Within the same orbit
+        TransOrbital, // Across orbits
+        IntraOrbital // Within the same orbit
     };
 }

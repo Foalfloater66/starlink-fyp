@@ -15,32 +15,29 @@ namespace QuickPrimitives.Scripts
             public int sides = 5;
 
             public float triangleIncline = 0.5f;
+
             public void CopyFrom(QcPyramidProperties source)
             {
                 base.CopyFrom(source);
 
-                this.width = source.width;
-                this.depth = source.depth;
-                this.height = source.height;
-                this.sides = source.sides;
-                this.triangleIncline = source.triangleIncline;
+                width = source.width;
+                depth = source.depth;
+                height = source.height;
+                sides = source.sides;
+                triangleIncline = source.triangleIncline;
             }
 
             public bool Modified(QcPyramidProperties source)
             {
-                if ((this.width == source.width) && (this.depth == source.depth) && (this.height == source.height) &&
-                    (this.sides == source.sides) &&
-                    (this.triangleIncline == source.triangleIncline) &&
-                    (this.genTextureCoords == source.genTextureCoords) &&
-                    (this.addCollider == source.addCollider) &&
-                    (this.offset[0] == source.offset[0]) && (this.offset[1] == source.offset[1]) && (this.offset[2] == source.offset[2]))
-                {
-                        return false;
-                }
+                if (width == source.width && depth == source.depth && height == source.height &&
+                    sides == source.sides &&
+                    triangleIncline == source.triangleIncline &&
+                    genTextureCoords == source.genTextureCoords &&
+                    addCollider == source.addCollider &&
+                    offset[0] == source.offset[0] && offset[1] == source.offset[1] && offset[2] == source.offset[2])
+                    return false;
                 else
-                {
                     return true;
-                }
             }
         }
 
@@ -60,9 +57,10 @@ namespace QuickPrimitives.Scripts
         }
 
         #region BuildGeometry
+
         protected override void BuildGeometry()
         {
-            if ((properties.width <= 0) || (properties.depth <= 0) || (properties.height <= 0)) return;
+            if (properties.width <= 0 || properties.depth <= 0 || properties.height <= 0) return;
 
             xc = new float[properties.sides + 1];
             yc = new float[properties.sides + 1];
@@ -93,40 +91,31 @@ namespace QuickPrimitives.Scripts
             }
             else
             {
-                float partAngle = twoPi / properties.sides;
-                for (int i = 0; i <= properties.sides; ++i)
+                var partAngle = twoPi / properties.sides;
+                for (var i = 0; i <= properties.sides; ++i)
                 {
-                    float angle = i * partAngle;
+                    var angle = i * partAngle;
                     if (properties.sides % 2 == 1) angle += Mathf.PI * 0.5f;
                     xc[i] = Mathf.Cos(angle);
                     yc[i] = Mathf.Sin(angle);
                 }
             }
 
-            MeshFilter meshFilter = gameObject.GetComponent<MeshFilter>();
-            if (meshFilter == null)
-            {
-                meshFilter = gameObject.AddComponent<MeshFilter>();
-            }
+            var meshFilter = gameObject.GetComponent<MeshFilter>();
+            if (meshFilter == null) meshFilter = gameObject.AddComponent<MeshFilter>();
 
-            MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
-            if (meshRenderer == null)
-            {
-                meshRenderer = gameObject.AddComponent<MeshRenderer>();
-            }
+            var meshRenderer = gameObject.GetComponent<MeshRenderer>();
+            if (meshRenderer == null) meshRenderer = gameObject.AddComponent<MeshRenderer>();
 
             ClearVertices();
 
             GenerateVertices(properties.height, properties.sides, xc, yc);
             GenerateTriangles(properties.height, properties.sides);
 
-            if (properties.offset != Vector3.zero)
-            {
-                AddOffset(properties.offset);
-            }
+            if (properties.offset != Vector3.zero) AddOffset(properties.offset);
 
-            int[] triangles = new int[faces.Count * 3];
-            int index = 0;
+            var triangles = new int[faces.Count * 3];
+            var index = 0;
             foreach (var tri in faces)
             {
                 triangles[index] = tri.v1;
@@ -136,7 +125,7 @@ namespace QuickPrimitives.Scripts
                 index += 3;
             }
 
-            Mesh mesh = new Mesh();
+            var mesh = new Mesh();
 
             meshFilter.sharedMesh = mesh;
 
@@ -154,9 +143,11 @@ namespace QuickPrimitives.Scripts
 
             mesh.RecalculateBounds();
         }
+
         #endregion
 
         #region RebuildGeometry
+
         public override void RebuildGeometry()
         {
             xc = new float[properties.sides + 1];
@@ -188,10 +179,10 @@ namespace QuickPrimitives.Scripts
             }
             else
             {
-                float partAngle = twoPi / properties.sides;
-                for (int i = 0; i <= properties.sides; ++i)
+                var partAngle = twoPi / properties.sides;
+                for (var i = 0; i <= properties.sides; ++i)
                 {
-                    float angle = i * partAngle;
+                    var angle = i * partAngle;
                     if (properties.sides % 2 == 1) angle += Mathf.PI * 0.5f;
                     xc[i] = Mathf.Cos(angle);
                     yc[i] = Mathf.Sin(angle);
@@ -199,20 +190,17 @@ namespace QuickPrimitives.Scripts
             }
 
 
-            MeshFilter meshFilter = gameObject.GetComponent<MeshFilter>();
+            var meshFilter = gameObject.GetComponent<MeshFilter>();
 
             ClearVertices();
 
             GenerateVertices(properties.height, properties.sides, xc, yc);
             GenerateTriangles(properties.height, properties.sides);
 
-            if (properties.offset != Vector3.zero)
-            {
-                AddOffset(properties.offset);
-            }
+            if (properties.offset != Vector3.zero) AddOffset(properties.offset);
 
-            int[] triangles = new int[faces.Count * 3];
-            int index = 0;
+            var triangles = new int[faces.Count * 3];
+            var index = 0;
             foreach (var tri in faces)
             {
                 triangles[index] = tri.v1;
@@ -241,6 +229,7 @@ namespace QuickPrimitives.Scripts
                 meshFilter.sharedMesh.RecalculateBounds();
             }
         }
+
         #endregion
 
         private void SetCollider()
@@ -248,11 +237,8 @@ namespace QuickPrimitives.Scripts
             if (properties.addCollider)
             {
                 // set collider bound
-                BoxCollider collider = gameObject.GetComponent<BoxCollider>();
-                if (collider == null)
-                {
-                    collider = gameObject.AddComponent<BoxCollider>();
-                }
+                var collider = gameObject.GetComponent<BoxCollider>();
+                if (collider == null) collider = gameObject.AddComponent<BoxCollider>();
 
                 collider.enabled = true;
                 collider.center = properties.offset;
@@ -260,41 +246,39 @@ namespace QuickPrimitives.Scripts
             }
             else
             {
-                BoxCollider collider = gameObject.GetComponent<BoxCollider>();
-                if (collider != null)
-                {
-                    collider.enabled = false;
-                }
+                var collider = gameObject.GetComponent<BoxCollider>();
+                if (collider != null) collider.enabled = false;
             }
         }
 
         #region GenerateVertices
+
         private void GenerateVertices(float height, int numCircleSegments, float[] xc, float[] yc)
         {
-            float[] x = new float[numCircleSegments + 1];
-            float[] y = new float[numCircleSegments + 1];
+            var x = new float[numCircleSegments + 1];
+            var y = new float[numCircleSegments + 1];
 
-            float halfWidth = properties.width * 0.5f;
-            float halfDepth = properties.depth * 0.5f;
-            for (int i = 0; i <= numCircleSegments; ++i)
+            var halfWidth = properties.width * 0.5f;
+            var halfDepth = properties.depth * 0.5f;
+            for (var i = 0; i <= numCircleSegments; ++i)
             {
                 x[i] = xc[i] * halfWidth;
                 y[i] = yc[i] * halfDepth;
             }
 
-            float[] xn = new float[numCircleSegments + 1];
-            float[] yn = new float[numCircleSegments + 1];
+            var xn = new float[numCircleSegments + 1];
+            var yn = new float[numCircleSegments + 1];
             ComputeNormals(numCircleSegments, halfWidth, halfDepth, out xn, out yn);
 
-            Vector3 bottomNormal = Vector3.down;
+            var bottomNormal = Vector3.down;
 
-            AddVertex(new Vector3(0f, -0.5f * height, 0f));       // bottom center 
+            AddVertex(new Vector3(0f, -0.5f * height, 0f)); // bottom center 
 
             AddNormal(bottomNormal);
 
             AddUV(new Vector2(0.5f, 0.5f));
 
-            for (int i = 0; i <= numCircleSegments; i++)
+            for (var i = 0; i <= numCircleSegments; i++)
             {
                 // for bottom face
                 AddVertex(new Vector3(x[i], -0.5f * height, y[i]));
@@ -310,7 +294,7 @@ namespace QuickPrimitives.Scripts
                 AddUV(new Vector2(2 * i / (float)numCircleSegments, 0));
                 AddUV(new Vector2((2 * i + 1) / (float)numCircleSegments, 1));
 
-                if ((i > 0) && (i < numCircleSegments))
+                if (i > 0 && i < numCircleSegments)
                 {
                     AddVertex(new Vector3(x[i], -0.5f * height, y[i]));
                     AddVertex(new Vector3(0, 0.5f * height, 0));
@@ -321,16 +305,15 @@ namespace QuickPrimitives.Scripts
 
                 if (i == 0)
                 {
-                    Vector3 normal1 = new Vector3(xn[i], properties.height, yn[i]);
+                    var normal1 = new Vector3(xn[i], properties.height, yn[i]);
                     normal1.Normalize();
 
                     AddNormal(normal1);
                     AddNormal(normal1);
-
                 }
                 else if (i == numCircleSegments)
                 {
-                    Vector3 normal1 = new Vector3(xn[i - 1], properties.height, yn[i - 1]);
+                    var normal1 = new Vector3(xn[i - 1], properties.height, yn[i - 1]);
                     normal1.Normalize();
 
                     AddNormal(normal1);
@@ -338,13 +321,13 @@ namespace QuickPrimitives.Scripts
                 }
                 else
                 {
-                    Vector3 normal1 = new Vector3(xn[i - 1], properties.height, yn[i - 1]);
+                    var normal1 = new Vector3(xn[i - 1], properties.height, yn[i - 1]);
                     normal1.Normalize();
 
                     AddNormal(normal1);
                     AddNormal(normal1);
 
-                    Vector3 normal2 = new Vector3(xn[i], properties.height, yn[i]);
+                    var normal2 = new Vector3(xn[i], properties.height, yn[i]);
                     normal2.Normalize();
 
                     AddNormal(normal2);
@@ -352,9 +335,11 @@ namespace QuickPrimitives.Scripts
                 }
             }
         }
+
         #endregion
 
-        private void ComputeNormals(int numCircleSegments, float halfWidth, float halfDepth, out float[] xn, out float[] yn)
+        private void ComputeNormals(int numCircleSegments, float halfWidth, float halfDepth, out float[] xn,
+            out float[] yn)
         {
             xn = new float[numCircleSegments + 1];
             yn = new float[numCircleSegments + 1];
@@ -385,10 +370,10 @@ namespace QuickPrimitives.Scripts
             }
             else
             {
-                float partAngle = (2f * Mathf.PI) / numCircleSegments;
-                for (int i = 0; i < numCircleSegments; ++i)
+                var partAngle = 2f * Mathf.PI / numCircleSegments;
+                for (var i = 0; i < numCircleSegments; ++i)
                 {
-                    float angle = i * partAngle + partAngle * 0.5f + Mathf.PI * 0.5f;
+                    var angle = i * partAngle + partAngle * 0.5f + Mathf.PI * 0.5f;
                     xn[i] = Mathf.Cos(angle) * halfWidth;
                     yn[i] = Mathf.Sin(angle) * halfDepth;
                 }
@@ -396,14 +381,14 @@ namespace QuickPrimitives.Scripts
         }
 
         #region GenerateTriangles
+
         private void GenerateTriangles(float height, int numCircleSegments)
         {
-            for (int i = 0; i < numCircleSegments; ++i)
-            {
+            for (var i = 0; i < numCircleSegments; ++i)
                 if (i == 0)
                 {
-                    int base1 = 1;
-                    int base2 = 4;
+                    var base1 = 1;
+                    var base2 = 4;
 
                     // bottom triangles
                     faces.Add(new TriangleIndices(base2, 0, base1));
@@ -413,8 +398,8 @@ namespace QuickPrimitives.Scripts
                 }
                 else if (i == numCircleSegments - 1)
                 {
-                    int base1 = 4 + 5 * (i - 1);
-                    int base2 = 4 + 5 * i;
+                    var base1 = 4 + 5 * (i - 1);
+                    var base2 = 4 + 5 * i;
 
                     // bottom triangles
                     faces.Add(new TriangleIndices(base2, 0, base1));
@@ -424,8 +409,8 @@ namespace QuickPrimitives.Scripts
                 }
                 else
                 {
-                    int base1 = 4 + 5 * (i - 1);
-                    int base2 = 4 + 5 * i;
+                    var base1 = 4 + 5 * (i - 1);
+                    var base2 = 4 + 5 * i;
 
                     // bottom triangles
                     faces.Add(new TriangleIndices(base2, 0, base1));
@@ -433,8 +418,8 @@ namespace QuickPrimitives.Scripts
                     // side triangles
                     faces.Add(new TriangleIndices(base2 + 1, base1 + 3, base1 + 4));
                 }
-            }
         }
+
         #endregion
     }
 }

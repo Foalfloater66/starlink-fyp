@@ -15,7 +15,7 @@ namespace QuickPrimitives
         private static void CreateBox(MenuCommand menuCommand)
         {
             // Create a custom game object
-            GameObject box = new GameObject("QcBoxMesh");
+            var box = new GameObject("QcBoxMesh");
             box.AddComponent<QcBoxMesh>();
             box.name = "QcBox";
             box.GetComponent<MeshRenderer>().material = new Material(Shader.Find("Diffuse"));
@@ -32,7 +32,7 @@ namespace QuickPrimitives
         private static void CreateCylinder(MenuCommand menuCommand)
         {
             // Create a custom game object
-            GameObject cylinder = new GameObject("QuickCylinder");
+            var cylinder = new GameObject("QuickCylinder");
             cylinder.AddComponent<QcCylinderMesh>();
             cylinder.name = "QcCylinder";
             cylinder.GetComponent<MeshRenderer>().material = new Material(Shader.Find("Diffuse"));
@@ -49,7 +49,7 @@ namespace QuickPrimitives
         private static void CreateSphere(MenuCommand menuCommand)
         {
             // Create a custom game object
-            GameObject sphere = new GameObject("QcSphereMesh");
+            var sphere = new GameObject("QcSphereMesh");
             sphere.AddComponent<QcSphereMesh>();
             sphere.name = "QcSphere";
             sphere.GetComponent<MeshRenderer>().material = new Material(Shader.Find("Diffuse"));
@@ -66,7 +66,7 @@ namespace QuickPrimitives
         private static void CreateTorus(MenuCommand menuCommand)
         {
             // Create a custom game object
-            GameObject torus = new GameObject("QcTorusMesh"); 
+            var torus = new GameObject("QcTorusMesh");
             torus.AddComponent<QcTorusMesh>();
             torus.name = "QcTorus";
             torus.GetComponent<MeshRenderer>().material = new Material(Shader.Find("Diffuse"));
@@ -83,7 +83,7 @@ namespace QuickPrimitives
         private static void CreatePyramid(MenuCommand menuCommand)
         {
             // Create a custom game object
-            GameObject pyramid = new GameObject("QcPyramidMesh");
+            var pyramid = new GameObject("QcPyramidMesh");
             pyramid.AddComponent<QcPyramidMesh>();
             pyramid.name = "QcPyramid";
             pyramid.GetComponent<MeshRenderer>().material = new Material(Shader.Find("Diffuse"));
@@ -100,7 +100,7 @@ namespace QuickPrimitives
         private static void CreateColumn(MenuCommand menuCommand)
         {
             // Create a custom game object
-            GameObject plane = new GameObject("QcColumnMesh");
+            var plane = new GameObject("QcColumnMesh");
             plane.AddComponent<QcColumnMesh>();
             plane.name = "QcColumn";
             plane.GetComponent<MeshRenderer>().material = new Material(Shader.Find("Diffuse"));
@@ -117,7 +117,7 @@ namespace QuickPrimitives
         private static void CreateStair(MenuCommand menuCommand)
         {
             // Create a custom game object
-            GameObject stair = new GameObject("QcStairMesh");
+            var stair = new GameObject("QcStairMesh");
             stair.AddComponent<QcStairMesh>();
             stair.name = "QcStair";
             stair.GetComponent<MeshRenderer>().material = new Material(Shader.Find("Diffuse"));
@@ -134,7 +134,7 @@ namespace QuickPrimitives
         private static void CreateBeam(MenuCommand menuCommand)
         {
             // Create a custom game object
-            GameObject section = new GameObject("QcSectionMesh");
+            var section = new GameObject("QcSectionMesh");
             section.AddComponent<QcSectionMesh>();
             section.name = "QcSection";
             section.GetComponent<MeshRenderer>().material = new Material(Shader.Find("Diffuse"));
@@ -152,7 +152,7 @@ namespace QuickPrimitives
         private static void CreatePlane(MenuCommand menuCommand)
         {
             // Create a custom game object
-            GameObject plane = new GameObject("QcPlaneMesh");
+            var plane = new GameObject("QcPlaneMesh");
             plane.AddComponent<QcPlaneMesh>();
             plane.name = "QcPlane";
             plane.GetComponent<MeshRenderer>().material = new Material(Shader.Find("Diffuse"));
@@ -170,7 +170,7 @@ namespace QuickPrimitives
         private static void CreateCircle(MenuCommand menuCommand)
         {
             // Create a custom game object
-            GameObject plane = new GameObject("QcCircleMesh");
+            var plane = new GameObject("QcCircleMesh");
             plane.AddComponent<QcCircleMesh>();
             plane.name = "QcCircle";
             plane.GetComponent<MeshRenderer>().material = new Material(Shader.Find("Diffuse"));
@@ -187,7 +187,7 @@ namespace QuickPrimitives
         private static void CreateFrame(MenuCommand menuCommand)
         {
             // Create a custom game object
-            GameObject grid = new GameObject("QcGridMesh");
+            var grid = new GameObject("QcGridMesh");
             grid.AddComponent<QcGridMesh>();
             grid.name = "QcGrid";
             grid.GetComponent<MeshRenderer>().material = new Material(Shader.Find("Diffuse"));

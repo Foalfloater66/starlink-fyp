@@ -9,7 +9,12 @@ namespace QuickPrimitives.Scripts
         [System.Serializable]
         public class QcStairProperties : QcBaseProperties
         {
-            public enum Types { Box, Closed, Open }
+            public enum Types
+            {
+                Box,
+                Closed,
+                Open
+            }
 
             public float width = 1;
             public float depth = 1;
@@ -23,13 +28,20 @@ namespace QuickPrimitives.Scripts
             public Types type = new Types();
 
             public bool spiral = false;
+
             public float innerRadius = 0;
+
             //public float outerRadius = 0;
             public bool conical = false;
             public float radius = 0.0f;
             public float rotations = 1;
 
-            public enum WindingDirection {  Clockwise, Counterclockwise };
+            public enum WindingDirection
+            {
+                Clockwise,
+                Counterclockwise
+            };
+
             public WindingDirection windingDirection = WindingDirection.Counterclockwise;
 
             //public bool textureWrapped;
@@ -38,49 +50,49 @@ namespace QuickPrimitives.Scripts
             {
                 base.CopyFrom(source);
 
-                this.width = source.width;
-                this.height = source.height;
-                this.depth = source.depth;
+                width = source.width;
+                height = source.height;
+                depth = source.depth;
 
-                this.steps = source.steps;
-                this.treadDepth = source.treadDepth;
-                this.treadThickness = source.treadThickness;
+                steps = source.steps;
+                treadDepth = source.treadDepth;
+                treadThickness = source.treadThickness;
 
-                this.spiral = source.spiral;
-                this.innerRadius = source.innerRadius;
-                this.conical = source.conical;
-                this.radius = source.radius;
+                spiral = source.spiral;
+                innerRadius = source.innerRadius;
+                conical = source.conical;
+                radius = source.radius;
                 //this.outerRadius = source.outerRadius;
-                this.rotations = source.rotations;
-                this.windingDirection = source.windingDirection;
+                rotations = source.rotations;
+                windingDirection = source.windingDirection;
 
-                this.type = source.type;
+                type = source.type;
 
                 //this.textureWrapped = source.textureWrapped;
             }
 
             public bool Modified(QcStairProperties source)
             {
-                return ((this.width != source.width) ||
-                        (this.height != source.height) ||
-                        (this.depth != source.depth) ||
-                        (this.steps != source.steps) ||
-                        (this.treadDepth != source.treadDepth) ||
-                        (this.treadThickness != source.treadThickness) ||
-                        (this.spiral != source.spiral) ||
-                        (this.spiral && 
-                         ((this.innerRadius != source.innerRadius) ||
-                          (this.conical != source.conical) ||
-                          (this.radius != source.radius) ||
-                          (this.rotations != source.rotations) || 
-                          //(this.outerRadius != source.outerRadius) ||
-                          (this.windingDirection != source.windingDirection))) ||
-                        (this.offset[0] != source.offset[0]) ||
-                        (this.offset[1] != source.offset[1]) ||
-                        (this.offset[2] != source.offset[2]) ||
-                        (this.genTextureCoords != source.genTextureCoords) ||
-                        (this.addCollider != source.addCollider) ||
-                        (this.type != source.type));
+                return width != source.width ||
+                       height != source.height ||
+                       depth != source.depth ||
+                       steps != source.steps ||
+                       treadDepth != source.treadDepth ||
+                       treadThickness != source.treadThickness ||
+                       spiral != source.spiral ||
+                       (spiral &&
+                        (innerRadius != source.innerRadius ||
+                         conical != source.conical ||
+                         radius != source.radius ||
+                         rotations != source.rotations ||
+                         //(this.outerRadius != source.outerRadius) ||
+                         windingDirection != source.windingDirection)) ||
+                       offset[0] != source.offset[0] ||
+                       offset[1] != source.offset[1] ||
+                       offset[2] != source.offset[2] ||
+                       genTextureCoords != source.genTextureCoords ||
+                       addCollider != source.addCollider ||
+                       type != source.type;
             }
         }
 
@@ -97,33 +109,25 @@ namespace QuickPrimitives.Scripts
         }
 
         #region BuildGeometry
+
         protected override void BuildGeometry()
         {
-            if ((properties.width <= 0) || (properties.height <= 0) || (properties.depth <= 0)) return;
+            if (properties.width <= 0 || properties.height <= 0 || properties.depth <= 0) return;
 
-            MeshFilter meshFilter = gameObject.GetComponent<MeshFilter>();
-            if (meshFilter == null)
-            {
-                meshFilter = gameObject.AddComponent<MeshFilter>();
-            }
+            var meshFilter = gameObject.GetComponent<MeshFilter>();
+            if (meshFilter == null) meshFilter = gameObject.AddComponent<MeshFilter>();
 
-            MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
-            if (meshRenderer == null)
-            {
-                meshRenderer = gameObject.AddComponent<MeshRenderer>();
-            }
+            var meshRenderer = gameObject.GetComponent<MeshRenderer>();
+            if (meshRenderer == null) meshRenderer = gameObject.AddComponent<MeshRenderer>();
 
             ClearVertices();
 
             GenerateGeometry();
 
-            if (properties.offset != Vector3.zero)
-            {
-                AddOffset(properties.offset);
-            }
+            if (properties.offset != Vector3.zero) AddOffset(properties.offset);
 
-            int[] triangles = new int[faces.Count * 3];
-            int index = 0;
+            var triangles = new int[faces.Count * 3];
+            var index = 0;
             foreach (var tri in faces)
             {
                 triangles[index] = tri.v1;
@@ -133,7 +137,7 @@ namespace QuickPrimitives.Scripts
                 index += 3;
             }
 
-            Mesh mesh = new Mesh();
+            var mesh = new Mesh();
 
             meshFilter.sharedMesh = mesh;
 
@@ -151,24 +155,23 @@ namespace QuickPrimitives.Scripts
 
             mesh.RecalculateBounds();
         }
+
         #endregion
 
         #region RebuildGeometry
+
         public override void RebuildGeometry()
         {
-            MeshFilter meshFilter = gameObject.GetComponent<MeshFilter>();
+            var meshFilter = gameObject.GetComponent<MeshFilter>();
 
             ClearVertices();
 
             GenerateGeometry();
 
-            if (properties.offset != Vector3.zero)
-            {
-                AddOffset(properties.offset);
-            }
+            if (properties.offset != Vector3.zero) AddOffset(properties.offset);
 
-            int[] triangles = new int[faces.Count * 3];
-            int index = 0;
+            var triangles = new int[faces.Count * 3];
+            var index = 0;
             foreach (var tri in faces)
             {
                 triangles[index] = tri.v1;
@@ -197,6 +200,7 @@ namespace QuickPrimitives.Scripts
                 meshFilter.sharedMesh.RecalculateBounds();
             }
         }
+
         #endregion
 
         private void SetCollider()
@@ -206,50 +210,40 @@ namespace QuickPrimitives.Scripts
                 if (!properties.spiral)
                 {
                     // set collider bound
-                    BoxCollider collider = gameObject.GetComponent<BoxCollider>();
-                    if (collider == null)
-                    {
-                        collider = gameObject.AddComponent<BoxCollider>();
-                    }
+                    var collider = gameObject.GetComponent<BoxCollider>();
+                    if (collider == null) collider = gameObject.AddComponent<BoxCollider>();
 
                     collider.enabled = true;
                     collider.center = properties.offset + new Vector3(0, properties.height * 0.5f, 0);
                     collider.size = new Vector3(properties.width, properties.height, properties.depth);
 
-                    CapsuleCollider oldCollider = gameObject.GetComponent<CapsuleCollider>();
+                    var oldCollider = gameObject.GetComponent<CapsuleCollider>();
                     if (oldCollider != null) oldCollider.enabled = false;
                 }
                 else
                 {
-                    CapsuleCollider collider = gameObject.GetComponent<CapsuleCollider>();
-                    if (collider == null)
-                    {
-                        collider = gameObject.AddComponent<CapsuleCollider>();
-                    }
+                    var collider = gameObject.GetComponent<CapsuleCollider>();
+                    if (collider == null) collider = gameObject.AddComponent<CapsuleCollider>();
 
                     collider.enabled = true;
                     collider.center = properties.offset + new Vector3(0, properties.height * 0.5f, 0);
                     collider.radius = properties.innerRadius + properties.width;
                     collider.height = properties.height;
 
-                    BoxCollider oldCollider = gameObject.GetComponent<BoxCollider>();
+                    var oldCollider = gameObject.GetComponent<BoxCollider>();
                     if (oldCollider != null) oldCollider.enabled = false;
                 }
             }
             else
             {
-                Collider collider = gameObject.GetComponent<Collider>();
-                if (collider != null)
-                {
-                    collider.enabled = false;
-                }
+                var collider = gameObject.GetComponent<Collider>();
+                if (collider != null) collider.enabled = false;
             }
         }
 
         private void GenerateGeometry()
         {
             if (!properties.spiral)
-            {
                 switch (properties.type)
                 {
                     case QcStairProperties.Types.Box:
@@ -268,9 +262,7 @@ namespace QuickPrimitives.Scripts
                         GenerateTrianglesOpen();
                         break;
                 }
-            }
             else
-            {
                 switch (properties.type)
                 {
                     case QcStairProperties.Types.Box:
@@ -286,34 +278,34 @@ namespace QuickPrimitives.Scripts
                         GenerateTrianglesOpen();
                         break;
                 }
-            }
         }
 
         #region GenerateVerticesBox
+
         private void GenerateVerticesBox()
         {
-            float width = properties.width;
-            float height = properties.height;
-            float depth = properties.depth;
+            var width = properties.width;
+            var height = properties.height;
+            var depth = properties.depth;
 
-            float halfWidth = width * 0.5f;
-            float halfDepth = depth * 0.5f;
+            var halfWidth = width * 0.5f;
+            var halfDepth = depth * 0.5f;
 
-            AddVertex(new Vector3(-halfWidth, 0, halfDepth));    // bottom face
+            AddVertex(new Vector3(-halfWidth, 0, halfDepth)); // bottom face
             AddVertex(new Vector3(halfWidth, 0, halfDepth));
             AddVertex(new Vector3(halfWidth, 0, -halfDepth));
             AddVertex(new Vector3(-halfWidth, 0, -halfDepth));
 
-            AddVertex(new Vector3(-halfWidth, height, halfDepth));    // back face
+            AddVertex(new Vector3(-halfWidth, height, halfDepth)); // back face
             AddVertex(new Vector3(halfWidth, height, halfDepth));
             AddVertex(new Vector3(halfWidth, 0, halfDepth));
             AddVertex(new Vector3(-halfWidth, 0, halfDepth));
 
-            AddVertex(new Vector3(-halfWidth, 0, -halfDepth));    // left face
+            AddVertex(new Vector3(-halfWidth, 0, -halfDepth)); // left face
             AddVertex(new Vector3(-halfWidth, height, halfDepth));
             AddVertex(new Vector3(-halfWidth, 0, halfDepth));
 
-            AddVertex(new Vector3(halfWidth, 0, -halfDepth));    // right face
+            AddVertex(new Vector3(halfWidth, 0, -halfDepth)); // right face
             AddVertex(new Vector3(halfWidth, 0, halfDepth));
             AddVertex(new Vector3(halfWidth, height, halfDepth));
 
@@ -353,29 +345,29 @@ namespace QuickPrimitives.Scripts
             AddUV(new Vector2(1, 0));
             AddUV(new Vector2(1, 1));
 
-            float stepHeight = height / properties.steps;
-            float stepDepth = depth / properties.steps;
+            var stepHeight = height / properties.steps;
+            var stepDepth = depth / properties.steps;
 
-            for (int i = 0; i < properties.steps; ++i)
+            for (var i = 0; i < properties.steps; ++i)
             {
-                float stepBaseHeight = i * stepHeight;
-                float stepBaseDepth = i * stepDepth - halfDepth;
+                var stepBaseHeight = i * stepHeight;
+                var stepBaseDepth = i * stepDepth - halfDepth;
 
-                AddVertex(new Vector3(-halfWidth, stepBaseHeight, stepBaseDepth));    // step front
+                AddVertex(new Vector3(-halfWidth, stepBaseHeight, stepBaseDepth)); // step front
                 AddVertex(new Vector3(halfWidth, stepBaseHeight, stepBaseDepth));
                 AddVertex(new Vector3(halfWidth, stepBaseHeight + stepHeight, stepBaseDepth));
                 AddVertex(new Vector3(-halfWidth, stepBaseHeight + stepHeight, stepBaseDepth));
-                
-                AddVertex(new Vector3(-halfWidth, stepBaseHeight + stepHeight, stepBaseDepth));    // step top
+
+                AddVertex(new Vector3(-halfWidth, stepBaseHeight + stepHeight, stepBaseDepth)); // step top
                 AddVertex(new Vector3(halfWidth, stepBaseHeight + stepHeight, stepBaseDepth));
                 AddVertex(new Vector3(halfWidth, stepBaseHeight + stepHeight, stepBaseDepth + stepDepth));
                 AddVertex(new Vector3(-halfWidth, stepBaseHeight + stepHeight, stepBaseDepth + stepDepth));
 
-                AddVertex(new Vector3(-halfWidth, stepBaseHeight, stepBaseDepth));  // left cap
+                AddVertex(new Vector3(-halfWidth, stepBaseHeight, stepBaseDepth)); // left cap
                 AddVertex(new Vector3(-halfWidth, stepBaseHeight + stepHeight, stepBaseDepth));
                 AddVertex(new Vector3(-halfWidth, stepBaseHeight + stepHeight, stepBaseDepth + stepDepth));
 
-                AddVertex(new Vector3(halfWidth, stepBaseHeight, stepBaseDepth));   // roght cap
+                AddVertex(new Vector3(halfWidth, stepBaseHeight, stepBaseDepth)); // roght cap
                 AddVertex(new Vector3(halfWidth, stepBaseHeight + stepHeight, stepBaseDepth));
                 AddVertex(new Vector3(halfWidth, stepBaseHeight + stepHeight, stepBaseDepth + stepDepth));
 
@@ -407,52 +399,54 @@ namespace QuickPrimitives.Scripts
                 AddUV(new Vector2(1, (i + 1.0f) / properties.steps));
                 AddUV(new Vector2(0, (i + 1.0f) / properties.steps));
 
-                float currentDepth = i * stepDepth;
+                var currentDepth = i * stepDepth;
                 AddUV(new Vector2((depth - currentDepth) / depth, stepBaseHeight / height));
                 AddUV(new Vector2((depth - currentDepth) / depth, (stepBaseHeight + stepHeight) / height));
                 AddUV(new Vector2((depth - currentDepth - stepDepth) / depth, (stepBaseHeight + stepHeight) / height));
 
                 AddUV(new Vector2(currentDepth / depth, stepBaseHeight / height));
-                AddUV(new Vector2((currentDepth) / depth, (stepBaseHeight + stepHeight) / height));
+                AddUV(new Vector2(currentDepth / depth, (stepBaseHeight + stepHeight) / height));
                 AddUV(new Vector2((currentDepth + stepDepth) / depth, (stepBaseHeight + stepHeight) / height));
             }
         }
+
         #endregion
 
         #region GenerateVerticesClosed
+
         private void GenerateVerticesClosed()
         {
-            float width = properties.width;
-            float height = properties.height;
-            float depth = properties.depth;
+            var width = properties.width;
+            var height = properties.height;
+            var depth = properties.depth;
 
-            float halfWidth = width * 0.5f;
-            float halfDepth = depth * 0.5f;
+            var halfWidth = width * 0.5f;
+            var halfDepth = depth * 0.5f;
 
-            float stepHeight = height / properties.steps;
-            float stepDepth = depth / properties.steps;
+            var stepHeight = height / properties.steps;
+            var stepDepth = depth / properties.steps;
 
-            AddVertex(new Vector3(-halfWidth, 0, -halfDepth + stepDepth));    // bottom face
+            AddVertex(new Vector3(-halfWidth, 0, -halfDepth + stepDepth)); // bottom face
             AddVertex(new Vector3(halfWidth, 0, -halfDepth + stepDepth));
             AddVertex(new Vector3(halfWidth, 0, -halfDepth));
             AddVertex(new Vector3(-halfWidth, 0, -halfDepth));
 
-            AddVertex(new Vector3(-halfWidth, 0, -halfDepth + stepDepth));        // slanted bottom face
+            AddVertex(new Vector3(-halfWidth, 0, -halfDepth + stepDepth)); // slanted bottom face
             AddVertex(new Vector3(halfWidth, 0, -halfDepth + stepDepth));
             AddVertex(new Vector3(halfWidth, height - stepHeight, halfDepth));
             AddVertex(new Vector3(-halfWidth, height - stepHeight, halfDepth));
 
-            AddVertex(new Vector3(-halfWidth, height, halfDepth));    // back face
+            AddVertex(new Vector3(-halfWidth, height, halfDepth)); // back face
             AddVertex(new Vector3(halfWidth, height, halfDepth));
             AddVertex(new Vector3(halfWidth, height - stepHeight, halfDepth));
             AddVertex(new Vector3(-halfWidth, height - stepHeight, halfDepth));
 
-            AddVertex(new Vector3(-halfWidth, 0, -halfDepth + stepDepth));  // left face
-            AddVertex(new Vector3(-halfWidth, 0, -halfDepth));    
+            AddVertex(new Vector3(-halfWidth, 0, -halfDepth + stepDepth)); // left face
+            AddVertex(new Vector3(-halfWidth, 0, -halfDepth));
             AddVertex(new Vector3(-halfWidth, height, halfDepth));
             AddVertex(new Vector3(-halfWidth, height - stepHeight, halfDepth));
 
-            AddVertex(new Vector3(halfWidth, 0, -halfDepth + stepDepth));   // right face
+            AddVertex(new Vector3(halfWidth, 0, -halfDepth + stepDepth)); // right face
             AddVertex(new Vector3(halfWidth, 0, -halfDepth));
             AddVertex(new Vector3(halfWidth, height, halfDepth));
             AddVertex(new Vector3(halfWidth, height - stepHeight, halfDepth));
@@ -462,7 +456,7 @@ namespace QuickPrimitives.Scripts
             AddNormal(Vector3.down);
             AddNormal(Vector3.down);
 
-            Vector3 slantedVector = new Vector3(0, -depth, height);
+            var slantedVector = new Vector3(0, -depth, height);
             slantedVector.Normalize();
 
             AddNormal(slantedVector);
@@ -485,8 +479,9 @@ namespace QuickPrimitives.Scripts
             AddNormal(Vector3.right);
             AddNormal(Vector3.right);
 
-            float bottomLength = (Mathf.Sqrt((depth - stepDepth) * (depth - stepDepth) + (height - stepHeight) * (height - stepHeight))
-                                 + stepDepth + stepHeight);
+            var bottomLength = Mathf.Sqrt((depth - stepDepth) * (depth - stepDepth) +
+                                          (height - stepHeight) * (height - stepHeight))
+                               + stepDepth + stepHeight;
             AddUV(new Vector2(1, stepDepth / bottomLength));
             AddUV(new Vector2(0, stepDepth / bottomLength));
             AddUV(new Vector2(0, 0));
@@ -512,26 +507,26 @@ namespace QuickPrimitives.Scripts
             AddUV(new Vector2(1, 1));
             AddUV(new Vector2(1, (height - stepHeight) / height));
 
-            for (int i = 0; i < properties.steps; ++i)
+            for (var i = 0; i < properties.steps; ++i)
             {
-                float stepBaseHeight = i * stepHeight;
-                float stepBaseDepth = i * stepDepth - halfDepth;
+                var stepBaseHeight = i * stepHeight;
+                var stepBaseDepth = i * stepDepth - halfDepth;
 
-                AddVertex(new Vector3(-halfWidth, stepBaseHeight, stepBaseDepth));    // step front
+                AddVertex(new Vector3(-halfWidth, stepBaseHeight, stepBaseDepth)); // step front
                 AddVertex(new Vector3(halfWidth, stepBaseHeight, stepBaseDepth));
                 AddVertex(new Vector3(halfWidth, stepBaseHeight + stepHeight, stepBaseDepth));
                 AddVertex(new Vector3(-halfWidth, stepBaseHeight + stepHeight, stepBaseDepth));
 
-                AddVertex(new Vector3(-halfWidth, stepBaseHeight + stepHeight, stepBaseDepth));    // step top
+                AddVertex(new Vector3(-halfWidth, stepBaseHeight + stepHeight, stepBaseDepth)); // step top
                 AddVertex(new Vector3(halfWidth, stepBaseHeight + stepHeight, stepBaseDepth));
                 AddVertex(new Vector3(halfWidth, stepBaseHeight + stepHeight, stepBaseDepth + stepDepth));
                 AddVertex(new Vector3(-halfWidth, stepBaseHeight + stepHeight, stepBaseDepth + stepDepth));
 
-                AddVertex(new Vector3(-halfWidth, stepBaseHeight, stepBaseDepth));  // left cap
+                AddVertex(new Vector3(-halfWidth, stepBaseHeight, stepBaseDepth)); // left cap
                 AddVertex(new Vector3(-halfWidth, stepBaseHeight + stepHeight, stepBaseDepth));
                 AddVertex(new Vector3(-halfWidth, stepBaseHeight + stepHeight, stepBaseDepth + stepDepth));
 
-                AddVertex(new Vector3(halfWidth, stepBaseHeight, stepBaseDepth));   // roght cap
+                AddVertex(new Vector3(halfWidth, stepBaseHeight, stepBaseDepth)); // roght cap
                 AddVertex(new Vector3(halfWidth, stepBaseHeight + stepHeight, stepBaseDepth));
                 AddVertex(new Vector3(halfWidth, stepBaseHeight + stepHeight, stepBaseDepth + stepDepth));
 
@@ -563,71 +558,75 @@ namespace QuickPrimitives.Scripts
                 AddUV(new Vector2(1, (i + 1.0f) / properties.steps));
                 AddUV(new Vector2(0, (i + 1.0f) / properties.steps));
 
-                float currentDepth = i * stepDepth;
+                var currentDepth = i * stepDepth;
                 AddUV(new Vector2((depth - currentDepth) / depth, stepBaseHeight / height));
                 AddUV(new Vector2((depth - currentDepth) / depth, (stepBaseHeight + stepHeight) / height));
                 AddUV(new Vector2((depth - currentDepth - stepDepth) / depth, (stepBaseHeight + stepHeight) / height));
 
                 AddUV(new Vector2(currentDepth / depth, stepBaseHeight / height));
-                AddUV(new Vector2((currentDepth) / depth, (stepBaseHeight + stepHeight) / height));
+                AddUV(new Vector2(currentDepth / depth, (stepBaseHeight + stepHeight) / height));
                 AddUV(new Vector2((currentDepth + stepDepth) / depth, (stepBaseHeight + stepHeight) / height));
             }
         }
+
         #endregion
 
         #region GenerateVerticesOpen
+
         private void GenerateVerticesOpen()
         {
-            float halfWidth = properties.width * 0.5f;
-            float halfDepth = properties.depth * 0.5f;
+            var halfWidth = properties.width * 0.5f;
+            var halfDepth = properties.depth * 0.5f;
 
-            float stepHeight = properties.height / properties.steps;
-            float stepDepth = properties.depth / properties.steps;
-            float treadThickness = properties.treadThickness;
-            float treadDepth = properties.treadDepth;
+            var stepHeight = properties.height / properties.steps;
+            var stepDepth = properties.depth / properties.steps;
+            var treadThickness = properties.treadThickness;
+            var treadDepth = properties.treadDepth;
 
-            for (int i = 0; i < properties.steps; ++i)
+            for (var i = 0; i < properties.steps; ++i)
             {
-                float stepBaseHeight = i * stepHeight;
-                float stepBaseDepth = i * stepDepth - halfDepth;
+                var stepBaseHeight = i * stepHeight;
+                var stepBaseDepth = i * stepDepth - halfDepth;
 
-                Vector3[] pts = new Vector3[8];
+                var pts = new Vector3[8];
                 pts[0] = new Vector3(-halfWidth, stepBaseHeight + stepHeight - treadThickness, stepBaseDepth);
                 pts[1] = new Vector3(halfWidth, stepBaseHeight + stepHeight - treadThickness, stepBaseDepth);
-                pts[2] = new Vector3(halfWidth, stepBaseHeight + stepHeight - treadThickness, stepBaseDepth + treadDepth);
-                pts[3] = new Vector3(-halfWidth, stepBaseHeight + stepHeight - treadThickness, stepBaseDepth + treadDepth);
+                pts[2] = new Vector3(halfWidth, stepBaseHeight + stepHeight - treadThickness,
+                    stepBaseDepth + treadDepth);
+                pts[3] = new Vector3(-halfWidth, stepBaseHeight + stepHeight - treadThickness,
+                    stepBaseDepth + treadDepth);
 
                 pts[4] = new Vector3(-halfWidth, stepBaseHeight + stepHeight, stepBaseDepth);
                 pts[5] = new Vector3(halfWidth, stepBaseHeight + stepHeight, stepBaseDepth);
                 pts[6] = new Vector3(halfWidth, stepBaseHeight + stepHeight, stepBaseDepth + treadDepth);
                 pts[7] = new Vector3(-halfWidth, stepBaseHeight + stepHeight, stepBaseDepth + treadDepth);
 
-                AddVertex(pts[3]);    // step bottom
+                AddVertex(pts[3]); // step bottom
                 AddVertex(pts[2]);
                 AddVertex(pts[1]);
                 AddVertex(pts[0]);
 
-                AddVertex(pts[0]);    // step front
+                AddVertex(pts[0]); // step front
                 AddVertex(pts[1]);
                 AddVertex(pts[5]);
                 AddVertex(pts[4]);
 
-                AddVertex(pts[4]);    // step top
+                AddVertex(pts[4]); // step top
                 AddVertex(pts[5]);
                 AddVertex(pts[6]);
                 AddVertex(pts[7]);
 
-                AddVertex(pts[7]);    // step back
+                AddVertex(pts[7]); // step back
                 AddVertex(pts[6]);
                 AddVertex(pts[2]);
                 AddVertex(pts[3]);
 
-                AddVertex(pts[3]);    // step left
+                AddVertex(pts[3]); // step left
                 AddVertex(pts[0]);
                 AddVertex(pts[4]);
                 AddVertex(pts[7]);
 
-                AddVertex(pts[1]);    // step right
+                AddVertex(pts[1]); // step right
                 AddVertex(pts[2]);
                 AddVertex(pts[6]);
                 AddVertex(pts[5]);
@@ -693,51 +692,63 @@ namespace QuickPrimitives.Scripts
                 AddUV(new Vector2(0, 1));
             }
         }
+
         #endregion
-        
+
         #region GenerateVerticesSpiralBox
+
         private void GenerateVerticesSpiralBox()
         {
-            float stepHeight = properties.height / properties.steps;
+            var stepHeight = properties.height / properties.steps;
 
-            float innerRadius0 = properties.innerRadius;
-            float outerRadius0 = innerRadius0 + properties.width;
-            float innerRadius1 = innerRadius0;
-            float outerRadius1 = outerRadius0;
+            var innerRadius0 = properties.innerRadius;
+            var outerRadius0 = innerRadius0 + properties.width;
+            var innerRadius1 = innerRadius0;
+            var outerRadius1 = outerRadius0;
 
-            float rotations = properties.rotations;
+            var rotations = properties.rotations;
 
-            List<Vector3> pts = new List<Vector3>();
-            for (int i = 0; i < properties.steps; ++i)
+            var pts = new List<Vector3>();
+            for (var i = 0; i < properties.steps; ++i)
             {
-                float stepBaseHeight = i * stepHeight;
+                var stepBaseHeight = i * stepHeight;
 
-                float angle0 = (properties.windingDirection == QcStairProperties.WindingDirection.Counterclockwise) ?
-                                twoPi * rotations / properties.steps * i :
-                                -twoPi * rotations / properties.steps * i;
-                float angle1 = (properties.windingDirection == QcStairProperties.WindingDirection.Counterclockwise) ?
-                                twoPi * rotations / properties.steps * (i + 1):
-                                -twoPi * rotations / properties.steps * (i + 1);
+                var angle0 = properties.windingDirection == QcStairProperties.WindingDirection.Counterclockwise
+                    ? twoPi * rotations / properties.steps * i
+                    : -twoPi * rotations / properties.steps * i;
+                var angle1 = properties.windingDirection == QcStairProperties.WindingDirection.Counterclockwise
+                    ? twoPi * rotations / properties.steps * (i + 1)
+                    : -twoPi * rotations / properties.steps * (i + 1);
 
                 if (properties.conical)
                 {
-                    innerRadius0 = properties.innerRadius + (float)i * (properties.radius - properties.innerRadius) / (properties.steps - 1);
+                    innerRadius0 = properties.innerRadius +
+                                   (float)i * (properties.radius - properties.innerRadius) / (properties.steps - 1);
                     outerRadius0 = innerRadius0 + properties.width;
-                    innerRadius1 = properties.innerRadius + (float)(i + 1) * (properties.radius - properties.innerRadius) / (properties.steps - 1);
+                    innerRadius1 = properties.innerRadius + (float)(i + 1) *
+                        (properties.radius - properties.innerRadius) / (properties.steps - 1);
                     outerRadius1 = innerRadius1 + properties.width;
                 }
 
                 pts.Clear();
 
-                pts.Add(new Vector3(innerRadius0 * Mathf.Cos(angle0), stepBaseHeight, innerRadius0 * Mathf.Sin(angle0)));
-                pts.Add(new Vector3(innerRadius1 * Mathf.Cos(angle1), stepBaseHeight, innerRadius1 * Mathf.Sin(angle1)));
-                pts.Add(new Vector3(innerRadius0 * Mathf.Cos(angle0), stepBaseHeight + stepHeight, innerRadius0 * Mathf.Sin(angle0)));
-                pts.Add(new Vector3(innerRadius1 * Mathf.Cos(angle1), stepBaseHeight + stepHeight, innerRadius1 * Mathf.Sin(angle1)));
+                pts.Add(new Vector3(innerRadius0 * Mathf.Cos(angle0), stepBaseHeight,
+                    innerRadius0 * Mathf.Sin(angle0)));
+                pts.Add(new Vector3(innerRadius1 * Mathf.Cos(angle1), stepBaseHeight,
+                    innerRadius1 * Mathf.Sin(angle1)));
+                pts.Add(new Vector3(innerRadius0 * Mathf.Cos(angle0), stepBaseHeight + stepHeight,
+                    innerRadius0 * Mathf.Sin(angle0)));
+                pts.Add(new Vector3(innerRadius1 * Mathf.Cos(angle1), stepBaseHeight + stepHeight,
+                    innerRadius1 * Mathf.Sin(angle1)));
 
-                pts.Add(new Vector3(outerRadius0 * Mathf.Cos(angle0), stepBaseHeight, outerRadius0 * Mathf.Sin(angle0)));
-                pts.Add(new Vector3(outerRadius1 * Mathf.Cos(angle1), stepBaseHeight, outerRadius1 * Mathf.Sin(angle1)));
-                pts.Add(new Vector3(outerRadius0 * Mathf.Cos(angle0), stepBaseHeight + stepHeight, outerRadius0 * Mathf.Sin(angle0)));
-                pts.Add(new Vector3(outerRadius1 * Mathf.Cos(angle1), stepBaseHeight + stepHeight, outerRadius1 * Mathf.Sin(angle1)));
+                pts.Add(new Vector3(outerRadius0 * Mathf.Cos(angle0), stepBaseHeight,
+                    outerRadius0 * Mathf.Sin(angle0)));
+                pts.Add(new Vector3(outerRadius1 * Mathf.Cos(angle1), stepBaseHeight,
+                    outerRadius1 * Mathf.Sin(angle1)));
+                pts.Add(new Vector3(outerRadius0 * Mathf.Cos(angle0), stepBaseHeight + stepHeight,
+                    outerRadius0 * Mathf.Sin(angle0)));
+                pts.Add(new Vector3(outerRadius1 * Mathf.Cos(angle1), stepBaseHeight + stepHeight,
+                    outerRadius1 * Mathf.Sin(angle1)));
 
                 pts.Add(new Vector3(innerRadius0 * Mathf.Cos(angle0), 0, innerRadius0 * Mathf.Sin(angle0)));
                 pts.Add(new Vector3(innerRadius1 * Mathf.Cos(angle1), 0, innerRadius1 * Mathf.Sin(angle1)));
@@ -747,40 +758,40 @@ namespace QuickPrimitives.Scripts
 
                 if (properties.windingDirection == QcStairProperties.WindingDirection.Clockwise)
                 {
-                    AddVertex(pts[8]);  // back(inner)
+                    AddVertex(pts[8]); // back(inner)
                     AddVertex(pts[9]);
                     AddVertex(pts[3]);
                     AddVertex(pts[2]);
 
-                    AddVertex(pts[11]);  // front(outer)
+                    AddVertex(pts[11]); // front(outer)
                     AddVertex(pts[10]);
                     AddVertex(pts[6]);
                     AddVertex(pts[7]);
 
-                    AddVertex(pts[2]);  // top
+                    AddVertex(pts[2]); // top
                     AddVertex(pts[3]);
                     AddVertex(pts[7]);
                     AddVertex(pts[6]);
 
-                    AddVertex(pts[8]);  // bottom
+                    AddVertex(pts[8]); // bottom
                     AddVertex(pts[10]);
                     AddVertex(pts[11]);
                     AddVertex(pts[9]);
 
-                    AddVertex(pts[4]);  // right
+                    AddVertex(pts[4]); // right
                     AddVertex(pts[0]);
                     AddVertex(pts[2]);
                     AddVertex(pts[6]);
 
-                    
-                    Vector3 normal0Out = new Vector3(pts[4].x, 0f, pts[4].z);
+
+                    var normal0Out = new Vector3(pts[4].x, 0f, pts[4].z);
                     normal0Out.Normalize();
-                    Vector3 normal0In = new Vector3(-pts[4].x, 0f, -pts[4].z);
+                    var normal0In = new Vector3(-pts[4].x, 0f, -pts[4].z);
                     normal0In.Normalize();
 
-                    Vector3 normal1Out = new Vector3(pts[5].x, 0f, pts[5].z);
+                    var normal1Out = new Vector3(pts[5].x, 0f, pts[5].z);
                     normal0Out.Normalize();
-                    Vector3 normal1In = new Vector3(-pts[5].x, 0f, -pts[5].z);
+                    var normal1In = new Vector3(-pts[5].x, 0f, -pts[5].z);
                     normal0In.Normalize();
 
                     AddNormal(normal0In);
@@ -803,14 +814,14 @@ namespace QuickPrimitives.Scripts
                     AddNormal(Vector3.down);
                     AddNormal(Vector3.down);
 
-                    Vector3 capNormal1 = ComputeNormal(pts[2], pts[0], pts[4]);
+                    var capNormal1 = ComputeNormal(pts[2], pts[0], pts[4]);
 
                     AddNormal(capNormal1);
                     AddNormal(capNormal1);
                     AddNormal(capNormal1);
                     AddNormal(capNormal1);
 
-                    int nSteps = properties.steps;
+                    var nSteps = properties.steps;
                     AddUV(new Vector2((float)i / nSteps, 0));
                     AddUV(new Vector2((i + 1f) / nSteps, 0));
                     AddUV(new Vector2((i + 1f) / nSteps, (i + 1f) / nSteps));
@@ -821,7 +832,7 @@ namespace QuickPrimitives.Scripts
                     AddUV(new Vector2(1 - (float)i / nSteps, (i + 1f) / nSteps));
                     AddUV(new Vector2(1 - (i + 1f) / nSteps, (i + 1f) / nSteps));
 
-                    AddUV(new Vector2(1 - (i + 0.5f) / nSteps, 1));                    
+                    AddUV(new Vector2(1 - (i + 0.5f) / nSteps, 1));
                     AddUV(new Vector2(1 - (i + 1.0f) / nSteps, 1));
                     AddUV(new Vector2(1 - (i + 1.0f) / nSteps, 0));
                     AddUV(new Vector2(1 - (i + 0.5f) / nSteps, 0));
@@ -838,12 +849,12 @@ namespace QuickPrimitives.Scripts
 
                     if (i == properties.steps - 1)
                     {
-                        AddVertex(pts[9]);  // left
+                        AddVertex(pts[9]); // left
                         AddVertex(pts[11]);
                         AddVertex(pts[7]);
                         AddVertex(pts[3]);
 
-                        Vector3 capNormal2 = ComputeNormal(pts[7], pts[5], pts[1]);
+                        var capNormal2 = ComputeNormal(pts[7], pts[5], pts[1]);
 
                         AddNormal(capNormal2);
                         AddNormal(capNormal2);
@@ -856,42 +867,42 @@ namespace QuickPrimitives.Scripts
                         AddUV(new Vector2(0, 1));
                     }
                 }
-                else        // counterclockwise
+                else // counterclockwise
                 {
-                    AddVertex(pts[9]);  // back(inner)
+                    AddVertex(pts[9]); // back(inner)
                     AddVertex(pts[8]);
                     AddVertex(pts[2]);
                     AddVertex(pts[3]);
 
-                    AddVertex(pts[10]);  // front(outer)
+                    AddVertex(pts[10]); // front(outer)
                     AddVertex(pts[11]);
                     AddVertex(pts[7]);
                     AddVertex(pts[6]);
 
-                    AddVertex(pts[6]);  // top
+                    AddVertex(pts[6]); // top
                     AddVertex(pts[7]);
                     AddVertex(pts[3]);
                     AddVertex(pts[2]);
 
-                    AddVertex(pts[10]);  // bottom
+                    AddVertex(pts[10]); // bottom
                     AddVertex(pts[8]);
                     AddVertex(pts[9]);
                     AddVertex(pts[11]);
 
-                    AddVertex(pts[0]);  // left
+                    AddVertex(pts[0]); // left
                     AddVertex(pts[4]);
                     AddVertex(pts[6]);
                     AddVertex(pts[2]);
 
 
-                    Vector3 normal0Out = new Vector3(pts[4].x, 0f, pts[4].z);
+                    var normal0Out = new Vector3(pts[4].x, 0f, pts[4].z);
                     normal0Out.Normalize();
-                    Vector3 normal0In = new Vector3(-pts[4].x, 0f, -pts[4].z);
+                    var normal0In = new Vector3(-pts[4].x, 0f, -pts[4].z);
                     normal0In.Normalize();
 
-                    Vector3 normal1Out = new Vector3(pts[5].x, 0f, pts[5].z);
+                    var normal1Out = new Vector3(pts[5].x, 0f, pts[5].z);
                     normal0Out.Normalize();
-                    Vector3 normal1In = new Vector3(-pts[5].x, 0f, -pts[5].z);
+                    var normal1In = new Vector3(-pts[5].x, 0f, -pts[5].z);
                     normal0In.Normalize();
 
                     AddNormal(normal1In);
@@ -914,14 +925,14 @@ namespace QuickPrimitives.Scripts
                     AddNormal(Vector3.down);
                     AddNormal(Vector3.down);
 
-                    Vector3 capNormal1 = ComputeNormal(pts[2], pts[0], pts[4]);
+                    var capNormal1 = ComputeNormal(pts[2], pts[0], pts[4]);
 
                     AddNormal(capNormal1);
                     AddNormal(capNormal1);
                     AddNormal(capNormal1);
                     AddNormal(capNormal1);
 
-                    int nSteps = properties.steps;
+                    var nSteps = properties.steps;
                     AddUV(new Vector2(1 - (i + 1f) / nSteps, 0));
                     AddUV(new Vector2(1 - (float)i / nSteps, 0));
                     AddUV(new Vector2(1 - (float)i / nSteps, (i + 1f) / nSteps));
@@ -950,12 +961,12 @@ namespace QuickPrimitives.Scripts
 
                     if (i == properties.steps - 1)
                     {
-                        AddVertex(pts[11]);  // right
+                        AddVertex(pts[11]); // right
                         AddVertex(pts[9]);
                         AddVertex(pts[3]);
                         AddVertex(pts[7]);
 
-                        Vector3 capNormal2 = ComputeNormal(pts[7], pts[5], pts[1]);
+                        var capNormal2 = ComputeNormal(pts[7], pts[5], pts[1]);
 
                         AddNormal(capNormal2);
                         AddNormal(capNormal2);
@@ -970,78 +981,92 @@ namespace QuickPrimitives.Scripts
                 }
 
 
-                for (int j = 0; j < 6; ++j)
+                for (var j = 0; j < 6; ++j)
                 {
-                    int bi = i * 20 + j * 4;
+                    var bi = i * 20 + j * 4;
                     faces.Add(new TriangleIndices(bi + 1, bi + 0, bi + 2));
                     faces.Add(new TriangleIndices(bi + 2, bi + 0, bi + 3));
                 }
 
-                int ci = (i + 1) * 20;
+                var ci = (i + 1) * 20;
                 faces.Add(new TriangleIndices(ci + 1, ci + 0, ci + 2));
                 faces.Add(new TriangleIndices(ci + 2, ci + 0, ci + 3));
             }
         }
+
         #endregion
 
         #region GenerateVerticesSpiralClosed
+
         private void GenerateVerticesSpiralClosed()
         {
-            float stepHeight = properties.height / properties.steps;
+            var stepHeight = properties.height / properties.steps;
 
-            float innerRadius0 = properties.innerRadius;
-            float outerRadius0 = innerRadius0 + properties.width;
-            float innerRadius1 = innerRadius0;
-            float outerRadius1 = outerRadius0;
+            var innerRadius0 = properties.innerRadius;
+            var outerRadius0 = innerRadius0 + properties.width;
+            var innerRadius1 = innerRadius0;
+            var outerRadius1 = outerRadius0;
 
-            float rotations = properties.rotations;
+            var rotations = properties.rotations;
 
-            List<Vector3> pts = new List<Vector3>();
-            for (int i = 0; i < properties.steps; ++i)
+            var pts = new List<Vector3>();
+            for (var i = 0; i < properties.steps; ++i)
             {
-                float stepBaseHeight = i * stepHeight;
+                var stepBaseHeight = i * stepHeight;
 
-                float angle0 = (properties.windingDirection == QcStairProperties.WindingDirection.Counterclockwise) ?
-                                twoPi * rotations / properties.steps * i :
-                                -twoPi * rotations / properties.steps * i;
-                float angle1 = (properties.windingDirection == QcStairProperties.WindingDirection.Counterclockwise) ?
-                                twoPi * rotations / properties.steps * (i + 1) :
-                                -twoPi * rotations / properties.steps * (i + 1);
-                
+                var angle0 = properties.windingDirection == QcStairProperties.WindingDirection.Counterclockwise
+                    ? twoPi * rotations / properties.steps * i
+                    : -twoPi * rotations / properties.steps * i;
+                var angle1 = properties.windingDirection == QcStairProperties.WindingDirection.Counterclockwise
+                    ? twoPi * rotations / properties.steps * (i + 1)
+                    : -twoPi * rotations / properties.steps * (i + 1);
+
                 if (properties.conical)
                 {
-                    innerRadius0 = properties.innerRadius + (float)i * (properties.radius - properties.innerRadius) / (properties.steps - 1);
+                    innerRadius0 = properties.innerRadius +
+                                   (float)i * (properties.radius - properties.innerRadius) / (properties.steps - 1);
                     outerRadius0 = innerRadius0 + properties.width;
-                    innerRadius1 = properties.innerRadius + (float)(i + 1) * (properties.radius - properties.innerRadius) / (properties.steps - 1);
+                    innerRadius1 = properties.innerRadius + (float)(i + 1) *
+                        (properties.radius - properties.innerRadius) / (properties.steps - 1);
                     outerRadius1 = innerRadius1 + properties.width;
                 }
 
                 pts.Clear();
 
-                pts.Add(new Vector3(innerRadius0 * Mathf.Cos(angle0), stepBaseHeight, innerRadius0 * Mathf.Sin(angle0)));
-                pts.Add(new Vector3(innerRadius1 * Mathf.Cos(angle1), stepBaseHeight, innerRadius1 * Mathf.Sin(angle1)));
-                pts.Add(new Vector3(innerRadius0 * Mathf.Cos(angle0), stepBaseHeight + stepHeight, innerRadius0 * Mathf.Sin(angle0)));
-                pts.Add(new Vector3(innerRadius1 * Mathf.Cos(angle1), stepBaseHeight + stepHeight, innerRadius1 * Mathf.Sin(angle1)));
+                pts.Add(new Vector3(innerRadius0 * Mathf.Cos(angle0), stepBaseHeight,
+                    innerRadius0 * Mathf.Sin(angle0)));
+                pts.Add(new Vector3(innerRadius1 * Mathf.Cos(angle1), stepBaseHeight,
+                    innerRadius1 * Mathf.Sin(angle1)));
+                pts.Add(new Vector3(innerRadius0 * Mathf.Cos(angle0), stepBaseHeight + stepHeight,
+                    innerRadius0 * Mathf.Sin(angle0)));
+                pts.Add(new Vector3(innerRadius1 * Mathf.Cos(angle1), stepBaseHeight + stepHeight,
+                    innerRadius1 * Mathf.Sin(angle1)));
 
-                pts.Add(new Vector3(outerRadius0 * Mathf.Cos(angle0), stepBaseHeight, outerRadius0 * Mathf.Sin(angle0)));
-                pts.Add(new Vector3(outerRadius1 * Mathf.Cos(angle1), stepBaseHeight, outerRadius1 * Mathf.Sin(angle1)));
-                pts.Add(new Vector3(outerRadius0 * Mathf.Cos(angle0), stepBaseHeight + stepHeight, outerRadius0 * Mathf.Sin(angle0)));
-                pts.Add(new Vector3(outerRadius1 * Mathf.Cos(angle1), stepBaseHeight + stepHeight, outerRadius1 * Mathf.Sin(angle1)));
+                pts.Add(new Vector3(outerRadius0 * Mathf.Cos(angle0), stepBaseHeight,
+                    outerRadius0 * Mathf.Sin(angle0)));
+                pts.Add(new Vector3(outerRadius1 * Mathf.Cos(angle1), stepBaseHeight,
+                    outerRadius1 * Mathf.Sin(angle1)));
+                pts.Add(new Vector3(outerRadius0 * Mathf.Cos(angle0), stepBaseHeight + stepHeight,
+                    outerRadius0 * Mathf.Sin(angle0)));
+                pts.Add(new Vector3(outerRadius1 * Mathf.Cos(angle1), stepBaseHeight + stepHeight,
+                    outerRadius1 * Mathf.Sin(angle1)));
 
-                pts.Add(new Vector3(innerRadius0 * Mathf.Cos(angle0), stepBaseHeight - stepHeight, innerRadius0 * Mathf.Sin(angle0)));
-                pts.Add(new Vector3(outerRadius0 * Mathf.Cos(angle0), stepBaseHeight - stepHeight, outerRadius0 * Mathf.Sin(angle0)));
+                pts.Add(new Vector3(innerRadius0 * Mathf.Cos(angle0), stepBaseHeight - stepHeight,
+                    innerRadius0 * Mathf.Sin(angle0)));
+                pts.Add(new Vector3(outerRadius0 * Mathf.Cos(angle0), stepBaseHeight - stepHeight,
+                    outerRadius0 * Mathf.Sin(angle0)));
 
                 if (properties.windingDirection == QcStairProperties.WindingDirection.Clockwise)
                 {
                     if (i == 0)
-                        AddVertex(pts[0]);  // back(inner)
+                        AddVertex(pts[0]); // back(inner)
                     else
-                        AddVertex(pts[8]);  // back(inner)
+                        AddVertex(pts[8]); // back(inner)
                     AddVertex(pts[1]);
                     AddVertex(pts[3]);
                     AddVertex(pts[2]);
 
-                   AddVertex(pts[5]);  // front(outer)
+                    AddVertex(pts[5]); // front(outer)
                     if (i == 0)
                         AddVertex(pts[4]);
                     else
@@ -1049,12 +1074,12 @@ namespace QuickPrimitives.Scripts
                     AddVertex(pts[6]);
                     AddVertex(pts[7]);
 
-                    AddVertex(pts[2]);  // top
+                    AddVertex(pts[2]); // top
                     AddVertex(pts[3]);
                     AddVertex(pts[7]);
                     AddVertex(pts[6]);
-                    
-                    if (i == 0)     // bottom
+
+                    if (i == 0) // bottom
                     {
                         AddVertex(pts[0]);
                         AddVertex(pts[4]);
@@ -1064,22 +1089,23 @@ namespace QuickPrimitives.Scripts
                         AddVertex(pts[8]);
                         AddVertex(pts[9]);
                     }
-                    AddVertex(pts[5]);
-                    AddVertex(pts[1]);  
 
-                    AddVertex(pts[4]);  // right
+                    AddVertex(pts[5]);
+                    AddVertex(pts[1]);
+
+                    AddVertex(pts[4]); // right
                     AddVertex(pts[0]);
                     AddVertex(pts[2]);
                     AddVertex(pts[6]);
 
-                    Vector3 normal0Out = new Vector3(pts[4].x, 0f, pts[4].z);
+                    var normal0Out = new Vector3(pts[4].x, 0f, pts[4].z);
                     normal0Out.Normalize();
-                    Vector3 normal0In = new Vector3(-pts[4].x, 0f, -pts[4].z);
+                    var normal0In = new Vector3(-pts[4].x, 0f, -pts[4].z);
                     normal0In.Normalize();
 
-                    Vector3 normal1Out = new Vector3(pts[5].x, 0f, pts[5].z);
+                    var normal1Out = new Vector3(pts[5].x, 0f, pts[5].z);
                     normal1Out.Normalize();
-                    Vector3 normal1In = new Vector3(-pts[5].x, 0f, -pts[5].z);
+                    var normal1In = new Vector3(-pts[5].x, 0f, -pts[5].z);
                     normal1In.Normalize();
 
                     AddNormal(normal0In);
@@ -1102,14 +1128,14 @@ namespace QuickPrimitives.Scripts
                     AddNormal(Vector3.down);
                     AddNormal(Vector3.down);
 
-                    Vector3 capNormal1 = ComputeNormal(pts[2], pts[0], pts[4]);
+                    var capNormal1 = ComputeNormal(pts[2], pts[0], pts[4]);
 
                     AddNormal(capNormal1);
                     AddNormal(capNormal1);
                     AddNormal(capNormal1);
                     AddNormal(capNormal1);
 
-                    int nSteps = properties.steps;
+                    var nSteps = properties.steps;
                     if (i == 0)
                     {
                         AddUV(new Vector2((float)i / nSteps, (float)i / nSteps));
@@ -1120,6 +1146,7 @@ namespace QuickPrimitives.Scripts
                         AddUV(new Vector2((float)i / nSteps, (i - 1f) / nSteps));
                         AddUV(new Vector2((i + 1f) / nSteps, (float)i / nSteps));
                     }
+
                     AddUV(new Vector2((i + 1f) / nSteps, (i + 1f) / nSteps));
                     AddUV(new Vector2((float)i / nSteps, (i + 1f) / nSteps));
 
@@ -1133,6 +1160,7 @@ namespace QuickPrimitives.Scripts
                         AddUV(new Vector2(1 - (i + 1f) / nSteps, (float)i / nSteps));
                         AddUV(new Vector2(1 - (float)i / nSteps, (i - 1f) / nSteps));
                     }
+
                     AddUV(new Vector2(1 - (float)i / nSteps, (i + 1f) / nSteps));
                     AddUV(new Vector2(1 - (i + 1f) / nSteps, (i + 1f) / nSteps));
 
@@ -1153,27 +1181,27 @@ namespace QuickPrimitives.Scripts
 
                     if (i == properties.steps - 1)
                     {
-                        AddVertex(pts[1]);  // left
+                        AddVertex(pts[1]); // left
                         AddVertex(pts[5]);
                         AddVertex(pts[7]);
                         AddVertex(pts[3]);
 
-                        Vector3 capNormal2 = ComputeNormal(pts[7], pts[5], pts[1]);
+                        var capNormal2 = ComputeNormal(pts[7], pts[5], pts[1]);
 
                         AddNormal(capNormal2);
                         AddNormal(capNormal2);
                         AddNormal(capNormal2);
                         AddNormal(capNormal2);
-                        
+
                         AddUV(new Vector2(1.0f / (nSteps + 1), 0));
                         AddUV(new Vector2(1.0f / (nSteps + 1), 1));
                         AddUV(new Vector2(0, 1));
                         AddUV(new Vector2(0, 0));
                     }
                 }
-                else        // counterclockwise
+                else // counterclockwise
                 {
-                    AddVertex(pts[1]);  // back(inner)
+                    AddVertex(pts[1]); // back(inner)
                     if (i == 0)
                         AddVertex(pts[0]);
                     else
@@ -1182,46 +1210,46 @@ namespace QuickPrimitives.Scripts
                     AddVertex(pts[3]);
 
                     if (i == 0)
-                        AddVertex(pts[4]);  // front(outer)
+                        AddVertex(pts[4]); // front(outer)
                     else
                         AddVertex(pts[9]);
                     AddVertex(pts[5]);
                     AddVertex(pts[7]);
                     AddVertex(pts[6]);
 
-                    AddVertex(pts[6]);  // top
+                    AddVertex(pts[6]); // top
                     AddVertex(pts[7]);
                     AddVertex(pts[3]);
                     AddVertex(pts[2]);
 
                     if (i == 0)
                     {
-                        AddVertex(pts[4]);  // bottom
+                        AddVertex(pts[4]); // bottom
                         AddVertex(pts[0]);
                         AddVertex(pts[1]);
                         AddVertex(pts[5]);
                     }
                     else
                     {
-                        AddVertex(pts[9]);  // bottom
+                        AddVertex(pts[9]); // bottom
                         AddVertex(pts[8]);
                         AddVertex(pts[1]);
                         AddVertex(pts[5]);
                     }
 
-                    AddVertex(pts[0]);  // left
+                    AddVertex(pts[0]); // left
                     AddVertex(pts[4]);
                     AddVertex(pts[6]);
                     AddVertex(pts[2]);
 
-                    Vector3 normal0Out = new Vector3(pts[4].x, 0f, pts[4].z);
+                    var normal0Out = new Vector3(pts[4].x, 0f, pts[4].z);
                     normal0Out.Normalize();
-                    Vector3 normal0In = new Vector3(-pts[4].x, 0f, -pts[4].z);
+                    var normal0In = new Vector3(-pts[4].x, 0f, -pts[4].z);
                     normal0In.Normalize();
 
-                    Vector3 normal1Out = new Vector3(pts[5].x, 0f, pts[5].z);
+                    var normal1Out = new Vector3(pts[5].x, 0f, pts[5].z);
                     normal0Out.Normalize();
-                    Vector3 normal1In = new Vector3(-pts[5].x, 0f, -pts[5].z);
+                    var normal1In = new Vector3(-pts[5].x, 0f, -pts[5].z);
                     normal0In.Normalize();
 
                     AddNormal(normal1In);
@@ -1244,14 +1272,14 @@ namespace QuickPrimitives.Scripts
                     AddNormal(Vector3.down);
                     AddNormal(Vector3.down);
 
-                    Vector3 capNormal1 = ComputeNormal(pts[6], pts[4], pts[0]);
+                    var capNormal1 = ComputeNormal(pts[6], pts[4], pts[0]);
 
                     AddNormal(capNormal1);
                     AddNormal(capNormal1);
                     AddNormal(capNormal1);
                     AddNormal(capNormal1);
 
-                    int nSteps = properties.steps;
+                    var nSteps = properties.steps;
                     if (i == 0)
                     {
                         AddUV(new Vector2(1 - (i + 1f) / nSteps, (float)i / nSteps));
@@ -1262,6 +1290,7 @@ namespace QuickPrimitives.Scripts
                         AddUV(new Vector2(1 - (i + 1f) / nSteps, (float)i / nSteps));
                         AddUV(new Vector2(1 - (float)i / nSteps, (i - 1f) / nSteps));
                     }
+
                     AddUV(new Vector2(1 - (float)i / nSteps, (i + 1f) / nSteps));
                     AddUV(new Vector2(1 - (i + 1f) / nSteps, (i + 1f) / nSteps));
 
@@ -1275,6 +1304,7 @@ namespace QuickPrimitives.Scripts
                         AddUV(new Vector2((float)i / nSteps, (i - 1f) / nSteps));
                         AddUV(new Vector2((i + 1f) / nSteps, (float)i / nSteps));
                     }
+
                     AddUV(new Vector2((i + 1f) / nSteps, (i + 1f) / nSteps));
                     AddUV(new Vector2((float)i / nSteps, (i + 1f) / nSteps));
 
@@ -1295,12 +1325,12 @@ namespace QuickPrimitives.Scripts
 
                     if (i == properties.steps - 1)
                     {
-                        AddVertex(pts[5]);  // right
+                        AddVertex(pts[5]); // right
                         AddVertex(pts[1]);
                         AddVertex(pts[3]);
                         AddVertex(pts[7]);
 
-                        Vector3 capNormal2 = ComputeNormal(pts[3], pts[1], pts[5]);
+                        var capNormal2 = ComputeNormal(pts[3], pts[1], pts[5]);
 
                         AddNormal(capNormal2);
                         AddNormal(capNormal2);
@@ -1314,44 +1344,47 @@ namespace QuickPrimitives.Scripts
                     }
                 }
 
-                for (int j = 0; j < 5; ++j)
+                for (var j = 0; j < 5; ++j)
                 {
-                    int bi = i * 20 + j * 4;
+                    var bi = i * 20 + j * 4;
                     faces.Add(new TriangleIndices(bi + 1, bi + 0, bi + 2));
                     faces.Add(new TriangleIndices(bi + 2, bi + 0, bi + 3));
                 }
 
-                int ci = i * 20 + 20;
+                var ci = i * 20 + 20;
                 faces.Add(new TriangleIndices(ci + 1, ci + 0, ci + 2));
                 faces.Add(new TriangleIndices(ci + 2, ci + 0, ci + 3));
             }
         }
+
         #endregion
 
         #region GenerateVerticesSpiralOpen
+
         private void GenerateVerticesSpiralOpen()
         {
-            float stepHeight = properties.height / properties.steps;
-            float treadThickness = properties.treadThickness;
-            float treadDepth = properties.treadDepth;
+            var stepHeight = properties.height / properties.steps;
+            var treadThickness = properties.treadThickness;
+            var treadDepth = properties.treadDepth;
 
-            float rotations = properties.rotations;
+            var rotations = properties.rotations;
 
-            float innerRadius = properties.innerRadius;
-            float outerRadius = innerRadius + properties.width;
+            var innerRadius = properties.innerRadius;
+            var outerRadius = innerRadius + properties.width;
 
-            for (int i = 0; i < properties.steps; ++i)
+            for (var i = 0; i < properties.steps; ++i)
             {
-                float stepBaseHeight = i * stepHeight;
-                float stepHalfDepth = treadDepth * 0.5f;
+                var stepBaseHeight = i * stepHeight;
+                var stepHalfDepth = treadDepth * 0.5f;
 
                 if (properties.conical)
                 {
-                    innerRadius = properties.innerRadius + (float)i * (properties.radius - properties.innerRadius) / (properties.steps - 1);
+                    innerRadius = properties.innerRadius +
+                                  (float)i * (properties.radius - properties.innerRadius) / (properties.steps - 1);
                     outerRadius = innerRadius + properties.width;
                 }
 
-                Vector3[] pts = new Vector3[8];
+                var pts = new Vector3[8];
                 pts[0] = new Vector3(innerRadius, stepBaseHeight + stepHeight - treadThickness, -stepHalfDepth);
                 pts[1] = new Vector3(outerRadius, stepBaseHeight + stepHeight - treadThickness, -stepHalfDepth);
                 pts[2] = new Vector3(outerRadius, stepBaseHeight + stepHeight - treadThickness, stepHalfDepth);
@@ -1362,41 +1395,38 @@ namespace QuickPrimitives.Scripts
                 pts[6] = new Vector3(outerRadius, stepBaseHeight + stepHeight, stepHalfDepth);
                 pts[7] = new Vector3(innerRadius, stepBaseHeight + stepHeight, stepHalfDepth);
 
-                float rotDegree = (properties.windingDirection == QcStairProperties.WindingDirection.Clockwise) ?
-                                  360.0f * rotations / properties.steps * i :
-                                  -360.0f * rotations / properties.steps * i;
+                var rotDegree = properties.windingDirection == QcStairProperties.WindingDirection.Clockwise
+                    ? 360.0f * rotations / properties.steps * i
+                    : -360.0f * rotations / properties.steps * i;
                 //float rotRad = rotDegree * Mathf.Deg2Rad;
-                for (int pi = 0; pi < 8; ++pi)
-                {
-                    pts[pi] = Quaternion.Euler(0, rotDegree, 0) * pts[pi];
-                }
+                for (var pi = 0; pi < 8; ++pi) pts[pi] = Quaternion.Euler(0, rotDegree, 0) * pts[pi];
 
-                AddVertex(pts[3]);    // step bottom
+                AddVertex(pts[3]); // step bottom
                 AddVertex(pts[2]);
                 AddVertex(pts[1]);
                 AddVertex(pts[0]);
 
-                AddVertex(pts[0]);    // step front
+                AddVertex(pts[0]); // step front
                 AddVertex(pts[1]);
                 AddVertex(pts[5]);
                 AddVertex(pts[4]);
 
-                AddVertex(pts[4]);    // step top
+                AddVertex(pts[4]); // step top
                 AddVertex(pts[5]);
                 AddVertex(pts[6]);
                 AddVertex(pts[7]);
 
-                AddVertex(pts[7]);    // step back
+                AddVertex(pts[7]); // step back
                 AddVertex(pts[6]);
                 AddVertex(pts[2]);
                 AddVertex(pts[3]);
 
-                AddVertex(pts[3]);    // step left
+                AddVertex(pts[3]); // step left
                 AddVertex(pts[0]);
                 AddVertex(pts[4]);
                 AddVertex(pts[7]);
 
-                AddVertex(pts[1]);    // step right
+                AddVertex(pts[1]); // step right
                 AddVertex(pts[2]);
                 AddVertex(pts[6]);
                 AddVertex(pts[5]);
@@ -1407,7 +1437,7 @@ namespace QuickPrimitives.Scripts
                 AddNormal(Vector3.down);
 
 
-                Vector3 frontNormal = Quaternion.Euler(0, rotDegree, 0) * Vector3.back;
+                var frontNormal = Quaternion.Euler(0, rotDegree, 0) * Vector3.back;
                 AddNormal(frontNormal);
                 AddNormal(frontNormal);
                 AddNormal(frontNormal);
@@ -1418,19 +1448,19 @@ namespace QuickPrimitives.Scripts
                 AddNormal(Vector3.up);
                 AddNormal(Vector3.up);
 
-                Vector3 backNormal = Quaternion.Euler(0, rotDegree, 0) * Vector3.forward;
+                var backNormal = Quaternion.Euler(0, rotDegree, 0) * Vector3.forward;
                 AddNormal(backNormal);
                 AddNormal(backNormal);
                 AddNormal(backNormal);
                 AddNormal(backNormal);
 
-                Vector3 leftNormal = Quaternion.Euler(0, rotDegree, 0) * Vector3.left;
+                var leftNormal = Quaternion.Euler(0, rotDegree, 0) * Vector3.left;
                 AddNormal(leftNormal);
                 AddNormal(leftNormal);
                 AddNormal(leftNormal);
                 AddNormal(leftNormal);
 
-                Vector3 rightNormal = Quaternion.Euler(0, rotDegree, 0) * Vector3.right;
+                var rightNormal = Quaternion.Euler(0, rotDegree, 0) * Vector3.right;
                 AddNormal(rightNormal);
                 AddNormal(rightNormal);
                 AddNormal(rightNormal);
@@ -1467,9 +1497,11 @@ namespace QuickPrimitives.Scripts
                 AddUV(new Vector2(0, 1));
             }
         }
+
         #endregion
 
         #region GenerateTrianglesBox
+
         private void GenerateTrianglesBox()
         {
             // bottom triangles
@@ -1487,23 +1519,25 @@ namespace QuickPrimitives.Scripts
             // side triangles
             faces.Add(new TriangleIndices(8, 10, 9));
             faces.Add(new TriangleIndices(11, 13, 12));
-            
-            for (int i = 0; i < properties.steps; ++i)
+
+            for (var i = 0; i < properties.steps; ++i)
             {
-                int baseIndex = 14 + i * 14;
-                faces.Add(new TriangleIndices(baseIndex + 1, baseIndex + 0, baseIndex + 2));    // step front
+                var baseIndex = 14 + i * 14;
+                faces.Add(new TriangleIndices(baseIndex + 1, baseIndex + 0, baseIndex + 2)); // step front
                 faces.Add(new TriangleIndices(baseIndex + 2, baseIndex + 0, baseIndex + 3));
 
-                faces.Add(new TriangleIndices(baseIndex + 5, baseIndex + 4, baseIndex + 6));    // step top
+                faces.Add(new TriangleIndices(baseIndex + 5, baseIndex + 4, baseIndex + 6)); // step top
                 faces.Add(new TriangleIndices(baseIndex + 6, baseIndex + 4, baseIndex + 7));
 
-                faces.Add(new TriangleIndices(baseIndex + 8, baseIndex + 10, baseIndex + 9));    // step sides
+                faces.Add(new TriangleIndices(baseIndex + 8, baseIndex + 10, baseIndex + 9)); // step sides
                 faces.Add(new TriangleIndices(baseIndex + 12, baseIndex + 13, baseIndex + 11));
             }
         }
+
         #endregion
 
         #region GenerateTrianglesClosed
+
         private void GenerateTrianglesClosed()
         {
             // bottom triangles
@@ -1525,47 +1559,50 @@ namespace QuickPrimitives.Scripts
             faces.Add(new TriangleIndices(16, 17, 19));
             faces.Add(new TriangleIndices(19, 17, 18));
 
-            for (int i = 0; i < properties.steps; ++i)
+            for (var i = 0; i < properties.steps; ++i)
             {
-                int baseIndex = 20 + i * 14;
-                faces.Add(new TriangleIndices(baseIndex + 1, baseIndex + 0, baseIndex + 2));    // step front
+                var baseIndex = 20 + i * 14;
+                faces.Add(new TriangleIndices(baseIndex + 1, baseIndex + 0, baseIndex + 2)); // step front
                 faces.Add(new TriangleIndices(baseIndex + 2, baseIndex + 0, baseIndex + 3));
 
-                faces.Add(new TriangleIndices(baseIndex + 5, baseIndex + 4, baseIndex + 6));    // step top
+                faces.Add(new TriangleIndices(baseIndex + 5, baseIndex + 4, baseIndex + 6)); // step top
                 faces.Add(new TriangleIndices(baseIndex + 6, baseIndex + 4, baseIndex + 7));
 
-                faces.Add(new TriangleIndices(baseIndex + 8, baseIndex + 10, baseIndex + 9));    // step sides
+                faces.Add(new TriangleIndices(baseIndex + 8, baseIndex + 10, baseIndex + 9)); // step sides
                 faces.Add(new TriangleIndices(baseIndex + 12, baseIndex + 13, baseIndex + 11));
             }
         }
+
         #endregion
 
         #region GenerateTrianglesOpen
+
         private void GenerateTrianglesOpen()
         {
-            for (int i = 0; i < properties.steps; ++i)
+            for (var i = 0; i < properties.steps; ++i)
             {
-                int baseIndex = i * 24;
+                var baseIndex = i * 24;
 
-                faces.Add(new TriangleIndices(baseIndex + 1, baseIndex + 0, baseIndex + 2));    // step bottom
+                faces.Add(new TriangleIndices(baseIndex + 1, baseIndex + 0, baseIndex + 2)); // step bottom
                 faces.Add(new TriangleIndices(baseIndex + 2, baseIndex + 0, baseIndex + 3));
 
-                faces.Add(new TriangleIndices(baseIndex + 4, baseIndex + 7, baseIndex + 5));    // step front
+                faces.Add(new TriangleIndices(baseIndex + 4, baseIndex + 7, baseIndex + 5)); // step front
                 faces.Add(new TriangleIndices(baseIndex + 5, baseIndex + 7, baseIndex + 6));
 
-                faces.Add(new TriangleIndices(baseIndex + 9, baseIndex + 8, baseIndex + 10));    // step top
+                faces.Add(new TriangleIndices(baseIndex + 9, baseIndex + 8, baseIndex + 10)); // step top
                 faces.Add(new TriangleIndices(baseIndex + 10, baseIndex + 8, baseIndex + 11));
 
-                faces.Add(new TriangleIndices(baseIndex + 12, baseIndex + 15, baseIndex + 13));    // step back
+                faces.Add(new TriangleIndices(baseIndex + 12, baseIndex + 15, baseIndex + 13)); // step back
                 faces.Add(new TriangleIndices(baseIndex + 13, baseIndex + 15, baseIndex + 14));
 
-                faces.Add(new TriangleIndices(baseIndex + 17, baseIndex + 16, baseIndex + 18));    // step left side
+                faces.Add(new TriangleIndices(baseIndex + 17, baseIndex + 16, baseIndex + 18)); // step left side
                 faces.Add(new TriangleIndices(baseIndex + 18, baseIndex + 16, baseIndex + 19));
 
-                faces.Add(new TriangleIndices(baseIndex + 21, baseIndex + 20, baseIndex + 22));    // step right side
+                faces.Add(new TriangleIndices(baseIndex + 21, baseIndex + 20, baseIndex + 22)); // step right side
                 faces.Add(new TriangleIndices(baseIndex + 22, baseIndex + 20, baseIndex + 23));
             }
         }
+
         #endregion
     }
 }

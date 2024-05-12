@@ -7,10 +7,10 @@
     /// </summary>
     public enum Direction
     {
-        East,   
-        West,   
-        North,  
+        East,
+        West,
+        North,
         South,
-        Any     // no preference
+        Any // no preference
     }
 }

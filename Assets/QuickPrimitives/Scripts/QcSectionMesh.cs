@@ -14,8 +14,19 @@ namespace QuickPrimitives.Scripts
                 public Vector2 size;
             }
 
-            public enum Types { LType, IType, CType, TType }
-            public enum Options { None, SlantedSides }
+            public enum Types
+            {
+                LType,
+                IType,
+                CType,
+                TType
+            }
+
+            public enum Options
+            {
+                None,
+                SlantedSides
+            }
 
             public float width = 1;
             public float depth = 1;
@@ -38,50 +49,50 @@ namespace QuickPrimitives.Scripts
             {
                 base.CopyFrom(source);
 
-                this.width = source.width;
-                this.height = source.height;
-                this.depth = source.depth;
-                this.frontThickness = source.frontThickness;
-                this.backThickness = source.backThickness;
-                this.sideThickness = source.sideThickness;
+                width = source.width;
+                height = source.height;
+                depth = source.depth;
+                frontThickness = source.frontThickness;
+                backThickness = source.backThickness;
+                sideThickness = source.sideThickness;
 
-                this.capThickness = source.capThickness;
-                this.frontCap = source.frontCap;
-                this.backCap = source.backCap;
-                this.sideCap = source.sideCap;
+                capThickness = source.capThickness;
+                frontCap = source.frontCap;
+                backCap = source.backCap;
+                sideCap = source.sideCap;
 
-                this.type = source.type;
+                type = source.type;
 
-                this.option = source.option;
-                this.slantedSides.size = source.slantedSides.size;
+                option = source.option;
+                slantedSides.size = source.slantedSides.size;
 
-                this.textureWrapped = source.textureWrapped;
+                textureWrapped = source.textureWrapped;
             }
 
             public bool Modified(QcSectionProperties source)
             {
-                return ((this.width != source.width) ||
-                        (this.height != source.height) ||
-                        (this.depth != source.depth) ||
-                        (this.frontThickness != source.frontThickness) ||
-                        (this.backThickness != source.backThickness) ||
-                        (this.sideThickness != source.sideThickness) ||
-                        (this.capThickness != source.capThickness) ||
-                        (this.capThickness && 
-                         ((this.frontCap != source.frontCap) || 
-                          (this.backCap != source.backCap) || 
-                          (this.sideCap != source.sideCap))) ||
-                        (this.offset[0] != source.offset[0]) ||
-                        (this.offset[1] != source.offset[1]) ||
-                        (this.offset[2] != source.offset[2]) ||
-                        (this.genTextureCoords != source.genTextureCoords) ||
-                        (this.textureWrapped != source.textureWrapped) ||
-                        (this.addCollider != source.addCollider) ||
-                        (this.type != source.type) ||
-                        (this.option != source.option) ||
-                        ((source.option == QcSectionProperties.Options.SlantedSides) &&
-                         ((this.slantedSides.size[0] != source.slantedSides.size[0]) ||
-                          (this.slantedSides.size[1] != source.slantedSides.size[1]))));
+                return width != source.width ||
+                       height != source.height ||
+                       depth != source.depth ||
+                       frontThickness != source.frontThickness ||
+                       backThickness != source.backThickness ||
+                       sideThickness != source.sideThickness ||
+                       capThickness != source.capThickness ||
+                       (capThickness &&
+                        (frontCap != source.frontCap ||
+                         backCap != source.backCap ||
+                         sideCap != source.sideCap)) ||
+                       offset[0] != source.offset[0] ||
+                       offset[1] != source.offset[1] ||
+                       offset[2] != source.offset[2] ||
+                       genTextureCoords != source.genTextureCoords ||
+                       textureWrapped != source.textureWrapped ||
+                       addCollider != source.addCollider ||
+                       type != source.type ||
+                       option != source.option ||
+                       (source.option == Options.SlantedSides &&
+                        (slantedSides.size[0] != source.slantedSides.size[0] ||
+                         slantedSides.size[1] != source.slantedSides.size[1]));
             }
         }
 
@@ -98,33 +109,25 @@ namespace QuickPrimitives.Scripts
         }
 
         #region BuildGeometry
+
         protected override void BuildGeometry()
         {
-            if ((properties.width <= 0) || (properties.height <= 0) || (properties.depth <= 0)) return;
+            if (properties.width <= 0 || properties.height <= 0 || properties.depth <= 0) return;
 
-            MeshFilter meshFilter = gameObject.GetComponent<MeshFilter>();
-            if (meshFilter == null)
-            {
-                meshFilter = gameObject.AddComponent<MeshFilter>();
-            }
+            var meshFilter = gameObject.GetComponent<MeshFilter>();
+            if (meshFilter == null) meshFilter = gameObject.AddComponent<MeshFilter>();
 
-            MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
-            if (meshRenderer == null)
-            {
-                meshRenderer = gameObject.AddComponent<MeshRenderer>();
-            }
+            var meshRenderer = gameObject.GetComponent<MeshRenderer>();
+            if (meshRenderer == null) meshRenderer = gameObject.AddComponent<MeshRenderer>();
 
             ClearVertices();
 
             GenerateGeometry();
 
-            if (properties.offset != Vector3.zero)
-            {
-                AddOffset(properties.offset);
-            }
+            if (properties.offset != Vector3.zero) AddOffset(properties.offset);
 
-            int[] triangles = new int[faces.Count * 3];
-            int index = 0;
+            var triangles = new int[faces.Count * 3];
+            var index = 0;
             foreach (var tri in faces)
             {
                 triangles[index] = tri.v1;
@@ -134,7 +137,7 @@ namespace QuickPrimitives.Scripts
                 index += 3;
             }
 
-            Mesh mesh = new Mesh();
+            var mesh = new Mesh();
 
             meshFilter.sharedMesh = mesh;
 
@@ -152,24 +155,23 @@ namespace QuickPrimitives.Scripts
 
             mesh.RecalculateBounds();
         }
+
         #endregion
 
         #region RebuildGeometry
+
         public override void RebuildGeometry()
         {
-            MeshFilter meshFilter = gameObject.GetComponent<MeshFilter>();
+            var meshFilter = gameObject.GetComponent<MeshFilter>();
 
             ClearVertices();
 
             GenerateGeometry();
 
-            if (properties.offset != Vector3.zero)
-            {
-                AddOffset(properties.offset);
-            }
+            if (properties.offset != Vector3.zero) AddOffset(properties.offset);
 
-            int[] triangles = new int[faces.Count * 3];
-            int index = 0;
+            var triangles = new int[faces.Count * 3];
+            var index = 0;
             foreach (var tri in faces)
             {
                 triangles[index] = tri.v1;
@@ -198,6 +200,7 @@ namespace QuickPrimitives.Scripts
                 meshFilter.sharedMesh.RecalculateBounds();
             }
         }
+
         #endregion
 
         private void SetCollider()
@@ -205,25 +208,19 @@ namespace QuickPrimitives.Scripts
             if (properties.addCollider)
             {
                 // set collider bound
-                BoxCollider collider = gameObject.GetComponent<BoxCollider>();
-                if (collider == null)
-                {
-                    collider = gameObject.AddComponent<BoxCollider>();
-                }
+                var collider = gameObject.GetComponent<BoxCollider>();
+                if (collider == null) collider = gameObject.AddComponent<BoxCollider>();
 
                 collider.enabled = true;
-                collider.center = properties.offset + new Vector3(0, 
-                                                                  properties.height * 0.5f, 
-                                                                  0);
+                collider.center = properties.offset + new Vector3(0,
+                    properties.height * 0.5f,
+                    0);
                 collider.size = new Vector3(properties.width, properties.height, properties.depth);
             }
             else
             {
-                BoxCollider collider = gameObject.GetComponent<BoxCollider>();
-                if (collider != null)
-                {
-                    collider.enabled = false;
-                }
+                var collider = gameObject.GetComponent<BoxCollider>();
+                if (collider != null) collider.enabled = false;
             }
         }
 
@@ -255,15 +252,16 @@ namespace QuickPrimitives.Scripts
         }
 
         #region GenerateVerticesLType
+
         private void GenerateVerticesLType()
         {
-            float width = properties.width;
-            float height = properties.height;
-            float depth = properties.depth;
-            float backThicknees = properties.backThickness;
-            float sideThickness = properties.sideThickness;
+            var width = properties.width;
+            var height = properties.height;
+            var depth = properties.depth;
+            var backThicknees = properties.backThickness;
+            var sideThickness = properties.sideThickness;
 
-            Vector3[] pts = new Vector3[16];
+            var pts = new Vector3[16];
             if (!properties.capThickness)
             {
                 pts[0] = new Vector3(-width * 0.5f, 0, -depth * 0.5f);
@@ -332,7 +330,7 @@ namespace QuickPrimitives.Scripts
             AddVertex(pts[15]);
 
             // front facing
-            AddVertex(pts[0]);  
+            AddVertex(pts[0]);
             AddVertex(pts[1]);
             AddVertex(pts[9]);
             AddVertex(pts[8]);
@@ -399,9 +397,9 @@ namespace QuickPrimitives.Scripts
             }
             else
             {
-                Vector3 frontNormal = new Vector3(properties.backThickness - properties.backCap, 
-                                                  0, 
-                                                  -(properties.width - properties.sideThickness));
+                var frontNormal = new Vector3(properties.backThickness - properties.backCap,
+                    0,
+                    -(properties.width - properties.sideThickness));
                 frontNormal.Normalize();
                 AddNormal(frontNormal);
                 AddNormal(frontNormal);
@@ -428,9 +426,9 @@ namespace QuickPrimitives.Scripts
             }
             else
             {
-                Vector3 rightNormal = new Vector3(properties.depth - properties.backThickness, 
-                                                  0, 
-                                                  -(properties.sideThickness - properties.sideCap));
+                var rightNormal = new Vector3(properties.depth - properties.backThickness,
+                    0,
+                    -(properties.sideThickness - properties.sideCap));
                 rightNormal.Normalize();
                 AddNormal(rightNormal);
                 AddNormal(rightNormal);
@@ -443,7 +441,7 @@ namespace QuickPrimitives.Scripts
             AddNormal(Vector3.right);
             AddNormal(Vector3.right);
 
-            AddUV(new Vector2(0, 1));   // bottom
+            AddUV(new Vector2(0, 1)); // bottom
             if (!properties.capThickness)
                 AddUV(new Vector2(sideThickness / width, 1));
             else
@@ -461,7 +459,7 @@ namespace QuickPrimitives.Scripts
             AddUV(new Vector2(0, 0));
             AddUV(new Vector2(0, backThicknees / depth));
 
-            AddUV(new Vector2(0, 0));   // top
+            AddUV(new Vector2(0, 0)); // top
 
             if (!properties.capThickness)
                 AddUV(new Vector2(sideThickness / width, 0));
@@ -471,7 +469,7 @@ namespace QuickPrimitives.Scripts
             AddUV(new Vector2(sideThickness / width, 1 - backThicknees / depth));
 
             if (!properties.capThickness)
-                AddUV(new Vector2(1,  1- backThicknees / depth));
+                AddUV(new Vector2(1, 1 - backThicknees / depth));
             else
                 AddUV(new Vector2(1, 1 - properties.backCap / depth));
 
@@ -480,7 +478,7 @@ namespace QuickPrimitives.Scripts
             AddUV(new Vector2(0, 1));
             AddUV(new Vector2(0, 1 - backThicknees / depth));
 
-            AddUV(new Vector2(0, 0));   // front
+            AddUV(new Vector2(0, 0)); // front
 
             if (!properties.capThickness)
             {
@@ -510,17 +508,17 @@ namespace QuickPrimitives.Scripts
                 AddUV(new Vector2(properties.sideCap / (width - sideThickness + properties.sideCap), 1));
             }
 
-            AddUV(new Vector2(0, 0));   // back
+            AddUV(new Vector2(0, 0)); // back
             AddUV(new Vector2(1, 0));
             AddUV(new Vector2(1, 1));
             AddUV(new Vector2(0, 1));
 
-            AddUV(new Vector2(0, 0));   // left
+            AddUV(new Vector2(0, 0)); // left
             AddUV(new Vector2(1, 0));
             AddUV(new Vector2(1, 1));
             AddUV(new Vector2(0, 1));
 
-            AddUV(new Vector2(0, 0));   // right
+            AddUV(new Vector2(0, 0)); // right
 
             if (!properties.capThickness)
             {
@@ -550,19 +548,21 @@ namespace QuickPrimitives.Scripts
                 AddUV(new Vector2(1 - properties.backCap / (depth - backThicknees + properties.backCap), 1));
             }
         }
+
         #endregion
 
         #region GenerateVerticesIType
+
         private void GenerateVerticesIType()
         {
-            float width = properties.width;
-            float height = properties.height;
-            float depth = properties.depth;
-            float frontThickness = properties.frontThickness;
-            float backThickness = properties.backThickness;
-            float sideThickness = properties.sideThickness;
+            var width = properties.width;
+            var height = properties.height;
+            var depth = properties.depth;
+            var frontThickness = properties.frontThickness;
+            var backThickness = properties.backThickness;
+            var sideThickness = properties.sideThickness;
 
-            Vector3[] pts = new Vector3[32];
+            var pts = new Vector3[32];
             if (!properties.capThickness)
             {
                 pts[0] = new Vector3(-width * 0.5f, 0, -depth * 0.5f);
@@ -683,95 +683,91 @@ namespace QuickPrimitives.Scripts
             AddVertex(pts[31]);
 
             // front facing
-            AddVertex(pts[0]);      // 32
+            AddVertex(pts[0]); // 32
             AddVertex(pts[1]);
             AddVertex(pts[17]);
             AddVertex(pts[16]);
 
-            AddVertex(pts[1]);      // 36
+            AddVertex(pts[1]); // 36
             AddVertex(pts[2]);
             AddVertex(pts[18]);
             AddVertex(pts[17]);
 
-            AddVertex(pts[2]);      // 40
+            AddVertex(pts[2]); // 40
             AddVertex(pts[3]);
             AddVertex(pts[19]);
             AddVertex(pts[18]);
 
-            AddVertex(pts[12]);      // 44
+            AddVertex(pts[12]); // 44
             AddVertex(pts[13]);
             AddVertex(pts[29]);
             AddVertex(pts[28]);
 
-            AddVertex(pts[6]);      // 48
+            AddVertex(pts[6]); // 48
             AddVertex(pts[7]);
             AddVertex(pts[23]);
             AddVertex(pts[22]);
 
             // back facing
-            AddVertex(pts[8]);      // 52
+            AddVertex(pts[8]); // 52
             AddVertex(pts[9]);
             AddVertex(pts[25]);
             AddVertex(pts[24]);
 
-            AddVertex(pts[9]);      // 56
+            AddVertex(pts[9]); // 56
             AddVertex(pts[10]);
             AddVertex(pts[26]);
             AddVertex(pts[25]);
 
-            AddVertex(pts[10]);     // 60
+            AddVertex(pts[10]); // 60
             AddVertex(pts[11]);
             AddVertex(pts[27]);
             AddVertex(pts[26]);
 
-            AddVertex(pts[4]);     // 64
+            AddVertex(pts[4]); // 64
             AddVertex(pts[5]);
             AddVertex(pts[21]);
             AddVertex(pts[20]);
 
-            AddVertex(pts[14]);     // 68
+            AddVertex(pts[14]); // 68
             AddVertex(pts[15]);
             AddVertex(pts[31]);
             AddVertex(pts[30]);
 
             // left
-            AddVertex(pts[11]);      // 72
+            AddVertex(pts[11]); // 72
             AddVertex(pts[12]);
             AddVertex(pts[28]);
             AddVertex(pts[27]);
 
-            AddVertex(pts[13]);      // 76
+            AddVertex(pts[13]); // 76
             AddVertex(pts[14]);
             AddVertex(pts[30]);
             AddVertex(pts[29]);
 
-            AddVertex(pts[15]);      // 80
+            AddVertex(pts[15]); // 80
             AddVertex(pts[0]);
             AddVertex(pts[16]);
             AddVertex(pts[31]);
 
             // right
-            AddVertex(pts[3]);      // 84
+            AddVertex(pts[3]); // 84
             AddVertex(pts[4]);
             AddVertex(pts[20]);
             AddVertex(pts[19]);
 
-            AddVertex(pts[5]);      // 88
+            AddVertex(pts[5]); // 88
             AddVertex(pts[6]);
             AddVertex(pts[22]);
             AddVertex(pts[21]);
 
-            AddVertex(pts[7]);      // 92
+            AddVertex(pts[7]); // 92
             AddVertex(pts[8]);
             AddVertex(pts[24]);
             AddVertex(pts[23]);
 
 
             #region normals
-            AddNormal(Vector3.down);
-            AddNormal(Vector3.down);
-            AddNormal(Vector3.down);
-            AddNormal(Vector3.down);
 
             AddNormal(Vector3.down);
             AddNormal(Vector3.down);
@@ -788,10 +784,10 @@ namespace QuickPrimitives.Scripts
             AddNormal(Vector3.down);
             AddNormal(Vector3.down);
 
-            AddNormal(Vector3.up);
-            AddNormal(Vector3.up);
-            AddNormal(Vector3.up);
-            AddNormal(Vector3.up);
+            AddNormal(Vector3.down);
+            AddNormal(Vector3.down);
+            AddNormal(Vector3.down);
+            AddNormal(Vector3.down);
 
             AddNormal(Vector3.up);
             AddNormal(Vector3.up);
@@ -808,10 +804,10 @@ namespace QuickPrimitives.Scripts
             AddNormal(Vector3.up);
             AddNormal(Vector3.up);
 
-            AddNormal(Vector3.back);
-            AddNormal(Vector3.back);
-            AddNormal(Vector3.back);
-            AddNormal(Vector3.back);
+            AddNormal(Vector3.up);
+            AddNormal(Vector3.up);
+            AddNormal(Vector3.up);
+            AddNormal(Vector3.up);
 
             AddNormal(Vector3.back);
             AddNormal(Vector3.back);
@@ -823,7 +819,12 @@ namespace QuickPrimitives.Scripts
             AddNormal(Vector3.back);
             AddNormal(Vector3.back);
 
-            if(!properties.capThickness)
+            AddNormal(Vector3.back);
+            AddNormal(Vector3.back);
+            AddNormal(Vector3.back);
+            AddNormal(Vector3.back);
+
+            if (!properties.capThickness)
             {
                 AddNormal(Vector3.back);
                 AddNormal(Vector3.back);
@@ -837,9 +838,9 @@ namespace QuickPrimitives.Scripts
             }
             else
             {
-                Vector3 forwardNormal0 = new Vector3(-(properties.backThickness - properties.backCap), 
-                                                     0, 
-                                                     -(properties.width - properties.sideThickness) * 0.5f);
+                var forwardNormal0 = new Vector3(-(properties.backThickness - properties.backCap),
+                    0,
+                    -(properties.width - properties.sideThickness) * 0.5f);
                 forwardNormal0.Normalize();
 
                 AddNormal(forwardNormal0);
@@ -847,9 +848,9 @@ namespace QuickPrimitives.Scripts
                 AddNormal(forwardNormal0);
                 AddNormal(forwardNormal0);
 
-                Vector3 forwardNormal1 = new Vector3((properties.backThickness - properties.backCap),
-                                                     0,
-                                                     -(properties.width - properties.sideThickness) * 0.5f);
+                var forwardNormal1 = new Vector3(properties.backThickness - properties.backCap,
+                    0,
+                    -(properties.width - properties.sideThickness) * 0.5f);
                 forwardNormal1.Normalize();
                 AddNormal(forwardNormal1);
                 AddNormal(forwardNormal1);
@@ -886,9 +887,9 @@ namespace QuickPrimitives.Scripts
             }
             else
             {
-                Vector3 backNormal0 = new Vector3(properties.frontThickness - properties.frontCap,
-                                                  0,
-                                                  (properties.width - properties.sideThickness) * 0.5f);
+                var backNormal0 = new Vector3(properties.frontThickness - properties.frontCap,
+                    0,
+                    (properties.width - properties.sideThickness) * 0.5f);
                 backNormal0.Normalize();
 
                 AddNormal(backNormal0);
@@ -896,9 +897,9 @@ namespace QuickPrimitives.Scripts
                 AddNormal(backNormal0);
                 AddNormal(backNormal0);
 
-                Vector3 backNormal1 = new Vector3(-(properties.frontThickness - properties.frontCap),
-                                                  0,
-                                                  (properties.width - properties.sideThickness) * 0.5f);
+                var backNormal1 = new Vector3(-(properties.frontThickness - properties.frontCap),
+                    0,
+                    (properties.width - properties.sideThickness) * 0.5f);
                 backNormal1.Normalize();
                 AddNormal(backNormal1);
                 AddNormal(backNormal1);
@@ -935,12 +936,14 @@ namespace QuickPrimitives.Scripts
             AddNormal(Vector3.right);
             AddNormal(Vector3.right);
             AddNormal(Vector3.right);
+
             #endregion
 
             #region uv
-            float side0 = sideThickness / width * 0.5f;
 
-            AddUV(new Vector2(0, 1));   // bottom
+            var side0 = sideThickness / width * 0.5f;
+
+            AddUV(new Vector2(0, 1)); // bottom
             AddUV(new Vector2(0.5f - side0, 1));
             AddUV(new Vector2(0.5f + side0, 1));
             AddUV(new Vector2(1, 1));
@@ -977,7 +980,7 @@ namespace QuickPrimitives.Scripts
             else
                 AddUV(new Vector2(0, 1 - properties.frontCap / depth));
 
-            AddUV(new Vector2(0, 0));   // top
+            AddUV(new Vector2(0, 0)); // top
             AddUV(new Vector2(0.5f - side0, 0));
             AddUV(new Vector2(0.5f + side0, 0));
             AddUV(new Vector2(1, 0));
@@ -1012,7 +1015,7 @@ namespace QuickPrimitives.Scripts
                 AddUV(new Vector2(0, properties.frontCap / depth));
 
 
-            AddUV(new Vector2(0, 0));   // front
+            AddUV(new Vector2(0, 0)); // front
             AddUV(new Vector2(0.5f - side0, 0));
             AddUV(new Vector2(0.5f - side0, 1));
             AddUV(new Vector2(0, 1));
@@ -1027,7 +1030,7 @@ namespace QuickPrimitives.Scripts
             AddUV(new Vector2(1, 1));
             AddUV(new Vector2(0.5f + side0, 1));
 
-            AddUV(new Vector2(0, 0));   
+            AddUV(new Vector2(0, 0));
             AddUV(new Vector2(0.5f - side0, 0));
             AddUV(new Vector2(0.5f - side0, 1));
             AddUV(new Vector2(0, 1));
@@ -1037,8 +1040,8 @@ namespace QuickPrimitives.Scripts
             AddUV(new Vector2(1, 1));
             AddUV(new Vector2(0.5f + side0, 1));
 
-            AddUV(new Vector2(0, 0));   // back
-            AddUV(new Vector2(0.5f - side0, 0));    
+            AddUV(new Vector2(0, 0)); // back
+            AddUV(new Vector2(0.5f - side0, 0));
             AddUV(new Vector2(0.5f - side0, 1));
             AddUV(new Vector2(0, 1));
 
@@ -1052,7 +1055,7 @@ namespace QuickPrimitives.Scripts
             AddUV(new Vector2(1, 1));
             AddUV(new Vector2(0.5f + side0, 1));
 
-            AddUV(new Vector2(0, 0));   
+            AddUV(new Vector2(0, 0));
             AddUV(new Vector2(0.5f - side0, 0));
             AddUV(new Vector2(0.5f - side0, 1));
             AddUV(new Vector2(0, 1));
@@ -1062,7 +1065,7 @@ namespace QuickPrimitives.Scripts
             AddUV(new Vector2(1, 1));
             AddUV(new Vector2(0.5f + side0, 1));
 
-            AddUV(new Vector2(0, 0));   // left
+            AddUV(new Vector2(0, 0)); // left
             if (!properties.capThickness)
             {
                 AddUV(new Vector2(backThickness / depth, 0));
@@ -1073,6 +1076,7 @@ namespace QuickPrimitives.Scripts
                 AddUV(new Vector2(properties.backCap / (depth - backThickness + properties.backCap), 0));
                 AddUV(new Vector2(properties.backCap / (depth - backThickness + properties.backCap), 1));
             }
+
             AddUV(new Vector2(0, 1));
 
             if (!properties.capThickness)
@@ -1105,7 +1109,7 @@ namespace QuickPrimitives.Scripts
                 AddUV(new Vector2(1 - properties.frontCap / (depth - frontThickness + properties.frontCap), 1));
             }
 
-            AddUV(new Vector2(0, 0));   // right
+            AddUV(new Vector2(0, 0)); // right
             if (!properties.capThickness)
             {
                 AddUV(new Vector2(frontThickness / depth, 0));
@@ -1116,6 +1120,7 @@ namespace QuickPrimitives.Scripts
                 AddUV(new Vector2(properties.frontCap / (depth - frontThickness + properties.frontCap), 0));
                 AddUV(new Vector2(properties.frontCap / (depth - frontThickness + properties.frontCap), 1));
             }
+
             AddUV(new Vector2(0, 1));
 
             if (!properties.capThickness)
@@ -1147,24 +1152,27 @@ namespace QuickPrimitives.Scripts
                 AddUV(new Vector2(1, 1));
                 AddUV(new Vector2(1 - properties.backCap / (depth - backThickness + properties.backCap), 1));
             }
-            #endregion                                                                                                                                                                                                                                                                                                                  
+
+            #endregion
         }
+
         #endregion
 
         #region GenerateVerticesCType
+
         private void GenerateVerticesCType()
         {
-            float width = properties.width;
-            float height = properties.height;
-            float depth = properties.depth;
-            float frontThickness = properties.frontThickness;
-            float backThickness = properties.backThickness;
-            float sideThickness = properties.sideThickness;
+            var width = properties.width;
+            var height = properties.height;
+            var depth = properties.depth;
+            var frontThickness = properties.frontThickness;
+            var backThickness = properties.backThickness;
+            var sideThickness = properties.sideThickness;
 
-            float halfWidth = 0.5f * width;
-            float halfDepth = 0.5f * depth;
+            var halfWidth = 0.5f * width;
+            var halfDepth = 0.5f * depth;
 
-            Vector3[] pts = new Vector3[24];
+            var pts = new Vector3[24];
             if (!properties.capThickness)
             {
                 pts[0] = new Vector3(-halfWidth, 0, -halfDepth);
@@ -1255,45 +1263,45 @@ namespace QuickPrimitives.Scripts
             AddVertex(pts[23]);
 
             // front facing
-            AddVertex(pts[0]);  // 24
+            AddVertex(pts[0]); // 24
             AddVertex(pts[2]);
             AddVertex(pts[14]);
             AddVertex(pts[12]);
 
-            AddVertex(pts[5]);  // 28
+            AddVertex(pts[5]); // 28
             AddVertex(pts[6]);
             AddVertex(pts[18]);
             AddVertex(pts[17]);
 
             // back facing
-            AddVertex(pts[7]);  // 32
+            AddVertex(pts[7]); // 32
             AddVertex(pts[9]);
             AddVertex(pts[21]);
             AddVertex(pts[19]);
 
-            AddVertex(pts[3]);  // 36
+            AddVertex(pts[3]); // 36
             AddVertex(pts[4]);
             AddVertex(pts[16]);
             AddVertex(pts[15]);
 
             // left
-            AddVertex(pts[9]);  // 40
+            AddVertex(pts[9]); // 40
             AddVertex(pts[0]);
             AddVertex(pts[12]);
             AddVertex(pts[21]);
 
             // right
-            AddVertex(pts[2]);  // 44
+            AddVertex(pts[2]); // 44
             AddVertex(pts[3]);
             AddVertex(pts[15]);
             AddVertex(pts[14]);
 
-            AddVertex(pts[4]);  // 48
+            AddVertex(pts[4]); // 48
             AddVertex(pts[5]);
             AddVertex(pts[17]);
             AddVertex(pts[16]);
 
-            AddVertex(pts[6]);  // 52
+            AddVertex(pts[6]); // 52
             AddVertex(pts[7]);
             AddVertex(pts[19]);
             AddVertex(pts[18]);
@@ -1342,9 +1350,9 @@ namespace QuickPrimitives.Scripts
             }
             else
             {
-                Vector3 forwardNormal = new Vector3(properties.backThickness - properties.backCap,
-                                                    0,
-                                                    -(properties.width - properties.sideThickness));
+                var forwardNormal = new Vector3(properties.backThickness - properties.backCap,
+                    0,
+                    -(properties.width - properties.sideThickness));
                 forwardNormal.Normalize();
 
                 AddNormal(forwardNormal);
@@ -1367,9 +1375,9 @@ namespace QuickPrimitives.Scripts
             }
             else
             {
-                Vector3 backNormal = new Vector3(-(properties.frontThickness - properties.frontCap),
-                                                 0,
-                                                 properties.width - properties.sideThickness);
+                var backNormal = new Vector3(-(properties.frontThickness - properties.frontCap),
+                    0,
+                    properties.width - properties.sideThickness);
                 backNormal.Normalize();
 
                 AddNormal(backNormal);
@@ -1398,13 +1406,13 @@ namespace QuickPrimitives.Scripts
             AddNormal(Vector3.right);
             AddNormal(Vector3.right);
 
-            AddUV(new Vector2(0, 1));   // bottom
+            AddUV(new Vector2(0, 1)); // bottom
             AddUV(new Vector2(sideThickness / width, 1));
             AddUV(new Vector2(1, 1));
             if (!properties.capThickness)
                 AddUV(new Vector2(1, 1 - frontThickness / depth));
             else
-                AddUV(new Vector2(1, 1- properties.frontCap / depth));
+                AddUV(new Vector2(1, 1 - properties.frontCap / depth));
 
             AddUV(new Vector2(sideThickness / width, 1 - frontThickness / depth));
             AddUV(new Vector2(sideThickness / width, backThickness / depth));
@@ -1419,7 +1427,7 @@ namespace QuickPrimitives.Scripts
             AddUV(new Vector2(0, backThickness / depth));
             AddUV(new Vector2(0, 1 - frontThickness / depth));
 
-            AddUV(new Vector2(0, 0));   // top
+            AddUV(new Vector2(0, 0)); // top
             AddUV(new Vector2(sideThickness / width, 0));
             AddUV(new Vector2(1, 0));
             if (!properties.capThickness)
@@ -1441,32 +1449,32 @@ namespace QuickPrimitives.Scripts
             AddUV(new Vector2(0, 1 - backThickness / depth));
             AddUV(new Vector2(0, frontThickness / depth));
 
-            AddUV(new Vector2(0, 0));       // front
+            AddUV(new Vector2(0, 0)); // front
             AddUV(new Vector2(1, 0));
             AddUV(new Vector2(1, 1));
             AddUV(new Vector2(0, 1));
 
-            AddUV(new Vector2(sideThickness / width, 0));   
+            AddUV(new Vector2(sideThickness / width, 0));
             AddUV(new Vector2(1, 0));
             AddUV(new Vector2(1, 1));
-            AddUV(new Vector2(sideThickness / width, 1));        
+            AddUV(new Vector2(sideThickness / width, 1));
 
-            AddUV(new Vector2(0, 0));   // back
+            AddUV(new Vector2(0, 0)); // back
             AddUV(new Vector2(1, 0));
             AddUV(new Vector2(1, 1));
             AddUV(new Vector2(0, 1));
 
-            AddUV(new Vector2(1, 0));   
+            AddUV(new Vector2(1, 0));
             AddUV(new Vector2(sideThickness / width, 0));
             AddUV(new Vector2(sideThickness / width, 1));
             AddUV(new Vector2(1, 1));
 
-            AddUV(new Vector2(0, 0));   // left
+            AddUV(new Vector2(0, 0)); // left
             AddUV(new Vector2(1, 0));
             AddUV(new Vector2(1, 1));
             AddUV(new Vector2(0, 1));
 
-            AddUV(new Vector2(0, 0));   // right
+            AddUV(new Vector2(0, 0)); // right
             if (!properties.capThickness)
             {
                 AddUV(new Vector2(frontThickness / depth, 0));
@@ -1477,6 +1485,7 @@ namespace QuickPrimitives.Scripts
                 AddUV(new Vector2(properties.frontCap / (depth - frontThickness + properties.frontCap), 0));
                 AddUV(new Vector2(properties.frontCap / (depth - frontThickness + properties.frontCap), 1));
             }
+
             AddUV(new Vector2(0, 1));
 
             if (!properties.capThickness)
@@ -1509,19 +1518,21 @@ namespace QuickPrimitives.Scripts
                 AddUV(new Vector2(1 - properties.backCap / (depth - backThickness + properties.backCap), 1));
             }
         }
+
         #endregion
 
         #region GenerateVerticesTType
+
         private void GenerateVerticesTType()
         {
-            float width = properties.width;
-            float height = properties.height;
-            float depth = properties.depth;
+            var width = properties.width;
+            var height = properties.height;
+            var depth = properties.depth;
             //float frontThickness = properties.frontThickness;
-            float backThickness = properties.backThickness;
-            float sideThickness = properties.sideThickness;
+            var backThickness = properties.backThickness;
+            var sideThickness = properties.sideThickness;
 
-            Vector3[] pts = new Vector3[20];
+            var pts = new Vector3[20];
             if (!properties.capThickness)
             {
                 pts[0] = new Vector3(-sideThickness * 0.5f, 0, -depth * 0.5f);
@@ -1585,7 +1596,7 @@ namespace QuickPrimitives.Scripts
 
             // top face
             AddVertex(pts[10]);
-            AddVertex(pts[11]);           
+            AddVertex(pts[11]);
             AddVertex(pts[12]);
             AddVertex(pts[13]);
             AddVertex(pts[14]);
@@ -1596,60 +1607,61 @@ namespace QuickPrimitives.Scripts
             AddVertex(pts[19]);
 
             // front facing
-            AddVertex(pts[0]);      // 20
+            AddVertex(pts[0]); // 20
             AddVertex(pts[1]);
             AddVertex(pts[11]);
             AddVertex(pts[10]);
 
-            AddVertex(pts[2]);      // 24
+            AddVertex(pts[2]); // 24
             AddVertex(pts[3]);
             AddVertex(pts[13]);
             AddVertex(pts[12]);
 
-            AddVertex(pts[8]);      // 28
+            AddVertex(pts[8]); // 28
             AddVertex(pts[9]);
             AddVertex(pts[19]);
             AddVertex(pts[18]);
 
             // back facing
-            AddVertex(pts[4]);      // 32
+            AddVertex(pts[4]); // 32
             AddVertex(pts[5]);
             AddVertex(pts[15]);
             AddVertex(pts[14]);
 
-            AddVertex(pts[5]);      // 36
+            AddVertex(pts[5]); // 36
             AddVertex(pts[6]);
             AddVertex(pts[16]);
             AddVertex(pts[15]);
 
-            AddVertex(pts[6]);      // 40
+            AddVertex(pts[6]); // 40
             AddVertex(pts[7]);
             AddVertex(pts[17]);
             AddVertex(pts[16]);
 
             // left          
-            AddVertex(pts[7]);      // 44
+            AddVertex(pts[7]); // 44
             AddVertex(pts[8]);
             AddVertex(pts[18]);
             AddVertex(pts[17]);
 
-            AddVertex(pts[9]);      // 48
+            AddVertex(pts[9]); // 48
             AddVertex(pts[0]);
             AddVertex(pts[10]);
             AddVertex(pts[19]);
 
             // right
-            AddVertex(pts[1]);      // 52
+            AddVertex(pts[1]); // 52
             AddVertex(pts[2]);
             AddVertex(pts[12]);
             AddVertex(pts[11]);
 
-            AddVertex(pts[3]);      // 56
+            AddVertex(pts[3]); // 56
             AddVertex(pts[4]);
             AddVertex(pts[14]);
             AddVertex(pts[13]);
 
             #region normals
+
             AddNormal(Vector3.down);
             AddNormal(Vector3.down);
             AddNormal(Vector3.down);
@@ -1692,13 +1704,12 @@ namespace QuickPrimitives.Scripts
                 AddNormal(Vector3.back);
                 AddNormal(Vector3.back);
                 AddNormal(Vector3.back);
-
             }
             else
             {
-                Vector3 forwardNormal0 = new Vector3(-(properties.backThickness - properties.backCap),
-                                                    0,
-                                                    -(properties.width - properties.sideThickness) * 0.5f);
+                var forwardNormal0 = new Vector3(-(properties.backThickness - properties.backCap),
+                    0,
+                    -(properties.width - properties.sideThickness) * 0.5f);
                 forwardNormal0.Normalize();
 
                 AddNormal(forwardNormal0);
@@ -1706,9 +1717,9 @@ namespace QuickPrimitives.Scripts
                 AddNormal(forwardNormal0);
                 AddNormal(forwardNormal0);
 
-                Vector3 forwardNormal1 = new Vector3(properties.backThickness - properties.backCap,
-                                                    0,
-                                                    -(properties.width - properties.sideThickness) * 0.5f);
+                var forwardNormal1 = new Vector3(properties.backThickness - properties.backCap,
+                    0,
+                    -(properties.width - properties.sideThickness) * 0.5f);
                 forwardNormal1.Normalize();
 
                 AddNormal(forwardNormal1);
@@ -1752,9 +1763,9 @@ namespace QuickPrimitives.Scripts
             }
             else
             {
-                Vector3 leftNormal = new Vector3(-(properties.depth - properties.backThickness),
-                                                 0,
-                                                 -(properties.sideThickness - properties.sideCap) * 0.5f);
+                var leftNormal = new Vector3(-(properties.depth - properties.backThickness),
+                    0,
+                    -(properties.sideThickness - properties.sideCap) * 0.5f);
                 leftNormal.Normalize();
 
                 AddNormal(leftNormal);
@@ -1762,9 +1773,9 @@ namespace QuickPrimitives.Scripts
                 AddNormal(leftNormal);
                 AddNormal(leftNormal);
 
-                Vector3 rightNormal = new Vector3(properties.depth - properties.backThickness,
-                                                  0,
-                                                  -(properties.sideThickness - properties.sideCap) * 0.5f);
+                var rightNormal = new Vector3(properties.depth - properties.backThickness,
+                    0,
+                    -(properties.sideThickness - properties.sideCap) * 0.5f);
                 rightNormal.Normalize();
 
                 AddNormal(rightNormal);
@@ -1777,21 +1788,23 @@ namespace QuickPrimitives.Scripts
             AddNormal(Vector3.right);
             AddNormal(Vector3.right);
             AddNormal(Vector3.right);
+
             #endregion
 
             #region uv
-            float side0 = sideThickness / width * 0.5f;
-            float side1 = properties.sideCap * 0.5f / width;
+
+            var side0 = sideThickness / width * 0.5f;
+            var side1 = properties.sideCap * 0.5f / width;
             if (!properties.capThickness)
             {
-                AddUV(new Vector2(0.5f - side0, 1));   // bottom
+                AddUV(new Vector2(0.5f - side0, 1)); // bottom
                 AddUV(new Vector2(0.5f + side0, 1));
                 AddUV(new Vector2(0.5f + side0, backThickness / depth));
                 AddUV(new Vector2(1, backThickness / depth));
             }
             else
             {
-                AddUV(new Vector2(0.5f - side1, 1));   
+                AddUV(new Vector2(0.5f - side1, 1));
                 AddUV(new Vector2(0.5f + side1, 1));
                 AddUV(new Vector2(0.5f + side0, backThickness / depth));
                 AddUV(new Vector2(1, properties.backCap / depth));
@@ -1810,7 +1823,7 @@ namespace QuickPrimitives.Scripts
 
             if (!properties.capThickness)
             {
-                AddUV(new Vector2(0.5f - side0, 0));   // top
+                AddUV(new Vector2(0.5f - side0, 0)); // top
                 AddUV(new Vector2(0.5f + side0, 0));
                 AddUV(new Vector2(0.5f + side0, 1 - backThickness / depth));
                 AddUV(new Vector2(1, 1 - backThickness / depth));
@@ -1820,7 +1833,7 @@ namespace QuickPrimitives.Scripts
                 AddUV(new Vector2(0.5f - side1, 0));
                 AddUV(new Vector2(0.5f + side1, 0));
                 AddUV(new Vector2(0.5f + side0, 1 - backThickness / depth));
-                AddUV(new Vector2(1, 1- properties.backCap / depth));
+                AddUV(new Vector2(1, 1 - properties.backCap / depth));
             }
 
             AddUV(new Vector2(1, 1));
@@ -1834,8 +1847,8 @@ namespace QuickPrimitives.Scripts
                 AddUV(new Vector2(0, 1 - properties.backCap / depth));
             AddUV(new Vector2(0.5f - side0, 1 - backThickness / depth));
 
-          
-            if (!properties.capThickness)       // front
+
+            if (!properties.capThickness) // front
             {
                 AddUV(new Vector2(0.5f - side0, 0));
                 AddUV(new Vector2(0.5f + side0, 0));
@@ -1865,7 +1878,7 @@ namespace QuickPrimitives.Scripts
                 AddUV(new Vector2(0.5f + side1, 1));
             }
 
-            AddUV(new Vector2(0, 0));   // front left
+            AddUV(new Vector2(0, 0)); // front left
             if (!properties.capThickness)
             {
                 AddUV(new Vector2(0.5f - side0, 0));
@@ -1876,10 +1889,11 @@ namespace QuickPrimitives.Scripts
                 AddUV(new Vector2(0.5f - side1, 0));
                 AddUV(new Vector2(0.5f - side1, 1));
             }
+
             AddUV(new Vector2(0, 1));
 
 
-            AddUV(new Vector2(0, 0));   // back
+            AddUV(new Vector2(0, 0)); // back
             AddUV(new Vector2(0.5f - side0, 0));
             AddUV(new Vector2(0.5f - side0, 1));
             AddUV(new Vector2(0, 1));
@@ -1896,15 +1910,11 @@ namespace QuickPrimitives.Scripts
 
             float u0;
             if (!properties.capThickness)
-            {
                 u0 = backThickness / depth;
-            }
             else
-            {
                 u0 = properties.backCap / (depth - backThickness + properties.backCap);
-            }
 
-            AddUV(new Vector2(0, 0));   // left
+            AddUV(new Vector2(0, 0)); // left
             AddUV(new Vector2(u0, 0));
             AddUV(new Vector2(u0, 1));
             AddUV(new Vector2(0, 1));
@@ -1914,8 +1924,8 @@ namespace QuickPrimitives.Scripts
             AddUV(new Vector2(1, 1));
             AddUV(new Vector2(u0, 1));
 
-            float u1 = 1 - u0;
-            AddUV(new Vector2(0, 0));   // right
+            var u1 = 1 - u0;
+            AddUV(new Vector2(0, 0)); // right
             AddUV(new Vector2(u1, 0));
             AddUV(new Vector2(u1, 1));
             AddUV(new Vector2(0, 1));
@@ -1924,11 +1934,14 @@ namespace QuickPrimitives.Scripts
             AddUV(new Vector2(1, 0));
             AddUV(new Vector2(1, 1));
             AddUV(new Vector2(u1, 1));
-            #endregion           
+
+            #endregion
         }
+
         #endregion
 
         #region GenerateTrianglesLType
+
         private void GenerateTrianglesLType()
         {
             faces.Add(new TriangleIndices(2, 0, 1));
@@ -1972,9 +1985,11 @@ namespace QuickPrimitives.Scripts
             faces.Add(new TriangleIndices(36, 39, 37));
             faces.Add(new TriangleIndices(37, 39, 38));
         }
+
         #endregion
 
         #region GenerateTrianglesIType
+
         private void GenerateTrianglesIType()
         {
             // bottom
@@ -2073,9 +2088,11 @@ namespace QuickPrimitives.Scripts
             faces.Add(new TriangleIndices(92, 95, 93));
             faces.Add(new TriangleIndices(93, 95, 94));
         }
+
         #endregion
 
         #region GenerateTrianglesCType
+
         private void GenerateTrianglesCType()
         {
             // bottom
@@ -2138,9 +2155,11 @@ namespace QuickPrimitives.Scripts
             faces.Add(new TriangleIndices(53, 52, 54));
             faces.Add(new TriangleIndices(54, 52, 55));
         }
+
         #endregion
 
         #region GenerateTrianglesTType
+
         private void GenerateTrianglesTType()
         {
             // bottom
@@ -2203,6 +2222,7 @@ namespace QuickPrimitives.Scripts
             faces.Add(new TriangleIndices(56, 59, 57));
             faces.Add(new TriangleIndices(57, 59, 58));
         }
+
         #endregion
     }
 }

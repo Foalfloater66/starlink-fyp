@@ -6,7 +6,9 @@ namespace Attack.Cases
 {
     public class Equatorial : BaseCase
     {
-        public Equatorial(CityCreator cityCreator, Direction targetLinkDirection, GroundstationCollection groundstations, CustomCamera cam) : base(cityCreator, targetLinkDirection, groundstations, cam)
+        public Equatorial(CityCreator cityCreator, Direction targetLinkDirection,
+            GroundstationCollection groundstations, CustomCamera cam) : base(cityCreator, targetLinkDirection,
+            groundstations, cam)
         {
         }
 
@@ -22,7 +24,8 @@ namespace Attack.Cases
                 Cities.USACities();
                 Cities.SACities();
             }
-            if (new HashSet<Direction> { Direction.East, Direction.West, Direction.Any}.Contains(Ctx.Direction))
+
+            if (new HashSet<Direction> { Direction.East, Direction.West, Direction.Any }.Contains(Ctx.Direction))
             {
                 Cities.ASEANCities();
                 Cities.OceaniaCities();
@@ -49,7 +52,7 @@ namespace Attack.Cases
                         "Caracas",
                         "Maracaibo",
                         "Boston",
-                        "Chicago",
+                        "Chicago"
                     };
                 case Direction.North:
                     return new List<string>
@@ -69,9 +72,9 @@ namespace Attack.Cases
                         "Caracas",
                         "Maracaibo",
                         "Medellin",
-                        "Quito",
+                        "Quito"
                     };
-                    
+
                 case Direction.West:
                     return new List<string>
                     {
@@ -79,7 +82,7 @@ namespace Attack.Cases
                         "New York",
                         // "Miami",
                         "Caracas",
-                        "Maracaibo",
+                        "Maracaibo"
                         // "Boston",
                         // "Chicago",
                     };
@@ -94,10 +97,9 @@ namespace Attack.Cases
                         // North
                         "New York",
                         "Miami",
-                        "Caracas",
+                        "Caracas"
                     };
             }
-
         }
     }
 }

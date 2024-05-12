@@ -6,7 +6,9 @@ namespace Attack.Cases
 {
     public class TransOrbital : BaseCase
     {
-        public TransOrbital(CityCreator cityCreator, Direction targetLinkDirection, GroundstationCollection groundstations, CustomCamera cam) : base(cityCreator, targetLinkDirection, groundstations, cam)
+        public TransOrbital(CityCreator cityCreator, Direction targetLinkDirection,
+            GroundstationCollection groundstations, CustomCamera cam) : base(cityCreator, targetLinkDirection,
+            groundstations, cam)
         {
         }
 
@@ -23,7 +25,7 @@ namespace Attack.Cases
         protected override void CreateTargetCoordinates()
         {
             // Denver, USA
-            Ctx.Latitude = 39.73f; 
+            Ctx.Latitude = 39.73f;
             Ctx.Longitude = 104.99f;
         }
 

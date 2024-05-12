@@ -12,6 +12,7 @@ namespace QuickPrimitives.Scripts
             public int segments = 8;
 
             public bool doubleSided = false;
+
             public enum FaceDirection
             {
                 Left,
@@ -28,27 +29,23 @@ namespace QuickPrimitives.Scripts
             {
                 base.CopyFrom(source);
 
-                this.radius = source.radius;
-                this.segments = source.segments;
-                this.doubleSided = source.doubleSided;
-                this.direction = source.direction;
+                radius = source.radius;
+                segments = source.segments;
+                doubleSided = source.doubleSided;
+                direction = source.direction;
             }
 
             public bool Modified(QcCircleProperties source)
             {
-                if ((this.radius == source.radius) && (this.segments == source.segments) &&
-                    (this.direction == source.direction) &&
-                    (this.doubleSided == source.doubleSided) &&
-                    (this.genTextureCoords == source.genTextureCoords) &&
-                    (this.addCollider == source.addCollider) &&
-                    (this.offset[0] == source.offset[0]) && (this.offset[1] == source.offset[1]) && (this.offset[2] == source.offset[2]))
-                {
+                if (radius == source.radius && segments == source.segments &&
+                    direction == source.direction &&
+                    doubleSided == source.doubleSided &&
+                    genTextureCoords == source.genTextureCoords &&
+                    addCollider == source.addCollider &&
+                    offset[0] == source.offset[0] && offset[1] == source.offset[1] && offset[2] == source.offset[2])
                     return false;
-                }
                 else
-                {
                     return true;
-                }
             }
         }
 
@@ -65,32 +62,24 @@ namespace QuickPrimitives.Scripts
         }
 
         #region BuildGeometry
+
         protected override void BuildGeometry()
         {
-            MeshFilter meshFilter = gameObject.GetComponent<MeshFilter>();
-            if (meshFilter == null)
-            {
-                meshFilter = gameObject.AddComponent<MeshFilter>();
-            }
+            var meshFilter = gameObject.GetComponent<MeshFilter>();
+            if (meshFilter == null) meshFilter = gameObject.AddComponent<MeshFilter>();
 
-            MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
-            if (meshRenderer == null)
-            {
-                meshRenderer = gameObject.AddComponent<MeshRenderer>();
-            }
+            var meshRenderer = gameObject.GetComponent<MeshRenderer>();
+            if (meshRenderer == null) meshRenderer = gameObject.AddComponent<MeshRenderer>();
 
             ClearVertices();
 
             GenerateVertices();
             GenerateTriangles();
 
-            if (properties.offset != Vector3.zero)
-            {
-                AddOffset(properties.offset);
-            }
+            if (properties.offset != Vector3.zero) AddOffset(properties.offset);
 
-            int[] triangles = new int[faces.Count * 3];
-            int ti = 0;
+            var triangles = new int[faces.Count * 3];
+            var ti = 0;
             foreach (var tri in faces)
             {
                 triangles[ti] = tri.v1;
@@ -100,7 +89,7 @@ namespace QuickPrimitives.Scripts
                 ti += 3;
             }
 
-            Mesh mesh = new Mesh();
+            var mesh = new Mesh();
 
             meshFilter.sharedMesh = mesh;
 
@@ -119,25 +108,24 @@ namespace QuickPrimitives.Scripts
 
             mesh.RecalculateBounds();
         }
+
         #endregion
 
         #region RebuildGeometry
+
         public override void RebuildGeometry()
         {
-            MeshFilter meshFilter = gameObject.GetComponent<MeshFilter>();
+            var meshFilter = gameObject.GetComponent<MeshFilter>();
 
             ClearVertices();
 
             GenerateVertices();
             GenerateTriangles();
 
-            if (properties.offset != Vector3.zero)
-            {
-                AddOffset(properties.offset);
-            }
+            if (properties.offset != Vector3.zero) AddOffset(properties.offset);
 
-            int[] triangles = new int[faces.Count * 3];
-            int index = 0;
+            var triangles = new int[faces.Count * 3];
+            var index = 0;
             foreach (var tri in faces)
             {
                 triangles[index] = tri.v1;
@@ -168,256 +156,267 @@ namespace QuickPrimitives.Scripts
                 meshFilter.sharedMesh.RecalculateBounds();
             }
         }
+
         #endregion
 
         #region GenerateVertices
+
         private void GenerateVertices()
         {
-            int segments = properties.segments;
-            float radius = properties.radius;
+            var segments = properties.segments;
+            var radius = properties.radius;
 
             if (properties.doubleSided)
-            {
                 switch (properties.direction)
                 {
                     case QcCircleProperties.FaceDirection.Forward:
                     case QcCircleProperties.FaceDirection.Back:
                     default:
-                        AddVertex(Vector3.zero);      // center vertex
+                        AddVertex(Vector3.zero); // center vertex
                         AddNormal(Vector3.back);
                         AddUV(new Vector2(0.5f, 0.5f));
 
-                        for (int i = 0; i < segments; ++i)
+                        for (var i = 0; i < segments; ++i)
                         {
-                            float a1 = twoPi * (float)i / segments;
-                            float sin1 = Mathf.Sin(a1);
-                            float cos1 = Mathf.Cos(a1);
+                            var a1 = twoPi * (float)i / segments;
+                            var sin1 = Mathf.Sin(a1);
+                            var cos1 = Mathf.Cos(a1);
 
                             AddVertex(new Vector3(radius * cos1, radius * sin1, 0));
                             AddNormal(Vector3.back);
                             AddUV(new Vector2((cos1 + 1f) * 0.5f, (sin1 + 1f) * 0.5f));
                         }
-                    
-                        AddVertex(Vector3.zero);      // center vertex
+
+                        AddVertex(Vector3.zero); // center vertex
                         AddNormal(Vector3.forward);
                         AddUV(new Vector2(0.5f, 0.5f));
 
-                        for (int i = 0; i < segments; ++i)
+                        for (var i = 0; i < segments; ++i)
                         {
-                            float a1 = -twoPi * (float)i / segments;
-                            float sin1 = Mathf.Sin(a1);
-                            float cos1 = Mathf.Cos(a1);
+                            var a1 = -twoPi * (float)i / segments;
+                            var sin1 = Mathf.Sin(a1);
+                            var cos1 = Mathf.Cos(a1);
 
                             AddVertex(new Vector3(radius * cos1, radius * sin1, 0));
                             AddNormal(Vector3.forward);
                             AddUV(new Vector2((-cos1 + 1f) * 0.5f, (sin1 + 1f) * 0.5f));
                         }
+
                         break;
 
                     case QcCircleProperties.FaceDirection.Left:
                     case QcCircleProperties.FaceDirection.Right:
-                        AddVertex(Vector3.zero);      // center vertex
+                        AddVertex(Vector3.zero); // center vertex
                         AddNormal(Vector3.left);
                         AddUV(new Vector2(0.5f, 0.5f));
 
-                        for (int i = 0; i < segments; ++i)
+                        for (var i = 0; i < segments; ++i)
                         {
-                            float a1 = twoPi * (float)i / segments;
-                            float sin1 = Mathf.Sin(a1);
-                            float cos1 = Mathf.Cos(a1);
+                            var a1 = twoPi * (float)i / segments;
+                            var sin1 = Mathf.Sin(a1);
+                            var cos1 = Mathf.Cos(a1);
 
                             AddVertex(new Vector3(0, radius * sin1, -radius * cos1));
                             AddNormal(Vector3.left);
                             AddUV(new Vector2((cos1 + 1f) * 0.5f, (sin1 + 1f) * 0.5f));
                         }
 
-                        AddVertex(Vector3.zero);      // center vertex
+                        AddVertex(Vector3.zero); // center vertex
                         AddNormal(Vector3.right);
                         AddUV(new Vector2(0.5f, 0.5f));
 
-                        for (int i = 0; i < segments; ++i)
+                        for (var i = 0; i < segments; ++i)
                         {
-                            float a1 = -twoPi * (float)i / segments;
-                            float sin1 = Mathf.Sin(a1);
-                            float cos1 = Mathf.Cos(a1);
+                            var a1 = -twoPi * (float)i / segments;
+                            var sin1 = Mathf.Sin(a1);
+                            var cos1 = Mathf.Cos(a1);
 
                             AddVertex(new Vector3(0, radius * sin1, -radius * cos1));
                             AddNormal(Vector3.right);
                             AddUV(new Vector2((-cos1 + 1f) * 0.5f, (sin1 + 1f) * 0.5f));
                         }
+
                         break;
 
                     case QcCircleProperties.FaceDirection.Up:
                     case QcCircleProperties.FaceDirection.Down:
-                        AddVertex(Vector3.zero);      // center vertex
+                        AddVertex(Vector3.zero); // center vertex
                         AddNormal(Vector3.up);
                         AddUV(new Vector2(0.5f, 0.5f));
 
-                        for (int i = 0; i < segments; ++i)
+                        for (var i = 0; i < segments; ++i)
                         {
-                            float a1 = -twoPi * (float)i / segments;
-                            float sin1 = Mathf.Sin(a1);
-                            float cos1 = Mathf.Cos(a1);
+                            var a1 = -twoPi * (float)i / segments;
+                            var sin1 = Mathf.Sin(a1);
+                            var cos1 = Mathf.Cos(a1);
 
                             AddVertex(new Vector3(radius * cos1, 0, -radius * sin1));
                             AddNormal(Vector3.up);
                             AddUV(new Vector2((cos1 + 1f) * 0.5f, (-sin1 + 1f) * 0.5f));
                         }
-                    
-                        AddVertex(Vector3.zero);      // center vertex
+
+                        AddVertex(Vector3.zero); // center vertex
                         AddNormal(Vector3.down);
                         AddUV(new Vector2(0.5f, 0.5f));
 
-                        for (int i = 0; i < segments; ++i)
+                        for (var i = 0; i < segments; ++i)
                         {
-                            float a1 = twoPi * (float)i / segments;
-                            float sin1 = Mathf.Sin(a1);
-                            float cos1 = Mathf.Cos(a1);
+                            var a1 = twoPi * (float)i / segments;
+                            var sin1 = Mathf.Sin(a1);
+                            var cos1 = Mathf.Cos(a1);
 
                             AddVertex(new Vector3(radius * cos1, 0, -radius * sin1));
                             AddNormal(Vector3.down);
                             AddUV(new Vector2((cos1 + 1f) * 0.5f, (sin1 + 1f) * 0.5f));
                         }
+
                         break;
                 }
-            }
             else
-            {
                 switch (properties.direction)
                 {
                     case QcCircleProperties.FaceDirection.Forward:
                     default:
-                        AddVertex(Vector3.zero);      // center vertex
+                        AddVertex(Vector3.zero); // center vertex
                         AddNormal(Vector3.back);
                         AddUV(new Vector2(0.5f, 0.5f));
 
-                        for (int i = 0; i < segments; ++i)
+                        for (var i = 0; i < segments; ++i)
                         {
-                            float a1 = twoPi * (float)i / segments;
-                            float sin1 = Mathf.Sin(a1);
-                            float cos1 = Mathf.Cos(a1);
+                            var a1 = twoPi * (float)i / segments;
+                            var sin1 = Mathf.Sin(a1);
+                            var cos1 = Mathf.Cos(a1);
 
                             AddVertex(new Vector3(radius * cos1, radius * sin1, 0));
                             AddNormal(Vector3.back);
                             AddUV(new Vector2((cos1 + 1f) * 0.5f, (sin1 + 1f) * 0.5f));
                         }
+
                         break;
 
                     case QcCircleProperties.FaceDirection.Back:
-                        AddVertex(Vector3.zero);      // center vertex
+                        AddVertex(Vector3.zero); // center vertex
                         AddNormal(Vector3.forward);
                         AddUV(new Vector2(0.5f, 0.5f));
 
-                        for (int i = 0; i < segments; ++i)
+                        for (var i = 0; i < segments; ++i)
                         {
-                            float a1 = -twoPi * (float)i / segments;
-                            float sin1 = Mathf.Sin(a1);
-                            float cos1 = Mathf.Cos(a1);
+                            var a1 = -twoPi * (float)i / segments;
+                            var sin1 = Mathf.Sin(a1);
+                            var cos1 = Mathf.Cos(a1);
 
                             AddVertex(new Vector3(radius * cos1, radius * sin1, 0));
                             AddNormal(Vector3.forward);
                             AddUV(new Vector2((-cos1 + 1f) * 0.5f, (sin1 + 1f) * 0.5f));
                         }
+
                         break;
 
                     case QcCircleProperties.FaceDirection.Left:
-                        AddVertex(Vector3.zero);      // center vertex
+                        AddVertex(Vector3.zero); // center vertex
                         AddNormal(Vector3.left);
                         AddUV(new Vector2(0.5f, 0.5f));
 
-                        for (int i = 0; i < segments; ++i)
+                        for (var i = 0; i < segments; ++i)
                         {
-                            float a1 = twoPi * (float)i / segments;
-                            float sin1 = Mathf.Sin(a1);
-                            float cos1 = Mathf.Cos(a1);
+                            var a1 = twoPi * (float)i / segments;
+                            var sin1 = Mathf.Sin(a1);
+                            var cos1 = Mathf.Cos(a1);
 
                             AddVertex(new Vector3(0, radius * sin1, -radius * cos1));
                             AddNormal(Vector3.left);
                             AddUV(new Vector2((cos1 + 1f) * 0.5f, (sin1 + 1f) * 0.5f));
                         }
+
                         break;
 
                     case QcCircleProperties.FaceDirection.Right:
-                        AddVertex(Vector3.zero);      // center vertex
+                        AddVertex(Vector3.zero); // center vertex
                         AddNormal(Vector3.right);
                         AddUV(new Vector2(0.5f, 0.5f));
 
-                        for (int i = 0; i < segments; ++i)
+                        for (var i = 0; i < segments; ++i)
                         {
-                            float a1 = -twoPi * (float)i / segments;
-                            float sin1 = Mathf.Sin(a1);
-                            float cos1 = Mathf.Cos(a1);
+                            var a1 = -twoPi * (float)i / segments;
+                            var sin1 = Mathf.Sin(a1);
+                            var cos1 = Mathf.Cos(a1);
 
                             AddVertex(new Vector3(0, radius * sin1, -radius * cos1));
                             AddNormal(Vector3.right);
                             AddUV(new Vector2((-cos1 + 1f) * 0.5f, (sin1 + 1f) * 0.5f));
                         }
+
                         break;
 
                     case QcCircleProperties.FaceDirection.Up:
-                        AddVertex(Vector3.zero);      // center vertex
+                        AddVertex(Vector3.zero); // center vertex
                         AddNormal(Vector3.up);
                         AddUV(new Vector2(0.5f, 0.5f));
 
-                        for (int i = 0; i < segments; ++i)
+                        for (var i = 0; i < segments; ++i)
                         {
-                            float a1 = -twoPi * (float)i / segments;
-                            float sin1 = Mathf.Sin(a1);
-                            float cos1 = Mathf.Cos(a1);
+                            var a1 = -twoPi * (float)i / segments;
+                            var sin1 = Mathf.Sin(a1);
+                            var cos1 = Mathf.Cos(a1);
 
                             AddVertex(new Vector3(radius * cos1, 0, -radius * sin1));
                             AddNormal(Vector3.up);
                             AddUV(new Vector2((cos1 + 1f) * 0.5f, (-sin1 + 1f) * 0.5f));
                         }
+
                         break;
 
                     case QcCircleProperties.FaceDirection.Down:
-                        AddVertex(Vector3.zero);      // center vertex
+                        AddVertex(Vector3.zero); // center vertex
                         AddNormal(Vector3.down);
                         AddUV(new Vector2(0.5f, 0.5f));
 
-                        for (int i = 0; i < segments; ++i)
+                        for (var i = 0; i < segments; ++i)
                         {
-                            float a1 = twoPi * (float)i / segments;
-                            float sin1 = Mathf.Sin(a1);
-                            float cos1 = Mathf.Cos(a1);
+                            var a1 = twoPi * (float)i / segments;
+                            var sin1 = Mathf.Sin(a1);
+                            var cos1 = Mathf.Cos(a1);
 
                             AddVertex(new Vector3(radius * cos1, 0, -radius * sin1));
                             AddNormal(Vector3.down);
                             AddUV(new Vector2((cos1 + 1f) * 0.5f, (sin1 + 1f) * 0.5f));
                         }
+
                         break;
                 }
-            }
         }
+
         #endregion
 
         #region GenerateTriangles
+
         private void GenerateTriangles()
         {
             if (properties.doubleSided)
             {
-                for (int i = 0; i < properties.segments; ++i)
+                for (var i = 0; i < properties.segments; ++i)
                 {
-                    int baseIndex = i + 1;
+                    var baseIndex = i + 1;
                     faces.Add(new TriangleIndices(baseIndex, 0, (i + 1) % properties.segments + 1));
                 }
 
-                for (int i = 0; i < properties.segments; ++i)
+                for (var i = 0; i < properties.segments; ++i)
                 {
-                    int baseIndex = i + properties.segments + 2;
-                    faces.Add(new TriangleIndices(baseIndex, properties.segments + 1, (i + 1) % properties.segments + properties.segments + 2));
+                    var baseIndex = i + properties.segments + 2;
+                    faces.Add(new TriangleIndices(baseIndex, properties.segments + 1,
+                        (i + 1) % properties.segments + properties.segments + 2));
                 }
             }
             else
             {
-                for (int i = 0; i < properties.segments; ++i)
+                for (var i = 0; i < properties.segments; ++i)
                 {
-                    int baseIndex = i + 1;
+                    var baseIndex = i + 1;
                     faces.Add(new TriangleIndices(baseIndex, 0, baseIndex % properties.segments + 1));
                 }
             }
         }
+
         #endregion
 
         private void SetBoxCollider()
@@ -445,11 +444,8 @@ namespace QuickPrimitives.Scripts
 
             if (properties.addCollider)
             {
-                BoxCollider collider = gameObject.GetComponent<BoxCollider>();
-                if (collider == null)
-                {
-                    collider = gameObject.AddComponent<BoxCollider>();
-                }
+                var collider = gameObject.GetComponent<BoxCollider>();
+                if (collider == null) collider = gameObject.AddComponent<BoxCollider>();
 
                 const float thickness = 0.001f;
 
@@ -477,11 +473,8 @@ namespace QuickPrimitives.Scripts
             }
             else
             {
-                BoxCollider collider = gameObject.GetComponent<BoxCollider>();
-                if (collider != null)
-                {
-                    collider.enabled = false;
-                }
+                var collider = gameObject.GetComponent<BoxCollider>();
+                if (collider != null) collider.enabled = false;
             }
         }
     }

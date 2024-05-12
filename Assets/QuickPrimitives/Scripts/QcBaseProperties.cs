@@ -11,9 +11,9 @@ namespace QuickPrimitives.Scripts
 
         public void CopyFrom(QcBaseProperties source)
         {
-            this.offset = source.offset;
-            this.genTextureCoords = source.genTextureCoords;
-            this.addCollider = source.addCollider;
+            offset = source.offset;
+            genTextureCoords = source.genTextureCoords;
+            addCollider = source.addCollider;
         }
     }
 }

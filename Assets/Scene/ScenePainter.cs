@@ -10,6 +10,7 @@ namespace Scene
     {
         public Satellite sat1, sat2;
         public Node node1, node2;
+
         public ActiveISL(Satellite sat1_, Node node1_, Satellite sat2_, Node node2_)
         {
             sat1 = sat1_;
@@ -24,6 +25,7 @@ namespace Scene
         public Satellite sat;
         public GameObject city;
         public Node node1, node2;
+
         public ActiveRF(GameObject city_, Node node1_, Satellite sat_, Node node2_)
         {
             city = city_;
@@ -72,7 +74,8 @@ namespace Scene
         /// <summary>
         /// Constructor creating a <c>ScenePainter</c> object with new empty of <c>UsedISLLinks</c> and <c>UsedRFLinks</c> links.
         /// </summary>
-        public ScenePainter(Material isl_material, Material[] laserMaterials, Material[] target_link_materials, Material cityMaterial)
+        public ScenePainter(Material isl_material, Material[] laserMaterials, Material[] target_link_materials,
+            Material cityMaterial)
         {
             UsedISLLinks = new List<ActiveISL>();
             UsedRFLinks = new List<ActiveRF>();
@@ -88,11 +91,8 @@ namespace Scene
         /// <param name="city">City object</param>
         public void ChangeCityMaterial(GameObject city)
         {
-            Renderer[] renderers = city.GetComponentsInChildren<Renderer>();
-            foreach (Renderer r in renderers)
-            {
-                r.material = _cityMaterial;
-            }
+            var renderers = city.GetComponentsInChildren<Renderer>();
+            foreach (var r in renderers) r.material = _cityMaterial;
         }
 
         /// <summary>
@@ -133,13 +133,9 @@ namespace Scene
         public void ColorTargetISLLink(Satellite prevsat, Satellite sat, Node prevnode, Node node, bool flooded)
         {
             if (flooded)
-            {
                 ColorISLLink(prevsat, sat, prevnode, node, _target_link_materials[1]);
-            }
             else
-            {
                 ColorISLLink(prevsat, sat, prevnode, node, _target_link_materials[0]);
-            }
         }
 
         /// <summary>
@@ -162,32 +158,20 @@ namespace Scene
         /// <param name="maxsats">Maximum number of satellites in the graph.</param>
         public void UpdateLasers(Satellite[] satlist, int maxsats, float speed)
         {
-            // UsedRFLinks.ForEach(a => a.sat.LinkOn(a.city));
+            UsedRFLinks.ForEach(a => a.sat.LinkOn(a.city));
 
             /* assign all the lasers that both sides agree on */
-            for (int satnum = 0; satnum < maxsats; satnum++)
-            {
-                satlist[satnum].ClearAssignment();
-            }
+            for (var satnum = 0; satnum < maxsats; satnum++) satlist[satnum].ClearAssignment();
 
-            for (int satnum = 0; satnum < maxsats; satnum++)
-            {
-                satlist[satnum].UsePreAssigned();
-            }
+            for (var satnum = 0; satnum < maxsats; satnum++) satlist[satnum].UsePreAssigned();
 
             /* finalize the choices, and draw the lasers */
-            for (int satnum = 0; satnum < maxsats; satnum++)
-            {
-                satlist[satnum].FinalizeLasers(speed, _isl_material);
-            }
+            for (var satnum = 0; satnum < maxsats; satnum++) satlist[satnum].FinalizeLasers(speed, _isl_material);
         }
 
         public void TurnLasersOff(Satellite[] satlist, int maxsats)
         {
-            for (int satnum = 0; satnum < maxsats; satnum++)
-            {
-                satlist[satnum].LinkOff();
-            }
+            for (var satnum = 0; satnum < maxsats; satnum++) satlist[satnum].LinkOff();
         }
 
 
@@ -198,7 +182,7 @@ namespace Scene
         {
             while (UsedISLLinks.Count > 0)
             {
-                ActiveISL isl = UsedISLLinks[0];
+                var isl = UsedISLLinks[0];
                 isl.sat1.ColorLink(isl.sat2, _isl_material);
                 isl.sat2.ColorLink(isl.sat1, _isl_material);
                 UsedISLLinks.RemoveAt(0);
@@ -212,7 +196,7 @@ namespace Scene
         {
             while (UsedRFLinks.Count > 0)
             {
-                ActiveRF rf = UsedRFLinks[0];
+                var rf = UsedRFLinks[0];
                 UsedRFLinks.RemoveAt(0);
             }
         }

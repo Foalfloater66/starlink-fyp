@@ -7,7 +7,8 @@ namespace Attack.Cases
     // TODO: finish this example case.
     public class Polar : BaseCase
     {
-        public Polar(CityCreator cityCreator, Direction targetLinkDirection, GroundstationCollection groundstations, CustomCamera cam) : base(cityCreator, targetLinkDirection, groundstations, cam)
+        public Polar(CityCreator cityCreator, Direction targetLinkDirection, GroundstationCollection groundstations,
+            CustomCamera cam) : base(cityCreator, targetLinkDirection, groundstations, cam)
         {
         }
 
@@ -43,7 +44,7 @@ namespace Attack.Cases
                         "Calgary",
                         "Ottawa",
                         "Vancouver",
-                        "Brampton",
+                        "Brampton"
                     };
                 case Direction.West:
                     return new List<string>
@@ -78,7 +79,7 @@ namespace Attack.Cases
                         "Calgary",
                         "Ottawa",
                         "Vancouver",
-                        "Brampton",
+                        "Brampton"
                     };
                 case Direction.Any:
                 default:
@@ -91,10 +92,9 @@ namespace Attack.Cases
                         // African cities (Southern region)
                         "Johannesburg",
                         "Cape Town",
-                        "Durban",
+                        "Durban"
                     };
             }
-
         }
     }
 }

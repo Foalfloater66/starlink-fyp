@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Routing
@@ -5,15 +6,13 @@ namespace Routing
     /**
     * @author Morgane Marie Ohlig
     */
-
     /// <summary>
     /// Class <c>LinkCapacityMonitor</c> maps links to their current capacity and provides methods to modify these capacities. Links are full duplex; they are unidirectional only. Therefore, for two nodes `a` and `b`, we have the following link property `(a, b) != `(b, a)`.
     /// A link's <c>capacity</c> is the number of additional mbits it can carry. If the capacity reaches 0, then the link is considered saturated. If the capacity is strictly below 0, then the link is considered flooded.
     /// The <c>LinkCapacityMonitor</c> provides capacity monitoring for both inter-satellite links (ISL) and radio frequency (RF) links.
     /// </summary>
-    public class LinkCapacityMonitor
+    public class LinkCapacityMonitor : ICloneable
     {
-
         /// <value>
         /// Dictionary containing inter-satellite links with a set capacity.
         /// Keys are link names of format (src_id, dest_id) and values are integers in mbits.
@@ -29,8 +28,9 @@ namespace Routing
         /// <value>
         /// Initial maximum capacity of any link in the network.
         /// </value>
-        private int _initialISLCapacity = 20000;  // 20 Gbps
-        private int _initialRFCapacity = 4000;           // 4 Gbps
+        private int _initialISLCapacity = 20000; // 20 Gbps
+
+        private int _initialRFCapacity = 4000; // 4 Gbps
 
         /// <summary>
         /// Constructor initializing the <c>LinkCapacityMonitor</c> object and its`_initial_capacity` and `_capacities`.
@@ -40,6 +40,12 @@ namespace Routing
         {
             _ISLcapacities = new Dictionary<(int, int), int>();
             _RFcapacities = new Dictionary<(string, string), int>();
+        }
+
+        public LinkCapacityMonitor(LinkCapacityMonitor monitor)
+        {
+            _ISLcapacities = new Dictionary<(int, int), int>(monitor._ISLcapacities);
+            _RFcapacities = new Dictionary<(string, string), int>(monitor._RFcapacities);
         }
 
         /// <summary>
@@ -59,9 +65,7 @@ namespace Routing
         private void _AddMissingLink(int src_id, int dest_id)
         {
             if (!_ISLcapacities.ContainsKey((src_id, dest_id)))
-            {
                 _ISLcapacities.Add((src_id, dest_id), _initialISLCapacity);
-            }
         }
 
         /// <summary>
@@ -72,9 +76,7 @@ namespace Routing
         private void _AddMissingLink(string src_name, string dest_name)
         {
             if (!_RFcapacities.ContainsKey((src_name, dest_name)))
-            {
                 _RFcapacities.Add((src_name, dest_name), _initialRFCapacity);
-            }
         }
 
         /// <summary>
@@ -142,5 +144,12 @@ namespace Routing
             _AddMissingLink(src_name, dest_name);
             return _RFcapacities[(src_name, dest_name)];
         }
-}
+
+        public object Clone()
+        {
+            return new LinkCapacityMonitor(this);
+
+            // throw new NotImplementedException();
+        }
+    }
 }

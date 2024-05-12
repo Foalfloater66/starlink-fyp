@@ -7,8 +7,8 @@ namespace Orbits
         public Satellite[] satlist;
         public float km_per_unit;
         public int maxsats;
-        public  float maxdist;
-        public  float margin;
+        public float maxdist;
+        public float margin;
     }
 
 

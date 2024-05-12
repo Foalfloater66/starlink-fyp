@@ -5,7 +5,8 @@ namespace Attack.Cases
 {
     public static class CasesFactory
     {
-        public static BaseCase GetCase(CaseChoice choice, CityCreator cities, Direction targetLinkDirection, GroundstationCollection groundstations, CustomCamera cam)
+        public static BaseCase GetCase(CaseChoice choice, CityCreator cities, Direction targetLinkDirection,
+            GroundstationCollection groundstations, CustomCamera cam)
         {
             switch (choice)
             {

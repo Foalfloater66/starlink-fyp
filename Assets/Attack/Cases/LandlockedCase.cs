@@ -6,9 +6,10 @@ namespace Attack.Cases
 {
     public class LandlockedCase : BaseCase
     {
-        public LandlockedCase(CityCreator cityCreator, Direction targetLinkDirection, GroundstationCollection groundstations, CustomCamera cam) : base(cityCreator, targetLinkDirection, groundstations, cam)
+        public LandlockedCase(CityCreator cityCreator, Direction targetLinkDirection,
+            GroundstationCollection groundstations, CustomCamera cam) : base(cityCreator, targetLinkDirection,
+            groundstations, cam)
         {
-            
         }
 
         protected override void SetupCameras(CustomCamera cam)
@@ -40,7 +41,7 @@ namespace Attack.Cases
                         "Los Angeles",
                         "El Paso",
                         "Houston",
-                        "Denver",
+                        "Denver"
                     };
                 case Direction.West:
                 {
@@ -51,7 +52,7 @@ namespace Attack.Cases
                         "Chicago",
                         "Winnipeg",
                         "Edmundston",
-                        "Montreal",
+                        "Montreal"
                     };
                 }
                 case Direction.North:
@@ -74,10 +75,10 @@ namespace Attack.Cases
                         "Chicago",
                         "Winnipeg",
                         "Edmundston",
-                        "Montreal",
+                        "Montreal"
                     };
                 }
-                case Direction.Any: 
+                case Direction.Any:
                 default:
                     return new List<string>
                     {

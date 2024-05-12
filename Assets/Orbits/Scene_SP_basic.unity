@@ -485,17 +485,12 @@ MonoBehaviour:
   use_isls: 1
   direction: 1
   directionChangeSpeed: 2
-  attack_radius: 1000
-  captureMode: 0
+  graph_on: 0
   orbit: {fileID: 1172864837802712, guid: 3b4a1d43d21bf42d8ad02077259400de, type: 3}
   satellite: {fileID: 1842355326392174, guid: 7327322cd40cd49898f0f3e031d063e4, type: 3}
   laser: {fileID: 1648504976000122, guid: 88944ffc92ba14ec5a48961205eeab10, type: 3}
   thin_laser: {fileID: 1648504976000122, guid: d79140fe819d64f8980864f3fa028b6d, type: 3}
   city_prefab: {fileID: 1240812473641584, guid: dca4c6136c32540cbbb49eb487de1c9d,
-    type: 3}
-  beam_prefab: {fileID: 1179252676941566, guid: 4f91908e9c1b94fa9865a33a3dec4b0b,
-    type: 3}
-  beam_prefab2: {fileID: 1454064570112744, guid: ae0115a2e33c24b7d92d193312575599,
     type: 3}
   isl_material: {fileID: 2100000, guid: 054725efd433545d0867a6c84dd8b574, type: 2}
   laserMaterials:
@@ -509,14 +504,16 @@ MonoBehaviour:
   cityMaterial: {fileID: 2100000, guid: d6795a24fec3f4b478a2532645da09a8, type: 2}
   leftbottom: {fileID: 485043185}
   rightbottom: {fileID: 1204926847}
-  maxorbits: 24
-  caseChoice: 2
-  targetLinkDirection: 3
-  decimator: 1
-  raan0: 0
-  log_choice: 5
+  beam_prefab: {fileID: 1179252676941566, guid: 4f91908e9c1b94fa9865a33a3dec4b0b,
+    type: 3}
+  beam_prefab2: {fileID: 1454064570112744, guid: ae0115a2e33c24b7d92d193312575599,
+    type: 3}
+  caseChoice: 1
+  targetLinkDirection: 0
+  attack_radius: 1000
   beam_on: 0
-  graph_on: 0
+  defenceOn: 0
+  captureMode: 0
 --- !u!1 &1375312105
 GameObject:
   m_ObjectHideFlags: 0

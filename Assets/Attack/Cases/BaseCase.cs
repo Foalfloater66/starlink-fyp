@@ -4,9 +4,6 @@ using Utilities;
 
 namespace Attack.Cases
 {
-
-
-
     public abstract class BaseCase
     {
         protected AttackerParams Ctx;
@@ -22,8 +19,8 @@ namespace Attack.Cases
             SetupCameras(cam);
             CreateCities();
             CreateTargetCoordinates();
-            List<string> srcGroundstationNames = SetSourceGroundstations();
-            foreach (string name in srcGroundstationNames) Ctx.SrcGroundstations.Add(groundstations[name]);
+            var srcGroundstationNames = SetSourceGroundstations();
+            foreach (var name in srcGroundstationNames) Ctx.SrcGroundstations.Add(groundstations[name]);
         }
 
         protected abstract void SetupCameras(CustomCamera cam);

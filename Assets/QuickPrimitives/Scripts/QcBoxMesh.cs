@@ -28,8 +28,14 @@ namespace QuickPrimitives.Scripts
                 public float height;
             }
 
-            public enum Options { None, SlantedSides, BeveledEdge, Hollow }
-            
+            public enum Options
+            {
+                None,
+                SlantedSides,
+                BeveledEdge,
+                Hollow
+            }
+
             public float width = 1;
             public float depth = 1;
             public float height = 1;
@@ -48,48 +54,48 @@ namespace QuickPrimitives.Scripts
             {
                 base.CopyFrom(source);
 
-                this.width = source.width;
-                this.height = source.height;
-                this.depth = source.depth;
+                width = source.width;
+                height = source.height;
+                depth = source.depth;
 
-                this.widthSegments = source.widthSegments;
-                this.heightSegments = source.heightSegments;
-                this.depthSegments = source.depthSegments;
+                widthSegments = source.widthSegments;
+                heightSegments = source.heightSegments;
+                depthSegments = source.depthSegments;
 
-                this.beveledEdge.width = source.beveledEdge.width;
-                this.slantedSides.size = source.slantedSides.size;
+                beveledEdge.width = source.beveledEdge.width;
+                slantedSides.size = source.slantedSides.size;
 
-                this.hollow.thickness = source.hollow.thickness;
-                this.hollow.height = source.hollow.height;
+                hollow.thickness = source.hollow.thickness;
+                hollow.height = source.hollow.height;
 
-                this.textureWrapped = source.textureWrapped;
+                textureWrapped = source.textureWrapped;
 
-                this.option = source.option;
+                option = source.option;
             }
 
             public bool Modified(QcBoxProperties source)
             {
-                return ((this.width != source.width) || 
-                        (this.height != source.height) || 
-                        (this.depth != source.depth) ||
-                        (this.widthSegments != source.widthSegments) ||
-                        (this.heightSegments != source.heightSegments) ||
-                        (this.depthSegments != source.depthSegments) ||
-                        (this.offset[0] != source.offset[0]) ||
-                        (this.offset[1] != source.offset[1]) ||
-                        (this.offset[2] != source.offset[2]) ||
-                        (this.genTextureCoords != source.genTextureCoords) ||
-                        (this.textureWrapped != source.textureWrapped) ||
-                        (this.addCollider != source.addCollider) ||
-                        (this.option != source.option) ||
-                        ((source.option == QcBoxProperties.Options.BeveledEdge) && 
-                         (this.beveledEdge.width != source.beveledEdge.width)) ||
-                        ((source.option == QcBoxProperties.Options.SlantedSides) && 
-                         ((this.slantedSides.size[0] != source.slantedSides.size[0]) || 
-                          (this.slantedSides.size[1] != source.slantedSides.size[1]))) ||
-                        ((source.option == QcBoxProperties.Options.Hollow) && 
-                         ((this.hollow.thickness != source.hollow.thickness) || 
-                          (this.hollow.height != source.hollow.height))));
+                return width != source.width ||
+                       height != source.height ||
+                       depth != source.depth ||
+                       widthSegments != source.widthSegments ||
+                       heightSegments != source.heightSegments ||
+                       depthSegments != source.depthSegments ||
+                       offset[0] != source.offset[0] ||
+                       offset[1] != source.offset[1] ||
+                       offset[2] != source.offset[2] ||
+                       genTextureCoords != source.genTextureCoords ||
+                       textureWrapped != source.textureWrapped ||
+                       addCollider != source.addCollider ||
+                       option != source.option ||
+                       (source.option == Options.BeveledEdge &&
+                        beveledEdge.width != source.beveledEdge.width) ||
+                       (source.option == Options.SlantedSides &&
+                        (slantedSides.size[0] != source.slantedSides.size[0] ||
+                         slantedSides.size[1] != source.slantedSides.size[1])) ||
+                       (source.option == Options.Hollow &&
+                        (hollow.thickness != source.hollow.thickness ||
+                         hollow.height != source.hollow.height));
             }
         }
 
@@ -106,10 +112,11 @@ namespace QuickPrimitives.Scripts
         }
 
         #region BuildGeometry
+
         protected override void BuildGeometry()
         {
-            float[] x = new float[4];
-            float[] y = new float[4];
+            var x = new float[4];
+            var y = new float[4];
 
             // 4 vertices on the base rectangle
             if (properties.option == QcBoxProperties.Options.SlantedSides)
@@ -136,33 +143,27 @@ namespace QuickPrimitives.Scripts
             y[3] = properties.depth * 0.5f;
 
 
-            MeshFilter meshFilter = gameObject.GetComponent<MeshFilter>();
-            if (meshFilter == null)
-            {
-                meshFilter = gameObject.AddComponent<MeshFilter>();
-            }
+            var meshFilter = gameObject.GetComponent<MeshFilter>();
+            if (meshFilter == null) meshFilter = gameObject.AddComponent<MeshFilter>();
 
-            MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
-            if (meshRenderer == null)
-            {
-                meshRenderer = gameObject.AddComponent<MeshRenderer>();
-            }
+            var meshRenderer = gameObject.GetComponent<MeshRenderer>();
+            if (meshRenderer == null) meshRenderer = gameObject.AddComponent<MeshRenderer>();
 
             ClearVertices();
 
-            if ((properties.option == QcBoxProperties.Options.BeveledEdge) && (properties.beveledEdge.width > 0))
+            if (properties.option == QcBoxProperties.Options.BeveledEdge && properties.beveledEdge.width > 0)
             {
                 GenerateVerticesBeveled();
                 GenerateTrianglesBeveled();
             }
-            else if ((properties.option == QcBoxProperties.Options.Hollow) && 
-                     (properties.hollow.thickness > 0) && (properties.hollow.height > 0))
+            else if (properties.option == QcBoxProperties.Options.Hollow &&
+                     properties.hollow.thickness > 0 && properties.hollow.height > 0)
             {
                 GenerateVerticesHollowed();
                 GenerateTrianglesHollowed();
             }
-            else if ((properties.option == QcBoxProperties.Options.SlantedSides) && 
-                     ((properties.slantedSides.size[0] > 0) || (properties.slantedSides.size[1] > 0)))
+            else if (properties.option == QcBoxProperties.Options.SlantedSides &&
+                     (properties.slantedSides.size[0] > 0 || properties.slantedSides.size[1] > 0))
             {
                 GenerateVerticesSlanted();
                 GenerateTrianglesSlanted();
@@ -173,13 +174,10 @@ namespace QuickPrimitives.Scripts
                 GenerateTriangles();
             }
 
-            if (properties.offset != Vector3.zero)
-            {
-                AddOffset(properties.offset);
-            }
+            if (properties.offset != Vector3.zero) AddOffset(properties.offset);
 
-            int[] triangles = new int[faces.Count * 3];
-            int ti = 0;
+            var triangles = new int[faces.Count * 3];
+            var ti = 0;
             foreach (var tri in faces)
             {
                 triangles[ti] = tri.v1;
@@ -189,7 +187,7 @@ namespace QuickPrimitives.Scripts
                 ti += 3;
             }
 
-            Mesh mesh = new Mesh();
+            var mesh = new Mesh();
 
             meshFilter.sharedMesh = mesh;
 
@@ -206,28 +204,30 @@ namespace QuickPrimitives.Scripts
 
             mesh.RecalculateBounds();
         }
+
         #endregion
 
         #region RebuildGeometry
+
         public override void RebuildGeometry()
         {
-            MeshFilter meshFilter = gameObject.GetComponent<MeshFilter>();
+            var meshFilter = gameObject.GetComponent<MeshFilter>();
 
             ClearVertices();
 
-            if ((properties.option == QcBoxProperties.Options.BeveledEdge) && (properties.beveledEdge.width > 0))
+            if (properties.option == QcBoxProperties.Options.BeveledEdge && properties.beveledEdge.width > 0)
             {
                 GenerateVerticesBeveled();
                 GenerateTrianglesBeveled();
             }
-            else if ((properties.option == QcBoxProperties.Options.Hollow) && 
-                     (properties.hollow.thickness > 0) && (properties.hollow.height > 0))
+            else if (properties.option == QcBoxProperties.Options.Hollow &&
+                     properties.hollow.thickness > 0 && properties.hollow.height > 0)
             {
                 GenerateVerticesHollowed();
                 GenerateTrianglesHollowed();
             }
-            else if ((properties.option == QcBoxProperties.Options.SlantedSides) && 
-                     ((properties.slantedSides.size[0] > 0) || (properties.slantedSides.size[1] > 0)))
+            else if (properties.option == QcBoxProperties.Options.SlantedSides &&
+                     (properties.slantedSides.size[0] > 0 || properties.slantedSides.size[1] > 0))
             {
                 GenerateVerticesSlanted();
                 GenerateTrianglesSlanted();
@@ -238,13 +238,10 @@ namespace QuickPrimitives.Scripts
                 GenerateTriangles();
             }
 
-            if (properties.offset != Vector3.zero)
-            {
-                AddOffset(properties.offset);
-            }
+            if (properties.offset != Vector3.zero) AddOffset(properties.offset);
 
-            int[] triangles = new int[faces.Count * 3];
-            int index = 0;
+            var triangles = new int[faces.Count * 3];
+            var index = 0;
             foreach (var tri in faces)
             {
                 triangles[index] = tri.v1;
@@ -274,17 +271,15 @@ namespace QuickPrimitives.Scripts
                 meshFilter.sharedMesh.RecalculateBounds();
             }
         }
+
         #endregion
 
         private void SetCollider()
         {
             if (properties.addCollider)
             {
-                BoxCollider boxCollider = gameObject.GetComponent<BoxCollider>();
-                if (boxCollider == null)
-                {
-                    boxCollider = gameObject.AddComponent<BoxCollider>();
-                }
+                var boxCollider = gameObject.GetComponent<BoxCollider>();
+                if (boxCollider == null) boxCollider = gameObject.AddComponent<BoxCollider>();
 
                 // set collider bound
                 boxCollider.enabled = true;
@@ -293,11 +288,8 @@ namespace QuickPrimitives.Scripts
             }
             else
             {
-                BoxCollider collider = gameObject.GetComponent<BoxCollider>();
-                if (collider != null)
-                {
-                    collider.enabled = false;
-                }
+                var collider = gameObject.GetComponent<BoxCollider>();
+                if (collider != null) collider.enabled = false;
             }
         }
 
@@ -306,242 +298,215 @@ namespace QuickPrimitives.Scripts
             if (!properties.genTextureCoords) return;
 
             uvs = new List<Vector2>();
-            if ((properties.option == QcBoxProperties.Options.BeveledEdge) && (properties.beveledEdge.width > 0))
-            {
+            if (properties.option == QcBoxProperties.Options.BeveledEdge && properties.beveledEdge.width > 0)
                 SetTextureCoordsBeveled();
-            }
-            else if ((properties.option == QcBoxProperties.Options.Hollow) && 
-                        (properties.hollow.thickness > 0) && (properties.hollow.height > 0))
-            {
+            else if (properties.option == QcBoxProperties.Options.Hollow &&
+                     properties.hollow.thickness > 0 && properties.hollow.height > 0)
                 SetTextureCoordsHollowed();
-            }
-            else if ((properties.option == QcBoxProperties.Options.SlantedSides) && 
-                        ((properties.slantedSides.size[0] > 0) || (properties.slantedSides.size[1] > 0)))
-            {
+            else if (properties.option == QcBoxProperties.Options.SlantedSides &&
+                     (properties.slantedSides.size[0] > 0 || properties.slantedSides.size[1] > 0))
                 SetTextureCoordsSlanted();
-            }
             else
-            {
                 SetTextureCoords();
-            }
 
             gameObject.GetComponent<MeshFilter>().sharedMesh.uv = uvs.ToArray();
         }
 
         #region GenerateVertices
+
         private void GenerateVertices()
         {
-            float width = properties.width;
-            float height = properties.height;
-            float depth = properties.depth;
+            var width = properties.width;
+            var height = properties.height;
+            var depth = properties.depth;
 
-            int widthSeg = properties.widthSegments;
-            int heightSeg = properties.heightSegments;
-            int depthSeg = properties.depthSegments;
+            var widthSeg = properties.widthSegments;
+            var heightSeg = properties.heightSegments;
+            var depthSeg = properties.depthSegments;
 
             // for bottom face
-            for (int j = 0; j <= depthSeg; ++j)
+            for (var j = 0; j <= depthSeg; ++j)
+            for (var i = 0; i <= widthSeg; ++i)
             {
-                for (int i = 0; i <= widthSeg; ++i)
-                {
-                    AddVertex(new Vector3(-width * 0.5f + i * width / widthSeg, 
-                                          -height * 0.5f, 
-                                          depth * 0.5f - j * depth / depthSeg));
-                    AddNormal(Vector3.down);
-                }
+                AddVertex(new Vector3(-width * 0.5f + i * width / widthSeg,
+                    -height * 0.5f,
+                    depth * 0.5f - j * depth / depthSeg));
+                AddNormal(Vector3.down);
             }
 
             // for top face
-            for (int j = 0; j <= depthSeg; ++j)
+            for (var j = 0; j <= depthSeg; ++j)
+            for (var i = 0; i <= widthSeg; ++i)
             {
-                for (int i = 0; i <= widthSeg; ++i)
-                {
-                    AddVertex(new Vector3(-width * 0.5f + i * width / widthSeg,
-                                          height * 0.5f,
-                                          -depth * 0.5f + j * depth / depthSeg));
-                    AddNormal(Vector3.up);
-                }
+                AddVertex(new Vector3(-width * 0.5f + i * width / widthSeg,
+                    height * 0.5f,
+                    -depth * 0.5f + j * depth / depthSeg));
+                AddNormal(Vector3.up);
             }
 
             // for front face
-            for (int j = 0; j <= heightSeg; ++j)
+            for (var j = 0; j <= heightSeg; ++j)
+            for (var i = 0; i <= widthSeg; ++i)
             {
-                for (int i = 0; i <= widthSeg; ++i)
-                {
-                    AddVertex(new Vector3(-width * 0.5f + i * width / widthSeg,
-                                          -height * 0.5f + j * height / heightSeg,
-                                          -depth * 0.5f));
-                    AddNormal(Vector3.back);
-                }
+                AddVertex(new Vector3(-width * 0.5f + i * width / widthSeg,
+                    -height * 0.5f + j * height / heightSeg,
+                    -depth * 0.5f));
+                AddNormal(Vector3.back);
             }
 
             // for back face
-            for (int j = 0; j <= heightSeg; ++j)
+            for (var j = 0; j <= heightSeg; ++j)
+            for (var i = 0; i <= widthSeg; ++i)
             {
-                for (int i = 0; i <= widthSeg; ++i)
-                {
-                    AddVertex(new Vector3(width * 0.5f - i * width / widthSeg,
-                                          -height * 0.5f + j * height / heightSeg,
-                                          depth * 0.5f));
-                    AddNormal(Vector3.forward);
-                }
+                AddVertex(new Vector3(width * 0.5f - i * width / widthSeg,
+                    -height * 0.5f + j * height / heightSeg,
+                    depth * 0.5f));
+                AddNormal(Vector3.forward);
             }
 
             // for left side face
-            for (int j = 0; j <= heightSeg; ++j)
+            for (var j = 0; j <= heightSeg; ++j)
+            for (var i = 0; i <= depthSeg; ++i)
             {
-                for (int i = 0; i <= depthSeg; ++i)
-                {
-                    AddVertex(new Vector3(-width * 0.5f,
-                                          -height * 0.5f + j * height / heightSeg,
-                                          depth * 0.5f - i * depth / depthSeg));
-                    AddNormal(Vector3.left);
-                }
+                AddVertex(new Vector3(-width * 0.5f,
+                    -height * 0.5f + j * height / heightSeg,
+                    depth * 0.5f - i * depth / depthSeg));
+                AddNormal(Vector3.left);
             }
 
             // for right side face
-            for (int j = 0; j <= heightSeg; ++j)
+            for (var j = 0; j <= heightSeg; ++j)
+            for (var i = 0; i <= depthSeg; ++i)
             {
-                for (int i = 0; i <= depthSeg; ++i)
-                {
-                    AddVertex(new Vector3(width * 0.5f,
-                                          -height * 0.5f + j * height / heightSeg,
-                                          -depth * 0.5f + i * depth / depthSeg));
-                    AddNormal(Vector3.right);
-                }
+                AddVertex(new Vector3(width * 0.5f,
+                    -height * 0.5f + j * height / heightSeg,
+                    -depth * 0.5f + i * depth / depthSeg));
+                AddNormal(Vector3.right);
             }
 
             SetTextureCoords();
         }
+
         #endregion
 
         #region GenerateVerticesSlanted
+
         private void GenerateVerticesSlanted()
         {
-            float width = properties.width;
-            float height = properties.height;
-            float depth = properties.depth;
+            var width = properties.width;
+            var height = properties.height;
+            var depth = properties.depth;
 
-            int widthSeg = properties.widthSegments;
-            int heightSeg = properties.heightSegments;
-            int depthSeg = properties.depthSegments;
+            var widthSeg = properties.widthSegments;
+            var heightSeg = properties.heightSegments;
+            var depthSeg = properties.depthSegments;
 
-            Vector2 slant = properties.slantedSides.size;
+            var slant = properties.slantedSides.size;
 
-            float width0 = properties.width - slant[0] * 2;
-            float height0 = properties.height - slant[1] * 2;
+            var width0 = properties.width - slant[0] * 2;
+            var height0 = properties.height - slant[1] * 2;
 
-            Vector3 topNormal = new Vector3(0, depth, -slant[1]);
+            var topNormal = new Vector3(0, depth, -slant[1]);
             topNormal.Normalize();
-            Vector3 bottomNormal = new Vector3(0, -depth, -slant[1]);
-            bottomNormal.Normalize();            
+            var bottomNormal = new Vector3(0, -depth, -slant[1]);
+            bottomNormal.Normalize();
 
             // for bottom face
-            for (int j = 0; j <= depthSeg; ++j)
+            for (var j = 0; j <= depthSeg; ++j)
+            for (var i = 0; i <= widthSeg; ++i)
             {
-                for (int i = 0; i <= widthSeg; ++i)
-                {
-                    float w = ((float)j / depthSeg * width0 + (1.0f - (float)j / depthSeg) * width) * i / widthSeg +
-                               (float)j / depthSeg * slant[0];
-                    AddVertex(new Vector3(-width * 0.5f + w,
-                                          -height * 0.5f + slant[1] * (float)j / depthSeg,
-                                          depth * 0.5f - j * depth / depthSeg));
-                    AddNormal(bottomNormal);
-                }
+                var w = ((float)j / depthSeg * width0 + (1.0f - (float)j / depthSeg) * width) * i / widthSeg +
+                        (float)j / depthSeg * slant[0];
+                AddVertex(new Vector3(-width * 0.5f + w,
+                    -height * 0.5f + slant[1] * (float)j / depthSeg,
+                    depth * 0.5f - j * depth / depthSeg));
+                AddNormal(bottomNormal);
             }
 
             // for top face
-            for (int j = 0; j <= depthSeg; ++j)
+            for (var j = 0; j <= depthSeg; ++j)
+            for (var i = 0; i <= widthSeg; ++i)
             {
-                for (int i = 0; i <= widthSeg; ++i)
-                {
-                    float w = ((float)j / depthSeg * width + (1.0f - (float)j / depthSeg) * width0) * i / widthSeg + 
-                               (1 - (float)j / depthSeg) * slant[0];
-                    AddVertex(new Vector3(-width * 0.5f + w,
-                                          height * 0.5f - slant[1] * (1 - (float)j / depthSeg),
-                                          -depth * 0.5f + j * depth / depthSeg));
-                    AddNormal(topNormal);
-                }
+                var w = ((float)j / depthSeg * width + (1.0f - (float)j / depthSeg) * width0) * i / widthSeg +
+                        (1 - (float)j / depthSeg) * slant[0];
+                AddVertex(new Vector3(-width * 0.5f + w,
+                    height * 0.5f - slant[1] * (1 - (float)j / depthSeg),
+                    -depth * 0.5f + j * depth / depthSeg));
+                AddNormal(topNormal);
             }
 
             // for front face
-            for (int j = 0; j <= heightSeg; ++j)
+            for (var j = 0; j <= heightSeg; ++j)
+            for (var i = 0; i <= widthSeg; ++i)
             {
-                for (int i = 0; i <= widthSeg; ++i)
-                {
-                    AddVertex(new Vector3(-width0 * 0.5f + i * width0 / widthSeg,
-                                          -height0 * 0.5f + j * height0 / heightSeg,
-                                          -depth * 0.5f));
-                    AddNormal(Vector3.back);
-                }
+                AddVertex(new Vector3(-width0 * 0.5f + i * width0 / widthSeg,
+                    -height0 * 0.5f + j * height0 / heightSeg,
+                    -depth * 0.5f));
+                AddNormal(Vector3.back);
             }
 
             // for back face
-            for (int j = 0; j <= heightSeg; ++j)
+            for (var j = 0; j <= heightSeg; ++j)
+            for (var i = 0; i <= widthSeg; ++i)
             {
-                for (int i = 0; i <= widthSeg; ++i)
-                {
-                    AddVertex(new Vector3(width * 0.5f - i * width / widthSeg,
-                                          -height * 0.5f + j * height / heightSeg,
-                                          depth * 0.5f));
-                    AddNormal(Vector3.forward);
-                }
+                AddVertex(new Vector3(width * 0.5f - i * width / widthSeg,
+                    -height * 0.5f + j * height / heightSeg,
+                    depth * 0.5f));
+                AddNormal(Vector3.forward);
             }
 
-            Vector3 leftNormal = new Vector3(-depth, 0, -slant[0]);
+            var leftNormal = new Vector3(-depth, 0, -slant[0]);
             leftNormal.Normalize();
-            Vector3 rightNormal = new Vector3(depth, 0, -slant[0]);
+            var rightNormal = new Vector3(depth, 0, -slant[0]);
             rightNormal.Normalize();
 
             // for left side face
-            for (int j = 0; j <= heightSeg; ++j)
+            for (var j = 0; j <= heightSeg; ++j)
+            for (var i = 0; i <= depthSeg; ++i)
             {
-                for (int i = 0; i <= depthSeg; ++i)
-                {
-                    float h = ((float)i / depthSeg * height0 + (1.0f - (float)i / depthSeg) * height) * j / heightSeg + 
-                              (float)i / depthSeg * slant[1];
-                    AddVertex(new Vector3(-width * 0.5f + slant[0] * (float)i / depthSeg,
-                                          -height * 0.5f + h,
-                                          depth * 0.5f - i * depth / depthSeg));
-                    AddNormal(leftNormal);
-                }
+                var h = ((float)i / depthSeg * height0 + (1.0f - (float)i / depthSeg) * height) * j / heightSeg +
+                        (float)i / depthSeg * slant[1];
+                AddVertex(new Vector3(-width * 0.5f + slant[0] * (float)i / depthSeg,
+                    -height * 0.5f + h,
+                    depth * 0.5f - i * depth / depthSeg));
+                AddNormal(leftNormal);
             }
 
             // for right side face
-            for (int j = 0; j <= heightSeg; ++j)
+            for (var j = 0; j <= heightSeg; ++j)
+            for (var i = 0; i <= depthSeg; ++i)
             {
-                for (int i = 0; i <= depthSeg; ++i)
-                {
-                    float h = ((float)i / depthSeg * height + (1.0f - (float)i / depthSeg) * height0) * j / heightSeg +
-                              (1 - (float)i / depthSeg) * slant[1];
-                    AddVertex(new Vector3(width * 0.5f - slant[0] * (1 - (float)i / depthSeg),
-                                          -height * 0.5f + h,
-                                          -depth * 0.5f + i * depth / depthSeg));
-                    AddNormal(rightNormal);
-                }
+                var h = ((float)i / depthSeg * height + (1.0f - (float)i / depthSeg) * height0) * j / heightSeg +
+                        (1 - (float)i / depthSeg) * slant[1];
+                AddVertex(new Vector3(width * 0.5f - slant[0] * (1 - (float)i / depthSeg),
+                    -height * 0.5f + h,
+                    -depth * 0.5f + i * depth / depthSeg));
+                AddNormal(rightNormal);
             }
 
             SetTextureCoordsSlanted();
         }
+
         #endregion
 
         #region GenerateVerticesBeveled
+
         private void GenerateVerticesBeveled()
         {
-            float width = properties.width;
-            float height = properties.height;
-            float depth = properties.depth;
+            var width = properties.width;
+            var height = properties.height;
+            var depth = properties.depth;
 
-            int widthSeg = properties.widthSegments;
-            int heightSeg = properties.heightSegments;
-            int depthSeg = properties.depthSegments;
+            var widthSeg = properties.widthSegments;
+            var heightSeg = properties.heightSegments;
+            var depthSeg = properties.depthSegments;
 
-            float width0 = properties.width - properties.beveledEdge.width * 2;
-            float depth0 = properties.depth - properties.beveledEdge.width * 2;
-            float height0 = height - properties.beveledEdge.width * 2;
+            var width0 = properties.width - properties.beveledEdge.width * 2;
+            var depth0 = properties.depth - properties.beveledEdge.width * 2;
+            var height0 = height - properties.beveledEdge.width * 2;
 
-            float[] x = new float[4];
-            float[] y = new float[4];
+            var x = new float[4];
+            var y = new float[4];
 
             // 4 vertices on the base rectangle
             x[0] = -width * 0.5f;
@@ -556,8 +521,8 @@ namespace QuickPrimitives.Scripts
             x[3] = -width * 0.5f;
             y[3] = depth * 0.5f;
 
-            float[] x0 = new float[4];
-            float[] y0 = new float[4];
+            var x0 = new float[4];
+            var y0 = new float[4];
 
             x0[0] = -width0 * 0.5f;
             y0[0] = -depth0 * 0.5f;
@@ -573,19 +538,19 @@ namespace QuickPrimitives.Scripts
 
             // Basic top, bottom, side faces
 
-            List<Vector3> v = new List<Vector3>();
+            var v = new List<Vector3>();
 
             // for bottom face
-            v.Add(new Vector3(x0[3], -height * 0.5f, y0[3]));  // 0
+            v.Add(new Vector3(x0[3], -height * 0.5f, y0[3])); // 0
             v.Add(new Vector3(x0[2], -height * 0.5f, y0[2]));
             v.Add(new Vector3(x0[1], -height * 0.5f, y0[1]));
             v.Add(new Vector3(x0[0], -height * 0.5f, y0[0]));
-                 
+
             v.Add(new Vector3(x0[0], height * 0.5f, y0[0])); // 4
             v.Add(new Vector3(x0[1], height * 0.5f, y0[1]));
             v.Add(new Vector3(x0[2], height * 0.5f, y0[2]));
             v.Add(new Vector3(x0[3], height * 0.5f, y0[3]));
-     
+
             v.Add(new Vector3(x0[0], -height0 * 0.5f, y[0])); // 8
             v.Add(new Vector3(x0[1], -height0 * 0.5f, y[1]));
             v.Add(new Vector3(x0[1], height0 * 0.5f, y[1]));
@@ -595,18 +560,19 @@ namespace QuickPrimitives.Scripts
             v.Add(new Vector3(x0[3], -height0 * 0.5f, y[3]));
             v.Add(new Vector3(x0[3], height0 * 0.5f, y[3]));
             v.Add(new Vector3(x0[2], height0 * 0.5f, y[2]));
-           
+
             v.Add(new Vector3(x[3], -height0 * 0.5f, y0[3])); // 16
             v.Add(new Vector3(x[0], -height0 * 0.5f, y0[0]));
             v.Add(new Vector3(x[0], height0 * 0.5f, y0[0]));
             v.Add(new Vector3(x[3], height0 * 0.5f, y0[3]));
-            
-            v.Add(new Vector3(x[1], -height0 * 0.5f, y0[1]));  //20
+
+            v.Add(new Vector3(x[1], -height0 * 0.5f, y0[1])); //20
             v.Add(new Vector3(x[2], -height0 * 0.5f, y0[2]));
             v.Add(new Vector3(x[2], height0 * 0.5f, y0[2]));
             v.Add(new Vector3(x[1], height0 * 0.5f, y0[1]));
 
             #region old code
+
             //// Bevels (rectangels)
 
             // front bottom
@@ -680,76 +646,77 @@ namespace QuickPrimitives.Scripts
             //AddVertex(vertices[22]);
             //AddVertex(vertices[6]);
             //AddVertex(vertices[5]);
+
             #endregion
 
             // front bottom
-            AddVertex(v[3]);    // 0
+            AddVertex(v[3]); // 0
             AddVertex(v[2]);
             AddVertex(v[9]);
             AddVertex(v[8]);
-            
+
             // front top
-            AddVertex(v[11]);   // 4
+            AddVertex(v[11]); // 4
             AddVertex(v[10]);
             AddVertex(v[5]);
             AddVertex(v[4]);
 
             // back bottom
-            AddVertex(v[1]);    // 8
+            AddVertex(v[1]); // 8
             AddVertex(v[0]);
             AddVertex(v[13]);
             AddVertex(v[12]);
 
             // back top
-            AddVertex(v[15]);   // 12
+            AddVertex(v[15]); // 12
             AddVertex(v[14]);
             AddVertex(v[7]);
             AddVertex(v[6]);
 
             // front left bevel
-            AddVertex(v[17]);   // 16
+            AddVertex(v[17]); // 16
             AddVertex(v[8]);
             AddVertex(v[11]);
             AddVertex(v[18]);
 
             // front right bevel
-            AddVertex(v[9]);    // 20
+            AddVertex(v[9]); // 20
             AddVertex(v[20]);
             AddVertex(v[23]);
             AddVertex(v[10]);
 
             // back left bevel
-            AddVertex(v[21]);   // 24
+            AddVertex(v[21]); // 24
             AddVertex(v[12]);
             AddVertex(v[15]);
             AddVertex(v[22]);
 
             // back right bevel
-            AddVertex(v[13]);   // 28
+            AddVertex(v[13]); // 28
             AddVertex(v[16]);
             AddVertex(v[19]);
             AddVertex(v[14]);
 
             // bottom left bevel
-            AddVertex(v[0]);    // 32
+            AddVertex(v[0]); // 32
             AddVertex(v[3]);
             AddVertex(v[17]);
             AddVertex(v[16]);
 
             // top left bevel
-            AddVertex(v[19]);   // 36
+            AddVertex(v[19]); // 36
             AddVertex(v[18]);
             AddVertex(v[4]);
             AddVertex(v[7]);
 
             // bottom right bevel
-            AddVertex(v[2]);    // 40
+            AddVertex(v[2]); // 40
             AddVertex(v[1]);
             AddVertex(v[21]);
             AddVertex(v[20]);
 
             // top right bevel
-            AddVertex(v[23]);   // 44
+            AddVertex(v[23]); // 44
             AddVertex(v[22]);
             AddVertex(v[6]);
             AddVertex(v[5]);
@@ -757,93 +724,93 @@ namespace QuickPrimitives.Scripts
             // Front corners
 
             // bottom left corner
-            AddVertex(v[3]);    // 48
+            AddVertex(v[3]); // 48
             AddVertex(v[17]);
             AddVertex(v[8]);
 
             // bottom right corner
-            AddVertex(v[2]);    // 51
+            AddVertex(v[2]); // 51
             AddVertex(v[9]);
             AddVertex(v[20]);
 
             // top left corner
-            AddVertex(v[4]);    // 54
+            AddVertex(v[4]); // 54
             AddVertex(v[11]);
             AddVertex(v[18]);
 
             // top right corner
-            AddVertex(v[5]);    // 57
+            AddVertex(v[5]); // 57
             AddVertex(v[23]);
             AddVertex(v[10]);
 
             // Back corners
 
             // bottom right corner
-            AddVertex(v[1]);    // 60
+            AddVertex(v[1]); // 60
             AddVertex(v[21]);
             AddVertex(v[12]);
 
             // bottom left corner
-            AddVertex(v[0]);    // 63
+            AddVertex(v[0]); // 63
             AddVertex(v[13]);
             AddVertex(v[16]);
 
             // top right corner
-            AddVertex(v[6]);    // 66
+            AddVertex(v[6]); // 66
             AddVertex(v[15]);
             AddVertex(v[22]);
 
             // top left corner
-            AddVertex(v[7]);    // 69
+            AddVertex(v[7]); // 69
             AddVertex(v[19]);
             AddVertex(v[14]);
 
-            Vector3 frontBottomNormal = new Vector3(0f, -1f, -1f);
+            var frontBottomNormal = new Vector3(0f, -1f, -1f);
             frontBottomNormal.Normalize();
-            Vector3 frontTopNormal = new Vector3(0f, 1f, -1f);
+            var frontTopNormal = new Vector3(0f, 1f, -1f);
             frontTopNormal.Normalize();
 
-            Vector3 backBottomNormal = new Vector3(0f, -1f, 1f);
+            var backBottomNormal = new Vector3(0f, -1f, 1f);
             backBottomNormal.Normalize();
-            Vector3 backTopNormal = new Vector3(0f, 1f, 1f);
+            var backTopNormal = new Vector3(0f, 1f, 1f);
             backTopNormal.Normalize();
 
-            Vector3 frontLeftNormal = new Vector3(-1f, 0f, -1f);
+            var frontLeftNormal = new Vector3(-1f, 0f, -1f);
             frontLeftNormal.Normalize();
-            Vector3 frontRightNormal = new Vector3(1f, 0f, -1f);
+            var frontRightNormal = new Vector3(1f, 0f, -1f);
             frontRightNormal.Normalize();
 
-            Vector3 backLeftNormal = new Vector3(-1f, 0f, 1f);
+            var backLeftNormal = new Vector3(-1f, 0f, 1f);
             backLeftNormal.Normalize();
-            Vector3 backRightNormal = new Vector3(1f, 0f, 1f);
+            var backRightNormal = new Vector3(1f, 0f, 1f);
             backRightNormal.Normalize();
 
-            Vector3 bottomLeftNormal = new Vector3(-1f, -1f, 0f);
+            var bottomLeftNormal = new Vector3(-1f, -1f, 0f);
             bottomLeftNormal.Normalize();
-            Vector3 bottomRightNormal = new Vector3(1f, -1f, 0f);
+            var bottomRightNormal = new Vector3(1f, -1f, 0f);
             bottomRightNormal.Normalize();
 
-            Vector3 topLeftNormal = new Vector3(-1f, 1f, 0f);
+            var topLeftNormal = new Vector3(-1f, 1f, 0f);
             topLeftNormal.Normalize();
-            Vector3 topRightNormal = new Vector3(1f, 1f, 0f);
+            var topRightNormal = new Vector3(1f, 1f, 0f);
             topRightNormal.Normalize();
 
-            Vector3 frontBottomLeftNormal = new Vector3(-1f, -1f, -1f);
+            var frontBottomLeftNormal = new Vector3(-1f, -1f, -1f);
             frontBottomLeftNormal.Normalize();
-            Vector3 frontTopLeftNormal = new Vector3(-1f, 1f, -1f);
+            var frontTopLeftNormal = new Vector3(-1f, 1f, -1f);
             frontTopLeftNormal.Normalize();
-            Vector3 frontBottomRightNormal = new Vector3(1f, -1f, -1f);
+            var frontBottomRightNormal = new Vector3(1f, -1f, -1f);
             frontBottomRightNormal.Normalize();
-            Vector3 frontTopRightNormal = new Vector3(1f, 1f, -1f);
+            var frontTopRightNormal = new Vector3(1f, 1f, -1f);
             frontTopRightNormal.Normalize();
 
-            Vector3 backBottomLeftNormal = new Vector3(-1f, -1f, 1f);
+            var backBottomLeftNormal = new Vector3(-1f, -1f, 1f);
             backBottomLeftNormal.Normalize();
-            Vector3 backTopLeftNormal = new Vector3(-1f, 1f, 1f);
+            var backTopLeftNormal = new Vector3(-1f, 1f, 1f);
             backTopLeftNormal.Normalize();
-            Vector3 backBottomRightNormal = new Vector3(1f, -1f, 1f);
+            var backBottomRightNormal = new Vector3(1f, -1f, 1f);
             backBottomRightNormal.Normalize();
-            Vector3 backTopRightNormal = new Vector3(1f, 1f, 1f);
+            var backTopRightNormal = new Vector3(1f, 1f, 1f);
             backTopRightNormal.Normalize();
 
             // front bottom bevel
@@ -953,95 +920,84 @@ namespace QuickPrimitives.Scripts
             AddNormal(backTopLeftNormal);
 
             // for bottom face
-            for (int j = 0; j <= depthSeg; ++j)
+            for (var j = 0; j <= depthSeg; ++j)
+            for (var i = 0; i <= widthSeg; ++i)
             {
-                for (int i = 0; i <= widthSeg; ++i)
-                {
-                    AddVertex(new Vector3(-width0 * 0.5f + i * width0 / widthSeg,
-                                          -height * 0.5f,
-                                          depth0 * 0.5f - j * depth0 / depthSeg));
-                    AddNormal(Vector3.down);
-                }
+                AddVertex(new Vector3(-width0 * 0.5f + i * width0 / widthSeg,
+                    -height * 0.5f,
+                    depth0 * 0.5f - j * depth0 / depthSeg));
+                AddNormal(Vector3.down);
             }
 
             // for top face
-            for (int j = 0; j <= depthSeg; ++j)
+            for (var j = 0; j <= depthSeg; ++j)
+            for (var i = 0; i <= widthSeg; ++i)
             {
-                for (int i = 0; i <= widthSeg; ++i)
-                {
-                    AddVertex(new Vector3(-width0 * 0.5f + i * width0 / widthSeg,
-                                          height * 0.5f,
-                                          -depth0 * 0.5f + j * depth0 / depthSeg));
-                    AddNormal(Vector3.up);
-                }
+                AddVertex(new Vector3(-width0 * 0.5f + i * width0 / widthSeg,
+                    height * 0.5f,
+                    -depth0 * 0.5f + j * depth0 / depthSeg));
+                AddNormal(Vector3.up);
             }
 
             // for front face
-            for (int j = 0; j <= heightSeg; ++j)
+            for (var j = 0; j <= heightSeg; ++j)
+            for (var i = 0; i <= widthSeg; ++i)
             {
-                for (int i = 0; i <= widthSeg; ++i)
-                {
-                    AddVertex(new Vector3(-width0 * 0.5f + i * width0 / widthSeg,
-                                          -height0 * 0.5f + j * height0 / heightSeg,
-                                          -depth * 0.5f));
-                    AddNormal(Vector3.back);
-                }
+                AddVertex(new Vector3(-width0 * 0.5f + i * width0 / widthSeg,
+                    -height0 * 0.5f + j * height0 / heightSeg,
+                    -depth * 0.5f));
+                AddNormal(Vector3.back);
             }
 
             // for back face
-            for (int j = 0; j <= heightSeg; ++j)
+            for (var j = 0; j <= heightSeg; ++j)
+            for (var i = 0; i <= widthSeg; ++i)
             {
-                for (int i = 0; i <= widthSeg; ++i)
-                {
-                    AddVertex(new Vector3(width0 * 0.5f - i * width0 / widthSeg,
-                                          -height0 * 0.5f + j * height0 / heightSeg,
-                                          depth * 0.5f));
-                    AddNormal(Vector3.forward);
-                }
+                AddVertex(new Vector3(width0 * 0.5f - i * width0 / widthSeg,
+                    -height0 * 0.5f + j * height0 / heightSeg,
+                    depth * 0.5f));
+                AddNormal(Vector3.forward);
             }
 
             // for left side face
-            for (int j = 0; j <= heightSeg; ++j)
+            for (var j = 0; j <= heightSeg; ++j)
+            for (var i = 0; i <= depthSeg; ++i)
             {
-                for (int i = 0; i <= depthSeg; ++i)
-                {
-                    AddVertex(new Vector3(-width * 0.5f,
-                                          -height0 * 0.5f + j * height0 / heightSeg,
-                                          depth0 * 0.5f - i * depth0 / depthSeg));
-                    AddNormal(Vector3.left);
-                }
+                AddVertex(new Vector3(-width * 0.5f,
+                    -height0 * 0.5f + j * height0 / heightSeg,
+                    depth0 * 0.5f - i * depth0 / depthSeg));
+                AddNormal(Vector3.left);
             }
 
             // for right side face
-            for (int j = 0; j <= heightSeg; ++j)
+            for (var j = 0; j <= heightSeg; ++j)
+            for (var i = 0; i <= depthSeg; ++i)
             {
-                for (int i = 0; i <= depthSeg; ++i)
-                {
-                    AddVertex(new Vector3(width * 0.5f,
-                                          -height0 * 0.5f + j * height0 / heightSeg,
-                                          -depth0 * 0.5f + i * depth0 / depthSeg));
-                    AddNormal(Vector3.right);
-                }
+                AddVertex(new Vector3(width * 0.5f,
+                    -height0 * 0.5f + j * height0 / heightSeg,
+                    -depth0 * 0.5f + i * depth0 / depthSeg));
+                AddNormal(Vector3.right);
             }
 
             //if (properties.genTextureCoords)
             //    SetTextureCoordsBeveled();
 
             SetTextureCoordsBeveled();
-
         }
+
         #endregion
 
         #region GenerateVerticesHollowed
+
         private void GenerateVerticesHollowed()
         {
-            float width = properties.width;
-            float height = properties.height;
-            float depth = properties.depth;
-            float thickness = properties.hollow.thickness;
+            var width = properties.width;
+            var height = properties.height;
+            var depth = properties.depth;
+            var thickness = properties.hollow.thickness;
 
-            float[] x = new float[4];
-            float[] y = new float[4];
+            var x = new float[4];
+            var y = new float[4];
 
             // 4 vertices on the base rectangle
             x[0] = -width * 0.5f;
@@ -1057,8 +1013,8 @@ namespace QuickPrimitives.Scripts
             y[3] = depth * 0.5f;
 
 
-            float[] x0 = new float[4];
-            float[] y0 = new float[4];
+            var x0 = new float[4];
+            var y0 = new float[4];
 
             x0[0] = x[0] + thickness;
             y0[0] = y[0] + thickness;
@@ -1073,46 +1029,46 @@ namespace QuickPrimitives.Scripts
             y0[3] = y[3] - thickness;
 
             // Basic top, bottom, side faces
-            float depth0 = properties.hollow.height;
+            var depth0 = properties.hollow.height;
 
             // for top faces
-            AddVertex(new Vector3(x[0], height * 0.5f, y[0]));     // front
+            AddVertex(new Vector3(x[0], height * 0.5f, y[0])); // front
             AddVertex(new Vector3(x[1], height * 0.5f, y[1]));
             AddVertex(new Vector3(x0[1], height * 0.5f, y0[1]));
             AddVertex(new Vector3(x0[0], height * 0.5f, y0[0]));
 
-            AddVertex(new Vector3(x[2], height * 0.5f, y[2]));     // back
+            AddVertex(new Vector3(x[2], height * 0.5f, y[2])); // back
             AddVertex(new Vector3(x[3], height * 0.5f, y[3]));
             AddVertex(new Vector3(x0[3], height * 0.5f, y0[3]));
             AddVertex(new Vector3(x0[2], height * 0.5f, y0[2]));
 
-            AddVertex(new Vector3(x[3], height * 0.5f, y[3]));     // left
+            AddVertex(new Vector3(x[3], height * 0.5f, y[3])); // left
             AddVertex(new Vector3(x[0], height * 0.5f, y[0]));
             AddVertex(new Vector3(x0[0], height * 0.5f, y0[0]));
             AddVertex(new Vector3(x0[3], height * 0.5f, y0[3]));
 
-            AddVertex(new Vector3(x[1], height * 0.5f, y[1]));     // right
+            AddVertex(new Vector3(x[1], height * 0.5f, y[1])); // right
             AddVertex(new Vector3(x[2], height * 0.5f, y[2]));
             AddVertex(new Vector3(x0[2], height * 0.5f, y0[2]));
             AddVertex(new Vector3(x0[1], height * 0.5f, y0[1]));
 
             // for inner walls
-            AddVertex(new Vector3(x0[0], height * 0.5f - depth0, y0[0]));     // front
+            AddVertex(new Vector3(x0[0], height * 0.5f - depth0, y0[0])); // front
             AddVertex(new Vector3(x0[1], height * 0.5f - depth0, y0[1]));
             AddVertex(new Vector3(x0[1], height * 0.5f, y0[1]));
             AddVertex(new Vector3(x0[0], height * 0.5f, y0[0]));
 
-            AddVertex(new Vector3(x0[2], height * 0.5f - depth0, y0[2]));     // back
+            AddVertex(new Vector3(x0[2], height * 0.5f - depth0, y0[2])); // back
             AddVertex(new Vector3(x0[3], height * 0.5f - depth0, y0[3]));
             AddVertex(new Vector3(x0[3], height * 0.5f, y0[3]));
             AddVertex(new Vector3(x0[2], height * 0.5f, y0[2]));
 
-            AddVertex(new Vector3(x0[3], height * 0.5f - depth0, y0[3]));     // left
+            AddVertex(new Vector3(x0[3], height * 0.5f - depth0, y0[3])); // left
             AddVertex(new Vector3(x0[0], height * 0.5f - depth0, y0[0]));
             AddVertex(new Vector3(x0[0], height * 0.5f, y0[0]));
             AddVertex(new Vector3(x0[3], height * 0.5f, y0[3]));
 
-            AddVertex(new Vector3(x0[1], height * 0.5f - depth0, y0[1]));     // right
+            AddVertex(new Vector3(x0[1], height * 0.5f - depth0, y0[1])); // right
             AddVertex(new Vector3(x0[2], height * 0.5f - depth0, y0[2]));
             AddVertex(new Vector3(x0[2], height * 0.5f, y0[2]));
             AddVertex(new Vector3(x0[1], height * 0.5f, y0[1]));
@@ -1120,22 +1076,22 @@ namespace QuickPrimitives.Scripts
             if (depth0 == height)
             {
                 // for bottom faces
-                AddVertex(new Vector3(x[0], -height * 0.5f, y[0]));     // front
+                AddVertex(new Vector3(x[0], -height * 0.5f, y[0])); // front
                 AddVertex(new Vector3(x[1], -height * 0.5f, y[1]));
                 AddVertex(new Vector3(x0[1], -height * 0.5f, y0[1]));
                 AddVertex(new Vector3(x0[0], -height * 0.5f, y0[0]));
 
-                AddVertex(new Vector3(x[2], -height * 0.5f, y[2]));     // back
+                AddVertex(new Vector3(x[2], -height * 0.5f, y[2])); // back
                 AddVertex(new Vector3(x[3], -height * 0.5f, y[3]));
                 AddVertex(new Vector3(x0[3], -height * 0.5f, y0[3]));
                 AddVertex(new Vector3(x0[2], -height * 0.5f, y0[2]));
 
-                AddVertex(new Vector3(x[3], -height * 0.5f, y[3]));     // left
+                AddVertex(new Vector3(x[3], -height * 0.5f, y[3])); // left
                 AddVertex(new Vector3(x[0], -height * 0.5f, y[0]));
                 AddVertex(new Vector3(x0[0], -height * 0.5f, y0[0]));
                 AddVertex(new Vector3(x0[3], -height * 0.5f, y0[3]));
 
-                AddVertex(new Vector3(x[1], -height * 0.5f, y[1]));     // right
+                AddVertex(new Vector3(x[1], -height * 0.5f, y[1])); // right
                 AddVertex(new Vector3(x[2], -height * 0.5f, y[2]));
                 AddVertex(new Vector3(x0[2], -height * 0.5f, y0[2]));
                 AddVertex(new Vector3(x0[1], -height * 0.5f, y0[1]));
@@ -1149,18 +1105,18 @@ namespace QuickPrimitives.Scripts
                 AddVertex(new Vector3(x[0], -height * 0.5f, y[0]));
 
                 // for inner bottom
-                AddVertex(new Vector3(x0[0], height * 0.5f - depth0, y0[0]));     // front
+                AddVertex(new Vector3(x0[0], height * 0.5f - depth0, y0[0])); // front
                 AddVertex(new Vector3(x0[1], height * 0.5f - depth0, y0[1]));
                 AddVertex(new Vector3(x0[2], height * 0.5f - depth0, y0[2]));
                 AddVertex(new Vector3(x0[3], height * 0.5f - depth0, y0[3]));
             }
 
-            Vector3 frontNormal = new Vector3(0f, 0f, -1f);
-            Vector3 backNormal = new Vector3(0f, 0f, 1f);
-            Vector3 topNormal = new Vector3(0f, 1f, 0f);
-            Vector3 bottomNormal = new Vector3(0f, -1f, 0f);
-            Vector3 leftNormal = new Vector3(-1f, 0f, 0f);
-            Vector3 rightNormal = new Vector3(1f, 0f, 0f);
+            var frontNormal = new Vector3(0f, 0f, -1f);
+            var backNormal = new Vector3(0f, 0f, 1f);
+            var topNormal = new Vector3(0f, 1f, 0f);
+            var bottomNormal = new Vector3(0f, -1f, 0f);
+            var leftNormal = new Vector3(-1f, 0f, 0f);
+            var rightNormal = new Vector3(1f, 0f, 0f);
 
             // top faces
             AddNormal(topNormal);
@@ -1240,253 +1196,275 @@ namespace QuickPrimitives.Scripts
                 AddNormal(topNormal);
             }
 
-            int widthSeg = properties.widthSegments;
-            int heightSeg = properties.heightSegments;
-            int depthSeg = properties.depthSegments;
+            var widthSeg = properties.widthSegments;
+            var heightSeg = properties.heightSegments;
+            var depthSeg = properties.depthSegments;
 
             // for front face
-            for (int j = 0; j <= heightSeg; ++j)
+            for (var j = 0; j <= heightSeg; ++j)
+            for (var i = 0; i <= widthSeg; ++i)
             {
-                for (int i = 0; i <= widthSeg; ++i)
-                {
-                    AddVertex(new Vector3(-width * 0.5f + i * width / widthSeg,
-                                          -height * 0.5f + j * height / heightSeg,
-                                          -depth * 0.5f));
-                    AddNormal(Vector3.back);
-                }
+                AddVertex(new Vector3(-width * 0.5f + i * width / widthSeg,
+                    -height * 0.5f + j * height / heightSeg,
+                    -depth * 0.5f));
+                AddNormal(Vector3.back);
             }
 
             // for back face
-            for (int j = 0; j <= heightSeg; ++j)
+            for (var j = 0; j <= heightSeg; ++j)
+            for (var i = 0; i <= widthSeg; ++i)
             {
-                for (int i = 0; i <= widthSeg; ++i)
-                {
-                    AddVertex(new Vector3(width * 0.5f - i * width / widthSeg,
-                                          -height * 0.5f + j * height / heightSeg,
-                                          depth * 0.5f));
-                    AddNormal(Vector3.forward);
-                }
+                AddVertex(new Vector3(width * 0.5f - i * width / widthSeg,
+                    -height * 0.5f + j * height / heightSeg,
+                    depth * 0.5f));
+                AddNormal(Vector3.forward);
             }
 
             // for left side face
-            for (int j = 0; j <= heightSeg; ++j)
+            for (var j = 0; j <= heightSeg; ++j)
+            for (var i = 0; i <= depthSeg; ++i)
             {
-                for (int i = 0; i <= depthSeg; ++i)
-                {
-                    AddVertex(new Vector3(-width * 0.5f,
-                                          -height * 0.5f + j * height / heightSeg,
-                                          depth * 0.5f - i * depth / depthSeg));
-                    AddNormal(Vector3.left);
-                }
+                AddVertex(new Vector3(-width * 0.5f,
+                    -height * 0.5f + j * height / heightSeg,
+                    depth * 0.5f - i * depth / depthSeg));
+                AddNormal(Vector3.left);
             }
 
             // for right side face
-            for (int j = 0; j <= heightSeg; ++j)
+            for (var j = 0; j <= heightSeg; ++j)
+            for (var i = 0; i <= depthSeg; ++i)
             {
-                for (int i = 0; i <= depthSeg; ++i)
-                {
-                    AddVertex(new Vector3(width * 0.5f,
-                                          -height * 0.5f + j * height / heightSeg,
-                                          -depth * 0.5f + i * depth / depthSeg));
-                    AddNormal(Vector3.right);
-                }
+                AddVertex(new Vector3(width * 0.5f,
+                    -height * 0.5f + j * height / heightSeg,
+                    -depth * 0.5f + i * depth / depthSeg));
+                AddNormal(Vector3.right);
             }
 
             if (properties.genTextureCoords)
                 SetTextureCoordsHollowed();
         }
+
         #endregion
 
         #region GenerateTriangles
+
         private void GenerateTriangles()
         {
             faces.Clear();
 
-            int widthSeg = properties.widthSegments;
-            int heightSeg = properties.heightSegments;
-            int depthSeg = properties.depthSegments;
+            var widthSeg = properties.widthSegments;
+            var heightSeg = properties.heightSegments;
+            var depthSeg = properties.depthSegments;
 
             // bottom
-            int baseIndex = 0;
-            for (int i = 0; i < depthSeg; ++i)
+            var baseIndex = 0;
+            for (var i = 0; i < depthSeg; ++i)
             {
-                for (int j = 0; j < widthSeg; ++j)
+                for (var j = 0; j < widthSeg; ++j)
                 {
-                    int index = baseIndex + j;
+                    var index = baseIndex + j;
                     faces.Add(new TriangleIndices(index + 1, index, index + widthSeg + 2));
                     faces.Add(new TriangleIndices(index + widthSeg + 2, index, index + widthSeg + 1));
                 }
-                baseIndex += (widthSeg + 1);
+
+                baseIndex += widthSeg + 1;
             }
-            baseIndex += (widthSeg + 1);
+
+            baseIndex += widthSeg + 1;
 
             // top
-            for (int i = 0; i < depthSeg; ++i)
+            for (var i = 0; i < depthSeg; ++i)
             {
-                for (int j = 0; j < widthSeg; ++j)
+                for (var j = 0; j < widthSeg; ++j)
                 {
-                    int index = baseIndex + j;
+                    var index = baseIndex + j;
                     faces.Add(new TriangleIndices(index + 1, index, index + widthSeg + 2));
                     faces.Add(new TriangleIndices(index + widthSeg + 2, index, index + widthSeg + 1));
                 }
-                baseIndex += (widthSeg + 1);
+
+                baseIndex += widthSeg + 1;
             }
-            baseIndex += (widthSeg + 1);
+
+            baseIndex += widthSeg + 1;
 
             // front
-            for (int i = 0; i < heightSeg; ++i)
+            for (var i = 0; i < heightSeg; ++i)
             {
-                for (int j = 0; j < widthSeg; ++j)
+                for (var j = 0; j < widthSeg; ++j)
                 {
-                    int index = baseIndex + j;
+                    var index = baseIndex + j;
                     faces.Add(new TriangleIndices(index + 1, index, index + widthSeg + 2));
                     faces.Add(new TriangleIndices(index + widthSeg + 2, index, index + widthSeg + 1));
                 }
-                baseIndex += (widthSeg + 1);
+
+                baseIndex += widthSeg + 1;
             }
-            baseIndex += (widthSeg + 1);
+
+            baseIndex += widthSeg + 1;
 
             // back
-            for (int i = 0; i < heightSeg; ++i)
+            for (var i = 0; i < heightSeg; ++i)
             {
-                for (int j = 0; j < widthSeg; ++j)
+                for (var j = 0; j < widthSeg; ++j)
                 {
-                    int index = baseIndex + j;
+                    var index = baseIndex + j;
                     faces.Add(new TriangleIndices(index + 1, index, index + widthSeg + 2));
                     faces.Add(new TriangleIndices(index + widthSeg + 2, index, index + widthSeg + 1));
                 }
-                baseIndex += (widthSeg + 1);
+
+                baseIndex += widthSeg + 1;
             }
-            baseIndex += (widthSeg + 1);
+
+            baseIndex += widthSeg + 1;
 
             // left
-            for (int i = 0; i < heightSeg; ++i)
+            for (var i = 0; i < heightSeg; ++i)
             {
-                for (int j = 0; j < depthSeg; ++j)
+                for (var j = 0; j < depthSeg; ++j)
                 {
-                    int index = baseIndex + j;
+                    var index = baseIndex + j;
                     faces.Add(new TriangleIndices(index + 1, index, index + depthSeg + 2));
                     faces.Add(new TriangleIndices(index + depthSeg + 2, index, index + depthSeg + 1));
                 }
-                baseIndex += (depthSeg + 1);
+
+                baseIndex += depthSeg + 1;
             }
-            baseIndex += (depthSeg + 1);
+
+            baseIndex += depthSeg + 1;
 
             // right
-            for (int i = 0; i < heightSeg; ++i)
+            for (var i = 0; i < heightSeg; ++i)
             {
-                for (int j = 0; j < depthSeg; ++j)
+                for (var j = 0; j < depthSeg; ++j)
                 {
-                    int index = baseIndex + j;
+                    var index = baseIndex + j;
                     faces.Add(new TriangleIndices(index + 1, index, index + depthSeg + 2));
                     faces.Add(new TriangleIndices(index + depthSeg + 2, index, index + depthSeg + 1));
                 }
-                baseIndex += (depthSeg + 1);
+
+                baseIndex += depthSeg + 1;
             }
-            baseIndex += (depthSeg + 1);
+
+            baseIndex += depthSeg + 1;
         }
+
         #endregion
 
         #region GenerateTrianglesSlanted
+
         private void GenerateTrianglesSlanted()
         {
             faces.Clear();
 
-            int widthSeg = properties.widthSegments;
-            int heightSeg = properties.heightSegments;
-            int depthSeg = properties.depthSegments;
+            var widthSeg = properties.widthSegments;
+            var heightSeg = properties.heightSegments;
+            var depthSeg = properties.depthSegments;
 
             // bottom
-            int baseIndex = 0;
-            for (int i = 0; i < depthSeg; ++i)
+            var baseIndex = 0;
+            for (var i = 0; i < depthSeg; ++i)
             {
-                for (int j = 0; j < widthSeg; ++j)
+                for (var j = 0; j < widthSeg; ++j)
                 {
-                    int index = baseIndex + j;
+                    var index = baseIndex + j;
                     faces.Add(new TriangleIndices(index + 1, index, index + widthSeg + 2));
                     faces.Add(new TriangleIndices(index + widthSeg + 2, index, index + widthSeg + 1));
                 }
-                baseIndex += (widthSeg + 1);
+
+                baseIndex += widthSeg + 1;
             }
-            baseIndex += (widthSeg + 1);
+
+            baseIndex += widthSeg + 1;
 
             // top
-            for (int i = 0; i < depthSeg; ++i)
+            for (var i = 0; i < depthSeg; ++i)
             {
-                for (int j = 0; j < widthSeg; ++j)
+                for (var j = 0; j < widthSeg; ++j)
                 {
-                    int index = baseIndex + j;
+                    var index = baseIndex + j;
                     faces.Add(new TriangleIndices(index + 1, index, index + widthSeg + 2));
                     faces.Add(new TriangleIndices(index + widthSeg + 2, index, index + widthSeg + 1));
                 }
-                baseIndex += (widthSeg + 1);
+
+                baseIndex += widthSeg + 1;
             }
-            baseIndex += (widthSeg + 1);
+
+            baseIndex += widthSeg + 1;
 
             // front
-            for (int i = 0; i < heightSeg; ++i)
+            for (var i = 0; i < heightSeg; ++i)
             {
-                for (int j = 0; j < widthSeg; ++j)
+                for (var j = 0; j < widthSeg; ++j)
                 {
-                    int index = baseIndex + j;
+                    var index = baseIndex + j;
                     faces.Add(new TriangleIndices(index + 1, index, index + widthSeg + 2));
                     faces.Add(new TriangleIndices(index + widthSeg + 2, index, index + widthSeg + 1));
                 }
-                baseIndex += (widthSeg + 1);
+
+                baseIndex += widthSeg + 1;
             }
-            baseIndex += (widthSeg + 1);
+
+            baseIndex += widthSeg + 1;
 
             // back
-            for (int i = 0; i < heightSeg; ++i)
+            for (var i = 0; i < heightSeg; ++i)
             {
-                for (int j = 0; j < widthSeg; ++j)
+                for (var j = 0; j < widthSeg; ++j)
                 {
-                    int index = baseIndex + j;
+                    var index = baseIndex + j;
                     faces.Add(new TriangleIndices(index + 1, index, index + widthSeg + 2));
                     faces.Add(new TriangleIndices(index + widthSeg + 2, index, index + widthSeg + 1));
                 }
-                baseIndex += (widthSeg + 1);
+
+                baseIndex += widthSeg + 1;
             }
-            baseIndex += (widthSeg + 1);
+
+            baseIndex += widthSeg + 1;
 
             // left
-            for (int i = 0; i < heightSeg; ++i)
+            for (var i = 0; i < heightSeg; ++i)
             {
-                for (int j = 0; j < depthSeg; ++j)
+                for (var j = 0; j < depthSeg; ++j)
                 {
-                    int index = baseIndex + j;
+                    var index = baseIndex + j;
                     faces.Add(new TriangleIndices(index + 1, index, index + depthSeg + 2));
                     faces.Add(new TriangleIndices(index + depthSeg + 2, index, index + depthSeg + 1));
                 }
-                baseIndex += (depthSeg + 1);
+
+                baseIndex += depthSeg + 1;
             }
-            baseIndex += (depthSeg + 1);
+
+            baseIndex += depthSeg + 1;
 
             // right
-            for (int i = 0; i < heightSeg; ++i)
+            for (var i = 0; i < heightSeg; ++i)
             {
-                for (int j = 0; j < depthSeg; ++j)
+                for (var j = 0; j < depthSeg; ++j)
                 {
-                    int index = baseIndex + j;
+                    var index = baseIndex + j;
                     faces.Add(new TriangleIndices(index + 1, index, index + depthSeg + 2));
                     faces.Add(new TriangleIndices(index + depthSeg + 2, index, index + depthSeg + 1));
                 }
-                baseIndex += (depthSeg + 1);
+
+                baseIndex += depthSeg + 1;
             }
-            baseIndex += (depthSeg + 1);
+
+            baseIndex += depthSeg + 1;
         }
+
         #endregion
 
         #region GenerateTrianglesBeveled
+
         private void GenerateTrianglesBeveled()
         {
             //GenerateTriangles();
 
             // Bevels
 
-            int widthSeg = properties.widthSegments;
-            int heightSeg = properties.heightSegments;
-            int depthSeg = properties.depthSegments;
+            var widthSeg = properties.widthSegments;
+            var heightSeg = properties.heightSegments;
+            var depthSeg = properties.depthSegments;
 
             // front bottom
             faces.Add(new TriangleIndices(3, 2, 0));
@@ -1552,92 +1530,106 @@ namespace QuickPrimitives.Scripts
             faces.Add(new TriangleIndices(69, 70, 71));
 
             // bottom
-            int baseIndex = 72;
-            for (int i = 0; i < depthSeg; ++i)
+            var baseIndex = 72;
+            for (var i = 0; i < depthSeg; ++i)
             {
-                for (int j = 0; j < widthSeg; ++j)
+                for (var j = 0; j < widthSeg; ++j)
                 {
-                    int index = baseIndex + j;
+                    var index = baseIndex + j;
                     faces.Add(new TriangleIndices(index + 1, index, index + widthSeg + 2));
                     faces.Add(new TriangleIndices(index + widthSeg + 2, index, index + widthSeg + 1));
                 }
-                baseIndex += (widthSeg + 1);
+
+                baseIndex += widthSeg + 1;
             }
-            baseIndex += (widthSeg + 1);
+
+            baseIndex += widthSeg + 1;
 
             // top
-            for (int i = 0; i < depthSeg; ++i)
+            for (var i = 0; i < depthSeg; ++i)
             {
-                for (int j = 0; j < widthSeg; ++j)
+                for (var j = 0; j < widthSeg; ++j)
                 {
-                    int index = baseIndex + j;
+                    var index = baseIndex + j;
                     faces.Add(new TriangleIndices(index + 1, index, index + widthSeg + 2));
                     faces.Add(new TriangleIndices(index + widthSeg + 2, index, index + widthSeg + 1));
                 }
-                baseIndex += (widthSeg + 1);
+
+                baseIndex += widthSeg + 1;
             }
-            baseIndex += (widthSeg + 1);
+
+            baseIndex += widthSeg + 1;
 
             // front
-            for (int i = 0; i < heightSeg; ++i)
+            for (var i = 0; i < heightSeg; ++i)
             {
-                for (int j = 0; j < widthSeg; ++j)
+                for (var j = 0; j < widthSeg; ++j)
                 {
-                    int index = baseIndex + j;
+                    var index = baseIndex + j;
                     faces.Add(new TriangleIndices(index + 1, index, index + widthSeg + 2));
                     faces.Add(new TriangleIndices(index + widthSeg + 2, index, index + widthSeg + 1));
                 }
-                baseIndex += (widthSeg + 1);
+
+                baseIndex += widthSeg + 1;
             }
-            baseIndex += (widthSeg + 1);
+
+            baseIndex += widthSeg + 1;
 
             // back
-            for (int i = 0; i < heightSeg; ++i)
+            for (var i = 0; i < heightSeg; ++i)
             {
-                for (int j = 0; j < widthSeg; ++j)
+                for (var j = 0; j < widthSeg; ++j)
                 {
-                    int index = baseIndex + j;
+                    var index = baseIndex + j;
                     faces.Add(new TriangleIndices(index + 1, index, index + widthSeg + 2));
                     faces.Add(new TriangleIndices(index + widthSeg + 2, index, index + widthSeg + 1));
                 }
-                baseIndex += (widthSeg + 1);
+
+                baseIndex += widthSeg + 1;
             }
-            baseIndex += (widthSeg + 1);
+
+            baseIndex += widthSeg + 1;
 
             // left
-            for (int i = 0; i < heightSeg; ++i)
+            for (var i = 0; i < heightSeg; ++i)
             {
-                for (int j = 0; j < depthSeg; ++j)
+                for (var j = 0; j < depthSeg; ++j)
                 {
-                    int index = baseIndex + j;
+                    var index = baseIndex + j;
                     faces.Add(new TriangleIndices(index + 1, index, index + depthSeg + 2));
                     faces.Add(new TriangleIndices(index + depthSeg + 2, index, index + depthSeg + 1));
                 }
-                baseIndex += (depthSeg + 1);
+
+                baseIndex += depthSeg + 1;
             }
-            baseIndex += (depthSeg + 1);
+
+            baseIndex += depthSeg + 1;
 
             // right
-            for (int i = 0; i < heightSeg; ++i)
+            for (var i = 0; i < heightSeg; ++i)
             {
-                for (int j = 0; j < depthSeg; ++j)
+                for (var j = 0; j < depthSeg; ++j)
                 {
-                    int index = baseIndex + j;
+                    var index = baseIndex + j;
                     faces.Add(new TriangleIndices(index + 1, index, index + depthSeg + 2));
                     faces.Add(new TriangleIndices(index + depthSeg + 2, index, index + depthSeg + 1));
                 }
-                baseIndex += (depthSeg + 1);
+
+                baseIndex += depthSeg + 1;
             }
-            baseIndex += (depthSeg + 1);
+
+            baseIndex += depthSeg + 1;
         }
+
         #endregion
 
         #region GenerateTrianglesHollowed
+
         private void GenerateTrianglesHollowed()
         {
             faces.Clear();
 
-            int baseIndex = 0;
+            var baseIndex = 0;
 
             // top faces
             faces.Add(new TriangleIndices(3, 2, 0));
@@ -1689,199 +1681,163 @@ namespace QuickPrimitives.Scripts
                 baseIndex = 40;
             }
 
-            int widthSeg = properties.widthSegments;
-            int heightSeg = properties.heightSegments;
-            int depthSeg = properties.depthSegments;
+            var widthSeg = properties.widthSegments;
+            var heightSeg = properties.heightSegments;
+            var depthSeg = properties.depthSegments;
 
             // front
-            for (int i = 0; i < heightSeg; ++i)
+            for (var i = 0; i < heightSeg; ++i)
             {
-                for (int j = 0; j < widthSeg; ++j)
+                for (var j = 0; j < widthSeg; ++j)
                 {
-                    int index = baseIndex + j;
+                    var index = baseIndex + j;
                     faces.Add(new TriangleIndices(index + 1, index, index + widthSeg + 2));
                     faces.Add(new TriangleIndices(index + widthSeg + 2, index, index + widthSeg + 1));
                 }
-                baseIndex += (widthSeg + 1);
+
+                baseIndex += widthSeg + 1;
             }
-            baseIndex += (widthSeg + 1);
+
+            baseIndex += widthSeg + 1;
 
             // back
-            for (int i = 0; i < heightSeg; ++i)
+            for (var i = 0; i < heightSeg; ++i)
             {
-                for (int j = 0; j < widthSeg; ++j)
+                for (var j = 0; j < widthSeg; ++j)
                 {
-                    int index = baseIndex + j;
+                    var index = baseIndex + j;
                     faces.Add(new TriangleIndices(index + 1, index, index + widthSeg + 2));
                     faces.Add(new TriangleIndices(index + widthSeg + 2, index, index + widthSeg + 1));
                 }
-                baseIndex += (widthSeg + 1);
+
+                baseIndex += widthSeg + 1;
             }
-            baseIndex += (widthSeg + 1);
+
+            baseIndex += widthSeg + 1;
 
             // left
-            for (int i = 0; i < heightSeg; ++i)
+            for (var i = 0; i < heightSeg; ++i)
             {
-                for (int j = 0; j < depthSeg; ++j)
+                for (var j = 0; j < depthSeg; ++j)
                 {
-                    int index = baseIndex + j;
+                    var index = baseIndex + j;
                     faces.Add(new TriangleIndices(index + 1, index, index + depthSeg + 2));
                     faces.Add(new TriangleIndices(index + depthSeg + 2, index, index + depthSeg + 1));
                 }
-                baseIndex += (depthSeg + 1);
+
+                baseIndex += depthSeg + 1;
             }
-            baseIndex += (depthSeg + 1);
+
+            baseIndex += depthSeg + 1;
 
             // right
-            for (int i = 0; i < heightSeg; ++i)
+            for (var i = 0; i < heightSeg; ++i)
             {
-                for (int j = 0; j < depthSeg; ++j)
+                for (var j = 0; j < depthSeg; ++j)
                 {
-                    int index = baseIndex + j;
+                    var index = baseIndex + j;
                     faces.Add(new TriangleIndices(index + 1, index, index + depthSeg + 2));
                     faces.Add(new TriangleIndices(index + depthSeg + 2, index, index + depthSeg + 1));
                 }
-                baseIndex += (depthSeg + 1);
+
+                baseIndex += depthSeg + 1;
             }
-            baseIndex += (depthSeg + 1);
+
+            baseIndex += depthSeg + 1;
         }
+
         #endregion
 
         #region SetTextureCoords
+
         private void SetTextureCoords()
         {
             if (!properties.genTextureCoords) return;
 
-            int widthSeg = properties.widthSegments;
-            int heightSeg = properties.heightSegments;
-            int depthSeg = properties.depthSegments;
+            var widthSeg = properties.widthSegments;
+            var heightSeg = properties.heightSegments;
+            var depthSeg = properties.depthSegments;
 
             if (!properties.textureWrapped)
             {
                 // for bottom face
-                for (int j = 0; j <= depthSeg; ++j)
-                {
-                    for (int i = 0; i <= widthSeg; ++i)
-                    {
-                        AddUV(new Vector2((float)i / widthSeg, (float)j / depthSeg));
-                    }
-                }
+                for (var j = 0; j <= depthSeg; ++j)
+                for (var i = 0; i <= widthSeg; ++i)
+                    AddUV(new Vector2((float)i / widthSeg, (float)j / depthSeg));
 
                 // for top face
-                for (int j = 0; j <= depthSeg; ++j)
-                {
-                    for (int i = 0; i <= widthSeg; ++i)
-                    {
-                        AddUV(new Vector2((float)i / widthSeg, (float)j / depthSeg));
-                    }
-                }
+                for (var j = 0; j <= depthSeg; ++j)
+                for (var i = 0; i <= widthSeg; ++i)
+                    AddUV(new Vector2((float)i / widthSeg, (float)j / depthSeg));
 
                 // for front face
-                for (int j = 0; j <= heightSeg; ++j)
-                {
-                    for (int i = 0; i <= widthSeg; ++i)
-                    {
-                        AddUV(new Vector2((float)i / widthSeg, (float)j / heightSeg));
-                    }
-                }
+                for (var j = 0; j <= heightSeg; ++j)
+                for (var i = 0; i <= widthSeg; ++i)
+                    AddUV(new Vector2((float)i / widthSeg, (float)j / heightSeg));
 
                 // for back face
-                for (int j = 0; j <= heightSeg; ++j)
-                {
-                    for (int i = 0; i <= widthSeg; ++i)
-                    {
-                        AddUV(new Vector2(1.0f - (float)i / widthSeg, 1.0f - (float)j / heightSeg));
-                    }
-                }
+                for (var j = 0; j <= heightSeg; ++j)
+                for (var i = 0; i <= widthSeg; ++i)
+                    AddUV(new Vector2(1.0f - (float)i / widthSeg, 1.0f - (float)j / heightSeg));
 
                 // for left side face
-                for (int j = 0; j <= heightSeg; ++j)
-                {
-                    for (int i = 0; i <= depthSeg; ++i)
-                    {
-                        AddUV(new Vector2((float)i / depthSeg, (float)j / heightSeg));
-                    }
-                }
+                for (var j = 0; j <= heightSeg; ++j)
+                for (var i = 0; i <= depthSeg; ++i)
+                    AddUV(new Vector2((float)i / depthSeg, (float)j / heightSeg));
 
                 // for right side face
-                for (int j = 0; j <= heightSeg; ++j)
-                {
-                    for (int i = 0; i <= depthSeg; ++i)
-                    {
-                        AddUV(new Vector2((float)i / depthSeg, (float)j / heightSeg));
-                    }
-                }
+                for (var j = 0; j <= heightSeg; ++j)
+                for (var i = 0; i <= depthSeg; ++i)
+                    AddUV(new Vector2((float)i / depthSeg, (float)j / heightSeg));
             }
             else
             {
-                float v0 = properties.depth / properties.width;
-                float v1 = 1 - v0;
+                var v0 = properties.depth / properties.width;
+                var v1 = 1 - v0;
 
                 // for bottom face
-                for (int j = 0; j <= depthSeg; ++j)
-                {
-                    for (int i = 0; i <= widthSeg; ++i)
-                    {
-                        AddUV(new Vector2((float)i / widthSeg, v0 * (float)j / depthSeg + v1));
-                    }
-                }
+                for (var j = 0; j <= depthSeg; ++j)
+                for (var i = 0; i <= widthSeg; ++i)
+                    AddUV(new Vector2((float)i / widthSeg, v0 * (float)j / depthSeg + v1));
 
                 // for top face
-                for (int j = 0; j <= depthSeg; ++j)
-                {
-                    for (int i = 0; i <= widthSeg; ++i)
-                    {
-                        AddUV(new Vector2((float)i / widthSeg, v0 * (float)j / depthSeg));
-                    }
-                }
+                for (var j = 0; j <= depthSeg; ++j)
+                for (var i = 0; i <= widthSeg; ++i)
+                    AddUV(new Vector2((float)i / widthSeg, v0 * (float)j / depthSeg));
 
                 // for front face
-                for (int j = 0; j <= heightSeg; ++j)
-                {
-                    for (int i = 0; i <= widthSeg; ++i)
-                    {
-                        AddUV(new Vector2((float)i / widthSeg, (float)j / heightSeg));
-                    }
-                }
+                for (var j = 0; j <= heightSeg; ++j)
+                for (var i = 0; i <= widthSeg; ++i)
+                    AddUV(new Vector2((float)i / widthSeg, (float)j / heightSeg));
 
                 // for back face
-                for (int j = 0; j <= heightSeg; ++j)
-                {
-                    for (int i = 0; i <= widthSeg; ++i)
-                    {
-                        AddUV(new Vector2(1.0f - (float)i / widthSeg, (float)j / heightSeg));
-                    }
-                }
+                for (var j = 0; j <= heightSeg; ++j)
+                for (var i = 0; i <= widthSeg; ++i)
+                    AddUV(new Vector2(1.0f - (float)i / widthSeg, (float)j / heightSeg));
 
                 // for left side face
-                for (int j = 0; j <= heightSeg; ++j)
-                {
-                    for (int i = 0; i <= depthSeg; ++i)
-                    {
-                        AddUV(new Vector2(v0 * (float)i / depthSeg + v1, (float)j / heightSeg));
-                    }
-                }
+                for (var j = 0; j <= heightSeg; ++j)
+                for (var i = 0; i <= depthSeg; ++i)
+                    AddUV(new Vector2(v0 * (float)i / depthSeg + v1, (float)j / heightSeg));
 
                 // for right side face
-                for (int j = 0; j <= heightSeg; ++j)
-                {
-                    for (int i = 0; i <= depthSeg; ++i)
-                    {
-                        AddUV(new Vector2(v0 * (float)i / depthSeg, (float)j / heightSeg));
-                    }
-                }
+                for (var j = 0; j <= heightSeg; ++j)
+                for (var i = 0; i <= depthSeg; ++i)
+                    AddUV(new Vector2(v0 * (float)i / depthSeg, (float)j / heightSeg));
             }
         }
+
         #endregion
 
         #region SetTextureCoordsBeveled
+
         private void SetTextureCoordsBeveled()
         {
             if (!properties.genTextureCoords) return;
 
-            int widthSeg = properties.widthSegments;
-            int heightSeg = properties.heightSegments;
-            int depthSeg = properties.depthSegments;
+            var widthSeg = properties.widthSegments;
+            var heightSeg = properties.heightSegments;
+            var depthSeg = properties.depthSegments;
 
             if (!properties.textureWrapped)
             {
@@ -2004,65 +1960,41 @@ namespace QuickPrimitives.Scripts
                 AddUV(new Vector2(1f, 1f));
 
                 // for bottom face
-                for (int j = 0; j <= depthSeg; ++j)
-                {
-                    for (int i = 0; i <= widthSeg; ++i)
-                    {
-                        AddUV(new Vector2((float)i / widthSeg, (float)j / depthSeg));
-                    }
-                }
+                for (var j = 0; j <= depthSeg; ++j)
+                for (var i = 0; i <= widthSeg; ++i)
+                    AddUV(new Vector2((float)i / widthSeg, (float)j / depthSeg));
 
                 // for top face
-                for (int j = 0; j <= depthSeg; ++j)
-                {
-                    for (int i = 0; i <= widthSeg; ++i)
-                    {
-                        AddUV(new Vector2((float)i / widthSeg, (float)j / depthSeg));
-                    }
-                }
+                for (var j = 0; j <= depthSeg; ++j)
+                for (var i = 0; i <= widthSeg; ++i)
+                    AddUV(new Vector2((float)i / widthSeg, (float)j / depthSeg));
 
                 // for front face
-                for (int j = 0; j <= heightSeg; ++j)
-                {
-                    for (int i = 0; i <= widthSeg; ++i)
-                    {
-                        AddUV(new Vector2((float)i / widthSeg, (float)j / heightSeg));
-                    }
-                }
+                for (var j = 0; j <= heightSeg; ++j)
+                for (var i = 0; i <= widthSeg; ++i)
+                    AddUV(new Vector2((float)i / widthSeg, (float)j / heightSeg));
 
                 // for back face
-                for (int j = 0; j <= heightSeg; ++j)
-                {
-                    for (int i = 0; i <= widthSeg; ++i)
-                    {
-                        AddUV(new Vector2(1.0f - (float)i / widthSeg, 1.0f - (float)j / heightSeg));
-                    }
-                }
+                for (var j = 0; j <= heightSeg; ++j)
+                for (var i = 0; i <= widthSeg; ++i)
+                    AddUV(new Vector2(1.0f - (float)i / widthSeg, 1.0f - (float)j / heightSeg));
 
                 // for left side face
-                for (int j = 0; j <= heightSeg; ++j)
-                {
-                    for (int i = 0; i <= depthSeg; ++i)
-                    {
-                        AddUV(new Vector2((float)i / depthSeg, (float)j / heightSeg));
-                    }
-                }
+                for (var j = 0; j <= heightSeg; ++j)
+                for (var i = 0; i <= depthSeg; ++i)
+                    AddUV(new Vector2((float)i / depthSeg, (float)j / heightSeg));
 
                 // for right side face
-                for (int j = 0; j <= heightSeg; ++j)
-                {
-                    for (int i = 0; i <= depthSeg; ++i)
-                    {
-                        AddUV(new Vector2((float)i / depthSeg, (float)j / heightSeg));
-                    }
-                }
+                for (var j = 0; j <= heightSeg; ++j)
+                for (var i = 0; i <= depthSeg; ++i)
+                    AddUV(new Vector2((float)i / depthSeg, (float)j / heightSeg));
             }
             else
             {
-                float u0 = properties.beveledEdge.width / properties.width;
-                float u1 = 1.0f - u0;
-                float v0 = properties.beveledEdge.width / properties.height;
-                float v1 = 1.0f - v0;
+                var u0 = properties.beveledEdge.width / properties.width;
+                var u1 = 1.0f - u0;
+                var v0 = properties.beveledEdge.width / properties.height;
+                var v1 = 1.0f - v0;
 
                 //float v0 = properties.depth / properties.width;
                 //float v1 = 1 - v0;
@@ -2186,283 +2118,225 @@ namespace QuickPrimitives.Scripts
                 AddUV(new Vector2(u1, v1));
 
                 // for bottom face
-                for (int j = 0; j <= depthSeg; ++j)
-                {
-                    for (int i = 0; i <= widthSeg; ++i)
-                    {
-                        AddUV(new Vector2((u1 - u0) * (float)i / widthSeg + u0, (v1 - v0) * (float)j / depthSeg + v0));
-                    }
-                }
+                for (var j = 0; j <= depthSeg; ++j)
+                for (var i = 0; i <= widthSeg; ++i)
+                    AddUV(new Vector2((u1 - u0) * (float)i / widthSeg + u0, (v1 - v0) * (float)j / depthSeg + v0));
 
                 // for top face
-                for (int j = 0; j <= depthSeg; ++j)
-                {
-                    for (int i = 0; i <= widthSeg; ++i)
-                    {
-                        AddUV(new Vector2((u1 - u0) * (float)i / widthSeg + u0, (v1 - v0) * (float)j / depthSeg + v0));
-                    }
-                }
+                for (var j = 0; j <= depthSeg; ++j)
+                for (var i = 0; i <= widthSeg; ++i)
+                    AddUV(new Vector2((u1 - u0) * (float)i / widthSeg + u0, (v1 - v0) * (float)j / depthSeg + v0));
 
                 // for front face
-                for (int j = 0; j <= heightSeg; ++j)
-                {
-                    for (int i = 0; i <= widthSeg; ++i)
-                    {
-                        AddUV(new Vector2((u1 - u0) * (float)i / widthSeg + u0, (v1 - v0) * (float)j / depthSeg + v0));
-                    }
-                }
+                for (var j = 0; j <= heightSeg; ++j)
+                for (var i = 0; i <= widthSeg; ++i)
+                    AddUV(new Vector2((u1 - u0) * (float)i / widthSeg + u0, (v1 - v0) * (float)j / depthSeg + v0));
 
                 // for back face
-                for (int j = 0; j <= heightSeg; ++j)
-                {
-                    for (int i = 0; i <= widthSeg; ++i)
-                    {
-                        AddUV(new Vector2((u1 - u0) * (float)i / widthSeg + u0, (v1 - v0) * (float)j / depthSeg + v0));
-                    }
-                }
+                for (var j = 0; j <= heightSeg; ++j)
+                for (var i = 0; i <= widthSeg; ++i)
+                    AddUV(new Vector2((u1 - u0) * (float)i / widthSeg + u0, (v1 - v0) * (float)j / depthSeg + v0));
 
                 // for left side face
-                for (int j = 0; j <= heightSeg; ++j)
-                {
-                    for (int i = 0; i <= depthSeg; ++i)
-                    {
-                        AddUV(new Vector2((u1 - u0) * (float)i / depthSeg + u0, (v1 - v0) * (float)j / depthSeg + v0));
-                    }
-                }
+                for (var j = 0; j <= heightSeg; ++j)
+                for (var i = 0; i <= depthSeg; ++i)
+                    AddUV(new Vector2((u1 - u0) * (float)i / depthSeg + u0, (v1 - v0) * (float)j / depthSeg + v0));
 
                 // for right side face
-                for (int j = 0; j <= heightSeg; ++j)
-                {
-                    for (int i = 0; i <= depthSeg; ++i)
-                    {
-                        AddUV(new Vector2((u1 - u0) * (float)i / depthSeg + u0, (v1 - v0) * (float)j / depthSeg + v0));
-                    }
-                }
+                for (var j = 0; j <= heightSeg; ++j)
+                for (var i = 0; i <= depthSeg; ++i)
+                    AddUV(new Vector2((u1 - u0) * (float)i / depthSeg + u0, (v1 - v0) * (float)j / depthSeg + v0));
             }
         }
+
         #endregion
 
         #region SetTextureCoordsSlanted
+
         private void SetTextureCoordsSlanted()
         {
             if (!properties.genTextureCoords) return;
 
-            int widthSeg = properties.widthSegments;
-            int heightSeg = properties.heightSegments;
-            int depthSeg = properties.depthSegments;
+            var widthSeg = properties.widthSegments;
+            var heightSeg = properties.heightSegments;
+            var depthSeg = properties.depthSegments;
 
             if (!properties.textureWrapped)
             {
                 // for bottom face
-                for (int j = 0; j <= depthSeg; ++j)
-                {
-                    for (int i = 0; i <= widthSeg; ++i)
-                    {
-                        AddUV(new Vector2((float)i / widthSeg, (float)j / depthSeg));
-                    }
-                }
+                for (var j = 0; j <= depthSeg; ++j)
+                for (var i = 0; i <= widthSeg; ++i)
+                    AddUV(new Vector2((float)i / widthSeg, (float)j / depthSeg));
 
                 // for top face
-                for (int j = 0; j <= depthSeg; ++j)
-                {
-                    for (int i = 0; i <= widthSeg; ++i)
-                    {
-                        AddUV(new Vector2((float)i / widthSeg, (float)j / depthSeg));
-                    }
-                }
+                for (var j = 0; j <= depthSeg; ++j)
+                for (var i = 0; i <= widthSeg; ++i)
+                    AddUV(new Vector2((float)i / widthSeg, (float)j / depthSeg));
 
                 // for front face
-                for (int j = 0; j <= heightSeg; ++j)
-                {
-                    for (int i = 0; i <= widthSeg; ++i)
-                    {
-                        AddUV(new Vector2((float)i / widthSeg, (float)j / heightSeg));
-                    }
-                }
+                for (var j = 0; j <= heightSeg; ++j)
+                for (var i = 0; i <= widthSeg; ++i)
+                    AddUV(new Vector2((float)i / widthSeg, (float)j / heightSeg));
 
                 // for back face
-                for (int j = 0; j <= heightSeg; ++j)
-                {
-                    for (int i = 0; i <= widthSeg; ++i)
-                    {
-                        AddUV(new Vector2(1.0f - (float)i / widthSeg, 1.0f - (float)j / heightSeg));
-                    }
-                }
+                for (var j = 0; j <= heightSeg; ++j)
+                for (var i = 0; i <= widthSeg; ++i)
+                    AddUV(new Vector2(1.0f - (float)i / widthSeg, 1.0f - (float)j / heightSeg));
 
                 // for left side face
-                for (int j = 0; j <= heightSeg; ++j)
-                {
-                    for (int i = 0; i <= depthSeg; ++i)
-                    {
-                        AddUV(new Vector2((float)i / depthSeg, (float)j / heightSeg));
-                    }
-                }
+                for (var j = 0; j <= heightSeg; ++j)
+                for (var i = 0; i <= depthSeg; ++i)
+                    AddUV(new Vector2((float)i / depthSeg, (float)j / heightSeg));
 
                 // for right side face
-                for (int j = 0; j <= heightSeg; ++j)
-                {
-                    for (int i = 0; i <= depthSeg; ++i)
-                    {
-                        AddUV(new Vector2((float)i / depthSeg, (float)j / heightSeg));
-                    }
-                }
+                for (var j = 0; j <= heightSeg; ++j)
+                for (var i = 0; i <= depthSeg; ++i)
+                    AddUV(new Vector2((float)i / depthSeg, (float)j / heightSeg));
             }
             else
             {
-                float slantWidth = Mathf.Sqrt(properties.slantedSides.size[0] * properties.slantedSides.size[0] + properties.depth * properties.depth);
-                float slantHeight = Mathf.Sqrt(properties.slantedSides.size[1] * properties.slantedSides.size[1] + properties.depth * properties.depth);
-                float totalWidth = (properties.width - properties.slantedSides.size[0] * 2f) + slantWidth * 2f;
-                float totalHeight = (properties.height - properties.slantedSides.size[1] * 2f) + slantHeight * 2f;
+                var slantWidth = Mathf.Sqrt(properties.slantedSides.size[0] * properties.slantedSides.size[0] +
+                                            properties.depth * properties.depth);
+                var slantHeight = Mathf.Sqrt(properties.slantedSides.size[1] * properties.slantedSides.size[1] +
+                                             properties.depth * properties.depth);
+                var totalWidth = properties.width - properties.slantedSides.size[0] * 2f + slantWidth * 2f;
+                var totalHeight = properties.height - properties.slantedSides.size[1] * 2f + slantHeight * 2f;
 
-                float u0 = slantWidth / totalWidth;
-                float u1 = 1.0f - u0;
+                var u0 = slantWidth / totalWidth;
+                var u1 = 1.0f - u0;
 
-                float v0 = slantHeight / totalHeight;
-                float v1 = 1.0f - v0;
+                var v0 = slantHeight / totalHeight;
+                var v1 = 1.0f - v0;
 
                 // for bottom face
-                for (int j = 0; j <= depthSeg; ++j)
+                for (var j = 0; j <= depthSeg; ++j)
+                for (var i = 0; i <= widthSeg; ++i)
                 {
-                    for (int i = 0; i <= widthSeg; ++i)
-                    {
-                        float u = ((float)j / depthSeg * (u1 - u0) + (1.0f - (float)j / depthSeg) * 1) * i / widthSeg +
-                               (float)j / depthSeg * u0;
-                        AddUV(new Vector2(u, v0 * (float)j / depthSeg));
-                    }
+                    var u = ((float)j / depthSeg * (u1 - u0) + (1.0f - (float)j / depthSeg) * 1) * i / widthSeg +
+                            (float)j / depthSeg * u0;
+                    AddUV(new Vector2(u, v0 * (float)j / depthSeg));
                 }
 
                 // for top face
-                for (int j = 0; j <= depthSeg; ++j)
+                for (var j = 0; j <= depthSeg; ++j)
+                for (var i = 0; i <= widthSeg; ++i)
                 {
-                    for (int i = 0; i <= widthSeg; ++i)
-                    {
-                        float u = ((float)j / depthSeg * 1 + (1.0f - (float)j / depthSeg) * (u1 - u0)) * i / widthSeg +
-                               (1 - (float)j / depthSeg) * u0;
-                        AddUV(new Vector2(u, v1 + v0 * (float)j / depthSeg));
-                    }
+                    var u = ((float)j / depthSeg * 1 + (1.0f - (float)j / depthSeg) * (u1 - u0)) * i / widthSeg +
+                            (1 - (float)j / depthSeg) * u0;
+                    AddUV(new Vector2(u, v1 + v0 * (float)j / depthSeg));
                 }
 
                 // for front face
-                for (int j = 0; j <= heightSeg; ++j)
-                {
-                    for (int i = 0; i <= widthSeg; ++i)
-                    {
-                        AddUV(new Vector2((float)i / widthSeg * (u1 - u0) + u0, (float)j / heightSeg * (v1 - v0) + v0));
-                    }
-                }
+                for (var j = 0; j <= heightSeg; ++j)
+                for (var i = 0; i <= widthSeg; ++i)
+                    AddUV(new Vector2((float)i / widthSeg * (u1 - u0) + u0, (float)j / heightSeg * (v1 - v0) + v0));
 
                 // for back face
-                for (int j = 0; j <= heightSeg; ++j)
-                {
-                    for (int i = 0; i <= widthSeg; ++i)
-                    {
-                        AddUV(new Vector2(1.0f - (float)i / widthSeg, (float)j / heightSeg));
-                    }
-                }
+                for (var j = 0; j <= heightSeg; ++j)
+                for (var i = 0; i <= widthSeg; ++i)
+                    AddUV(new Vector2(1.0f - (float)i / widthSeg, (float)j / heightSeg));
 
                 // for left side face
-                for (int j = 0; j <= heightSeg; ++j)
+                for (var j = 0; j <= heightSeg; ++j)
+                for (var i = 0; i <= depthSeg; ++i)
                 {
-                    for (int i = 0; i <= depthSeg; ++i)
-                    {
-                        float v = ((float)i / depthSeg * (v1 - v0) + (1.0f - (float)i / depthSeg) * 1) * j / heightSeg +
-                               (float)i / depthSeg * v0;
-                        AddUV(new Vector2(u0 * (float)i / depthSeg, v));
-                    }
+                    var v = ((float)i / depthSeg * (v1 - v0) + (1.0f - (float)i / depthSeg) * 1) * j / heightSeg +
+                            (float)i / depthSeg * v0;
+                    AddUV(new Vector2(u0 * (float)i / depthSeg, v));
                 }
 
                 // for right side face
-                for (int j = 0; j <= heightSeg; ++j)
+                for (var j = 0; j <= heightSeg; ++j)
+                for (var i = 0; i <= depthSeg; ++i)
                 {
-                    for (int i = 0; i <= depthSeg; ++i)
-                    {
-                        float v = ((float)i / depthSeg * 1 + (1.0f - (float)i / depthSeg) * (v1 - v0)) * j / heightSeg +
-                               (1 - (float)i / depthSeg) * v0;
-                        AddUV(new Vector2(u1 + u0 * (float)i / depthSeg, v));
-                    }
+                    var v = ((float)i / depthSeg * 1 + (1.0f - (float)i / depthSeg) * (v1 - v0)) * j / heightSeg +
+                            (1 - (float)i / depthSeg) * v0;
+                    AddUV(new Vector2(u1 + u0 * (float)i / depthSeg, v));
                 }
             }
         }
+
         #endregion
 
         #region SetTextureCoordsHollowed
+
         private void SetTextureCoordsHollowed()
         {
             if (!properties.genTextureCoords) return;
 
-            int widthSeg = properties.widthSegments;
-            int heightSeg = properties.heightSegments;
-            int depthSeg = properties.depthSegments;
+            var widthSeg = properties.widthSegments;
+            var heightSeg = properties.heightSegments;
+            var depthSeg = properties.depthSegments;
 
             if (!properties.textureWrapped)
             {
                 // top faces
-                AddUV(new Vector2(0f, 0f));      // front
+                AddUV(new Vector2(0f, 0f)); // front
                 AddUV(new Vector2(1f, 0f));
                 AddUV(new Vector2(1f, 1f));
                 AddUV(new Vector2(0f, 1f));
 
-                AddUV(new Vector2(0f, 0f));      // back
+                AddUV(new Vector2(0f, 0f)); // back
                 AddUV(new Vector2(1f, 0f));
                 AddUV(new Vector2(1f, 1f));
                 AddUV(new Vector2(0f, 1f));
 
-                AddUV(new Vector2(0f, 0f));      // left
+                AddUV(new Vector2(0f, 0f)); // left
                 AddUV(new Vector2(1f, 0f));
                 AddUV(new Vector2(1f, 1f));
                 AddUV(new Vector2(0f, 1f));
 
-                AddUV(new Vector2(0f, 0f));      // right
+                AddUV(new Vector2(0f, 0f)); // right
                 AddUV(new Vector2(1f, 0f));
                 AddUV(new Vector2(1f, 1f));
                 AddUV(new Vector2(0f, 1f));
 
                 // inner walls
-                AddUV(new Vector2(0f, 0f));      // front
+                AddUV(new Vector2(0f, 0f)); // front
                 AddUV(new Vector2(1f, 0f));
                 AddUV(new Vector2(1f, 1f));
                 AddUV(new Vector2(0f, 1f));
 
-                AddUV(new Vector2(0f, 0f));      // back
+                AddUV(new Vector2(0f, 0f)); // back
                 AddUV(new Vector2(1f, 0f));
                 AddUV(new Vector2(1f, 1f));
                 AddUV(new Vector2(0f, 1f));
 
-                AddUV(new Vector2(0f, 0f));      // left
+                AddUV(new Vector2(0f, 0f)); // left
                 AddUV(new Vector2(1f, 0f));
                 AddUV(new Vector2(1f, 1f));
                 AddUV(new Vector2(0f, 1f));
 
-                AddUV(new Vector2(0f, 0f));      // right
+                AddUV(new Vector2(0f, 0f)); // right
                 AddUV(new Vector2(1f, 0f));
                 AddUV(new Vector2(1f, 1f));
                 AddUV(new Vector2(0f, 1f));
 
                 if (properties.hollow.height == properties.height)
                 {
-                    AddUV(new Vector2(0f, 0f));      // front
+                    AddUV(new Vector2(0f, 0f)); // front
                     AddUV(new Vector2(1f, 0f));
                     AddUV(new Vector2(1f, 1f));
                     AddUV(new Vector2(0f, 1f));
 
-                    AddUV(new Vector2(0f, 0f));      // back
+                    AddUV(new Vector2(0f, 0f)); // back
                     AddUV(new Vector2(1f, 0f));
                     AddUV(new Vector2(1f, 1f));
                     AddUV(new Vector2(0f, 1f));
 
-                    AddUV(new Vector2(0f, 0f));      // left
+                    AddUV(new Vector2(0f, 0f)); // left
                     AddUV(new Vector2(1f, 0f));
                     AddUV(new Vector2(1f, 1f));
                     AddUV(new Vector2(0f, 1f));
 
-                    AddUV(new Vector2(0f, 0f));      // right
+                    AddUV(new Vector2(0f, 0f)); // right
                     AddUV(new Vector2(1f, 0f));
                     AddUV(new Vector2(1f, 1f));
                     AddUV(new Vector2(0f, 1f));
                 }
                 else
                 {
-                    AddUV(new Vector2(0f, 0f));       // bottom
+                    AddUV(new Vector2(0f, 0f)); // bottom
                     AddUV(new Vector2(1f, 0f));
                     AddUV(new Vector2(1f, 1f));
                     AddUV(new Vector2(0f, 1f));
@@ -2475,116 +2349,100 @@ namespace QuickPrimitives.Scripts
                 }
 
                 // for front face
-                for (int j = 0; j <= heightSeg; ++j)
-                {
-                    for (int i = 0; i <= widthSeg; ++i)
-                    {
-                        AddUV(new Vector2((float)i / widthSeg, (float)j / heightSeg));
-                    }
-                }
+                for (var j = 0; j <= heightSeg; ++j)
+                for (var i = 0; i <= widthSeg; ++i)
+                    AddUV(new Vector2((float)i / widthSeg, (float)j / heightSeg));
 
                 // for back face
-                for (int j = 0; j <= heightSeg; ++j)
-                {
-                    for (int i = 0; i <= widthSeg; ++i)
-                    {
-                        AddUV(new Vector2(1.0f - (float)i / widthSeg, 1.0f - (float)j / heightSeg));
-                    }
-                }
+                for (var j = 0; j <= heightSeg; ++j)
+                for (var i = 0; i <= widthSeg; ++i)
+                    AddUV(new Vector2(1.0f - (float)i / widthSeg, 1.0f - (float)j / heightSeg));
 
                 // for left side face
-                for (int j = 0; j <= heightSeg; ++j)
-                {
-                    for (int i = 0; i <= depthSeg; ++i)
-                    {
-                        AddUV(new Vector2((float)i / depthSeg, (float)j / heightSeg));
-                    }
-                }
+                for (var j = 0; j <= heightSeg; ++j)
+                for (var i = 0; i <= depthSeg; ++i)
+                    AddUV(new Vector2((float)i / depthSeg, (float)j / heightSeg));
 
                 // for right side face
-                for (int j = 0; j <= heightSeg; ++j)
-                {
-                    for (int i = 0; i <= depthSeg; ++i)
-                    {
-                        AddUV(new Vector2((float)i / depthSeg, (float)j / heightSeg));
-                    }
-                }
+                for (var j = 0; j <= heightSeg; ++j)
+                for (var i = 0; i <= depthSeg; ++i)
+                    AddUV(new Vector2((float)i / depthSeg, (float)j / heightSeg));
             }
             else
             {
-                float u0 = properties.hollow.thickness / properties.width;
-                float u1 = 1.0f - u0;
-                float v0 = properties.hollow.thickness / properties.depth;
-                float v1 = 1.0f - v0;    
+                var u0 = properties.hollow.thickness / properties.width;
+                var u1 = 1.0f - u0;
+                var v0 = properties.hollow.thickness / properties.depth;
+                var v1 = 1.0f - v0;
 
                 // top faces
-                AddUV(new Vector2(0f, 0f));      // front
+                AddUV(new Vector2(0f, 0f)); // front
                 AddUV(new Vector2(1f, 0f));
                 AddUV(new Vector2(u1, v0));
                 AddUV(new Vector2(u0, v0));
 
-                AddUV(new Vector2(1f, 1f));      // back
+                AddUV(new Vector2(1f, 1f)); // back
                 AddUV(new Vector2(0f, 1f));
                 AddUV(new Vector2(u0, v1));
                 AddUV(new Vector2(u1, v1));
 
-                AddUV(new Vector2(0f, 1f));      // left
+                AddUV(new Vector2(0f, 1f)); // left
                 AddUV(new Vector2(0f, 0f));
                 AddUV(new Vector2(u0, v0));
                 AddUV(new Vector2(u0, v1));
 
-                AddUV(new Vector2(1f, 0f));      // right
+                AddUV(new Vector2(1f, 0f)); // right
                 AddUV(new Vector2(1f, 1f));
                 AddUV(new Vector2(u1, v1));
                 AddUV(new Vector2(u1, v0));
 
                 // inner walls
-                float v2 = properties.hollow.height / properties.depth;
-                AddUV(new Vector2(u0, v0 + v2));      // front
+                var v2 = properties.hollow.height / properties.depth;
+                AddUV(new Vector2(u0, v0 + v2)); // front
                 AddUV(new Vector2(u1, v0 + v2));
                 AddUV(new Vector2(u1, v0));
                 AddUV(new Vector2(u0, v0));
 
-                AddUV(new Vector2(u1, v1 - v2));      // back
+                AddUV(new Vector2(u1, v1 - v2)); // back
                 AddUV(new Vector2(u0, v1 - v2));
                 AddUV(new Vector2(u0, v1));
                 AddUV(new Vector2(u1, v1));
 
-                AddUV(new Vector2(u0 + v2, v0));      // left
+                AddUV(new Vector2(u0 + v2, v0)); // left
                 AddUV(new Vector2(u0 + v2, v1));
                 AddUV(new Vector2(u0, v1));
                 AddUV(new Vector2(u0, v0));
 
-                AddUV(new Vector2(u1 - v2, v0));      // right
+                AddUV(new Vector2(u1 - v2, v0)); // right
                 AddUV(new Vector2(u1 - v2, v1));
                 AddUV(new Vector2(u1, v1));
                 AddUV(new Vector2(u1, v0));
 
                 if (properties.hollow.height == properties.height)
                 {
-                    AddUV(new Vector2(0f, 1f));      // front
+                    AddUV(new Vector2(0f, 1f)); // front
                     AddUV(new Vector2(1f, 1f));
                     AddUV(new Vector2(u1, v1));
                     AddUV(new Vector2(u0, v1));
 
-                    AddUV(new Vector2(1f, 0f));      // back
+                    AddUV(new Vector2(1f, 0f)); // back
                     AddUV(new Vector2(0f, 0f));
                     AddUV(new Vector2(u0, v0));
                     AddUV(new Vector2(u1, v0));
 
-                    AddUV(new Vector2(1f, 0f));      // left
+                    AddUV(new Vector2(1f, 0f)); // left
                     AddUV(new Vector2(1f, 1f));
                     AddUV(new Vector2(u1, v1));
                     AddUV(new Vector2(u1, v0));
 
-                    AddUV(new Vector2(0f, 0f));      // right
+                    AddUV(new Vector2(0f, 0f)); // right
                     AddUV(new Vector2(0f, 1f));
                     AddUV(new Vector2(u0, v1));
                     AddUV(new Vector2(u0, v0));
                 }
                 else
                 {
-                    AddUV(new Vector2(0f, 0f));       // bottom
+                    AddUV(new Vector2(0f, 0f)); // bottom
                     AddUV(new Vector2(1f, 0f));
                     AddUV(new Vector2(1f, 1f));
                     AddUV(new Vector2(0f, 1f));
@@ -2597,47 +2455,30 @@ namespace QuickPrimitives.Scripts
                 }
 
                 // for front face
-                for (int j = 0; j <= heightSeg; ++j)
-                {
-                    for (int i = 0; i <= widthSeg; ++i)
-                    {
-                        AddUV(new Vector2((float)i / widthSeg, (float)j / heightSeg));
-                    }
-                }
+                for (var j = 0; j <= heightSeg; ++j)
+                for (var i = 0; i <= widthSeg; ++i)
+                    AddUV(new Vector2((float)i / widthSeg, (float)j / heightSeg));
 
                 // for back face
-                for (int j = 0; j <= heightSeg; ++j)
-                {
-                    for (int i = 0; i <= widthSeg; ++i)
-                    {
-                        AddUV(new Vector2(1.0f - (float)i / widthSeg, (float)j / heightSeg));
-                    }
-                }
+                for (var j = 0; j <= heightSeg; ++j)
+                for (var i = 0; i <= widthSeg; ++i)
+                    AddUV(new Vector2(1.0f - (float)i / widthSeg, (float)j / heightSeg));
 
-                float v00 = properties.depth / properties.width;
-                float v01 = 1 - v00;
+                var v00 = properties.depth / properties.width;
+                var v01 = 1 - v00;
 
                 // for left side face
-                for (int j = 0; j <= heightSeg; ++j)
-                {
-                    for (int i = 0; i <= depthSeg; ++i)
-                    {
-                        AddUV(new Vector2(v00 * (float)i / depthSeg + v01, (float)j / heightSeg));
-                    }
-                }
+                for (var j = 0; j <= heightSeg; ++j)
+                for (var i = 0; i <= depthSeg; ++i)
+                    AddUV(new Vector2(v00 * (float)i / depthSeg + v01, (float)j / heightSeg));
 
                 // for right side face
-                for (int j = 0; j <= heightSeg; ++j)
-                {
-                    for (int i = 0; i <= depthSeg; ++i)
-                    {
-                        AddUV(new Vector2(v00 * (float)i / depthSeg, (float)j / heightSeg));
-                    }
-                }
+                for (var j = 0; j <= heightSeg; ++j)
+                for (var i = 0; i <= depthSeg; ++i)
+                    AddUV(new Vector2(v00 * (float)i / depthSeg, (float)j / heightSeg));
             }
         }
-        #endregion
 
+        #endregion
     }
 }
-

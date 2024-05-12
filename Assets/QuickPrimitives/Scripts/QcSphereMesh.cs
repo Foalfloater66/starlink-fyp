@@ -26,8 +26,12 @@ namespace QuickPrimitives.Scripts
                 public float sliceTo = 0.0f;
             }
 
-            public enum MeshGenMethod {  Icosphere, UVSphere }
-            
+            public enum MeshGenMethod
+            {
+                Icosphere,
+                UVSphere
+            }
+
             public float radius = 0.5f;
 
             public MeshGenMethod meshGenMethod = MeshGenMethod.Icosphere;
@@ -38,31 +42,33 @@ namespace QuickPrimitives.Scripts
             {
                 base.CopyFrom(source);
 
-                this.radius = source.radius;
-             
-                this.icosphere.subdivisions = source.icosphere.subdivisions;
-                this.uvSphere.segments = source.uvSphere.segments;
-                this.uvSphere.hemisphere = source.uvSphere.hemisphere;
-                this.uvSphere.sliceOn = source.uvSphere.sliceOn;
-                this.uvSphere.sliceFrom = source.uvSphere.sliceFrom;
-                this.uvSphere.sliceTo = source.uvSphere.sliceTo;
+                radius = source.radius;
+
+                icosphere.subdivisions = source.icosphere.subdivisions;
+                uvSphere.segments = source.uvSphere.segments;
+                uvSphere.hemisphere = source.uvSphere.hemisphere;
+                uvSphere.sliceOn = source.uvSphere.sliceOn;
+                uvSphere.sliceFrom = source.uvSphere.sliceFrom;
+                uvSphere.sliceTo = source.uvSphere.sliceTo;
 
 
-                this.meshGenMethod = source.meshGenMethod;
+                meshGenMethod = source.meshGenMethod;
             }
 
             public bool Modified(QcSphereProperties source)
             {
-                return (this.radius != source.radius) ||
-                       (this.uvSphere.sliceOn != source.uvSphere.sliceOn) ||
-                       (this.uvSphere.sliceOn && ((this.uvSphere.sliceFrom != source.uvSphere.sliceFrom) || (this.uvSphere.sliceTo != source.uvSphere.sliceTo))) ||
-                       (this.icosphere.subdivisions != source.icosphere.subdivisions) ||
-                       (this.offset[0] != source.offset[0]) || (this.offset[1] != source.offset[1]) || (this.offset[2] != source.offset[2]) ||
-                       (this.uvSphere.segments != source.uvSphere.segments) ||
-                       (this.uvSphere.hemisphere != source.uvSphere.hemisphere) ||
-                       (this.genTextureCoords != source.genTextureCoords) ||
-                       (this.addCollider != source.addCollider) ||
-                       (this.meshGenMethod != source.meshGenMethod);
+                return radius != source.radius ||
+                       uvSphere.sliceOn != source.uvSphere.sliceOn ||
+                       (uvSphere.sliceOn && (uvSphere.sliceFrom != source.uvSphere.sliceFrom ||
+                                             uvSphere.sliceTo != source.uvSphere.sliceTo)) ||
+                       icosphere.subdivisions != source.icosphere.subdivisions ||
+                       offset[0] != source.offset[0] || offset[1] != source.offset[1] ||
+                       offset[2] != source.offset[2] ||
+                       uvSphere.segments != source.uvSphere.segments ||
+                       uvSphere.hemisphere != source.uvSphere.hemisphere ||
+                       genTextureCoords != source.genTextureCoords ||
+                       addCollider != source.addCollider ||
+                       meshGenMethod != source.meshGenMethod;
             }
         }
 
@@ -96,17 +102,11 @@ namespace QuickPrimitives.Scripts
         {
             if (properties.radius <= 0) return;
 
-            MeshFilter meshFilter = gameObject.GetComponent<MeshFilter>();
-            if (meshFilter == null)
-            {
-                meshFilter = gameObject.AddComponent<MeshFilter>();
-            }
+            var meshFilter = gameObject.GetComponent<MeshFilter>();
+            if (meshFilter == null) meshFilter = gameObject.AddComponent<MeshFilter>();
 
-            MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
-            if (meshRenderer == null)
-            {
-                meshRenderer = gameObject.AddComponent<MeshRenderer>();
-            }
+            var meshRenderer = gameObject.GetComponent<MeshRenderer>();
+            if (meshRenderer == null) meshRenderer = gameObject.AddComponent<MeshRenderer>();
 
             ClearVertices();
 
@@ -122,13 +122,10 @@ namespace QuickPrimitives.Scripts
                     break;
             }
 
-            if (properties.offset != Vector3.zero)
-            {
-                AddOffset(properties.offset);
-            }
+            if (properties.offset != Vector3.zero) AddOffset(properties.offset);
 
-            int[] triangles = new int[faces.Count * 3];
-            int ti = 0;
+            var triangles = new int[faces.Count * 3];
+            var ti = 0;
             foreach (var tri in faces)
             {
                 triangles[ti] = tri.v1;
@@ -138,7 +135,7 @@ namespace QuickPrimitives.Scripts
                 ti += 3;
             }
 
-            Mesh mesh = new Mesh();
+            var mesh = new Mesh();
 
             meshFilter.sharedMesh = mesh;
 
@@ -158,19 +155,14 @@ namespace QuickPrimitives.Scripts
         }
 
         #region RebuildGeometry
+
         public override void RebuildGeometry()
         {
-            MeshFilter meshFilter = gameObject.GetComponent<MeshFilter>();
-            if (meshFilter == null)
-            {
-                meshFilter = gameObject.AddComponent<MeshFilter>();
-            }
+            var meshFilter = gameObject.GetComponent<MeshFilter>();
+            if (meshFilter == null) meshFilter = gameObject.AddComponent<MeshFilter>();
 
-            MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
-            if (meshRenderer == null)
-            {
-                meshRenderer = gameObject.AddComponent<MeshRenderer>();
-            }
+            var meshRenderer = gameObject.GetComponent<MeshRenderer>();
+            if (meshRenderer == null) meshRenderer = gameObject.AddComponent<MeshRenderer>();
 
             ClearVertices();
 
@@ -186,15 +178,12 @@ namespace QuickPrimitives.Scripts
                     break;
             }
 
-            if (properties.offset != Vector3.zero)
-            {
-                AddOffset(properties.offset);
-            }
+            if (properties.offset != Vector3.zero) AddOffset(properties.offset);
 
             int[] triangles;
 
             triangles = new int[faces.Count * 3];
-            int index = 0;
+            var index = 0;
             foreach (var tri in faces)
             {
                 triangles[index] = tri.v1;
@@ -223,6 +212,7 @@ namespace QuickPrimitives.Scripts
                 meshFilter.sharedMesh.RecalculateBounds();
             }
         }
+
         #endregion
 
         private void SetCollider()
@@ -230,11 +220,8 @@ namespace QuickPrimitives.Scripts
             if (properties.addCollider)
             {
                 // set collider bound
-                SphereCollider collider = gameObject.GetComponent<SphereCollider>();
-                if (collider == null)
-                {
-                    collider = gameObject.AddComponent<SphereCollider>();
-                }
+                var collider = gameObject.GetComponent<SphereCollider>();
+                if (collider == null) collider = gameObject.AddComponent<SphereCollider>();
 
                 collider.enabled = true;
                 collider.center = properties.offset;
@@ -242,48 +229,58 @@ namespace QuickPrimitives.Scripts
             }
             else
             {
-                SphereCollider collider = gameObject.GetComponent<SphereCollider>();
-                if (collider != null)
-                {
-                    collider.enabled = false;
-                }
+                var collider = gameObject.GetComponent<SphereCollider>();
+                if (collider != null) collider.enabled = false;
             }
         }
 
         #region GenerateMeshIcosahedron
+
         //
         // code from http://blog.andreaskahler.com/2009/06/creating-icosphere-mesh-in-code.html
         //
         private void GenerateMeshIcosahedron()
         {
-            float t = (1.0f + Mathf.Sqrt(5.0f)) * 0.5f;
+            var t = (1.0f + Mathf.Sqrt(5.0f)) * 0.5f;
 
-            Vector3 point = new Vector3(-1, t, 0).normalized;
-            AddVertex(point * properties.radius, point, new Vector2(Mathf.Atan2(point.z, point.x) * oneOver2PI, point.y * 0.5f + 0.5f));
+            var point = new Vector3(-1, t, 0).normalized;
+            AddVertex(point * properties.radius, point,
+                new Vector2(Mathf.Atan2(point.z, point.x) * oneOver2PI, point.y * 0.5f + 0.5f));
             point = new Vector3(1, t, 0).normalized;
-            AddVertex(point * properties.radius, point, new Vector2(Mathf.Atan2(point.z, point.x) * oneOver2PI, point.y * 0.5f + 0.5f));
+            AddVertex(point * properties.radius, point,
+                new Vector2(Mathf.Atan2(point.z, point.x) * oneOver2PI, point.y * 0.5f + 0.5f));
             point = new Vector3(-1, -t, 0).normalized;
-            AddVertex(point * properties.radius, point, new Vector2(Mathf.Atan2(point.z, point.x) * oneOver2PI, point.y * 0.5f + 0.5f));
+            AddVertex(point * properties.radius, point,
+                new Vector2(Mathf.Atan2(point.z, point.x) * oneOver2PI, point.y * 0.5f + 0.5f));
             point = new Vector3(1, -t, 0).normalized;
-            AddVertex(point * properties.radius, point, new Vector2(Mathf.Atan2(point.z, point.x) * oneOver2PI, point.y * 0.5f + 0.5f));
+            AddVertex(point * properties.radius, point,
+                new Vector2(Mathf.Atan2(point.z, point.x) * oneOver2PI, point.y * 0.5f + 0.5f));
 
             point = new Vector3(0, -1, t).normalized;
-            AddVertex(point * properties.radius, point, new Vector2(Mathf.Atan2(point.z, point.x) * oneOver2PI, point.y * 0.5f + 0.5f));
+            AddVertex(point * properties.radius, point,
+                new Vector2(Mathf.Atan2(point.z, point.x) * oneOver2PI, point.y * 0.5f + 0.5f));
             point = new Vector3(0, 1, t).normalized;
-            AddVertex(point * properties.radius, point, new Vector2(Mathf.Atan2(point.z, point.x) * oneOver2PI, point.y * 0.5f + 0.5f));
+            AddVertex(point * properties.radius, point,
+                new Vector2(Mathf.Atan2(point.z, point.x) * oneOver2PI, point.y * 0.5f + 0.5f));
             point = new Vector3(0, -1, -t).normalized;
-            AddVertex(point * properties.radius, point, new Vector2(Mathf.Atan2(point.z, point.x) * oneOver2PI, point.y * 0.5f + 0.5f));
+            AddVertex(point * properties.radius, point,
+                new Vector2(Mathf.Atan2(point.z, point.x) * oneOver2PI, point.y * 0.5f + 0.5f));
             point = new Vector3(0, 1, -t).normalized;
-            AddVertex(point * properties.radius, point, new Vector2(Mathf.Atan2(point.z, point.x) * oneOver2PI, point.y * 0.5f + 0.5f));
+            AddVertex(point * properties.radius, point,
+                new Vector2(Mathf.Atan2(point.z, point.x) * oneOver2PI, point.y * 0.5f + 0.5f));
 
             point = new Vector3(t, 0, -1).normalized;
-            AddVertex(point * properties.radius, point, new Vector2(Mathf.Atan2(point.z, point.x) * oneOver2PI, point.y * 0.5f + 0.5f));
+            AddVertex(point * properties.radius, point,
+                new Vector2(Mathf.Atan2(point.z, point.x) * oneOver2PI, point.y * 0.5f + 0.5f));
             point = new Vector3(t, 0, 1).normalized;
-            AddVertex(point * properties.radius, point, new Vector2(Mathf.Atan2(point.z, point.x) * oneOver2PI, point.y * 0.5f + 0.5f));
+            AddVertex(point * properties.radius, point,
+                new Vector2(Mathf.Atan2(point.z, point.x) * oneOver2PI, point.y * 0.5f + 0.5f));
             point = new Vector3(-t, 0, -1).normalized;
-            AddVertex(point * properties.radius, point, new Vector2(Mathf.Atan2(point.z, point.x) * oneOver2PI, point.y * 0.5f + 0.5f));
+            AddVertex(point * properties.radius, point,
+                new Vector2(Mathf.Atan2(point.z, point.x) * oneOver2PI, point.y * 0.5f + 0.5f));
             point = new Vector3(-t, 0, 1).normalized;
-            AddVertex(point * properties.radius, point, new Vector2(Mathf.Atan2(point.z, point.x) * oneOver2PI, point.y * 0.5f + 0.5f));
+            AddVertex(point * properties.radius, point,
+                new Vector2(Mathf.Atan2(point.z, point.x) * oneOver2PI, point.y * 0.5f + 0.5f));
 
             // create 20 triangles of the icosahedron
             faces.Clear();
@@ -316,27 +313,31 @@ namespace QuickPrimitives.Scripts
             faces.Add(new TriangleIndices(8, 6, 7));
             faces.Add(new TriangleIndices(9, 8, 1));
 
-            for (int i = 0; i < properties.icosphere.subdivisions; i++)
+            for (var i = 0; i < properties.icosphere.subdivisions; i++)
             {
                 var faces2 = new List<TriangleIndices>();
                 foreach (var tri in faces)
                 {
                     // replace triangle by 4 triangles
-                    int a = GetMiddlePoint(tri.v1, tri.v2);
-                    int b = GetMiddlePoint(tri.v2, tri.v3);
-                    int c = GetMiddlePoint(tri.v3, tri.v1); ;
+                    var a = GetMiddlePoint(tri.v1, tri.v2);
+                    var b = GetMiddlePoint(tri.v2, tri.v3);
+                    var c = GetMiddlePoint(tri.v3, tri.v1);
+                    ;
 
                     faces2.Add(new TriangleIndices(tri.v1, a, c));
                     faces2.Add(new TriangleIndices(tri.v2, b, a));
                     faces2.Add(new TriangleIndices(tri.v3, c, b));
                     faces2.Add(new TriangleIndices(a, b, c));
                 }
+
                 faces = faces2;
             }
         }
+
         #endregion
 
         #region GenerateMeshUvSphere
+
         private void GenerateMeshUvSphere()
         {
             if (properties.uvSphere.hemisphere > 0)
@@ -344,9 +345,11 @@ namespace QuickPrimitives.Scripts
             else
                 GenerateMeshUvFullSphere();
         }
+
         #endregion
 
         #region GenerateMeshUvFullSphere
+
         //
         // code adapted from http://wiki.unity3d.com/index.php/ProceduralPrimitives
         //
@@ -354,93 +357,77 @@ namespace QuickPrimitives.Scripts
         {
             //AddVertex(Vector3.up * properties.radius);      // top vertex (north pole)
 
-            int segments = properties.uvSphere.segments;
+            var segments = properties.uvSphere.segments;
 
-            bool sideCap = (properties.uvSphere.sliceOn) &&
-                (properties.uvSphere.sliceFrom != properties.uvSphere.sliceTo) &&
-                (Mathf.Abs(properties.uvSphere.sliceFrom - properties.uvSphere.sliceTo) < 360);
+            var sideCap = properties.uvSphere.sliceOn &&
+                          properties.uvSphere.sliceFrom != properties.uvSphere.sliceTo &&
+                          Mathf.Abs(properties.uvSphere.sliceFrom - properties.uvSphere.sliceTo) < 360;
 
             float partAngle;
             float startAngle = 0;
             float endAngle = 0;
             if (!sideCap)
             {
-                partAngle = (2f * Mathf.PI) / segments;
+                partAngle = 2f * Mathf.PI / segments;
             }
             else
             {
-                float sliceTo = properties.uvSphere.sliceTo;
-                float sliceFrom = properties.uvSphere.sliceFrom;
-                if (sliceFrom > sliceTo)
-                {
-                    sliceTo += 360;
-                }
+                var sliceTo = properties.uvSphere.sliceTo;
+                var sliceFrom = properties.uvSphere.sliceFrom;
+                if (sliceFrom > sliceTo) sliceTo += 360;
                 startAngle = sliceFrom * Mathf.Deg2Rad;
                 endAngle = sliceTo * Mathf.Deg2Rad;
                 partAngle = (endAngle - startAngle) / segments;
             }
 
-            for (int lat = 0; lat <= segments; lat++)
+            for (var lat = 0; lat <= segments; lat++)
             {
-                float a1 = Mathf.PI * (float)(lat) / segments;
-                float sin1 = Mathf.Sin(a1);
-                float cos1 = Mathf.Cos(a1);
+                var a1 = Mathf.PI * (float)lat / segments;
+                var sin1 = Mathf.Sin(a1);
+                var cos1 = Mathf.Cos(a1);
 
-                for (int lon = 0; lon <= segments; lon++)
+                for (var lon = 0; lon <= segments; lon++)
                 {
-                    float a2 = lon * partAngle + startAngle;
-                    float sin2 = Mathf.Sin(a2);
-                    float cos2 = Mathf.Cos(a2);
+                    var a2 = lon * partAngle + startAngle;
+                    var sin2 = Mathf.Sin(a2);
+                    var cos2 = Mathf.Cos(a2);
 
                     AddVertex(new Vector3(sin1 * cos2, cos1, sin1 * sin2) * properties.radius);
                 }
             }
 
-            for (int n = 0; n < vertices.Count; n++)
-            {
-                AddNormal(vertices[n].normalized);
-            }
+            for (var n = 0; n < vertices.Count; n++) AddNormal(vertices[n].normalized);
 
             if (properties.genTextureCoords)
             {
                 //AddUV(Vector2.up);
-                for (int lon = 0; lon <= segments; lon++)
-                {
-                    AddUV(new Vector2(((float)lon + 0.5f) / segments, 1f));
-                }
+                for (var lon = 0; lon <= segments; lon++) AddUV(new Vector2(((float)lon + 0.5f) / segments, 1f));
 
-                for (int lat = 1; lat < segments; lat++)
-                {
-                    for (int lon = 0; lon <= segments; lon++)
-                    {
-                        AddUV(new Vector2(((float)lon) / segments, 1f - (float)lat / segments));
-                    }
-                }
+                for (var lat = 1; lat < segments; lat++)
+                for (var lon = 0; lon <= segments; lon++)
+                    AddUV(new Vector2((float)lon / segments, 1f - (float)lat / segments));
                 //AddUV(Vector2.zero);
-                for (int lon = 0; lon <= segments; lon++)
-                {
-                    AddUV(new Vector2(((float)lon + 0.5f) / segments, 0f));
-                }
+                for (var lon = 0; lon <= segments; lon++) AddUV(new Vector2(((float)lon + 0.5f) / segments, 0f));
             }
 
             if (sideCap)
             {
-                float sin2s = Mathf.Sin(startAngle);
-                float cos2s = Mathf.Cos(startAngle);
+                var sin2s = Mathf.Sin(startAngle);
+                var cos2s = Mathf.Cos(startAngle);
 
-                float sin2e = Mathf.Sin(endAngle);
-                float cos2e = Mathf.Cos(endAngle);
+                var sin2e = Mathf.Sin(endAngle);
+                var cos2e = Mathf.Cos(endAngle);
 
-                float a1n = Mathf.PI * 0.5f;
-                float sin1n = Mathf.Sin(a1n);
-                float cos1n = Mathf.Cos(a1n);
+                var a1n = Mathf.PI * 0.5f;
+                var sin1n = Mathf.Sin(a1n);
+                var cos1n = Mathf.Cos(a1n);
 
-                Vector3 capNormal1 = ComputeNormal(new Vector3(sin1n * cos2s, cos1n, sin1n * sin2s),
-                                                   new Vector3(0, -properties.radius, 0),
-                                                   new Vector3(0, properties.radius, 0));
-                Vector3 capNormal2 = ComputeNormal(new Vector3(sin1n * cos2e, cos1n, sin1n * sin2e),
-                                                   new Vector3(0, properties.radius, 0),
-                                                   new Vector3(0, -properties.radius, 0));
+                var capNormal1 = ComputeNormal(new Vector3(sin1n * cos2s, cos1n, sin1n * sin2s),
+                    new Vector3(0, -properties.radius, 0),
+                    new Vector3(0, properties.radius, 0));
+                var capNormal2 = ComputeNormal(new Vector3(sin1n * cos2e, cos1n, sin1n * sin2e),
+                    new Vector3(0, properties.radius, 0),
+                    new Vector3(0, -properties.radius, 0));
 
                 AddVertex(Vector3.up * properties.radius);
                 AddNormal(capNormal1);
@@ -450,11 +437,11 @@ namespace QuickPrimitives.Scripts
                 AddNormal(capNormal2);
                 AddUV(Vector2.zero);
 
-                for (int lat = 0; lat < segments; lat++)
+                for (var lat = 0; lat < segments; lat++)
                 {
-                    float a1 = Mathf.PI * (float)(lat + 1) / (segments + 1);
-                    float sin1 = Mathf.Sin(a1);
-                    float cos1 = Mathf.Cos(a1);
+                    var a1 = Mathf.PI * (float)(lat + 1) / (segments + 1);
+                    var sin1 = Mathf.Sin(a1);
+                    var cos1 = Mathf.Cos(a1);
 
                     AddVertex(new Vector3(sin1 * cos2s, cos1, sin1 * sin2s) * properties.radius);
                     AddNormal(capNormal1);
@@ -484,36 +471,35 @@ namespace QuickPrimitives.Scripts
             }
 
             #region Triangles
+
             faces.Clear();
 
             //Middle
 
             //Top Cap
-            for (int lon = 0; lon < segments; lon++)
+            for (var lon = 0; lon < segments; lon++)
             {
-                int current = lon;
-                int next = current + segments + 1;
+                var current = lon;
+                var next = current + segments + 1;
 
                 faces.Add(new TriangleIndices(next + 1, next, current));
             }
 
-            for (int lat = 1; lat < segments - 1; lat++)
+            for (var lat = 1; lat < segments - 1; lat++)
+            for (var lon = 0; lon < segments; lon++)
             {
-                for (int lon = 0; lon < segments; lon++)
-                {
-                    int current = lon + lat * (segments + 1);
-                    int next = current + segments + 1;
+                var current = lon + lat * (segments + 1);
+                var next = current + segments + 1;
 
-                    faces.Add(new TriangleIndices(current, current + 1, next + 1));
-                    faces.Add(new TriangleIndices(current, next + 1, next));
-                }
+                faces.Add(new TriangleIndices(current, current + 1, next + 1));
+                faces.Add(new TriangleIndices(current, next + 1, next));
             }
 
             //Bottom Cap
-            for (int lon = 0; lon < segments; lon++)
+            for (var lon = 0; lon < segments; lon++)
             {
-                int current = lon + (segments - 1) * (segments + 1);
-                int next = current + segments + 1;
+                var current = lon + (segments - 1) * (segments + 1);
+                var next = current + segments + 1;
 
                 faces.Add(new TriangleIndices(current, current + 1, next));
             }
@@ -521,12 +507,12 @@ namespace QuickPrimitives.Scripts
             if (sideCap)
             {
                 // side faces
-                int baseIndex = (segments + 1) * (segments + 1);
+                var baseIndex = (segments + 1) * (segments + 1);
                 faces.Add(new TriangleIndices(baseIndex + 0, baseIndex + 1, baseIndex + 2));
                 faces.Add(new TriangleIndices(baseIndex + 3, baseIndex + 2, baseIndex + 1));
 
                 baseIndex += 2;
-                for (int lat = 0; lat < segments - 1; lat++)
+                for (var lat = 0; lat < segments - 1; lat++)
                 {
                     faces.Add(new TriangleIndices(baseIndex + 1, baseIndex + 0, baseIndex + 5));
                     faces.Add(new TriangleIndices(baseIndex + 5, baseIndex + 0, baseIndex + 4));
@@ -539,137 +525,116 @@ namespace QuickPrimitives.Scripts
                 faces.Add(new TriangleIndices(baseIndex + 1, baseIndex + 0, baseIndex + 4));
                 faces.Add(new TriangleIndices(baseIndex + 2, baseIndex + 3, baseIndex + 5));
             }
-            
+
             #endregion
         }
+
         #endregion
 
         #region GenerateMeshUvHemiSphere
+
         private void GenerateMeshUvHemiSphere()
         {
-            int segments = properties.uvSphere.segments;
+            var segments = properties.uvSphere.segments;
 
-            bool sideCap = (properties.uvSphere.sliceOn) &&
-                   (properties.uvSphere.sliceFrom != properties.uvSphere.sliceTo) &&
-                   (Mathf.Abs(properties.uvSphere.sliceFrom - properties.uvSphere.sliceTo) < 360);
+            var sideCap = properties.uvSphere.sliceOn &&
+                          properties.uvSphere.sliceFrom != properties.uvSphere.sliceTo &&
+                          Mathf.Abs(properties.uvSphere.sliceFrom - properties.uvSphere.sliceTo) < 360;
 
             float partAngle;
             float startAngle = 0;
             float endAngle = 0;
             if (!sideCap)
             {
-                partAngle = (2f * Mathf.PI) / segments;
+                partAngle = 2f * Mathf.PI / segments;
             }
             else
             {
-                float sliceTo = properties.uvSphere.sliceTo;
-                float sliceFrom = properties.uvSphere.sliceFrom;
-                if (sliceFrom > sliceTo)
-                {
-                    sliceTo += 360;
-                }
+                var sliceTo = properties.uvSphere.sliceTo;
+                var sliceFrom = properties.uvSphere.sliceFrom;
+                if (sliceFrom > sliceTo) sliceTo += 360;
                 startAngle = sliceFrom * Mathf.Deg2Rad;
                 endAngle = sliceTo * Mathf.Deg2Rad;
                 partAngle = (endAngle - startAngle) / segments;
             }
 
-            float baseAngle = Mathf.PI * properties.uvSphere.hemisphere;
-            int vSegments = (int)(segments * (1 - properties.uvSphere.hemisphere));
-            
-            float a0 = (Mathf.PI - baseAngle) * 1.0f / (vSegments + 1) + baseAngle;
-            float sin0 = Mathf.Sin(a0);
-            float cos0 = Mathf.Cos(a0);
+            var baseAngle = Mathf.PI * properties.uvSphere.hemisphere;
+            var vSegments = (int)(segments * (1 - properties.uvSphere.hemisphere));
 
-            for (int lon = 0; lon <= segments; lon++)  // for top center
-            {
+            var a0 = (Mathf.PI - baseAngle) * 1.0f / (vSegments + 1) + baseAngle;
+            var sin0 = Mathf.Sin(a0);
+            var cos0 = Mathf.Cos(a0);
+
+            for (var lon = 0; lon <= segments; lon++) // for top center
                 AddVertex(new Vector3(0, cos0 * properties.radius, 0));
-            }
 
-            for (int lon = 0; lon <= segments; lon++)   // for top perimeter
+            for (var lon = 0; lon <= segments; lon++) // for top perimeter
             {
                 //float a2 = twoPi * (float)(lon % segments) / segments;
-                float a2 = partAngle * lon + startAngle;
-                float sin2 = Mathf.Sin(a2);
-                float cos2 = Mathf.Cos(a2);
+                var a2 = partAngle * lon + startAngle;
+                var sin2 = Mathf.Sin(a2);
+                var cos2 = Mathf.Cos(a2);
 
                 AddVertex(new Vector3(sin0 * cos2, cos0, sin0 * sin2) * properties.radius);
-            }          
+            }
 
-            for (int lat = 0; lat < vSegments; lat++)   // for 
+            for (var lat = 0; lat < vSegments; lat++) // for 
             {
-                float a1 = (Mathf.PI - baseAngle) * (float)(lat + 1) / (vSegments + 1) + baseAngle;
-                float sin1 = Mathf.Sin(a1);
-                float cos1 = Mathf.Cos(a1);
+                var a1 = (Mathf.PI - baseAngle) * (float)(lat + 1) / (vSegments + 1) + baseAngle;
+                var sin1 = Mathf.Sin(a1);
+                var cos1 = Mathf.Cos(a1);
 
-                for (int lon = 0; lon <= segments; lon++)
+                for (var lon = 0; lon <= segments; lon++)
                 {
-                    float a2 = partAngle * lon + startAngle;
-                    float sin2 = Mathf.Sin(a2);
-                    float cos2 = Mathf.Cos(a2);
+                    var a2 = partAngle * lon + startAngle;
+                    var sin2 = Mathf.Sin(a2);
+                    var cos2 = Mathf.Cos(a2);
 
                     AddVertex(new Vector3(sin1 * cos2, cos1, sin1 * sin2) * properties.radius);
                 }
             }
 
-            for (int lon = 0; lon <= segments; lon++)       // south pole
-            {
+            for (var lon = 0; lon <= segments; lon++) // south pole
                 AddVertex(Vector3.down * properties.radius);
-            }
 
-            for (int n = 0; n <= segments * 2; n++)
-            {
-                AddNormal(Vector3.up);
-            }
+            for (var n = 0; n <= segments * 2; n++) AddNormal(Vector3.up);
 
-            for (int n = segments * 2 + 1; n < vertices.Count; n++)
-            {
-                AddNormal(vertices[n].normalized);
-            }
+            for (var n = segments * 2 + 1; n < vertices.Count; n++) AddNormal(vertices[n].normalized);
 
-            float h = (properties.uvSphere.hemisphere > 0.5) ? properties.uvSphere.hemisphere - 0.5f :  0.5f - properties.uvSphere.hemisphere;
-            float hRadius = Mathf.Sqrt(0.25f - h * h);
+            var h = properties.uvSphere.hemisphere > 0.5
+                ? properties.uvSphere.hemisphere - 0.5f
+                : 0.5f - properties.uvSphere.hemisphere;
+            var hRadius = Mathf.Sqrt(0.25f - h * h);
 
-            for (int lon = 0; lon <= segments; lon++)
-            {
+            for (var lon = 0; lon <= segments; lon++)
                 AddUV(new Vector2(((float)lon + 0.5f) / segments, 1 - hRadius * 0.5f));
-            }
 
-            for (int lon = 0; lon <= segments; lon++)
-            {
-                AddUV(new Vector2((float)lon / segments, 1.0f));
-            }
+            for (var lon = 0; lon <= segments; lon++) AddUV(new Vector2((float)lon / segments, 1.0f));
 
-            for (int lat = 0; lat < vSegments; lat++)
-            {
-                for (int lon = 0; lon <= segments; lon++)
-                {
-                    AddUV(new Vector2((float)lon / segments, 1f - (float)lat / vSegments));
-                }
-            }
+            for (var lat = 0; lat < vSegments; lat++)
+            for (var lon = 0; lon <= segments; lon++)
+                AddUV(new Vector2((float)lon / segments, 1f - (float)lat / vSegments));
 
-            for (int lon = 0; lon <= segments; lon++)
-            {
-                AddUV(new Vector2(((float)lon + 0.5f) / segments, 0f));
-            }
+            for (var lon = 0; lon <= segments; lon++) AddUV(new Vector2(((float)lon + 0.5f) / segments, 0f));
 
             if (sideCap)
             {
-                float sin2s = Mathf.Sin(startAngle);
-                float cos2s = Mathf.Cos(startAngle);
+                var sin2s = Mathf.Sin(startAngle);
+                var cos2s = Mathf.Cos(startAngle);
 
-                float sin2e = Mathf.Sin(endAngle);
-                float cos2e = Mathf.Cos(endAngle);
+                var sin2e = Mathf.Sin(endAngle);
+                var cos2e = Mathf.Cos(endAngle);
 
-                float a1n = Mathf.PI * 0.5f;
-                float sin1n = Mathf.Sin(a1n);
-                float cos1n = Mathf.Cos(a1n);
+                var a1n = Mathf.PI * 0.5f;
+                var sin1n = Mathf.Sin(a1n);
+                var cos1n = Mathf.Cos(a1n);
 
-                Vector3 capNormal1 = ComputeNormal(new Vector3(sin1n * cos2s, cos1n, sin1n * sin2s),
-                                                   new Vector3(0, -properties.radius, 0),
-                                                   new Vector3(0, properties.radius, 0));
-                Vector3 capNormal2 = ComputeNormal(new Vector3(sin1n * cos2e, cos1n, sin1n * sin2e),
-                                                   new Vector3(0, properties.radius, 0),
-                                                   new Vector3(0, -properties.radius, 0));
+                var capNormal1 = ComputeNormal(new Vector3(sin1n * cos2s, cos1n, sin1n * sin2s),
+                    new Vector3(0, -properties.radius, 0),
+                    new Vector3(0, properties.radius, 0));
+                var capNormal2 = ComputeNormal(new Vector3(sin1n * cos2e, cos1n, sin1n * sin2e),
+                    new Vector3(0, properties.radius, 0),
+                    new Vector3(0, -properties.radius, 0));
 
                 AddVertex(new Vector3(0, cos0 * properties.radius, 0));
                 AddNormal(capNormal1);
@@ -679,11 +644,11 @@ namespace QuickPrimitives.Scripts
                 AddNormal(capNormal2);
                 AddUV(Vector2.zero);
 
-                for (int lat = 0; lat < vSegments; lat++)
+                for (var lat = 0; lat < vSegments; lat++)
                 {
-                    float a1 = (Mathf.PI - baseAngle) * (float)(lat + 1) / (vSegments + 1) + baseAngle;
-                    float sin1 = Mathf.Sin(a1);
-                    float cos1 = Mathf.Cos(a1);
+                    var a1 = (Mathf.PI - baseAngle) * (float)(lat + 1) / (vSegments + 1) + baseAngle;
+                    var sin1 = Mathf.Sin(a1);
+                    var cos1 = Mathf.Cos(a1);
 
                     AddVertex(new Vector3(sin1 * cos2s, cos1, sin1 * sin2s) * properties.radius);
                     AddNormal(capNormal1);
@@ -713,25 +678,26 @@ namespace QuickPrimitives.Scripts
             }
 
             #region Triangles
+
             faces.Clear();
 
             //Top Cap
-            for (int lon = 0; lon < segments; lon++)
+            for (var lon = 0; lon < segments; lon++)
             {
-                int current = lon;
-                int next = current + segments + 1;
+                var current = lon;
+                var next = current + segments + 1;
 
                 faces.Add(new TriangleIndices(next + 1, next, current));
             }
 
             //Middle
-            int baseIndex = (segments + 1) * 2;
-            for (int lat = 0; lat < vSegments - 1; lat++)
+            var baseIndex = (segments + 1) * 2;
+            for (var lat = 0; lat < vSegments - 1; lat++)
             {
-                for (int lon = 0; lon < segments; lon++)
+                for (var lon = 0; lon < segments; lon++)
                 {
-                    int current = lon + baseIndex;
-                    int next = current + (segments + 1);
+                    var current = lon + baseIndex;
+                    var next = current + segments + 1;
 
                     faces.Add(new TriangleIndices(current, current + 1, next + 1));
                     faces.Add(new TriangleIndices(current, next + 1, next));
@@ -741,10 +707,10 @@ namespace QuickPrimitives.Scripts
             }
 
             //Bottom Cap
-            for (int lon = 0; lon < segments; lon++)
+            for (var lon = 0; lon < segments; lon++)
             {
-                int current = baseIndex + lon;
-                int next = current + (segments + 1);
+                var current = baseIndex + lon;
+                var next = current + segments + 1;
 
                 faces.Add(new TriangleIndices(current, current + 1, next));
             }
@@ -756,7 +722,7 @@ namespace QuickPrimitives.Scripts
                 faces.Add(new TriangleIndices(baseIndex + 0, baseIndex + 1, baseIndex - 2));
                 faces.Add(new TriangleIndices(baseIndex + 3, baseIndex + 2, baseIndex - 1));
 
-                for (int lat = 0; lat < vSegments - 1; lat++)
+                for (var lat = 0; lat < vSegments - 1; lat++)
                 {
                     faces.Add(new TriangleIndices(baseIndex + 1, baseIndex + 0, baseIndex + 5));
                     faces.Add(new TriangleIndices(baseIndex + 5, baseIndex + 0, baseIndex + 4));
@@ -769,34 +735,34 @@ namespace QuickPrimitives.Scripts
                 faces.Add(new TriangleIndices(baseIndex + 1, baseIndex + 0, baseIndex + 4));
                 faces.Add(new TriangleIndices(baseIndex + 2, baseIndex + 3, baseIndex + 5));
             }
+
             #endregion
         }
+
         #endregion
-        
+
         // return index of point in the middle of p1 and p2
         private int GetMiddlePoint(int p1, int p2)
         {
             // first check if we have it already
-            bool firstIsSmaller = p1 < p2;
+            var firstIsSmaller = p1 < p2;
             long smallerIndex = firstIsSmaller ? p1 : p2;
             long greaterIndex = firstIsSmaller ? p2 : p1;
-            long key = (smallerIndex << 32) + greaterIndex;
+            var key = (smallerIndex << 32) + greaterIndex;
 
             int ret;
-            if (middlePointIndexCache.TryGetValue(key, out ret))
-            {
-                return ret;
-            }
+            if (middlePointIndexCache.TryGetValue(key, out ret)) return ret;
 
             // not in cache, calculate it
-            Vector3 point1 = GetVertex(p1);
-            Vector3 point2 = GetVertex(p2);
-            Vector3 middle = new Vector3((point1.x + point2.x) * 0.5f, (point1.y + point2.y) * 0.5f, (point1.z + point2.z) * 0.5f);
+            var point1 = GetVertex(p1);
+            var point2 = GetVertex(p2);
+            var middle = new Vector3((point1.x + point2.x) * 0.5f, (point1.y + point2.y) * 0.5f,
+                (point1.z + point2.z) * 0.5f);
 
-            Vector3 middlePt = middle.normalized * properties.radius;
+            var middlePt = middle.normalized * properties.radius;
 
             // add vertex makes sure point is on unit sphere
-            int index = AddVertex(middlePt);
+            var index = AddVertex(middlePt);
             AddNormal(middlePt.normalized);
             AddUV(new Vector2(Mathf.Atan2(middlePt.z, middlePt.x) * oneOver2PI, middle.normalized.y * 0.5f + 0.5f));
 
@@ -814,5 +780,3 @@ namespace QuickPrimitives.Scripts
         }
     }
 }
-
-

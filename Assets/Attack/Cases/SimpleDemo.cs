@@ -6,7 +6,9 @@ namespace Attack.Cases
 {
     public class SimpleDemo : BaseCase
     {
-        public SimpleDemo(CityCreator cityCreator, Direction targetLinkDirection, GroundstationCollection groundstations, CustomCamera cam) : base(cityCreator, targetLinkDirection, groundstations, cam)
+        public SimpleDemo(CityCreator cityCreator, Direction targetLinkDirection,
+            GroundstationCollection groundstations, CustomCamera cam) : base(cityCreator, targetLinkDirection,
+            groundstations, cam)
         {
         }
 

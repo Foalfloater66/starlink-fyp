@@ -6,9 +6,10 @@ namespace Attack.Cases
 {
     public class InsularCase : BaseCase
     {
-        public InsularCase(CityCreator cityCreator, Direction targetLinkDirection, GroundstationCollection groundstations, CustomCamera cam) : base(cityCreator, targetLinkDirection, groundstations, cam)
+        public InsularCase(CityCreator cityCreator, Direction targetLinkDirection,
+            GroundstationCollection groundstations, CustomCamera cam) : base(cityCreator, targetLinkDirection,
+            groundstations, cam)
         {
-            
         }
 
         protected override void SetupCameras(CustomCamera cam)
@@ -32,8 +33,8 @@ namespace Attack.Cases
         protected override void CreateTargetCoordinates()
         {
             // Hawaii, USA
-            Ctx.Latitude = 19.89f; 
-            Ctx.Longitude = 155.66f; 
+            Ctx.Latitude = 19.89f;
+            Ctx.Longitude = 155.66f;
         }
 
         protected override List<string> SetSourceGroundstations()
@@ -48,7 +49,7 @@ namespace Attack.Cases
                         "Brisbane",
                         "Melbourne",
                         "Wellington",
-                        "Port Moresby",
+                        "Port Moresby"
                     };
                 case Direction.South:
                     return new List<string>()
@@ -60,7 +61,7 @@ namespace Attack.Cases
                         "Edmonton",
                         "New York"
                     };
-                    
+
                 case Direction.East:
                     return new List<string>()
                     {
@@ -83,7 +84,7 @@ namespace Attack.Cases
                         "Belo Horizonte"
                     };
 
-            case Direction.Any:
+                case Direction.Any:
                 default:
                     return new List<string>()
                     {
@@ -94,7 +95,6 @@ namespace Attack.Cases
                         "Port Hardy",
                         "Brisbaine"
                     };
-                    
             }
         }
     }
