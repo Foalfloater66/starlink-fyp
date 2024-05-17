@@ -10,31 +10,13 @@ using Routing;
 using Scene;
 using UnityEngine;
 using Utilities;
+using Path = Routing.Path;
 
 namespace Attack
 {
     /**
- * @author Morgane Marie Ohlig
- */
-    /// <summary>
-    /// Class <c>Path</c> contains a list of nodes in the path between the <c>end_city</c> and the <c>start_city</c>.
-    /// </summary>
-    public class Path : HeapNode
-    {
-        public readonly List<Node> Nodes = new List<Node>();
-        public readonly Node StartNode;
-        public readonly Node EndNode;
-        public readonly GameObject StartCity;
-        public readonly GameObject EndCity;
-
-        public Path(Node startNode, Node endNode, GameObject startCity, GameObject endCity)
-        {
-            StartNode = startNode;
-            EndNode = endNode;
-            StartCity = startCity;
-            EndCity = endCity;
-        }
-    }
+     * @author Morgane Marie Ohlig
+    */
 
     /// <summary>
     /// Class <c>Attacker</c> provides a set of properties and methods used to target and flood links in a geographic area of specified center and radius.
@@ -584,6 +566,7 @@ namespace Attack
 
                 // Extract the attack routes that are needed to congest the victim link.
                 var finalAttackRoutes = FloodLink(viableAttackRoutes, mbits);
+                // TODO: just return this.
 
                 var counter = 0;
 
@@ -608,7 +591,7 @@ namespace Attack
                     counter++;
                 }
 
-                UpdateTargetLinkVisuals(constellation_ctx);
+                UpdateTargetLinkVisuals(constellation_ctx); // TODO: can move this outside? idk.
                 _attackLogger.Write(
                     $",{_linkCapacityMonitor.GetCapacity(Target.Link.SrcNode.Id, Target.Link.DestNode.Id)}");
             }

@@ -379,8 +379,13 @@ public class Main : MonoBehaviour
         _pathLogger.Write($"{framecount}");
 
         // Attempt an attack.
+        // TODO: separate the attacker and the actual route execution.
+        // Attacker submits routes it thinks will congest the network.
         List<float> rttList = _attacker.Run(constellation_ctx, graph_on, groundstations.ToList(), defenceOn);
-        // TODO: It would be nicer if the attacker just returned routes it would like to execute, and I had another entity for actually executing them.
+        
+        // The network executes these route requests. It returns the latency of those routes. 
+        
+        
         string rttLog = "Latency: ";
         for (int idx = 0; idx < rttList.Count; idx++)
         {
