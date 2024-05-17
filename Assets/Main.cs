@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.Serialization.Formatters;
 using System.Threading;
 using Attack;
 using Attack.Cases;
@@ -54,6 +53,7 @@ public class Main : MonoBehaviour
     public Material cityMaterial;
     [FormerlySerializedAs("countdown")] public Text leftbottom;
     public Text rightbottom;
+    public Text topleft;
     [Space] private Captures captures;
 
     private const double earthperiod = 86400f;
@@ -114,7 +114,10 @@ public class Main : MonoBehaviour
 
     public Direction targetLinkDirection;
     public float attack_radius = 1000f;
-
+    
+    [HideInInspector]
+    public bool deterministic_attacker; // YES OR NO...?
+    
     private int decimator = 1;
     private float raan0 = 0f;
 
@@ -176,6 +179,7 @@ public class Main : MonoBehaviour
         phase1_sats = maxsats; // will differ if simulating multiple phases
         simspeed = speed * 360f / 86400f; // Speed 1 is realtime
         rightbottom.text = "";
+        topleft.text = "";
 
         orbits = new GameObject[maxorbits];
         orbitalperiod = new double[maxorbits];
@@ -234,7 +238,7 @@ public class Main : MonoBehaviour
 
         // Create attacker entity.
         _attacker = new Attacker(attackerParams, sat0r, attack_radius, transform, city_prefab, groundstations,
-            _routeHandler, _painter, _link_capacities, _fileWriter, _pathLogger);
+            _routeHandler, _painter, _link_capacities, _fileWriter, _pathLogger, km_per_unit);
 
         CreateContext();
     }
@@ -255,7 +259,7 @@ public class Main : MonoBehaviour
     {
         var path = Path.Combine(_loggingDirectory, $"{caseChoice}_{targetLinkDirection}.csv");
         _fileWriter = new StreamWriter(path);
-        _fileWriter.WriteLine("FRAME,TARGET LINK,ROUTE COUNT,FINAL CAPACITY");
+        _fileWriter.WriteLine("FRAME,TARGET LINK,ROUTE COUNT,FINAL CAPACITY"); // todo: should I do average latency?
     }
 
     /// <summary>
@@ -375,8 +379,50 @@ public class Main : MonoBehaviour
         _pathLogger.Write($"{framecount}");
 
         // Attempt an attack.
-        _attacker.Run(constellation_ctx, graph_on, groundstations.ToList(), defenceOn);
+        List<float> rttList = _attacker.Run(constellation_ctx, graph_on, groundstations.ToList(), defenceOn);
+        // TODO: It would be nicer if the attacker just returned routes it would like to execute, and I had another entity for actually executing them.
+        string rttLog = "Latency: ";
+        for (int idx = 0; idx < rttList.Count; idx++)
+        {
+            float rtt = rttList[idx];
+            string text;
+            if (rtt > 2000f)
+            {
+                text = "Fail!";
+            }
+            else
+            {
+                text = $"{(int) rtt} ms";
+            }
+            if (idx == 0)
+            {
+                rttLog += text;
+            }
+            else
+            {
+                if (idx % 5 == 0)
+                {
+                    rttLog += ",\n";
+                }
+                else
+                {
+                    rttLog += ", ";
+                }
 
+                rttLog += text;
+            }
+        }
+
+        topleft.text = rttLog;
+        // foreach (float rtt in rttList)
+        // {
+        //     if
+        //     rttLog += 
+        //     
+        //     
+        //     
+        // }
+        
         // Finish logging for this frame.
         _fileWriter.Write("\n");
         _pathLogger.Write("\n");
@@ -387,8 +433,15 @@ public class Main : MonoBehaviour
         _painter.UpdateLasers(satlist, maxsats, speed);
         leftbottom.text = $"Frame {framecount}";
 
+        if (_attacker.Target.Link != null)
+        {
         rightbottom.text =
             $"Target Link Capacity: {_link_capacities.GetCapacity(_attacker.Target.Link.SrcNode.Id, _attacker.Target.Link.DestNode.Id)} mbits/sec";
+        }
+        else
+        {
+            rightbottom.text = $"No Target Link.";
+        }
 
         // Take a screenshot (if captureMode is enabled)
         if (captureMode)

@@ -62,6 +62,8 @@ namespace Attack
 
         private StreamWriter _pathLogger;
 
+        private float km_per_unit;
+
         /// <summary>
         /// Constructor creating an <c>Attacker</c> object with an attack area around the provided <c>(latitude, longitude)</c> coordinates. 
         /// </summary>
@@ -75,7 +77,7 @@ namespace Attack
         public Attacker(AttackerParams attackParams, float sat0r, float attack_radius, Transform transform,
             GameObject prefab, GroundstationCollection groundstations, RouteHandler route_handler, ScenePainter painter,
             LinkCapacityMonitor
-                linkCapacityMonitor, StreamWriter fileWriter, StreamWriter pathWriter)
+                linkCapacityMonitor, StreamWriter fileWriter, StreamWriter pathWriter, float km_per_unit)
         {
             // AttackParams
             SourceGroundstations =
@@ -89,6 +91,7 @@ namespace Attack
             _Groundstations = groundstations;
             _attackLogger = fileWriter;
             _pathLogger = pathWriter;
+            this.km_per_unit = km_per_unit;
         }
 
         /// <summary>
@@ -211,13 +214,13 @@ namespace Attack
 
         // TODO: I would like to put this in the defence code area. or like. some routing code.
         public Path GetRandomRoute(Node startNode, Node endNode, GameObject srcGs, GameObject destGs,
-            int maximumRouteCount, int mbits, bool graphOn)
+            int rmax, int mbits, bool graphOn)
         {
             // TODO: check what the randomizer uses.
-            var selectedRouteId = new System.Random().Next(0, maximumRouteCount);
+            var selectedRouteId = new System.Random().Next(0, rmax);
 
             // Compute the multiple shortest paths and select the one for the selected random ID.
-            for (var i = 0; i < maximumRouteCount; i++)
+            for (var i = 0; i < rmax; i++) 
             {
                 // TODO: make sure that the multipath setting work
                 // TODO: the multipath setting 
@@ -534,10 +537,21 @@ namespace Attack
         }
 
         /// <summary>
+        /// Compute RTT of a route in milliseconds.
+        /// </summary>
+        /// <param name="route"></param>
+        /// <returns></returns>
+        private float GetRTT(Path route)
+        {
+            float endDist = km_per_unit * route.EndNode.Dist;
+            return 2 * endDist / 299.792f; // NOTE: where does this 299.792f come from?
+        }
+        
+        /// <summary>
         /// Execute the attacker object.
         /// </summary>
         /// <exception cref="NotImplementedException"></exception>
-        public void Run(ConstellationContext constellation_ctx, bool graph_on, List<GameObject> groundstations,
+        public List<float> Run(ConstellationContext constellation_ctx, bool graph_on, List<GameObject> groundstations,
             bool defenceOn)
         {
             _constellationContext = constellation_ctx;
@@ -547,6 +561,7 @@ namespace Attack
                 constellation_ctx.maxdist, constellation_ctx.margin, constellation_ctx.maxsats,
                 constellation_ctx.satlist, constellation_ctx.km_per_unit, graph_on);
 
+            List<float> rttList = new List<float>();
             // If the current link isn't valid, select a new target link.
             if (!Target.HasValidTargetLink())
                 // should make the debug on false!
@@ -581,10 +596,14 @@ namespace Attack
                         executedRoute = GetRandomRoute(route.StartNode, route.EndNode, route.StartCity,
                             route.EndCity, 3, mbits, graph_on);
 
+                    // executedRoute.
                     ExecuteAttackRoute(executedRoute, route.StartCity, route.EndCity, mbits, _linkCapacityMonitor,
                         _painter, _constellationContext);
 
-                    if (counter == 3) break;
+                    rttList.Add(GetRTT(executedRoute));
+
+
+                    if (counter == 3) break; // wtf??? what is this??
 
                     counter++;
                 }
@@ -598,6 +617,8 @@ namespace Attack
                 _attackLogger.Write(",,0,nan");
                 _pathLogger.Write(",nan");
             }
+
+            return rttList;
         }
     }
 }
