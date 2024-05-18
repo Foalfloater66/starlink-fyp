@@ -134,7 +134,7 @@ namespace Attack
         /// <param name="rg">Built <c>Routegraph</c> object.</param>
         /// <param name="debug_on">If set to true, selects the first node that satisfy target node criterion instead. Useful for debugging.</param>
         /// <returns>If a valid node was found, returns it. Otherwise, returns null.</returns>
-        private Tuple<Node, Node> SelectLink(RouteGraph rg, bool debug_on)
+        private Tuple<Node, Node> SelectLink(RouteGraph rg)
         {
             for (var i = 0; i < rg.nodes.Count(); i++)
             {
@@ -144,7 +144,7 @@ namespace Attack
                     continue;
                 if (node.Id > 0 && InTargetArea(node.Position))
                 {
-                    var link = SelectDestinationNode(node, debug_on);
+                    var link = SelectDestinationNode(node);
                     if (link == null) continue;
                     return link;
                 }
@@ -159,7 +159,7 @@ namespace Attack
         /// <param name="src_node">Potential target link source node.</param>
         /// <param name="debug_on">If set to true, selects the first node that satisfy target node criterion instead. Useful for debugging.</param>
         /// <returns>A valid node if one is found. Otherwise, returns null.</returns>
-        private Tuple<Node, Node> SelectDestinationNode(Node src_node, bool debug_on)
+        private Tuple<Node, Node> SelectDestinationNode(Node src_node)
         {
             // if (debug_on)ds
             // {
@@ -209,9 +209,9 @@ namespace Attack
         /// </summary>
         /// <param name="rg">Built <c>Routegraph</c> object.</param>
         /// <param name="debug_on">If set to true, selects the first link that satisfy target link criterion. Useful for debugging.</param>
-        public void ChangeTargetLink(RouteGraph rg, bool debug_on)
+        public void ChangeTargetLink(RouteGraph rg)
         {
-            var nodes = SelectLink(rg, debug_on);
+            var nodes = SelectLink(rg);
 
             if (nodes != null)
                 Link = new TargetLink(nodes.Item1, nodes.Item2);

@@ -11,9 +11,8 @@ namespace Routing
         private RouteGraph _rg;
 
 
-        public RouteHandler(ScenePainter painter)
+        public RouteHandler()
         {
-            // this.rg = rg;
             _rg = new RouteGraph();
         }
 

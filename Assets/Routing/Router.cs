@@ -258,9 +258,9 @@ namespace Routing
 
             if (Target.Link != null)
             {
-            UpdateTargetLinkVisuals(_constellation, Target); // TODO: can move this outside? idk.
-            _attackLogger.Write(
-                $",{_linkCapacityMonitor.GetCapacity(Target.Link.SrcNode.Id, Target.Link.DestNode.Id)}");
+                UpdateTargetLinkVisuals(_constellation, Target); // TODO: can move this outside? idk.
+                _attackLogger.Write(
+                    $",{_linkCapacityMonitor.GetCapacity(Target.Link.SrcNode.Id, Target.Link.DestNode.Id)}");
                 
             }
         }

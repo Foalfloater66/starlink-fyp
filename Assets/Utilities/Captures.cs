@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using System.Threading;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.UI;
@@ -23,7 +22,7 @@ namespace Utilities
         /// <summary>
         /// Saves a screenshot of the current display on Unity.
         /// </summary>
-        public void CaptureState(CustomCamera views, Text text, int imgId)
+        public void TakeScreenshot(CustomCamera views, Text text, int imgId)
         {
             Canvas.ForceUpdateCanvases();
             text.canvas.renderMode = RenderMode.ScreenSpaceCamera;
