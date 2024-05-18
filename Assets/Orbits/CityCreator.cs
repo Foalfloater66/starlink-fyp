@@ -23,76 +23,15 @@ namespace Orbits
             this.global_transform = global_transform;
             this.city_prefab = city_prefab;
             this.groundstations = groundstations;
+            DefaultCities();
         }
 
-        public void DefaultCities()
+        private void DefaultCities()
         {
             CreateCity(40.76f, 73.98f, "New York");
             CreateCity(43.65f, 79.38f, "Toronto");
         }
 
-//         
-//         /// <summary>
-//         /// Create cities and place them on planet Earth.
-//         /// </summary>
-//         public void AddCities(CaseChoice caseChoice, Direction targetLinkDirection)
-//         {
-// // TODO: this is more of an attackCases thing.
-//             switch (caseChoice)
-//             {
-//                 case CaseChoice.SimpleDemo:
-//                     DemoCities();
-//                     break;
-//                 case CaseChoice.Coastal:
-//                     // add depending on the angle.
-//                     NonASEANCities();
-//                     ASEANCities();
-//                     WPacific();
-//                     if (targetLinkDirection == Direction.East)
-//                     {
-//                         NorthAsiaCities();
-//                     }
-//                     else
-//                     {
-//                         OceaniaCities();
-//                     }
-//                     NACities();
-//                     break;
-//                 case CaseChoice.Landlocked:
-//                     NACities();
-//                     break;
-//                 case CaseChoice.Insular:
-//                     NACities();
-//                     NonASEANCities();
-//                     WPacific();
-//                     PacificCities();
-//                     break;
-//                 case CaseChoice.Polar:
-//                     CANCities();
-//                     AFCities();
-//                     break;
-//                 case CaseChoice.Equatorial:
-//                     if (new HashSet<Direction> { Direction.North, Direction.South }.Contains(targetLinkDirection))
-//                     {
-//                         USACities();
-//                         SACities();
-//                     }
-//                     if (new HashSet<Direction> { Direction.East, Direction.West, Direction.Any}.Contains(targetLinkDirection))
-//                     {
-//                         
-//                         // WPacificCities();
-//                         ASEANCities();
-//                         OceaniaCities();
-//                         AFCities();
-//                     }
-//                     break;
-//                 case CaseChoice.IntraOrbital:
-//                 case CaseChoice.TransOrbital:
-//                     NACities();
-//                     break;
-//             }
-//         }
-//         
         /// <summary>
         /// Creates a small collection of cities needed to run the demonstration code.
         /// </summary>
@@ -400,61 +339,6 @@ namespace Orbits
             CreateCity(31.563340f, -130.553916f, "Kagoshima City"); // Kagoshima City, Japan
         }
 
-        // public void OceaniaCities()
-        // {
-        //     // Top cities in Oceania
-        //     CreateCity(-33.87f, -151.21f, "Sydney");         // Sydney, Australia
-        //     CreateCity(-37.81f, -144.96f, "Melbourne");      // Melbourne, Australia
-        //     CreateCity(-27.47f, -153.03f, "Brisbane");       // Brisbane, Australia
-        //     CreateCity(-31.95f, -115.86f, "Perth");          // Perth, Australia
-        //     CreateCity(-36.85f, -174.76f, "Auckland");       // Auckland, New Zealand
-        //     CreateCity(-41.29f, -174.78f, "Wellington");     // Wellington, New Zealand
-        // }
-
-        //     public void EPacificCities()
-        //     {
-        //         
-        //     }
-        //         void WPacificCities() {
-        // }
-        //
-        // void AusCities() {
-        //     CreateCity(-12.463968f, -130.842777f, true);  // Darwin, AUS
-        //     CreateCity(-16.920180f, -145.769174f, true);  // Cairns, AUS
-        //     CreateCity(-27.501833f, -153.060355f, true);  // Brisbane, AUS
-        //     CreateCity(-12.185451f, -136.788007f, true);  // Nuhlunbuy, AUS
-        //     CreateCity(-17.671119f, -141.078417f, true);  // Normanton, QND, AUS
-        //     CreateCity(-23.704273f, -133.875712f, true);  // Alice Springs, AUS
-        //     CreateCity(-31.525911f, -159.065333f, true);  // Lord Howe Island, AUS
-        // }
-        //
-        // void SPacificCities() {
-        //     CreateCity(-29.031895f, -167.946841f, true);  // Burnt Pine, Norfolk Island
-        //     CreateCity(-22.274674f, -166.452682f, true); // Noumea, New Caledonia
-        //     CreateCity(-18.143231f, -178.435968f, true); // Suva, Fiji
-        //     CreateCity(-13.834423f, 171.760831f, true);  // Apia, Samoa
-        //     CreateCity(-14.220016f, 169.423424f, true);  // Maia, Manu'a, American Samoa
-        //     CreateCity(-21.207587f, 159.783645f, true);  // Cook Islands
-        //     CreateCity(-21.926098f, 157.955635f, true);  // Oneroa, Cook Islands
-        //     CreateCity(-17.558133f, 149.600364f, true);  // F'a'a', French Polynesia
-        //     CreateCity(-14.959108f, 147.646249f, true);  // Rangiroa, French Polynesia
-        //     CreateCity(-16.067234f, 145.614420f, true);  // Rotoava, French Polynesia
-        //     CreateCity(-17.354274f, 138.444553f, true);  // Tatakoto, French Polynesia
-        //     CreateCity(-23.122389f, 134.968636f, true);  // Rikitea, French Polynesia
-        //     CreateCity(-25.066740f, 130.099011f, true);  // Adamstown, Pitcairn Islands
-        //     CreateCity(-24.333670f, 128.303854f, true);  // Henderson Island, Pitcairn Islands (uninhabited)
-        //     CreateCity(-24.674048f, 124.777367f, true);  // Ducie, Pitcairn Islands (uninhabited)
-        //     CreateCity(-25.91f, 117.1f, true);  // ship
-        //     CreateCity(-27.149430f, 109.428944f, true);  // Easter Island
-        //     //CreateCity(-22.14f, 98.75f, true); // ship
-        //     //CreateCity(-17.03f, 87.7f, true); // ship
-        //     //CreateCity(-21.523945f, 92.142192f, true); // ship
-        //     CreateCity(-12.073062f, 77.065722f, true); // Lima, Peru
-        //     CreateCity(-18f, 103f, true); // ship
-        //     CreateCity(-9f, 97f, true); // ship
-        //     CreateCity(-0.956546f, 90.968258f, true); // Puerto Villamil, Galapagos, Ecuador
-        //     lima = CreateCity(-1.069440f, 80.907160f, true); // San Lorenzo, Ecuador
-        //     
         /// <summary>
         /// Creates a city GameObject and stores it as a groundstation.
         /// Note: N and W are +ve

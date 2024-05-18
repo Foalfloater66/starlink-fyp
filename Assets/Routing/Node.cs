@@ -4,7 +4,7 @@ using Utilities;
 
 namespace Routing
 {
- public class Node : HeapNode
+    public class Node : HeapNode
     {
         private int _id;
         public Vector3 _position;

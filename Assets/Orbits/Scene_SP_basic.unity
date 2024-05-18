@@ -512,8 +512,9 @@ MonoBehaviour:
   caseChoice: 1
   targetLinkDirection: 0
   attack_radius: 1000
+  deterministic_attacker: 0
   beam_on: 0
-  defenceOn: 0
+  defenceOn: 1
   captureMode: 0
 --- !u!1 &1375312105
 GameObject:

@@ -123,22 +123,6 @@ namespace Attack
             return false; // link is vertically inclined.
         }
 
-        private bool IsDirectedNorth(Node srcNode, Node destNode)
-        {
-            var srcPosition = srcNode.Position;
-            var destPosition = destNode.Position;
-            var candidateVector = (destPosition - srcPosition).normalized;
-            if (candidateVector.y >= 0) return true;
-            return false;
-        }
-
-        private bool IsDirectedEast(Node srcNode, Node destNode)
-        {
-            var candidateVector = (destNode.Position - srcNode.Position).normalized;
-            if (candidateVector.x >= 0) return true;
-            return false;
-        }
-
         private Vector3 GetLinkDirection(Node srcNode, Node destNode)
         {
             return (destNode.Position - srcNode.Position).normalized;
