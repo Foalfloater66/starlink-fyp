@@ -1,13 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.IO;
-using Attack;
 using Orbits.Satellites;
-using Routing;
-using Scene;
 using UnityEngine;
-using UnityEngine.Experimental.PlayerLoop;
-using UnityEngine.Serialization;
-using Utilities;
 
 namespace Orbits
 {
@@ -17,49 +10,21 @@ namespace Orbits
     //
     // TODO: WILL THIS APPEAR IN THE INSPECTOR? :0
     public float simspeed; // actual speed scaled appropriately
-    //
-    // // [Tooltip("Enable use of inter-sat lasers")]
+
     public bool use_isls = true;
-    //
-    // // [HideInInspector] public float direction = 1f;
-    // // [HideInInspector] public float directionChangeSpeed = 2f;
-    // // [HideInInspector] public bool graph_on;
-    //
-    //
     public GameObject orbit;
     public GameObject satellite;
     public GameObject laser;
     public GameObject thin_laser;
-    // // public GameObject city_prefab;
-    // // public Material isl_material;
-    // // public Material[] laserMaterials;
-    // // public Material[] targetLinkMaterial; // 1st is link up, 2nd is link down.
-    // // public Material cityMaterial;
-    // // [Space] private Captures captures;
-    //
-    // // private const double earthperiod = 86400f;
-    // private Attacker _attacker;
-    //
-    //
     public GameObject beam_prefab;
     public GameObject beam_prefab2;
-    //
     private Dictionary<int, List<int>>
         orbit2sats = new Dictionary<int, List<int>>(); /* Orbit ID mapping to satellite ID list. */
-    //
-    // private LinkCapacityMonitor _link_capacities; /* (node1, node2) link mapping to capacity. Links are full duplex. */
-    //
-    // private CityCreator _city_creator;
     public GameObject[] orbits;
     public double[] orbitalperiod;
     public Satellite[] satlist;
     public Vector3[] orbitaxes;
     public int orbitcount = 0, satcount = 0;
-    //
-    // private float elapsed_time;
-    // private float last_speed_change;
-    // private float last_elapsed_time;
-    // private int framecount = 0;
     public int maxsats; // total number of satellites
     private int phase1_sats; // number of satellites in phase 1
     public int maxorbits;
@@ -69,32 +34,15 @@ namespace Orbits
     private bool isl_connect_plane = true;
     private int isl_plane2_shift = 0;
     private int isl_plane2_step = 0;
-    // private float pause_start_time;
-    // private Node[] nodes;
-    // private ScenePainter _painter;
     public float km_per_unit;
-    // private ConstellationContext constellation_ctx;
-    // private StreamWriter _fileWriter;
-    // private StreamWriter _pathLogger;
-    // private readonly GroundstationCollection groundstations = new GroundstationCollection();
-    // private RouteHandler _routeHandler;
-    // private GameObject[] lasers;
-    // private int lastpath; // used for multipaths
-    // private Satellite[] nearest_sats; // used for calculating collision distances
-    private StreamWriter logfile;  // TODO: I want to remove this.
     public float maxdist = 0f;
     private float beam_radius = 0f;
     public float margin = 100f;
     public float sat0r;
     private float raan0 = 0f;
     private int decimator = 1; // was originally modifiable.
-
-    // private Transform _mainTransform;
-    //
-    private Main.BeamChoice beam_on;
-    private LogChoice log_choice;
     
-    public Constellation(Transform transform, GameObject orbit, GameObject satellite, GameObject beam_prefab, GameObject beam_prefab2, GameObject laser, GameObject thinLaser, Main.BeamChoice beam_on, LogChoice log_choice, float speed, float simspeed, bool use_isls, StreamWriter logfile)
+    public Constellation(Transform transform, GameObject orbit, GameObject satellite, GameObject beam_prefab, GameObject beam_prefab2, GameObject laser, GameObject thinLaser, float speed, bool use_isls)
     {
         // Initialize GameObjects
         this.orbit = orbit;
@@ -103,16 +51,8 @@ namespace Orbits
         this.beam_prefab2 = beam_prefab2;
         this.laser = laser;
         this.thin_laser = thinLaser;
-        
-        this.beam_on = beam_on;
-        this.log_choice = log_choice;
         this.speed = speed;
-        this.simspeed = simspeed;
         this.use_isls = use_isls;
-        // Init(transform);
-        // Build();
-
-        this.logfile = logfile;
         
         Init(transform);
         Build();
@@ -179,22 +119,9 @@ namespace Orbits
             }
         }
 
-        // public ConstellationContext GetContext()
-        // {
-        //     // Constellation context.
-        //     constellation_ctx = new ConstellationContext
-        //     {
-        //         satlist = satlist,
-        //         km_per_unit = km_per_unit,
-        //         maxsats = maxsats,
-        //         maxdist = maxdist,
-        //         margin = margin
-        //     };
-        //     return constellation_ctx;
-        // }
-        /// <summary>
-    /// Default way to create a constellation
-    /// </summary>
+        ///<summary>
+        /// Default way to create a constellation
+        /// </summary>
     private void CreateSats(int num_orbits, int sats_per_orbit, float inclination, float orbit_phase_offset,
         float sat_phase_offset, float sat_phase_stagger, double period, float altitude,
         int beam_angle, float beam_radius, Transform transform)
@@ -202,7 +129,7 @@ namespace Orbits
         var orbit_angle_step = 360f / num_orbits;
         for (var i = 0; i < num_orbits; i++)
         {
-            orbits[orbitcount] = (GameObject)Main.Instantiate(orbit, transform.position, transform.rotation);
+            orbits[orbitcount] = (GameObject)Object.Instantiate(orbit, transform.position, transform.rotation);
             orbits[orbitcount].transform.RotateAround(Vector3.zero, Vector3.forward, inclination);
             var orbit_angle = orbit_phase_offset * orbit_angle_step + i * orbit_angle_step + raan0;
             orbits[orbitcount].transform.RotateAround(Vector3.zero, Vector3.up, orbit_angle);
@@ -217,15 +144,13 @@ namespace Orbits
                                 s * sat_angle_step;
                 var newsat = new Satellite(satcount, s, i, transform, orbits[orbitcount],
                     sat_angle, maxlasers, maxsats, phase1_sats, sat_phase_stagger, sats_per_orbit, num_orbits,
-                    altitude, beam_angle, beam_radius, satellite, beam_prefab, beam_prefab2, laser, thin_laser,
-                    logfile, log_choice);
+                    altitude, beam_angle, beam_radius, satellite, beam_prefab, beam_prefab2, laser, thin_laser);
                 satlist[satcount] = newsat;
 
                 // Add the satellite to the orbit's list of satellites.
                 if (!orbit2sats.ContainsKey(i)) orbit2sats.Add(i, new List<int>());
                 orbit2sats[i].Add(newsat.satid);
 
-                if (beam_on == Main.BeamChoice.AllOn) newsat.BeamOn();
                 satcount++;
             }
 

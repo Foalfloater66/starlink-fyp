@@ -57,18 +57,7 @@ namespace Orbits.Satellites
         private int graphcount = 0;
         private int maxgraph = -1;
         private Transform earth_transform;
-        private System.IO.StreamWriter logfile;
-        private LogChoice log_choice;
 
-        // public int SatId
-        // {
-        // 	/* Returns the satellite ID! */
-        // 	get
-        // 	{
-        // 		return satnum;
-        // 	}
-
-        // }
 
         public int Orbit =>
             /* Returns the orbit ID, not the object! */
@@ -78,8 +67,7 @@ namespace Orbits.Satellites
             GameObject orbit_, double orbitalangle, int maxlasercount, int maxsatcount, int phase1_satcount_,
             double sat_phase_stagger_, int sats_per_orbit_, int orbital_planes_,
             float altitude_, int beam_angle_, float beam_radius_, GameObject sat_prefab, GameObject beam_prefab1_,
-            GameObject beam_prefab2_, GameObject laser_prefab_, GameObject thin_laser_prefab_,
-            System.IO.StreamWriter logfile_, LogChoice log_choice_)
+            GameObject beam_prefab2_, GameObject laser_prefab_, GameObject thin_laser_prefab_)
         {
             orbit = orbit_;
             satid = satelliteid; /* globally unique satellite ID */
@@ -93,8 +81,6 @@ namespace Orbits.Satellites
             laser_prefab = laser_prefab_;
             thin_laser_prefab = thin_laser_prefab_;
             earth_transform = earth_transform_;
-            logfile = logfile_;
-            log_choice = log_choice_;
 
             maxsats = maxsatcount; /* total number of satellites */
             phase1_satcount = phase1_satcount_; // number of satellites in phase 1 
@@ -383,11 +369,6 @@ namespace Orbits.Satellites
             if (preassignedcount == LASERS_PER_SAT || s.preassignedcount == LASERS_PER_SAT || IsPreAssigned(s))
                 return false;
             Debug.Assert(s.IsPreAssigned(this) == false);
-            if (log_choice == LogChoice.LaserDists)
-            {
-                logfile.WriteLine("dist: " + Dist(s));
-                logfile.Flush();
-            }
 
             SimplePreAssign(s);
             s.SimplePreAssign(this);

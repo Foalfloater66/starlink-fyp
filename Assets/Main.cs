@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using Attack;
@@ -10,133 +9,85 @@ using Routing;
 using UnityEngine;
 using Scene;
 using UnityEditor;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Utilities;
-using Debug = UnityEngine.Debug;
 using Path = System.IO.Path;
-
-public enum LogChoice
-{
-    None,
-    RTT,
-    Distance,
-    HopDists,
-    LaserDists,
-    Path
-};
 
 public class Main : MonoBehaviour
 {
+    // Environment Parameters
+    [HideInInspector]
+    public float _direction = 1f;   // If I make this private, Unity (serialization?) sets this to 0, which breaks the program.
+    private readonly float _directionChangeSpeed = 2f;
+    // private readonly bool _graphOn;
+    // TODO: I want to remove the below 3 variables. just need to check that its not killing my code.
+    private int _frameCount = 0;
+    private float _pauseStartTime;
+    private const double EarthPeriod = 86400f;
+    // private int _lastPath;               // used for multipaths
+    // Core simulation objects
+    private GroundstationCollection _groundstations; // = new GroundstationCollection();
+    private GameObject[] _lasers;
+    private Satellite[] _nearestSats;   // used for calculating collision distances
+    private Node[] _nodes;
+    private CityCreator _cityCreator;
+    private ScenePainter _painter;
+    private Constellation _constellation;
+    private LinkCapacityMonitor _linkCapacities; /* (node1, node2) link mapping to capacity. Links are full duplex. */
+    private Attacker _attacker;
+    private RouteHandler _routeHandler;
+    private Router _router;
+    // Logging objects
+    private StreamWriter _logfile; // TODO: remove this.
+    private Captures _captures;
+    private StreamWriter _fileWriter;
+    private StreamWriter _pathLogger;
+    private string _loggingDirectory;
+    
     [Header("Environment")] public CustomCamera cam;
 
     [Tooltip("Speed 1 is realtime")] public float speed = 1f; // a value of 1 is realtime
 
-    private float simspeed; // actual speed scaled appropriately
-
     [Tooltip("Enable use of inter-sat lasers")]
     public bool use_isls = true;
 
-    [HideInInspector] public float direction = 1f;
-    [HideInInspector] public float directionChangeSpeed = 2f;
-    [HideInInspector] public bool graph_on;
-
-
-    [Header("Objects & Materials")] public GameObject orbit;
+    [Header("Objects & Materials")]
     // GameObjects
+    public GameObject orbit;
     public GameObject satellite;
     public GameObject laser;
-    [FormerlySerializedAs("thin_laser")] public GameObject thinLaser;
-    [FormerlySerializedAs("city_prefab")] public GameObject cityPrefab;
-    [FormerlySerializedAs("isl_material")] public Material islMaterial;
+    public GameObject thinLaser;
+    public GameObject cityPrefab;
+    public Material islMaterial;
     public Material[] laserMaterials;
-    public Material[] targetLinkMaterial; // 1st is link up, 2nd is link down.
+    public Material[] targetLinkMaterial;  // 1st is link up, 2nd is link down.
     public Material cityMaterial;
     
     // Text
-    [FormerlySerializedAs("countdown")] public Text leftbottom;
+    public Text leftbottom;
     public Text rightbottom;
     public Text topleft;
-    [Space] private Captures captures;
-
-    private const double earthperiod = 86400f;
-    private Attacker _attacker;
-
-
-    [FormerlySerializedAs("beam_prefab")] [HideInInspector] public GameObject beamPrefab;
-    [FormerlySerializedAs("beam_prefab2")] [HideInInspector] public GameObject beamPrefab2;
-
-    // private Dictionary<int, List<int>>
-    //     orbit2sats = new Dictionary<int, List<int>>(); /* Orbit ID mapping to satellite ID list. */
-
-    private LinkCapacityMonitor _link_capacities; /* (node1, node2) link mapping to capacity. Links are full duplex. */
-
-    private CityCreator _city_creator;
-    // private GameObject[] orbits;
-    // private double[] orbitalperiod;
-    // private Satellite[] satlist;
-    // private Vector3[] orbitaxes;
-    // private int orbitcount = 0, satcount = 0;
-
-    private float elapsed_time;
-    private float last_speed_change;
-    private float last_elapsed_time;
-    private int framecount = 0;
-    // private const int maxlasers = 4;
-    // private int isl_plane_shift = 0;
-    // private int isl_plane_step = 0;
-    // private bool isl_connect_plane = true;
-    // private int isl_plane2_shift = 0;
-    // private int isl_plane2_step = 0;
-    private float pause_start_time;
-    private Node[] nodes;
-    private ScenePainter _painter;
-    // private float km_per_unit;
-    // private ConstellationContext constellation_ctx;
-    private StreamWriter _fileWriter;
-    private StreamWriter _pathLogger;
-    private readonly GroundstationCollection groundstations = new GroundstationCollection();
-    private RouteHandler _routeHandler;
-    private GameObject[] lasers;
-    private int lastpath; // used for multipaths
-    private Satellite[] nearest_sats; // used for calculating collision distances
-    private StreamWriter logfile;
-    private float maxdist = 0f;
-
-    private string _loggingDirectory;
+    public GameObject beamPrefab;
+    public GameObject beamPrefab2;
 
     [Header("Attack Parameters")]
-    [FormerlySerializedAs("qualitativeCase")]
-    [FormerlySerializedAs("attackArea")]
-    [FormerlySerializedAs("attack_choice")]
     public CaseChoice caseChoice;
-
     public Direction targetLinkDirection;
     public float attack_radius = 1000f;
 
     [HideInInspector] public bool deterministic_attacker; // YES OR NO...?
 
-    private Constellation _constellation;
 
-    // Deprecated log choice.
-    private LogChoice log_choice = LogChoice.None;
-
-    // [HideInInspector]
-    public enum BeamChoice
-    {
-        AllOff,
-        AllOn,
-        SrcDstOn
-    };
-
-    // [HideInInspector]
-    public BeamChoice beam_on;
-
-    [Header("Defence Parameters")] public bool defenceOn = false;
-    private Router _router;
+    [Header("Defence Parameters")] 
+    public bool defenceOn = false;
 
     [Header("Logging")] public bool captureMode = true;
-    
+
+    // public Main(bool graphOn)
+    // {
+        // _graphOn = graphOn;
+    // }
+
     private CustomCamera InitCamera()
     {
         var camscript = (CustomCamera)cam.GetComponent(typeof(CustomCamera));
@@ -144,13 +95,6 @@ public class Main : MonoBehaviour
         return camscript;
     }
 
-    private void InitTime()
-    {
-        // Handle time in a way that copes with speed change mid-simulation.
-        last_elapsed_time = Time.time;
-        last_speed_change = last_elapsed_time;
-        elapsed_time = 0f;
-    }
 
     private void InitLogging()
     {
@@ -162,7 +106,7 @@ public class Main : MonoBehaviour
         // Save a screenshot of each frame.
         if (captureMode)
         {
-            captures = new Captures(_loggingDirectory, $"{caseChoice}_{targetLinkDirection}");
+            _captures = new Captures(_loggingDirectory, $"{caseChoice}_{targetLinkDirection}");
         }
     
         // Record information about snapshots.
@@ -177,8 +121,9 @@ public class Main : MonoBehaviour
     private void InitScene()
     {
         // GameObjects
-        _city_creator = new CityCreator(transform, cityPrefab, groundstations);
-        _constellation = new Constellation(transform, orbit, satellite, beamPrefab, beamPrefab2, laser, thinLaser, beam_on, log_choice, speed, simspeed, use_isls, logfile);
+        _groundstations = new GroundstationCollection();
+        _cityCreator = new CityCreator(transform, cityPrefab, _groundstations);
+        _constellation = new Constellation(transform, orbit, satellite, beamPrefab, beamPrefab2, laser, thinLaser, speed, use_isls);
         // UI Text + Visuals.
         rightbottom.text = "";
         topleft.text = "";
@@ -188,25 +133,24 @@ public class Main : MonoBehaviour
     private void InitRoutingFramework()
     {
         // Routing + Stats Monitoring
-        _link_capacities = new LinkCapacityMonitor();
+        _linkCapacities = new LinkCapacityMonitor();
         _routeHandler = new RouteHandler(_painter);
         _routeHandler.InitRoute(_constellation.maxsats, _constellation.satlist, _constellation.maxdist, _constellation.km_per_unit);
-        _router = new Router(defenceOn, groundstations, _routeHandler, _painter, _link_capacities, _constellation, _fileWriter, _constellation.km_per_unit);
+        _router = new Router(defenceOn, _groundstations, _routeHandler, _painter, _linkCapacities, _constellation, _fileWriter, _constellation.km_per_unit);
     }
 
     private void Start()
     {
         // Simulation configuration.
-        InitTime();
         Application.runInBackground = true;
         InitLogging();
         InitScene();
         var camscript = InitCamera();
         var attackerParams = CasesFactory
-            .GetCase(caseChoice, _city_creator, targetLinkDirection, groundstations, camscript).GetParams();
+            .GetCase(caseChoice, _cityCreator, targetLinkDirection, _groundstations, camscript).GetParams();
         InitRoutingFramework();
-        _attacker = new Attacker(attackerParams, _constellation.sat0r, attack_radius, transform, cityPrefab, groundstations,
-            _routeHandler, _painter, _link_capacities, _constellation, _fileWriter, _pathLogger);
+        _attacker = new Attacker(attackerParams, _constellation.sat0r, attack_radius, transform, cityPrefab, _groundstations,
+            _routeHandler, _painter, _linkCapacities, _constellation, _fileWriter, _pathLogger);
         camscript.InitView();
         
         // Give the program enough time to generate all game objects when capture mode is disabled.
@@ -223,12 +167,12 @@ public class Main : MonoBehaviour
     private void RotateCamera()
     {
         // Update the direction of the orbits
-        if (direction < 1f) direction += Time.deltaTime / (directionChangeSpeed / 2);
+        if (_direction < 1f) _direction += Time.deltaTime / (_directionChangeSpeed / 2);
 
         // Move the orbits
         for (var i = 0; i < _constellation.maxorbits; i++)
             _constellation.orbits[i].transform.RotateAround(Vector3.zero, _constellation.orbitaxes[i],
-                (float)(-1f * earthperiod / _constellation.orbitalperiod[i] * _constellation.simspeed * direction) * Time.deltaTime);
+                (float)(-1f * EarthPeriod / _constellation.orbitalperiod[i] * _constellation.simspeed * _direction) * Time.deltaTime);
     }
 
     private void LogRTT(List<Routing.Path> routes)
@@ -265,18 +209,18 @@ public class Main : MonoBehaviour
     {
         // TODO: DEMO MODE NEEDS TO PAUSE FOR EACH STEP/TAKE A SCREENSHOT.
         // Update / Reset scene parameters.
-        elapsed_time = last_elapsed_time + (Time.time - last_speed_change) * speed;
+        // elapsed_time = _lastElapsedTime + (Time.time - _lastSpeedChange) * speed;
         RotateCamera();
-        _link_capacities.Reset();
+        _linkCapacities.Reset();
         RouteHandler.ClearRoutes(_painter);
 
         // Start logging for this frame.
-        _fileWriter.Write($"{framecount}");
-        _pathLogger.Write($"{framecount}");
+        _fileWriter.Write($"{_frameCount}");
+        _pathLogger.Write($"{_frameCount}");
 
         // Attack attempt.
-        var routes = _attacker.Run(graph_on, groundstations.ToList());
-        _router.Run(routes, graph_on, _attacker.Target);
+        var routes = _attacker.Run(_groundstations.ToList());
+        _router.Run(routes, _attacker.Target);
         LogRTT(routes);
         
         // Finish logging for this frame.
@@ -284,14 +228,14 @@ public class Main : MonoBehaviour
         _pathLogger.Write("\n");
         _fileWriter.Flush();
         _pathLogger.Flush();
-
+        
         // Update the scene.
         _painter.UpdateLasers(_constellation.satlist, _constellation.maxsats, speed);
-        leftbottom.text = $"Frame {framecount}";
+        leftbottom.text = $"Frame {_frameCount}";
         if (_attacker.Target.Link != null)
         {
             rightbottom.text =
-                $"Target Link Capacity: {_link_capacities.GetCapacity(_attacker.Target.Link.SrcNode.Id, _attacker.Target.Link.DestNode.Id)} mbits/sec";
+                $"Target Link Capacity: {_linkCapacities.GetCapacity(_attacker.Target.Link.SrcNode.Id, _attacker.Target.Link.DestNode.Id)} mbits/sec";
         }
         else
         {
@@ -301,60 +245,17 @@ public class Main : MonoBehaviour
         // Take a screenshot (if captureMode is enabled)
         if (captureMode)
         {
-            captures.CaptureState(cam, leftbottom, framecount); //, leftbottom);
-            if (framecount == 50) Terminate();
+            _captures.CaptureState(cam, leftbottom, _frameCount);
+            if (_frameCount == 50) Terminate(); // TODO: this is a weird termination condition. I should separate data plotting (enable logging) from screenshot taking
         }
 
-        framecount++; 
+        _frameCount++; 
     }
 
     private void Terminate()
     {
-        if (captureMode) SaveVideo();
-        PlotData();
+        if (captureMode) PowershellTools.SaveVideo(cam, _loggingDirectory, caseChoice, targetLinkDirection);
+        PowershellTools.PlotData(cam, _loggingDirectory, caseChoice, targetLinkDirection);
         EditorApplication.Exit(0);
-    }
-
-    private void SaveVideo()
-    {
-        var imgHeight = 748 * cam.cam_count;
-        var imgWidth = 1504;
-
-        var command =
-            // $"ffmpeg -framerate 3 -i {Directory.GetCurrentDirectory()}/Logs/Captures/{_loggingDirectory}/{qualitativeCase}_{targetLinkDirection}_%02d.png -vf \"scale={imgWidth}:{imgHeight}\" -c:v libx265 -preset fast -crf 20 -pix_fmt yuv420p {Directory.GetCurrentDirectory()}/Logs/Captures/{_loggingDirectory}/output.mp4";
-            $"ffmpeg -framerate 3 -i {_loggingDirectory}/{caseChoice}_{targetLinkDirection}_%02d.png -vf \"scale={imgWidth}:{imgHeight}\" -c:v libx265 -preset fast -crf 20 -pix_fmt yuv420p {_loggingDirectory}/output.mp4";
-        ExecutePowershellCommand(command);
-    }
-
-    private void PlotData()
-    {
-        var command =
-            $"python generate_graph.py {_loggingDirectory}/{caseChoice}_{targetLinkDirection}.csv {_loggingDirectory}/{caseChoice}_{targetLinkDirection}_graph.svg";
-        ExecutePowershellCommand(command);
-    }
-
-    private void ExecutePowershellCommand(string command)
-    {
-        // TODO: move this stuff somewhere else :)
-        var startInfo = new ProcessStartInfo()
-        {
-            FileName = "powershell.exe",
-            Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{command}\"",
-            UseShellExecute = false,
-            RedirectStandardOutput = false,
-            RedirectStandardError = true,
-            CreateNoWindow = true
-        };
-
-        var process = new Process() { StartInfo = startInfo };
-
-        process.Start();
-        var errors = process.StandardError.ReadToEnd();
-
-        if (!process.WaitForExit(5000)) // Kills the process after 5 seconds.
-            process.Kill();
-        process.Close();
-
-        if (!string.IsNullOrEmpty(errors)) Debug.LogError("PowerShell Errors: " + errors);
     }
 }

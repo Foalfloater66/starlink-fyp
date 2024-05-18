@@ -1,11 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using Attack.Cases;
 using Orbits;
-using Orbits.Satellites;
 using Routing;
 using Scene;
 using UnityEngine;
@@ -131,7 +129,7 @@ namespace Attack
             return false; // This candidate might be able to reach the target source node.
         }
 
-        private BinaryHeap<Path> _FindAttackRoutes(RouteGraph rg, List<GameObject> dest_groundstations, bool graph_on)
+        private BinaryHeap<Path> _FindAttackRoutes(RouteGraph rg, List<GameObject> dest_groundstations)
         {
             // REVIEW: Do I want to pass the destination groundstations at the beginning?
             // NOTE: I would like to remove some of these parameters or pass them in a more elegant way.
@@ -150,7 +148,7 @@ namespace Attack
                     _constellation.maxsats);
                 rg = _routeHandler.BuildRouteGraph(src_gs, dest_gs, _constellation.maxdist,
                     _constellation.margin, _constellation.maxsats, _constellation.satlist,
-                    _constellation.km_per_unit, graph_on);
+                    _constellation.km_per_unit);
                 rg.ComputeRoutes();
 
 
@@ -174,9 +172,9 @@ namespace Attack
                 $"Execute AttackRoute | The last node isn't -1. Instead, got {rn.Id}"); //, "ExecuteAttackRoute | The last node is not -2. Instead, it's " + rn.Id);
 
             if (path.Nodes.First().Id != -2) return; // This isn't a valid path; it doesn't have a destination.
-            Node prevnode = null;
-            Satellite sat = null;
-            Satellite prevsat = null;
+            // Node prevnode = null;
+            // Satellite sat = null;
+            // Satellite prevsat = null;
             var previd = -4;
             var id = -4; /* first id */
 
@@ -289,14 +287,14 @@ namespace Attack
 
 
         /// Execute the attacker object.
-        public List<Path> Run(bool graph_on, List<GameObject> groundstations)
+        public List<Path> Run(List<GameObject> groundstations)
         {
             // _constellation = constellation_ctx;
             _routeHandler.ResetRoute(_Groundstations["New York"], _Groundstations["Toronto"], _painter,
                 _constellation.satlist, _constellation.maxsats);
             _rg = _routeHandler.BuildRouteGraph(_Groundstations["New York"], _Groundstations["Toronto"],
                 _constellation.maxdist, _constellation.margin, _constellation.maxsats,
-                _constellation.satlist, _constellation.km_per_unit, graph_on);
+                _constellation.satlist, _constellation.km_per_unit);
 
             // If the current link isn't valid, select a new target link.
             if (!Target.HasValidTargetLink())
@@ -310,8 +308,7 @@ namespace Attack
 
                 // Find viable attack routes.
                 var viableAttackRoutes = _FindAttackRoutes(_rg,
-                    groundstations,
-                    graph_on);
+                    groundstations);
 
                 // Send the maximum capacity of an RF link.
                 var mbits = 4000;

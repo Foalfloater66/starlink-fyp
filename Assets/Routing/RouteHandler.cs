@@ -1,11 +1,7 @@
-using System.Collections.Generic;
 using System.Linq;
-using Attack;
-using Orbits;
 using Orbits.Satellites;
 using Scene;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace Routing
 {
@@ -13,14 +9,12 @@ namespace Routing
     {
         // Should I create a new routehandler each time I create a route?
         private RouteGraph _rg;
-        private ScenePainter _painter;
 
 
         public RouteHandler(ScenePainter painter)
         {
             // this.rg = rg;
             _rg = new RouteGraph();
-            _painter = painter;
         }
 
         // TODO: add docstrings
@@ -44,7 +38,7 @@ namespace Routing
         }
 
         public RouteGraph BuildRouteGraph(GameObject city1, GameObject city2, float maxdist, float margin, int maxsats,
-            Satellite[] satlist, float kmPerUnit, bool graphOn)
+            Satellite[] satlist, float kmPerUnit)
         {
             // TODO: Create a BuildRouteGraph function that doesn't include cities.
 
@@ -69,8 +63,8 @@ namespace Routing
                 else if (radiodist * kmPerUnit < maxdist + margin)
                     _rg.AddNeighbour(maxsats + 1, satnum, Node.INFINITY, true);
 
-                if (graphOn) satlist[satnum].GraphReset();
-                if (graphOn) satlist[satnum].GraphDone();
+                // if (graphOn) satlist[satnum].GraphReset();
+                // if (graphOn) satlist[satnum].GraphDone();
             }
 
             return _rg;

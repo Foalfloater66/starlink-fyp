@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel.Design.Serialization;
 using System.IO;
 using System.Linq;
 using Attack;
@@ -76,32 +75,20 @@ namespace Routing
             var route = new Path(startNode, endNode, srcGs, destGs, 4000);
             route.Nodes.Add(rn);
 
-            var startsatid = 0;
             var endsatid = -1;
             var id = -4;
-            var prevID = -4;
-            var viableRoute = false; // can the target link be attacked with this route?
 
             while (true)
             {
                 if (rn == startNode)
                 {
                     route.Nodes.Add(rn);
-                    startsatid = id; // TODO: do I need to keep this?
                     break;
                 }
-
                 id = rn.Id;
-
                 if (id >= 0) route.Nodes.Add(rn);
-
                 if (endsatid == -1 && id >= 0) endsatid = id;
-
-
-                prevID = id;
-
                 rn = rn.Parent;
-
                 if (rn == null) // this route is incomplete.
                     return null;
             }
@@ -112,7 +99,7 @@ namespace Routing
 
         // TODO: I would like to put this in the defence code area. or like. some routing code.
         public Path GetRandomRoute(Node startNode, Node endNode, GameObject srcGs, GameObject destGs,
-            int rmax, bool graphOn)
+            int rmax)
         {
             // TODO: check what the randomizer uses.
             var selectedRouteId = new System.Random().Next(0, rmax);
@@ -129,7 +116,7 @@ namespace Routing
                         _constellation.maxsats);
                     _rg = _routeHandler.BuildRouteGraph(srcGs, destGs, _constellation.maxdist,
                         _constellation.margin, _constellation.maxsats, _constellation.satlist,
-                        _constellation.km_per_unit, graphOn);
+                        _constellation.km_per_unit);
                 }
                 else
                 {
@@ -250,9 +237,8 @@ namespace Routing
         }
 
 
-        public void Run(List<Path> routes, bool graph_on, AttackTarget Target)
+        public void Run(List<Path> routes, AttackTarget Target)
         {
-            var rttList = new List<float>();
 
             // Execute the final list of attack routes.
             foreach (var route in routes)
@@ -261,13 +247,12 @@ namespace Routing
 
                 if (_defenceOn)
                     executedRoute = GetRandomRoute(route.StartNode, route.EndNode, route.StartCity,
-                        route.EndCity, 3, graph_on);
+                        route.EndCity, 3);
 
                 // executedRoute.
                 ExecuteAttackRoute(executedRoute, route.StartCity, route.EndCity, 4000, _linkCapacityMonitor,
                     _painter, _constellation);
 
-                rttList.Add(executedRoute.GetRTT(_kmPerUnit));
                 // counter++;
             }
 
@@ -278,7 +263,6 @@ namespace Routing
                 $",{_linkCapacityMonitor.GetCapacity(Target.Link.SrcNode.Id, Target.Link.DestNode.Id)}");
                 
             }
-            // return rttList;
         }
     }
 }
