@@ -9,9 +9,6 @@ using Utilities;
 
 namespace Attack
 {
-    /**
-     * @author Morgane Marie Ohlig
-    */
     /// Class <c>Attacker</c> provides a set of properties and methods used to target and flood links in a geographic area of specified center and radius.
     public class Attacker
     {
