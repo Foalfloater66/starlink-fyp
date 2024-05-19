@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Attack;
 using Orbits;
@@ -18,29 +17,18 @@ namespace Routing
     /// </summary>
     public class Router
     {
-        private bool _defenceOn = false;
+        private bool _defenceOn;
         private float _kmPerUnit;
-
-        // TODO: I need to check what I actually need to keep here.
         private RouteHandler _routeHandler;
         private ScenePainter _painter;
         private LinkCapacityMonitor _linkCapacityMonitor;
         private GroundstationCollection _Groundstations;
-
         private RouteGraph _rg;
-
-        // public AttackTarget Target;
         private Constellation _constellation;
-
-        /// <summary>
-        /// File for debugging.
-        /// </summary>
-        // private System.IO.StreamWriter logfile;
-        private StreamWriter _attackLogger;
 
         public Router(bool defenceOn,GroundstationCollection groundstations, RouteHandler route_handler, ScenePainter painter,
             LinkCapacityMonitor
-                linkCapacityMonitor, Constellation constellation, StreamWriter fileWriter, float kmPerUnit)
+                linkCapacityMonitor, Constellation constellation, float kmPerUnit)
         {
             _defenceOn = defenceOn;
             Assert.IsTrue(_kmPerUnit >= 0);
@@ -49,56 +37,10 @@ namespace Routing
             _linkCapacityMonitor = linkCapacityMonitor;
             _routeHandler = route_handler;
             _constellation = constellation;
-
             _Groundstations = groundstations;
-            _attackLogger = fileWriter;
         }
 
-
-        /// <summary>
-        /// Finds the shortest route between two groundstations.
-        /// </summary>
-        /// <param name="startNode"></param>
-        /// <param name="endNode"></param>
-        /// <param name="srcGs">Source groundstation.</param>
-        /// <param name="destGs">Destination groundstation.</param>
-        /// <returns>If a route containing the target link is found, creates and returns the route's <c>Path</c>. Otherwise, returns null.</returns>
-        public Path ExtractRoute(Node startNode, Node endNode, GameObject srcGs, GameObject destGs)
-        {
-            // TODO: I want to put this in the Path thing.
-            // This function processes the route in the reverse order.
-            // TODO: this EXTRACTS THE attack route.
-
-            // System.Diagnostics.Debug.Assert(Target.Link != null, "FindAttackRoute | No attacker link has been set.");
-
-            var rn = endNode;
-            var route = new Path(startNode, endNode, srcGs, destGs, 4000);
-            route.Nodes.Add(rn);
-
-            var endsatid = -1;
-            var id = -4;
-
-            while (true)
-            {
-                if (rn == startNode)
-                {
-                    route.Nodes.Add(rn);
-                    break;
-                }
-                id = rn.Id;
-                if (id >= 0) route.Nodes.Add(rn);
-                if (endsatid == -1 && id >= 0) endsatid = id;
-                rn = rn.Parent;
-                if (rn == null) // this route is incomplete.
-                    return null;
-            }
-
-            return route;
-        }
-
-
-        // TODO: I would like to put this in the defence code area. or like. some routing code.
-        public Path GetRandomRoute(Node startNode, Node endNode, GameObject srcGs, GameObject destGs,
+        private Route GetRandomRoute(Node startNode, Node endNode, GameObject srcGs, GameObject destGs,
             int rmax)
         {
             // TODO: check what the randomizer uses.
@@ -107,8 +49,6 @@ namespace Routing
             // Compute the multiple shortest paths and select the one for the selected random ID.
             for (var i = 0; i < rmax; i++)
             {
-                // TODO: make sure that the multipath setting work
-                // TODO: the multipath setting 
                 // Update the route graph in a multipath setting.
                 if (i == 0)
                 {
@@ -125,9 +65,8 @@ namespace Routing
 
                 _rg.ComputeRoutes();
 
-                // Path route = ExtractRoute(startNode, endNode, srcGs, destGs);
-
-                if (i == selectedRouteId) return ExtractRoute(startNode, endNode, srcGs, destGs);
+                if (i == selectedRouteId) return Route.Nodes2Route(startNode, endNode, srcGs, destGs); 
+                    // ExtractRoute(startNode, endNode, srcGs, destGs);
 
                 RouteHandler.LockRoute(_painter);
             }
@@ -135,31 +74,31 @@ namespace Routing
             return null;
         }
 
-        /* Draw the computed path and send traffic in mbits. */
-        public void ExecuteAttackRoute(Path path, GameObject city1 /* TODO: remove this */,
+        /// <summary>
+        /// Draw the computed path and send traffic in mbits.
+        /// </summary>
+        private void ExecuteAttackRoute(Route route, GameObject city1 /* TODO: remove this */,
             GameObject city2 /* TODO: remove this */, int mbits, LinkCapacityMonitor _linkCapacityMonitor,
             ScenePainter _painter, Constellation constellation_ctx)
         {
-            var rn = path.Nodes.Last();
-
-            // REVIEW: Separate the drawing functionality from the link capacity modification.
+            var rn = route.Nodes.Last();
 
             Debug.Assert(rn != null); //, "ExecuteAttackRoute | The last node is empty.");
             Debug.Assert(rn.Id == -1,
                 $"Execute AttackRoute | The last node isn't -1. Instead, got {rn.Id}"); //, "ExecuteAttackRoute | The last node is not -2. Instead, it's " + rn.Id);
 
-            if (path.Nodes.First().Id != -2) return; // This isn't a valid path; it doesn't have a destination.
+            if (route.Nodes.First().Id != -2) return; // This isn't a valid path; it doesn't have a destination.
             Node prevnode = null;
             Satellite sat = null;
             Satellite prevsat = null;
             var previd = -4;
             var id = -4; /* first id */
 
-            if (path.Nodes.Count == 1)
+            if (route.Nodes.Count == 1)
                 // Only node -1 is present; so no real path exists.
                 return;
 
-            var index = path.Nodes.Count - 2;
+            var index = route.Nodes.Count - 2;
 
             // process links from start (id: -1) to end (id: -2)
             while (true)
@@ -176,7 +115,6 @@ namespace Routing
                         prevsat = constellation_ctx.satlist[previd];
 
                         // Increase the load of the link and abort if link becomes flooded.
-                        // TODO: becauise im processing this backwards, I need to process the links by previd to id! not the other way around!
                         if (_linkCapacityMonitor.IsCongested(previd, id)) return;
                         _linkCapacityMonitor.DecreaseLinkCapacity(previd, id, mbits);
                         _painter.ColorRouteISLLink(prevsat, sat, prevnode, rn);
@@ -184,8 +122,8 @@ namespace Routing
                     // The current node is a satellite and the previous, a city. (RF link)
                     else if (id >= 0 && previd == -1)
                     {
-                        if (_linkCapacityMonitor.IsCongested(_Groundstations[path.StartCity], id.ToString())) return;
-                        _linkCapacityMonitor.DecreaseLinkCapacity(_Groundstations[path.StartCity], id.ToString(),
+                        if (_linkCapacityMonitor.IsCongested(_Groundstations[route.StartCity], id.ToString())) return;
+                        _linkCapacityMonitor.DecreaseLinkCapacity(_Groundstations[route.StartCity], id.ToString(),
                             mbits);
                         sat = constellation_ctx.satlist[id];
                         _painter.ColorRFLink(city1, sat, prevnode, rn);
@@ -193,8 +131,8 @@ namespace Routing
                     // The current node is a city and the previous, a satellite. (RF link)
                     else if (id == -2 && previd >= 0)
                     {
-                        if (_linkCapacityMonitor.IsCongested(previd.ToString(), _Groundstations[path.EndCity])) return;
-                        _linkCapacityMonitor.DecreaseLinkCapacity(previd.ToString(), _Groundstations[path.EndCity],
+                        if (_linkCapacityMonitor.IsCongested(previd.ToString(), _Groundstations[route.EndCity])) return;
+                        _linkCapacityMonitor.DecreaseLinkCapacity(previd.ToString(), _Groundstations[route.EndCity],
                             mbits);
                         sat = constellation_ctx.satlist[previd];
                         _painter.ColorRFLink(city2, sat, prevnode, rn);
@@ -209,7 +147,7 @@ namespace Routing
                 if (index == -1) // only show a path if it's feasible.
                     return;
 
-                rn = path.Nodes[index];
+                rn = route.Nodes[index];
                 if (rn == null) // only show a path if it's feasible.
                     return;
 
@@ -217,51 +155,43 @@ namespace Routing
             }
         }
 
-        // TODO: I want any painting-related functionality to be done later on.
         /// <summary>
         /// Update the Target Link Visuals
         /// </summary>
-        private void UpdateTargetLinkVisuals(Constellation constellation_ctx, AttackTarget Target)
+        private void UpdateTargetLinkVisuals(Constellation constellationCtx, AttackTarget Target)
         {
             // Debugging messages.
             // Color the target link on the map. If flooded, the link is colored red. Otherwise, the link is colored pink.
             // Checks if the link has any capacity left
             if (_linkCapacityMonitor.IsCongested(Target.Link.SrcNode.Id, Target.Link.DestNode.Id))
-                _painter.ColorTargetISLLink(constellation_ctx.satlist[Target.Link.SrcNode.Id],
-                    constellation_ctx.satlist[Target.Link.DestNode.Id], Target.Link.DestNode, Target.Link.SrcNode,
+                _painter.ColorTargetISLLink(constellationCtx.satlist[Target.Link.SrcNode.Id],
+                    constellationCtx.satlist[Target.Link.DestNode.Id], Target.Link.DestNode, Target.Link.SrcNode,
                     true);
             else
-                _painter.ColorTargetISLLink(constellation_ctx.satlist[Target.Link.SrcNode.Id],
-                    constellation_ctx.satlist[Target.Link.DestNode.Id], Target.Link.DestNode, Target.Link.SrcNode,
+                _painter.ColorTargetISLLink(constellationCtx.satlist[Target.Link.SrcNode.Id],
+                    constellationCtx.satlist[Target.Link.DestNode.Id], Target.Link.DestNode, Target.Link.SrcNode,
                     false);
         }
 
 
-        public void Run(List<Path> routes, AttackTarget Target)
+        public void Run(List<Route> routes, AttackTarget target)
         {
 
             // Execute the final list of attack routes.
             foreach (var route in routes)
             {
                 var executedRoute = route;
-
                 if (_defenceOn)
                     executedRoute = GetRandomRoute(route.StartNode, route.EndNode, route.StartCity,
                         route.EndCity, 3);
-
-                // executedRoute.
                 ExecuteAttackRoute(executedRoute, route.StartCity, route.EndCity, 4000, _linkCapacityMonitor,
                     _painter, _constellation);
-
-                // counter++;
             }
 
-            if (Target.Link != null)
+            if (target.Link != null)
             {
-                UpdateTargetLinkVisuals(_constellation, Target); // TODO: can move this outside? idk.
-                _attackLogger.Write(
-                    $",{_linkCapacityMonitor.GetCapacity(Target.Link.SrcNode.Id, Target.Link.DestNode.Id)}");
-                
+                UpdateTargetLinkVisuals(_constellation, target); // TODO: can move this outside? idk.
+
             }
         }
     }

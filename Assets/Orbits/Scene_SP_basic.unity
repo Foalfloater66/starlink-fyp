@@ -480,10 +480,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e262a71538d9547419b5142e89144cb2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _direction: 1
+  direction: 1
   cam: {fileID: 1375312111}
   speed: 20
-  use_isls: 1
+  useISLs: 1
   orbit: {fileID: 1172864837802712, guid: 3b4a1d43d21bf42d8ad02077259400de, type: 3}
   satellite: {fileID: 1842355326392174, guid: 7327322cd40cd49898f0f3e031d063e4, type: 3}
   laser: {fileID: 1648504976000122, guid: 88944ffc92ba14ec5a48961205eeab10, type: 3}
@@ -507,10 +507,11 @@ MonoBehaviour:
     type: 3}
   caseChoice: 1
   targetLinkDirection: 0
-  attack_radius: 1000
-  deterministic_attacker: 0
+  attackRadius: 1000
+  deterministicAttacker: 0
   defenceOn: 0
-  captureMode: 0
+  screenshotMode: 0
+  logAttack: 1
 --- !u!1 &1375312105
 GameObject:
   m_ObjectHideFlags: 0

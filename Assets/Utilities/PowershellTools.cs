@@ -14,14 +14,14 @@ namespace Utilities
             var command =
                 // $"ffmpeg -framerate 3 -i {Directory.GetCurrentDirectory()}/Logs/Captures/{_loggingDirectory}/{qualitativeCase}_{targetLinkDirection}_%02d.png -vf \"scale={imgWidth}:{imgHeight}\" -c:v libx265 -preset fast -crf 20 -pix_fmt yuv420p {Directory.GetCurrentDirectory()}/Logs/Captures/{_loggingDirectory}/output.mp4";
                 $"ffmpeg -framerate 3 -i {_loggingDirectory}/{caseChoice}_{targetLinkDirection}_%02d.png -vf \"scale={imgWidth}:{imgHeight}\" -c:v libx265 -preset fast -crf 20 -pix_fmt yuv420p {_loggingDirectory}/output.mp4";
-            ExecutePowershellCommand(command);
+            PowershellTools.ExecutePowershellCommand(command);
         }
 
         public static void PlotData(CustomCamera cam, string _loggingDirectory, CaseChoice caseChoice, Direction targetLinkDirection)
         {
             var command =
                 $"python generate_graph.py {_loggingDirectory}/{caseChoice}_{targetLinkDirection}.csv {_loggingDirectory}/{caseChoice}_{targetLinkDirection}_graph.svg";
-            ExecutePowershellCommand(command);
+            PowershellTools.ExecutePowershellCommand(command);
         }
 
         private static void ExecutePowershellCommand(string command)

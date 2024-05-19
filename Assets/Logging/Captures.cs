@@ -2,8 +2,9 @@
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.UI;
+using Utilities;
 
-namespace Utilities
+namespace Logging
 {
     public class Captures
     {

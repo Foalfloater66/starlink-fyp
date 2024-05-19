@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading;
 using Attack;
 using Attack.Cases;
+using Logging;
 using Orbits;
 using Orbits.Satellites;
 using Routing;
@@ -12,7 +13,7 @@ using UnityEditor;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Utilities;
-using Path = System.IO.Path;
+using Logger = UnityEngine.Logger;
 
 public class Main : MonoBehaviour
 {
@@ -37,9 +38,9 @@ public class Main : MonoBehaviour
     private Router _router;
     // Logging objects
     private Captures _captures;
-    private StreamWriter _fileWriter;
-    private StreamWriter _pathLogger;
     private string _loggingDirectory;
+    private Logging.ILogger _attackLogger;
+    private Logging.ILogger _pathLogger;
     
     [Header("Environment")] public CustomCamera cam;
 
@@ -74,13 +75,12 @@ public class Main : MonoBehaviour
 
     [HideInInspector] public bool deterministicAttacker; // YES OR NO...?
 
-
     [Header("Defence Parameters")] 
     public bool defenceOn = false;
 
     [Header("Logging")]
     public bool screenshotMode = true;
-    
+    public bool logAttack = true;
 
     private CustomCamera InitCamera()
     {
@@ -96,19 +96,16 @@ public class Main : MonoBehaviour
         if (Directory.Exists(_loggingDirectory)) Directory.Delete(_loggingDirectory, true);
         Directory.CreateDirectory(_loggingDirectory);
         
-        // Save a screenshot of each frame.
         if (screenshotMode)
         {
             _captures = new Captures(_loggingDirectory, $"{caseChoice}_{targetLinkDirection}");
         }
-    
-        // Record information about snapshots.
-        _fileWriter = new StreamWriter(Path.Combine(_loggingDirectory, $"{caseChoice}_{targetLinkDirection}.csv"));
-        _fileWriter.WriteLine("FRAME,TARGET LINK,ROUTE COUNT,FINAL CAPACITY");
-        
-        // Record information about the attack routes selected for each frame.
-        _pathLogger = new StreamWriter(Path.Combine(_loggingDirectory, "paths.csv"));
-        _pathLogger.WriteLine("FRAME,PATHS");
+
+        if (logAttack)
+        {
+            _attackLogger = new AttackLogger(_loggingDirectory, caseChoice, targetLinkDirection, _linkCapacities);
+            _pathLogger = new PathLogger(_loggingDirectory, _groundstations);
+        }
     }
 
     private void InitScene()
@@ -129,21 +126,21 @@ public class Main : MonoBehaviour
         _linkCapacities = new LinkCapacityMonitor();
         _routeHandler = new RouteHandler();
         _routeHandler.InitRoute(_constellation.maxsats, _constellation.satlist, _constellation.maxdist, _constellation.km_per_unit);
-        _router = new Router(defenceOn, _groundstations, _routeHandler, _painter, _linkCapacities, _constellation, _fileWriter, _constellation.km_per_unit);
+        _router = new Router(defenceOn, _groundstations, _routeHandler, _painter, _linkCapacities, _constellation, _constellation.km_per_unit);
     }
 
     private void Start()
     {
         // Simulation configuration.
         Application.runInBackground = true;
-        InitLogging();
         InitScene();
         var camscript = InitCamera();
         var attackerParams = CasesFactory
             .GetCase(caseChoice, _cityCreator, targetLinkDirection, _groundstations, camscript).GetParams();
         InitRoutingFramework();
         _attacker = new Attacker(attackerParams, _constellation.sat0r, attackRadius, transform, cityPrefab, _groundstations,
-            _routeHandler, _painter, _linkCapacities, _constellation, _fileWriter, _pathLogger);
+            _routeHandler, _painter, _linkCapacities, _constellation);
+        InitLogging();
         camscript.InitView();
         
         // Give the program enough time to generate all game objects when capture mode is disabled.
@@ -166,10 +163,8 @@ public class Main : MonoBehaviour
             _constellation.orbits[i].transform.RotateAround(Vector3.zero, _constellation.orbitaxes[i],
                 (float)(-1f * EarthPeriod / _constellation.orbitalperiod[i] * _constellation.simspeed * direction) * Time.deltaTime);
     }
-    
-    /// UI UPDATE FUNCTIONS /// 
 
-    private void UpdateSceneRTT(List<Routing.Path> routes)
+    private void UpdateSceneRTT(List<Routing.Route> routes)
     {
         var rttLog = "RTT: ";
         for (int idx = 0; idx < routes.Count; idx++)
@@ -215,7 +210,7 @@ public class Main : MonoBehaviour
         RouteHandler.ClearRoutes(_painter);
     }
     
-    private void UpdateScene(List<Routing.Path> routes)
+    private void UpdateScene(List<Routing.Route> routes)
     {
         _painter.UpdateLasers(_constellation.satlist, _constellation.maxsats, speed);
         UpdateSceneRTT(routes);
@@ -231,31 +226,35 @@ public class Main : MonoBehaviour
         // TODO: DEMO MODE NEEDS TO PAUSE FOR EACH STEP/TAKE A SCREENSHOT.
         ResetScene();
 
-        // Start logging for this frame.
-        _fileWriter.Write($"{_frameCount}");
-        _pathLogger.Write($"{_frameCount}");
-
-        // Attack attempt.
+        // Attempt an attack on the network.
         var routes = _attacker.Run(_groundstations.ToList());
         _router.Run(routes, _attacker.Target);
         
-        // Finish logging for this frame.
-        _fileWriter.Write("\n");
-        _pathLogger.Write("\n");
-        _fileWriter.Flush();
-        _pathLogger.Flush();
-        
         UpdateScene(routes);
         
+        if (logAttack)
+        {
+            _attackLogger.LogEntry(_frameCount, _attacker.Target, routes);
+            _pathLogger.LogEntry(_frameCount, _attacker.Target, routes);
+        }
+        
+        // Terminate
         if (screenshotMode) _captures.TakeScreenshot(cam, leftbottom, _frameCount);
-        if (screenshotMode && _frameCount == 50) Terminate();
+        if ((screenshotMode || logAttack) && _frameCount == 50) Terminate();
+        
         _frameCount++; 
     }
 
     private void Terminate()
     {
-        PowershellTools.SaveVideo(cam, _loggingDirectory, caseChoice, targetLinkDirection);
-        PowershellTools.PlotData(cam, _loggingDirectory, caseChoice, targetLinkDirection);
+        if (screenshotMode)
+        {
+            PowershellTools.SaveVideo(cam, _loggingDirectory, caseChoice, targetLinkDirection);
+        }
+        if (logAttack)
+        {
+            PowershellTools.PlotData(cam, _loggingDirectory, caseChoice, targetLinkDirection);
+        }
         EditorApplication.Exit(0);
     }
 }

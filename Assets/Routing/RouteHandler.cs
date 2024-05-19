@@ -87,15 +87,15 @@ namespace Routing
 
         /* Check if sending traffic through a given path will take down an earlier shared link in the network. Returns true if there is at least one early collision, and false otherwise. */
         // TODO: add docstrings
-        public static bool RouteHasEarlyCollisions(Path path, int desiredMbits, Node srcNode, Node destNode,
+        public static bool RouteHasEarlyCollisions(Route route, int desiredMbits, Node srcNode, Node destNode,
             LinkCapacityMonitor linkCapacities, string startCityName, string endCityName)
         {
             // REVIEW: I think this code might be going from the end node to the start node! I'm not sure
             var index = 0;
-            var prevRn = path.Nodes.First();
-            var rn = path.Nodes[index + 1];
+            var prevRn = route.Nodes.First();
+            var rn = route.Nodes[index + 1];
             // TODO: I need to find a way to log RF link capacities as well. (format source city, destination satellite OR format source satellite, destination city)
-            while (index < path.Nodes.Count)
+            while (index < route.Nodes.Count)
             {
                 // Target link is reachable. Exit the checker.
                 if (prevRn == srcNode && rn == destNode) break;
@@ -120,7 +120,7 @@ namespace Routing
                 }
 
                 prevRn = rn;
-                rn = path.Nodes[index];
+                rn = route.Nodes[index];
                 index++;
             }
 
