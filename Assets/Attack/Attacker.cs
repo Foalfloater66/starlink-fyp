@@ -13,7 +13,7 @@ namespace Attack
     public class Attacker
     {
         private List<GameObject> SourceGroundstations { get; }
-        private readonly RouteHandler _routeHandler;
+        // private readonly RouteHandler _routeHandler;
         private readonly ScenePainter _painter;
         private readonly LinkCapacityMonitor _linkCapacityMonitor;
         private readonly GroundstationCollection _groundstations;
@@ -23,17 +23,17 @@ namespace Attack
 
         /// Constructor creating an <c>Attacker</c> object with an attack area around the provided <c>(latitude, longitude)</c> coordinates. 
         public Attacker(AttackerParams attackParams, float sat0r, float attack_radius, Transform transform,
-            GameObject prefab, GroundstationCollection groundstations, RouteHandler route_handler, ScenePainter painter,
+            GameObject prefab, GroundstationCollection groundstations, RouteGraph rg, ScenePainter painter,
             LinkCapacityMonitor
                 linkCapacityMonitor, Constellation constellation)
         {
             // AttackParams
             SourceGroundstations =
-                attackParams.SrcGroundstations; // TODO: should this also be a groundstation collection object?
+                attackParams.SrcGroundstations;
             Target = new AttackTarget(attackParams, sat0r, attack_radius, transform, prefab);
             _painter = painter;
             _linkCapacityMonitor = linkCapacityMonitor;
-            _routeHandler = route_handler;
+            _rg = rg;
             _constellation = constellation;
             _groundstations = groundstations;
         }
@@ -65,9 +65,9 @@ namespace Attack
                 // Don't compute the route if the direction of the two nodes makes it unlikely that a possible
                 // will exist.
                 if (_IsInvalidPair(srcGs, destGs)) continue; // route & 
-                _routeHandler.ResetRoute(srcGs, destGs, _painter, _constellation.satlist,
+                _rg.ResetRoute(srcGs, destGs, _painter, _constellation.satlist,
                     _constellation.maxsats);
-                rg = _routeHandler.BuildRouteGraph(srcGs, destGs, _constellation.maxdist,
+                _rg.Build(srcGs, destGs, _constellation.maxdist,
                     _constellation.margin, _constellation.maxsats, _constellation.satlist,
                     _constellation.km_per_unit);
                 rg.ComputeRoutes();
@@ -140,7 +140,6 @@ namespace Attack
             }
         }
 
-
         /// Create routes until the link's capacity has supposedly been reached.
         private List<Route> FloodLink(BinaryHeap<Route> viableAttackRoutes, int mbits)
         {
@@ -151,9 +150,8 @@ namespace Attack
                    viableAttackRoutes.Count > 0)
             {
                 var route = viableAttackRoutes.ExtractMin();
-                if (!RouteHandler.RouteHasEarlyCollisions(route, mbits, Target.Link.SrcNode, Target.Link.DestNode,
-                        virtualLinkCapacityMonitor, _groundstations[route.StartCity],
-                        _groundstations[route.EndCity]))
+                if (!route.HasEarlyCollisions(mbits, 
+                        virtualLinkCapacityMonitor, _groundstations[route.StartCity], Target.Link))
                 {
                     SimulateRoute(route, mbits, virtualLinkCapacityMonitor);
                     finalAttackRoutes.Add(route);
@@ -165,9 +163,9 @@ namespace Attack
         /// Execute the attacker object.
         public List<Route> Run(List<GameObject> groundstations)
         {
-            _routeHandler.ResetRoute(_groundstations["New York"], _groundstations["Toronto"], _painter,
+            _rg.ResetRoute(_groundstations["New York"], _groundstations["Toronto"], _painter,
                 _constellation.satlist, _constellation.maxsats);
-            _rg = _routeHandler.BuildRouteGraph(_groundstations["New York"], _groundstations["Toronto"],
+            _rg.Build(_groundstations["New York"], _groundstations["Toronto"],
                 _constellation.maxdist, _constellation.margin, _constellation.maxsats,
                 _constellation.satlist, _constellation.km_per_unit);
 

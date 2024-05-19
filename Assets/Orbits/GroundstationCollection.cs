@@ -28,10 +28,6 @@ namespace Orbits
             name2groundstation.Add(gs_name, gs_object);
         }
 
-        /// <summary>
-        /// TODO: docstring.
-        /// </summary>
-        /// <returns></returns>
         public List<GameObject> ToList()
         {
             return name2groundstation.Values.ToList();

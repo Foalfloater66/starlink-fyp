@@ -16,14 +16,13 @@ namespace Routing
     {
         private bool _defenceOn;
         private float _kmPerUnit;
-        private RouteHandler _routeHandler;
         private ScenePainter _painter;
         private LinkCapacityMonitor _linkCapacityMonitor;
         private GroundstationCollection _Groundstations;
         private RouteGraph _rg;
         private Constellation _constellation;
 
-        public Router(bool defenceOn,GroundstationCollection groundstations, RouteHandler route_handler, ScenePainter painter,
+        public Router(bool defenceOn,GroundstationCollection groundstations, RouteGraph rg, ScenePainter painter,
             LinkCapacityMonitor
                 linkCapacityMonitor, Constellation constellation, float kmPerUnit)
         {
@@ -31,8 +30,8 @@ namespace Routing
             Assert.IsTrue(_kmPerUnit >= 0);
             _kmPerUnit = kmPerUnit;
             _painter = painter;
+            _rg = rg;
             _linkCapacityMonitor = linkCapacityMonitor;
-            _routeHandler = route_handler;
             _constellation = constellation;
             _Groundstations = groundstations;
         }
@@ -49,9 +48,9 @@ namespace Routing
                 // Update the route graph in a multipath setting.
                 if (i == 0)
                 {
-                    _routeHandler.ResetRoute(srcGs, destGs, _painter, _constellation.satlist,
+                    _rg.ResetRoute(srcGs, destGs, _painter, _constellation.satlist,
                         _constellation.maxsats);
-                    _rg = _routeHandler.BuildRouteGraph(srcGs, destGs, _constellation.maxdist,
+                    _rg.Build(srcGs, destGs, _constellation.maxdist,
                         _constellation.margin, _constellation.maxsats, _constellation.satlist,
                         _constellation.km_per_unit);
                 }
@@ -65,7 +64,7 @@ namespace Routing
                 if (i == selectedRouteId) return Route.Nodes2Route(startNode, endNode, srcGs, destGs); 
                     // ExtractRoute(startNode, endNode, srcGs, destGs);
 
-                RouteHandler.LockRoute(_painter);
+                _rg.LockRoute(_painter);
             }
 
             return null;

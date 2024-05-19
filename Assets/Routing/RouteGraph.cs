@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using Orbits.Satellites;
+using Scene;
 using UnityEngine;
 using Utilities;
 
@@ -22,10 +24,6 @@ namespace Routing
         public GameObject StartObj => objs[satcount];
 
         public GameObject EndObj => objs[satcount + 1];
-
-        public RouteGraph()
-        {
-        }
 
         public void Init(int maxsat, float maxdist_, float km_per_unit_)
         {
@@ -180,5 +178,81 @@ namespace Routing
 
             return reachable;
         }
+        
+        public void InitRoute(int maxsats, Satellite[] satlist, float maxdist, float kmPerUnit)
+        {
+            Init(maxsats, maxdist, kmPerUnit);
+
+            // Plus 2 for start and end city
+            for (var satnum = 0; satnum < maxsats; satnum++)
+                NewNode(satlist[satnum].satid, satlist[satnum].Orbit, satlist[satnum].gameobject);
+            AddEndNodes();
+        }
+        
+        public void Build(GameObject city1, GameObject city2, float maxdist, float margin, int maxsats,
+            Satellite[] satlist, float kmPerUnit)
+        {
+            // TODO: Create a BuildRouteGraph function that doesn't include cities.
+
+            for (var satnum = 0; satnum < maxsats; satnum++)
+            {
+                for (var i = 0; i < satlist[satnum].assignedcount; i++)
+                    AddNeighbour(satnum, satlist[satnum].assignedsats[i].satid, false);
+
+                // Add start city
+                var radiodist = Vector3.Distance(satlist[satnum].gameobject.transform.position,
+                    city1.transform.position);
+                if (radiodist * kmPerUnit < maxdist)
+                    AddNeighbour(maxsats, satnum, radiodist, true);
+                else if (radiodist * kmPerUnit < maxdist + margin)
+                    AddNeighbour(maxsats, satnum, Node.INFINITY, true);
+
+                // Add end city
+                radiodist = Vector3.Distance(satlist[satnum].gameobject.transform.position,
+                    city2.transform.position);
+                if (radiodist * kmPerUnit < maxdist)
+                    AddNeighbour(maxsats + 1, satnum, radiodist, true);
+                else if (radiodist * kmPerUnit < maxdist + margin)
+                    AddNeighbour(maxsats + 1, satnum, Node.INFINITY, true);
+
+                // if (graphOn) satlist[satnum].GraphReset();
+                // if (graphOn) satlist[satnum].GraphDone();
+            }
+
+            // return _rg;
+        }
+        
+        public void ResetRoute(GameObject city1, GameObject city2, ScenePainter painter, Satellite[] satlist,
+            int maxsats)
+        {
+            ResetNodes(city1, city2);
+            painter.TurnLasersOff(satlist, maxsats);
+        }
+        
+        /// <summary>
+        /// Remove all of the used ISL and RF links from the routegraph.
+        /// </summary>
+        public void ClearRoutes(ScenePainter painter)
+        {
+            painter.EraseAllISLLinks();
+            painter.EraseAllRFLinks();
+        }
+        
+        public void LockRoute(ScenePainter painter)
+        {
+            /* Basically maintain all of the used ISL links. */
+            foreach (var pair in painter.UsedISLLinks)
+            {
+                pair.node1.LockLink(pair.node2);
+                pair.node2.LockLink(pair.node1);
+            }
+
+            foreach (var pair in painter.UsedRFLinks)
+            {
+                pair.node1.LockLink(pair.node2);
+                pair.node2.LockLink(pair.node1);
+            }
+        }
+        
     }
 }

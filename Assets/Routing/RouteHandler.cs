@@ -10,84 +10,18 @@ namespace Routing
         // Should I create a new routehandler each time I create a route?
         private RouteGraph _rg;
 
-
-        public RouteHandler()
-        {
-            _rg = new RouteGraph();
-        }
-
         // TODO: add docstrings
-        public void InitRoute(int maxsats, Satellite[] satlist, float maxdist, float kmPerUnit)
-        {
-            _rg.Init(maxsats, maxdist, kmPerUnit);
+        // public void ResetRoute(GameObject city1, GameObject city2, ScenePainter painter, Satellite[] satlist,
+        //     int maxsats)
+        // {
+        //     _rg.ResetNodes(city1, city2);
+        //     painter.TurnLasersOff(satlist, maxsats);
+        // }
 
-            // Plus 2 for start and end city
-            for (var satnum = 0; satnum < maxsats; satnum++)
-                _rg.NewNode(satlist[satnum].satid, satlist[satnum].Orbit, satlist[satnum].gameobject);
-            _rg.AddEndNodes();
-        }
-
-        /// <summary>
-        /// Remove all of the used ISL and RF links from the routegraph.
-        /// </summary>
-        public static void ClearRoutes(ScenePainter painter)
-        {
-            painter.EraseAllISLLinks();
-            painter.EraseAllRFLinks();
-        }
-
-        public RouteGraph BuildRouteGraph(GameObject city1, GameObject city2, float maxdist, float margin, int maxsats,
-            Satellite[] satlist, float kmPerUnit)
-        {
-            // TODO: Create a BuildRouteGraph function that doesn't include cities.
-
-            for (var satnum = 0; satnum < maxsats; satnum++)
-            {
-                for (var i = 0; i < satlist[satnum].assignedcount; i++)
-                    _rg.AddNeighbour(satnum, satlist[satnum].assignedsats[i].satid, false);
-
-                // Add start city
-                var radiodist = Vector3.Distance(satlist[satnum].gameobject.transform.position,
-                    city1.transform.position);
-                if (radiodist * kmPerUnit < maxdist)
-                    _rg.AddNeighbour(maxsats, satnum, radiodist, true);
-                else if (radiodist * kmPerUnit < maxdist + margin)
-                    _rg.AddNeighbour(maxsats, satnum, Node.INFINITY, true);
-
-                // Add end city
-                radiodist = Vector3.Distance(satlist[satnum].gameobject.transform.position,
-                    city2.transform.position);
-                if (radiodist * kmPerUnit < maxdist)
-                    _rg.AddNeighbour(maxsats + 1, satnum, radiodist, true);
-                else if (radiodist * kmPerUnit < maxdist + margin)
-                    _rg.AddNeighbour(maxsats + 1, satnum, Node.INFINITY, true);
-
-                // if (graphOn) satlist[satnum].GraphReset();
-                // if (graphOn) satlist[satnum].GraphDone();
-            }
-
-            return _rg;
-        }
-
-        // TODO: add docstrings
-        public void ResetRoute(GameObject city1, GameObject city2, ScenePainter painter, Satellite[] satlist,
-            int maxsats)
-        {
-            _rg.ResetNodes(city1, city2);
-            painter.TurnLasersOff(satlist, maxsats);
-        }
-
-        // TODO: add docstring
-        public void ResetRoutePos(GameObject city1, GameObject city2, ScenePainter painter, Satellite[] satlist,
-            int maxsats)
-        {
-            _rg.ResetNodesPos(city1, city2);
-            painter.TurnLasersOff(satlist, maxsats);
-        }
 
         /* Check if sending traffic through a given path will take down an earlier shared link in the network. Returns true if there is at least one early collision, and false otherwise. */
-        // TODO: add docstrings
-        public static bool RouteHasEarlyCollisions(Route route, int desiredMbits, Node srcNode, Node destNode,
+        // TODO: THIS FEELS LIKE A ROUTE FUNCTION TO BE FAIR :)
+        public static bool RouteHasEarlyCollisionsOld(Route route, int desiredMbits, Node srcNode, Node destNode,
             LinkCapacityMonitor linkCapacities, string startCityName, string endCityName)
         {
             // REVIEW: I think this code might be going from the end node to the start node! I'm not sure
@@ -128,20 +62,6 @@ namespace Routing
         }
 
 
-        public static void LockRoute(ScenePainter painter)
-        {
-            /* Basically maintain all of the used ISL links. */
-            foreach (var pair in painter.UsedISLLinks)
-            {
-                pair.node1.LockLink(pair.node2);
-                pair.node2.LockLink(pair.node1);
-            }
 
-            foreach (var pair in painter.UsedRFLinks)
-            {
-                pair.node1.LockLink(pair.node2);
-                pair.node2.LockLink(pair.node1);
-            }
-        }
     }
 }

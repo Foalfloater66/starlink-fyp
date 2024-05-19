@@ -34,7 +34,7 @@ public class Main : MonoBehaviour
     private Constellation _constellation;
     private LinkCapacityMonitor _linkCapacities;
     private Attacker _attacker;
-    private RouteHandler _routeHandler;
+    private RouteGraph _rg;
     private Router _router;
     // Logging objects
     private Captures _captures;
@@ -124,9 +124,9 @@ public class Main : MonoBehaviour
     {
         // Routing + Stats Monitoring
         _linkCapacities = new LinkCapacityMonitor();
-        _routeHandler = new RouteHandler();
-        _routeHandler.InitRoute(_constellation.maxsats, _constellation.satlist, _constellation.maxdist, _constellation.km_per_unit);
-        _router = new Router(defenceOn, _groundstations, _routeHandler, _painter, _linkCapacities, _constellation, _constellation.km_per_unit);
+        _rg = new RouteGraph();
+        _rg.InitRoute(_constellation.maxsats, _constellation.satlist, _constellation.maxdist, _constellation.km_per_unit);
+        _router = new Router(defenceOn, _groundstations, _rg, _painter, _linkCapacities, _constellation, _constellation.km_per_unit);
     }
 
     private void Start()
@@ -139,7 +139,7 @@ public class Main : MonoBehaviour
             .GetCase(caseChoice, _cityCreator, targetLinkDirection, _groundstations, camscript).GetParams();
         InitRoutingFramework();
         _attacker = new Attacker(attackerParams, _constellation.sat0r, attackRadius, transform, cityPrefab, _groundstations,
-            _routeHandler, _painter, _linkCapacities, _constellation);
+            _rg, _painter, _linkCapacities, _constellation);
         InitLogging();
         camscript.InitView();
         
@@ -207,7 +207,7 @@ public class Main : MonoBehaviour
     {
         RotateCamera();
         _linkCapacities.Reset();
-        RouteHandler.ClearRoutes(_painter);
+        _rg.ClearRoutes(_painter);
     }
     
     private void UpdateScene(List<Routing.Route> routes)

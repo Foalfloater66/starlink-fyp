@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace Scene
 {
-    // TODO: add documentation for ActiveISL and ActiveRF
     public class ActiveISL
     {
         public Satellite sat1, sat2;
@@ -85,7 +84,7 @@ namespace Scene
             _cityMaterial = cityMaterial;
         }
 
-        /// <summary> // TODO: can I describe this in more detail? I don't know what the purpose of the ChangeCityMaterial element is.
+        /// <summary>
         /// Color a city object.
         /// </summary>
         /// <param name="city">City object</param>

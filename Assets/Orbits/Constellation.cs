@@ -7,8 +7,6 @@ namespace Orbits
     public class Constellation 
     {
         public float speed = 1f; // a value of 1 is realtime
-        //
-        // TODO: WILL THIS APPEAR IN THE INSPECTOR? :0
         public float simspeed; // actual speed scaled appropriately
 
         public bool use_isls = true;
@@ -18,8 +16,7 @@ namespace Orbits
         public GameObject thin_laser;
         public GameObject beam_prefab;
         public GameObject beam_prefab2;
-        private Dictionary<int, List<int>>
-            orbit2sats = new Dictionary<int, List<int>>(); /* Orbit ID mapping to satellite ID list. */
+        private Dictionary<int, List<int>> orbit2sats = new Dictionary<int, List<int>>(); 
         public GameObject[] orbits;
         public double[] orbitalperiod;
         public Satellite[] satlist;

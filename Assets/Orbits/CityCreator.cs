@@ -362,8 +362,8 @@ namespace Orbits
             var cs = (CityScript)city.GetComponent(typeof(CityScript));
             cs.longitude = longitude;
             cs.latitude = latitude;
-            cs.city_name =
-                city_name; // TODO: make the target a different color, or not even a CityScript. (It's not correct!)
+            cs.city_name = city_name;
+            // TODO: make the target a different color, or not even a CityScript. (It's not correct!)
 
             // Add the city as a groundstation.
             groundstations.addGroundstation(city, city_name);

@@ -509,9 +509,9 @@ MonoBehaviour:
   targetLinkDirection: 0
   attackRadius: 1000
   deterministicAttacker: 0
-  defenceOn: 0
+  defenceOn: 1
   screenshotMode: 0
-  logAttack: 1
+  logAttack: 0
 --- !u!1 &1375312105
 GameObject:
   m_ObjectHideFlags: 0

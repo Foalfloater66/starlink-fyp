@@ -15,7 +15,7 @@ namespace Attack
         /// <summary>
         /// Class <c>TargetLink</c> contains information about the link that the <c>Attacker</c> object is aiming towards.
         /// </summary>
-        public class TargetLink
+        public class TargetLink // TODO: SHOULD THIS BE SEPARATE FROM THE TRADITIONAL LINK OBJECT? i think this is not something I have time to care about to be fair.
         {
             /// <value>
             /// Source node of the target link.
@@ -185,7 +185,6 @@ namespace Attack
                     }
 
                     if (_attackParams.Direction == Direction.Any
-                        // TODO: make sure that the horizontal/vertical variation DOES NOT occur
                         || (_attackParams.Direction == Direction.East &&
                             direction.x >= 0) // && IsHorizontal(src_node, node))
                         || (_attackParams.Direction == Direction.West &&
