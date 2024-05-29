@@ -52,10 +52,10 @@ The simulation uses the following color coding scheme:
 Below are some example frames.
 These can be reproduced by using parameters `qualitativeCase=Landlocked` and `targetLinkDirection=East`.
 
-![Landlocked_East_03](https://github.com/Foalfloater66/starlink-fyp/assets/72133888/579219cf-f900-4b38-9c2a-96f5824a28ef)
+![Landlocked_East_03.png](./Docs/Landlocked_East_03.png)
 Example congested target link.
 
-![Landlocked_East_08](https://github.com/Foalfloater66/starlink-fyp/assets/72133888/af506c12-7e7c-4c56-a769-7e495d62880f)
+![Landlocked_East_08](./Docs/Landlocked_East_08.png)
 Example uncongested target link.
 
 ## Troubleshooting
@@ -63,15 +63,22 @@ When enabling `captureMode`, screenshots of the scene are taken from each camera
 More precisely, the combined creation of city game objects and forced scene rendering at the first frame requires a high number of computations within a small timeframe and can cause the Unity simulation to become unresponsive.
 If this does occur, there are a couple of possible venues which you may apply individually or together.
 
-For reference, the experiments were run on a Windows device equipped with an Intel Core i9 CPU and NVIDIA GeForce RTX 3070 Ti laptop GPU.
+For reference, the experiments were run with Windows on a ROG Zephyrus M16 equipped with an Intel Core i9 CPU and NVIDIA GeForce RTX 3070 Ti laptop GPU.
 Devices running this simulation with a low-performance CPU or one whose architecture is not supported by Unity 2019.2.1f1 (e.g, Apple M* chips which use delay-inducing Rosetta ISA translation) are more likely to encounter this issue.
-### Enable Debugging Mode
+
+### Change the Operating Mode
+This is the solution that is most likely to work.
+The experiments were run on a ROG Zephyrus M16.
+If you are using any computer that allows for operating mode modification, please set it to ["Performance" mode](https://rog.asus.com/articles/guides/armoury-crate-performance-modes-explained-silent-vs-performance-vs-turbo-vs-windows/);
+"Silent" provides insufficient computational power, and "Turbo" attempts to maximize the framerate, hence not giving Unity enough time to generate game objects.
+
+### (Hacky) Enable Debugging Mode
 From a Unity-supporting IDE like Rider or Visual Studio, add a breakpoint to the [`Main.Update()`](https://github.com/Foalfloater66/starlink-fyp/blob/4881396f83662f559eaf89ddb3e5df7abeb6d089/Assets/Main.cs#L333) method.
 Then, attach the Unity editor and run the program in debugging mode with breakpoints enabled.
 If the program remains responsive after the first couple of executions of `Main.Update()`, disable the breakpoints.
 The program should now run as intended.
 
-### Save the Unity Scene Under Different Parameters
+### (Hacky) Save the Unity Scene Under Different Parameters
 Select a set of `qualitativeCase`and `targetLinkDirection`parameters that you _do not intend to run_.
 Save the Unity scene.
 Then, change the parameters to the intended parameters and run the program. _Do not save the Scene before running the program_.
