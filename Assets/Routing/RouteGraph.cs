@@ -120,41 +120,23 @@ namespace Routing
         public void ComputeRoutes()
         {
             /* Essentially runs Dijkstra. */
-            /* Make new binary heap. Add all of the nodes. */
             heap = new BinaryHeap<Node>(nodecount);
             for (var i = 0; i < nodecount; i++) heap.Add(nodes[i], (double)nodes[i].Dist);
 
             startnode.Dist = 0f;
             while (heap.Count > 0)
             {
-                /* Extract the smallest Node n from the heap. */
                 var u = heap.ExtractMin();
-
-                /* For the number of links associated with Node u: */
                 for (var i = 0; i < u.LinkCount; i++)
                 {
-                    /* Select a link of Node u. */
                     var l = u.GetLink(i);
-
-                    /* Get the neighbour of that link l. */
                     var n = u.GetNeighbour(l);
-
-                    /* Get the distance of that neighbour. */
                     var dist = n.Dist;
-
-                    /* Compute the distance of Node u + link. */
                     var newdist = u.Dist + l.Dist;
-
-                    /* If distance of neighbour n > new distance: */
                     if (newdist < dist)
                     {
-                        /* Update the new distance. */
                         n.Dist = newdist;
-
-                        /* smallest node n's parent is u. */
                         n.Parent = u;
-
-                        /* Decrease priority of that neighbour n. */
                         heap.DecreasePriority(n, (double)newdist);
                     }
                 }

@@ -46,8 +46,8 @@ public class Main : MonoBehaviour
 
     [Tooltip("Speed 1 is realtime")] public float speed = 1f; // a value of 1 is realtime
 
-    [FormerlySerializedAs("use_isls")] [Tooltip("Enable use of inter-sat lasers")]
-    public bool useISLs = true;
+    [FormerlySerializedAs("use_isls")] [FormerlySerializedAs("use_ISLs")] [FormerlySerializedAs("useISLs")] [Tooltip("Enable use of inter-sat lasers")]
+    public bool useIsls = true;
 
     [Header("Objects & Materials")]
     // GameObjects
@@ -62,9 +62,9 @@ public class Main : MonoBehaviour
     public Material cityMaterial;
     
     // Text
-    public Text leftbottom;
-    public Text rightbottom;
-    public Text topleft;
+    public Text leftBottomText;
+    public Text rightBottomText;
+    public Text topLeftText;
     public GameObject beamPrefab;
     public GameObject beamPrefab2;
 
@@ -73,9 +73,14 @@ public class Main : MonoBehaviour
     public Direction targetLinkDirection;
     public float attackRadius = 1000f;
 
-    [HideInInspector] public bool deterministicAttacker; // YES OR NO...?
+    // TODO: complete this later.
+    [HideInInspector]
+    [Tooltip("Whether the attacker assumes deterministic routing or not.")]
+    public bool deterministicAttacker = true; // YES OR NO...?
 
     [Header("Defence Parameters")] 
+    public int rmax = 3;
+    [Tooltip("Apply shortest route randomisation mechannism.")]
     public bool defenceOn = false;
 
     [Header("Logging")]
@@ -113,10 +118,10 @@ public class Main : MonoBehaviour
         // GameObjects
         _groundstations = new GroundstationCollection();
         _cityCreator = new CityCreator(transform, cityPrefab, _groundstations);
-        _constellation = new Constellation(transform, orbit, satellite, beamPrefab, beamPrefab2, laser, thinLaser, speed, useISLs);
+        _constellation = new Constellation(transform, orbit, satellite, beamPrefab, beamPrefab2, laser, thinLaser, speed, useIsls);
         // UI Text + Visuals.
-        rightbottom.text = "";
-        topleft.text = "";
+        rightBottomText.text = "";
+        topLeftText.text = "";
         _painter = new ScenePainter(islMaterial, laserMaterials, targetLinkMaterial, cityMaterial);
     }
 
@@ -126,7 +131,7 @@ public class Main : MonoBehaviour
         _linkCapacities = new LinkCapacityMonitor();
         _rg = new RouteGraph();
         _rg.InitRoute(_constellation.maxsats, _constellation.satlist, _constellation.maxdist, _constellation.km_per_unit);
-        _router = new Router(defenceOn, _groundstations, _rg, _painter, _linkCapacities, _constellation, _constellation.km_per_unit);
+        _router = new Router(defenceOn, _groundstations, _rg, _painter, _linkCapacities, _constellation, _constellation.km_per_unit, rmax);
     }
 
     private void Start()
@@ -142,9 +147,6 @@ public class Main : MonoBehaviour
             _rg, _painter, _linkCapacities, _constellation);
         InitLogging();
         camscript.InitView();
-        
-        // Give the program enough time to generate all game objects when capture mode is disabled.
-        Thread.Sleep(10000); 
     }
 
     private void OnDrawGizmos()
@@ -187,19 +189,19 @@ public class Main : MonoBehaviour
                 rttLog += $"{(int)rtt} ms";
             }
         }
-        topleft.text = rttLog;
+        topLeftText.text = rttLog;
     }
 
     private void UpdateSceneLinkStatus()
     {
         if (_attacker.Target.Link != null)
         {
-            rightbottom.text =
+            rightBottomText.text =
                 $"Target Link Capacity: {_linkCapacities.GetCapacity(_attacker.Target.Link.SrcNode.Id, _attacker.Target.Link.DestNode.Id)} mbits/sec";
         }
         else
         {
-            rightbottom.text = "No Target Link.";
+            rightBottomText.text = "No Target Link.";
         }
     }
 
@@ -214,7 +216,7 @@ public class Main : MonoBehaviour
     {
         _painter.UpdateLasers(_constellation.satlist, _constellation.maxsats, speed);
         UpdateSceneRTT(routes);
-        leftbottom.text = $"Frame {_frameCount}";
+        leftBottomText.text = $"Frame {_frameCount}";
         UpdateSceneLinkStatus();
     }
 
@@ -239,7 +241,7 @@ public class Main : MonoBehaviour
         }
         
         // Terminate
-        if (screenshotMode) _captures.TakeScreenshot(cam, leftbottom, _frameCount);
+        if (screenshotMode) _captures.TakeScreenshot(cam, leftBottomText, _frameCount);
         if ((screenshotMode || logAttack) && _frameCount == 50) Terminate();
         
         _frameCount++; 

@@ -21,10 +21,11 @@ namespace Routing
         private GroundstationCollection _Groundstations;
         private RouteGraph _rg;
         private Constellation _constellation;
+        private int _rmax;
 
         public Router(bool defenceOn,GroundstationCollection groundstations, RouteGraph rg, ScenePainter painter,
             LinkCapacityMonitor
-                linkCapacityMonitor, Constellation constellation, float kmPerUnit)
+                linkCapacityMonitor, Constellation constellation, float kmPerUnit, int rmax)
         {
             _defenceOn = defenceOn;
             Assert.IsTrue(_kmPerUnit >= 0);
@@ -34,36 +35,34 @@ namespace Routing
             _linkCapacityMonitor = linkCapacityMonitor;
             _constellation = constellation;
             _Groundstations = groundstations;
+            _rmax = rmax;
+
         }
 
-        private Route GetRandomRoute(Node startNode, Node endNode, GameObject srcGs, GameObject destGs,
-            int rmax)
+        private Route GetRandomRoute(Route route)
         {
             // TODO: check what the randomizer uses.
-            var selectedRouteId = new System.Random().Next(0, rmax);
+            var selectedRouteId = new System.Random().Next(0, _rmax);
 
             // Compute the multiple shortest paths and select the one for the selected random ID.
-            for (var i = 0; i < rmax; i++)
+            for (var i = 0; i < _rmax; i++)
             {
                 // Update the route graph in a multipath setting.
                 if (i == 0)
                 {
-                    _rg.ResetRoute(srcGs, destGs, _painter, _constellation.satlist,
+                    _rg.ResetRoute(route.StartCity, route.EndCity, _painter, _constellation.satlist,
                         _constellation.maxsats);
-                    _rg.Build(srcGs, destGs, _constellation.maxdist,
+                    _rg.Build(route.StartCity, route.EndCity, _constellation.maxdist,
                         _constellation.margin, _constellation.maxsats, _constellation.satlist,
                         _constellation.km_per_unit);
                 }
                 else
                 {
+                    // TODO: This is just a temporary modification. I want to figure out how MH removes the uplinks from the routegraph too.
                     _rg.ResetNodeDistances();
                 }
-
                 _rg.ComputeRoutes();
-
-                if (i == selectedRouteId) return Route.Nodes2Route(startNode, endNode, srcGs, destGs); 
-                    // ExtractRoute(startNode, endNode, srcGs, destGs);
-
+                if (i == selectedRouteId) return Route.Nodes2Route(route.StartNode, route.EndNode, route.StartCity, route.EndCity); 
                 _rg.LockRoute(_painter);
             }
 
@@ -73,8 +72,7 @@ namespace Routing
         /// <summary>
         /// Draw the computed path and send traffic in mbits.
         /// </summary>
-        private void ExecuteAttackRoute(Route route, GameObject city1 /* TODO: remove this */,
-            GameObject city2 /* TODO: remove this */, int mbits, LinkCapacityMonitor _linkCapacityMonitor,
+        private void ExecuteRoute(Route route, int mbits, LinkCapacityMonitor _linkCapacityMonitor,
             ScenePainter _painter, Constellation constellation_ctx)
         {
             var rn = route.Nodes.Last();
@@ -122,7 +120,7 @@ namespace Routing
                         _linkCapacityMonitor.DecreaseLinkCapacity(_Groundstations[route.StartCity], id.ToString(),
                             mbits);
                         sat = constellation_ctx.satlist[id];
-                        _painter.ColorRFLink(city1, sat, prevnode, rn);
+                        _painter.ColorRFLink(route.StartCity, sat, prevnode, rn);
                     }
                     // The current node is a city and the previous, a satellite. (RF link)
                     else if (id == -2 && previd >= 0)
@@ -131,7 +129,7 @@ namespace Routing
                         _linkCapacityMonitor.DecreaseLinkCapacity(previd.ToString(), _Groundstations[route.EndCity],
                             mbits);
                         sat = constellation_ctx.satlist[previd];
-                        _painter.ColorRFLink(city2, sat, prevnode, rn);
+                        _painter.ColorRFLink(route.EndCity, sat, prevnode, rn);
                         break; // We've reached the end node. Time to exit the loop.
                     }
                 }
@@ -178,9 +176,8 @@ namespace Routing
             {
                 var executedRoute = route;
                 if (_defenceOn)
-                    executedRoute = GetRandomRoute(route.StartNode, route.EndNode, route.StartCity,
-                        route.EndCity, 3);
-                ExecuteAttackRoute(executedRoute, route.StartCity, route.EndCity, 4000, _linkCapacityMonitor,
+                    executedRoute = GetRandomRoute(route);
+                ExecuteRoute(executedRoute, 4000, _linkCapacityMonitor,
                     _painter, _constellation);
             }
 

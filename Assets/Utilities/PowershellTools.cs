@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using Attack.Cases;
+using UnityEngine;
 
 
 namespace Utilities
@@ -8,8 +9,8 @@ namespace Utilities
     {
         public static void SaveVideo(CustomCamera cam, string _loggingDirectory, CaseChoice caseChoice, Direction targetLinkDirection)
         {
-            var imgHeight = 748 * cam.cam_count;
-            var imgWidth = 1504;
+            var imgHeight = Screen.height * cam.cam_count;
+            var imgWidth = Screen.width;
 
             var command =
                 // $"ffmpeg -framerate 3 -i {Directory.GetCurrentDirectory()}/Logs/Captures/{_loggingDirectory}/{qualitativeCase}_{targetLinkDirection}_%02d.png -vf \"scale={imgWidth}:{imgHeight}\" -c:v libx265 -preset fast -crf 20 -pix_fmt yuv420p {Directory.GetCurrentDirectory()}/Logs/Captures/{_loggingDirectory}/output.mp4";
