@@ -5,7 +5,7 @@ using QuickPrimitives;
 using QuickPrimitives.Scripts;
 
 [CustomEditor(typeof(QcSphereMesh))]
-public class QcSphereMeshEditor : Editor
+public class QcSphereMeshEditor : UnityEditor.Editor
 {
     private QcSphereMesh.QcSphereProperties oldProp = new QcSphereMesh.QcSphereProperties();
 

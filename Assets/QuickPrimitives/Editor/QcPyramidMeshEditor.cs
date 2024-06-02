@@ -5,7 +5,7 @@ using QuickPrimitives;
 using QuickPrimitives.Scripts;
 
 [CustomEditor(typeof(QcPyramidMesh))]
-public class QcPyramidMeshEditor : Editor
+public class QcPyramidMeshEditor : UnityEditor.Editor
 {
     private QcPyramidMesh.QcPyramidProperties oldProp = new QcPyramidMesh.QcPyramidProperties();
 

@@ -145,14 +145,24 @@ namespace Utilities
         /// </summary>
         public void ViewPolar()
         {
-            cam_count = 1;
+            cam_count = 2;
 
-            positions.Add(new Vector3(-18f, 20f, -18f));
-            angles.Add(new Vector3(35f, 47f, 0f));
+            // Polar View
+            positions.Add(new Vector3(-25f, 20f, -10f));
+            angles.Add(new Vector3(30f, 70f, 0f));
             times.Add(0f);
             speeds.Add(0.01f);
-
+            
             lightrots.Add(new Vector3(20f, 130f, 0f));
+            FoVs.Add(85f);
+            
+            // Africa View
+            positions.Add(new Vector3(15f, 20f, -28f));
+            angles.Add(new Vector3(30f, -20f, 0f));
+            times.Add(0f);
+            speeds.Add(0.01f);
+            
+            lightrots.Add(new Vector3(45f, 30f, 0f));
             FoVs.Add(85f);
         }
 
@@ -161,15 +171,45 @@ namespace Utilities
         /// </summary>
         public void ViewAmericanEquator()
         {
-            cam_count = 1;
+            cam_count = 2;
 
+            // Polar view
             positions.Add(new Vector3(-25f, 10f, -22f));
             angles.Add(new Vector3(15, 50f, 0f));
             times.Add(0f);
             speeds.Add(0.01f);
             lightrots.Add(new Vector3(-5f, 20f, 20f));
             FoVs.Add(80f);
+            
+            // Africa view
+            positions.Add(new Vector3(15f, 20f, -28f));
+            angles.Add(new Vector3(30f, -20f, 0f));
+            times.Add(0f);
+            speeds.Add(0.01f);
+            lightrots.Add(new Vector3(45f, 30f, 0f));
+            FoVs.Add(85f);
         }
+        
+        // public void ViewTransOrbital()
+        // {
+        //     cam_count = 2;
+        //
+        //     // Polar view
+        //     positions.Add(new Vector3(-25f, 10f, -22f));
+        //     angles.Add(new Vector3(15, 50f, 0f));
+        //     times.Add(0f);
+        //     speeds.Add(0.01f);
+        //     lightrots.Add(new Vector3(-5f, 20f, 20f));
+        //     FoVs.Add(80f);
+        //     
+        //     // Africa view
+        //     positions.Add(new Vector3(15f, 20f, -28f));
+        //     angles.Add(new Vector3(30f, -20f, 0f));
+        //     times.Add(0f);
+        //     speeds.Add(0.01f);
+        //     lightrots.Add(new Vector3(45f, 30f, 0f));
+        //     FoVs.Add(85f);
+        // }
 
         public void SetupView()
         {

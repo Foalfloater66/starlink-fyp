@@ -36,13 +36,13 @@ namespace Orbits
         /// <summary>
         /// With the groundstation GameObject as key, get its name.
         /// </summary>
-        /// <param name="gs_object">Unique groundstation GameObject.</param>
-        public string this[GameObject gs_object] => groundstation2name[gs_object];
+        /// <param name="gsObject">Unique groundstation GameObject.</param>
+        public string this[GameObject gsObject] => groundstation2name[gsObject];
 
         /// <summary>
         /// With the groundstation name as key, get its object.
         /// </summary>
-        /// <param name="gs_name">Unique groundstation name.</param>
-        public GameObject this[string gs_name] => name2groundstation[gs_name];
+        /// <param name="gsName">Unique groundstation name.</param>
+        public GameObject this[string gsName] => name2groundstation[gsName];
     }
 }

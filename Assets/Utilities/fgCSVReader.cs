@@ -22,7 +22,6 @@ namespace Utilities
         public static void LoadFromString(string file_contents, ReadLineDelegate line_reader)
         {
             var file_length = file_contents.Length;
-            //Debug.Log (file_length);
             // read char by char and when a , or \n, perform appropriate action
             var cur_file_index = 0; // index in the file
             var cur_line = new List<string>(); // current line of data

@@ -5,7 +5,7 @@ using QuickPrimitives;
 using QuickPrimitives.Scripts;
 
 [CustomEditor(typeof(QcCylinderMesh))]
-public class QcCylinderMeshEditor : Editor
+public class QcCylinderMeshEditor : UnityEditor.Editor
 {
     private QcCylinderMesh.QcCylinderProperties oldProp = new QcCylinderMesh.QcCylinderProperties();
 

@@ -63,7 +63,8 @@ namespace Attack.Cases
                         "Phoenix",
                         "Los Angeles",
                         "El Paso",
-                        "Houston"
+                        "Houston",
+                        "Denver"
                     };
                 }
                 case Direction.South:

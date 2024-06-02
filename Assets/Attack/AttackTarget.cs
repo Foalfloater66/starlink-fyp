@@ -119,7 +119,7 @@ namespace Attack
             var northVector = new Vector3(0.0f, 1.0f, 0.0f); // Reference unit northern vector
             var candidateVector = destPosition - srcPosition; // Candidate vector
             var angle = Vector3.Angle(northVector, candidateVector);
-            if (45 < angle && angle < 135) return true; // link is horizontally inclined.
+            if (angle > 45 && angle < 135) return true; // link is horizontally inclined.
             return false; // link is vertically inclined.
         }
 
@@ -139,7 +139,7 @@ namespace Attack
             for (var i = 0; i < rg.nodes.Count(); i++)
             {
                 var node = rg.nodes[i];
-                if (OrbitId != -1 && OrbitId != node.Orbit)
+                if (OrbitId > -1 && OrbitId != node.Orbit)
                     // If orbit-specific links are enabled, exclude links that are not part of the desired orbit.
                     continue;
                 if (node.Id > 0 && InTargetArea(node.Position))
@@ -161,14 +161,18 @@ namespace Attack
         /// <returns>A valid node if one is found. Otherwise, returns null.</returns>
         private Tuple<Node, Node> SelectDestinationNode(Node src_node)
         {
-            // if (debug_on)ds
-            // {
             for (var i = 0; i < src_node.LinkCount; i++)
             {
                 var node = src_node.GetNeighbour(src_node.GetLink(i));
-                if (OrbitId != -1 && OrbitId != node.Orbit)
+                if (OrbitId > -1 && OrbitId != node.Orbit)
                     // If orbit-specific links are enabled, exclude links that are not part of the desired orbit.
                     continue;
+                if (OrbitId == -2 && src_node.Orbit == node.Orbit) 
+                    // If non-orbit-specific links are enabled, exclude links on the same orbit.
+                    continue; // TODO: what if the link is not meant to be on any sort of orbit? (transobrital)
+                if (OrbitId == -3 && src_node.Orbit != node.Orbit)
+                    // If intraorbital specific links are enabled, exclude links whose nodes are on different orbits.
+                    continue; 
                 if (node.Id > 0 && InTargetArea(node.Position))
                 {
                     var direction = GetLinkDirection(src_node, node);
@@ -186,13 +190,13 @@ namespace Attack
 
                     if (_attackParams.Direction == Direction.Any
                         || (_attackParams.Direction == Direction.East &&
-                            direction.x >= 0) // && IsHorizontal(src_node, node))
+                            direction.x >= 0 && IsHorizontal(src_node, node))
                         || (_attackParams.Direction == Direction.West &&
-                            direction.x < 0) // && IsHorizontal(src_node, node))
+                            direction.x < 0  && IsHorizontal(src_node, node))
                         || (_attackParams.Direction == Direction.North &&
-                            direction.y >= 0) // && !IsHorizontal(src_node, node))
+                            direction.y >= 0 && !IsHorizontal(src_node, node))
                         || (_attackParams.Direction == Direction.South &&
-                            direction.y < 0)) //  && !IsHorizontal(src_node, node)))
+                            direction.y < 0  && !IsHorizontal(src_node, node)))
                         return new Tuple<Node, Node>(src_node, node);
                 }
             }

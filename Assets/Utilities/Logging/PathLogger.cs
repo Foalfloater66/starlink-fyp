@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.IO;
-using Attack;
 using Orbits;
 using Routing;
 
-namespace Logging
+namespace Utilities.Logging
 {
     public class PathLogger : ILogger
     {
@@ -14,31 +13,35 @@ namespace Logging
         public PathLogger(string directory,
             GroundstationCollection groundstations) // TODO: I can split this into their own objects.
         {
-
             // Record information about the attack routes selected for each frame.
-            _logger = new StreamWriter(System.IO.Path.Combine(directory, "paths.csv"));
+            _logger = new StreamWriter(Path.Combine(directory, "paths.csv"));
             _logger.WriteLine("FRAME,PATHS");
             _groundstations = groundstations;
         }
 
-        public void LogEntry(int frameCount, AttackTarget target, List<Route> routes)
+        public void LogEntry(int frameCount, LoggingContext ctx)
         {
             // FRAME
             _logger.Write($"{frameCount}");
 
             // PATHS
-            if (routes.Count == 0)
+            if (ctx.Routes.Count == 0)
             {
                 _logger.Write(",nan");
             }
 
-            foreach (Route route in routes)
+            foreach (Route route in ctx.Routes)
             {
                 _logger.Write($",{_groundstations[route.StartCity]} -> {_groundstations[route.EndCity]}");
             }
 
             _logger.Write("\n");
             _logger.Flush();
+        }
+        
+        public void Save()
+        {
+            throw new NotImplementedException();
         }
     }
 }

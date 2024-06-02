@@ -5,7 +5,7 @@ using QuickPrimitives;
 using QuickPrimitives.Scripts;
 
 [CustomEditor(typeof(QcCircleMesh))]
-public class QcCircleMeshEditor : Editor
+public class QcCircleMeshEditor : UnityEditor.Editor
 {
     private QcCircleMesh.QcCircleProperties oldProp = new QcCircleMesh.QcCircleProperties();
 

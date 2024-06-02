@@ -5,7 +5,7 @@ using QuickPrimitives;
 using QuickPrimitives.Scripts;
 
 [CustomEditor(typeof(QcSectionMesh))]
-public class QcSectionMeshEditor : Editor
+public class QcSectionMeshEditor : UnityEditor.Editor
 {
     private QcSectionMesh.QcSectionProperties oldProp = new QcSectionMesh.QcSectionProperties();
 

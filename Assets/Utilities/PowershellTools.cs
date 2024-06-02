@@ -7,27 +7,28 @@ namespace Utilities
 {
     public static class PowershellTools
     {
-        public static void SaveVideo(CustomCamera cam, string _loggingDirectory, CaseChoice caseChoice, Direction targetLinkDirection)
+        public static void SaveVideo(CustomCamera cam, string loggingDirectory, CaseChoice caseChoice, Direction targetLinkDirection, bool defenceOn, int rmax)
         {
             var imgHeight = Screen.height * cam.cam_count;
             var imgWidth = Screen.width;
+            
+            string type;
+            if (!defenceOn)
+            {
+                type = "OFF";
+            }
+            else
+            {
+                type = rmax.ToString();
+            }
 
             var command =
-                // $"ffmpeg -framerate 3 -i {Directory.GetCurrentDirectory()}/Logs/Captures/{_loggingDirectory}/{qualitativeCase}_{targetLinkDirection}_%02d.png -vf \"scale={imgWidth}:{imgHeight}\" -c:v libx265 -preset fast -crf 20 -pix_fmt yuv420p {Directory.GetCurrentDirectory()}/Logs/Captures/{_loggingDirectory}/output.mp4";
-                $"ffmpeg -framerate 3 -i {_loggingDirectory}/{caseChoice}_{targetLinkDirection}_%02d.png -vf \"scale={imgWidth}:{imgHeight}\" -c:v libx265 -preset fast -crf 20 -pix_fmt yuv420p {_loggingDirectory}/output.mp4";
-            PowershellTools.ExecutePowershellCommand(command);
-        }
-
-        public static void PlotData(CustomCamera cam, string _loggingDirectory, CaseChoice caseChoice, Direction targetLinkDirection)
-        {
-            var command =
-                $"python generate_graph.py {_loggingDirectory}/{caseChoice}_{targetLinkDirection}.csv {_loggingDirectory}/{caseChoice}_{targetLinkDirection}_graph.svg";
+                $"ffmpeg -framerate 3 -i {loggingDirectory}/{caseChoice}_{targetLinkDirection}_{type}_%02d_%03d.png -vf \"scale={imgWidth}:{imgHeight}\" -c:v libx265 -preset fast -crf 20 -pix_fmt yuv420p {loggingDirectory}/output.mp4";
             PowershellTools.ExecutePowershellCommand(command);
         }
 
         private static void ExecutePowershellCommand(string command)
         {
-            // TODO: move this stuff somewhere else :)
             var startInfo = new ProcessStartInfo()
             {
                 FileName = "powershell.exe",

@@ -6,8 +6,8 @@ namespace Orbits
     {
         public LineRenderer line;
 
-        public int src_satid; // REMOVE THIS AFTER
-        public int dest_satid; // REMOVE THIS AFTER
+        public int src_satid; 
+        public int dest_satid;
 
         // Use this for initialization
         private void Start()

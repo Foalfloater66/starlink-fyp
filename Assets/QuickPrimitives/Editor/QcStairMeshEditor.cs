@@ -5,7 +5,7 @@ using QuickPrimitives;
 using QuickPrimitives.Scripts;
 
 [CustomEditor(typeof(QcStairMesh))]
-public class QcStairMeshEditor : Editor
+public class QcStairMeshEditor : UnityEditor.Editor
 {
     private QcStairMesh.QcStairProperties oldProp = new QcStairMesh.QcStairProperties();
 

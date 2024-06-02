@@ -5,7 +5,7 @@ using QuickPrimitives;
 using QuickPrimitives.Scripts;
 
 [CustomEditor(typeof(QcTorusMesh))]
-public class QcTorusMeshEditor : Editor
+public class QcTorusMeshEditor : UnityEditor.Editor
 {
     private QcTorusMesh.QcTorusProperties oldProp = new QcTorusMesh.QcTorusProperties();
 

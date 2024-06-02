@@ -2,10 +2,12 @@
 using Attack;
 using Routing;
 
-namespace Logging
+namespace Utilities.Logging
 {
     public interface ILogger
     {
-        void LogEntry(int frameCount, AttackTarget target, List<Route> routes);
+        void LogEntry(int framecount, LoggingContext ctx); 
+
+        void Save();
     }
 }

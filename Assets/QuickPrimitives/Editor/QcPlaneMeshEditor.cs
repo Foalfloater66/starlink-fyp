@@ -5,7 +5,7 @@ using QuickPrimitives;
 using QuickPrimitives.Scripts;
 
 [CustomEditor(typeof(QcPlaneMesh))]
-public class QcPlaneMeshEditor : Editor
+public class QcPlaneMeshEditor : UnityEditor.Editor
 {
     private QcPlaneMesh.QcPlaneProperties oldProp = new QcPlaneMesh.QcPlaneProperties();
 

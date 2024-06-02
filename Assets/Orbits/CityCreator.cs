@@ -303,9 +303,15 @@ namespace Orbits
             CreateCity(10.38f, 71.38f, "Maracaibo"); // Maracaibo, Venezuela
             CreateCity(-8.03f, 34.54f, "Recife"); // Recife, Brazil
             CreateCity(-17.48f, 63.11f, "Santa Cruz de la Sierra"); // Santa Cruz de la Sierra, Bolivia
+            
         }
 
-
+        public void CarribbeanCities()
+        {
+            CreateCity(16.26f,  61.55f , "Guadeloupe");
+            CreateCity(18.46f, 69.93f, "Santo Domingo");
+        }
+        
         public void NorthAsiaCities()
         {
             CreateCity(55.75f, -37.62f, "Moscow"); // Russia

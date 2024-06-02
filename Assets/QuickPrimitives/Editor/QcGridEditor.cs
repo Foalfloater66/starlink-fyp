@@ -6,7 +6,7 @@ using QuickPrimitives;
 using QuickPrimitives.Scripts;
 
 [CustomEditor(typeof(QcGridMesh))]
-public class QcGridEditor : Editor
+public class QcGridEditor : UnityEditor.Editor
 {
     private QcGridMesh.QcGridProperties oldProp = new QcGridMesh.QcGridProperties();
 

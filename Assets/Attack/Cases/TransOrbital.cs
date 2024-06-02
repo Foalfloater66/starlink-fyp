@@ -14,7 +14,7 @@ namespace Attack.Cases
 
         protected override void SetupCameras(CustomCamera cam)
         {
-            throw new System.NotImplementedException();
+            cam.ViewLandlocked();
         }
 
         protected override void CreateCities()
@@ -24,22 +24,64 @@ namespace Attack.Cases
 
         protected override void CreateTargetCoordinates()
         {
-            // Denver, USA
-            Ctx.Latitude = 39.73f;
-            Ctx.Longitude = 104.99f;
+            // Pierre, South Dakota, USA
+            Ctx.Latitude = 44.36f;
+            Ctx.Longitude = 100.35f;
+            Ctx.OrbitId = -2;
         }
 
         protected override List<string> SetSourceGroundstations()
         {
-            return new List<string>
+            switch (Ctx.Direction)
             {
-                // south
-                "Fort Worth",
-                "Austin",
-                // north
-                "Denver",
-                "San Jose"
-            };
+                case Direction.North:
+                case Direction.South:
+                {
+                    // TODO: This doesn't really matter because no target link fulfilling the orientation restriction can be found.
+                    return new List<string>
+                    {
+                        "Oklahoma City",
+                        "Phoenix",
+                        "Los Angeles",
+                        "Toronto",
+                        "New York",
+                        "Chicago",
+                    };
+                }
+                case Direction.East:
+                    return new List<string>
+                    {
+                        "Vancouver",
+                        "Calgary",
+                        "Seattle",
+                        "Edmonton",
+                        "San Jose",
+                        "San Francisco",
+                    };
+                case Direction.West:
+                {
+                    return new List<string>
+                    {
+                        "Chicago",
+                        "Nashville",
+                        "Philadelphia",
+                        "Montreal",
+                        "Phoenix",
+                        "New York"
+                    };
+                }
+                case Direction.Any:
+                default:
+                    return new List<string>
+                    {
+                        "Fort Worth",
+                        "Austin",
+                        "Phoenix",
+                        "Los Angeles",
+                        "Denver",
+                        "San Jose"
+                    };
+            }
         }
     }
 }

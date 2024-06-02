@@ -5,7 +5,7 @@ using QuickPrimitives;
 using QuickPrimitives.Scripts;
 
 [CustomEditor(typeof(QcColumnMesh))]
-public class QcColumnMeshEditor : Editor
+public class QcColumnMeshEditor : UnityEditor.Editor
 {
     private QcColumnMesh.QcColumnProperties oldProp = new QcColumnMesh.QcColumnProperties();
 

@@ -23,13 +23,27 @@ namespace Attack.Cases
             {
                 Cities.USACities();
                 Cities.SACities();
+                Cities.CarribbeanCities();
             }
 
-            if (new HashSet<Direction> { Direction.East, Direction.West, Direction.Any }.Contains(Ctx.Direction))
+            if (Ctx.Direction == Direction.East)
+            {
+                // Cities.ASEANCities();
+                // Cities.OceaniaCities();
+                Cities.AFCities();
+                Cities.WPacific();
+                Cities.SACities();
+                Cities.EUCities();
+                return;
+            }
+
+            if (new HashSet<Direction> { Direction.West, Direction.Any }.Contains(Ctx.Direction))
             {
                 Cities.ASEANCities();
                 Cities.OceaniaCities();
                 Cities.AFCities();
+                Cities.WPacific();
+                Cities.SACities();
             }
         }
 
@@ -49,7 +63,8 @@ namespace Attack.Cases
                         // Northern countries (mostly NA)
                         "New York",
                         "Miami",
-                        "Caracas",
+                        // "Caracas",
+                        "Guadeloupe",
                         "Maracaibo",
                         "Boston",
                         "Chicago"
@@ -59,32 +74,34 @@ namespace Attack.Cases
                     {
                         // Southern countries (SA)
                         "Guayaquil",
-                        "Lima",
+                        // "Lima",
+                        "Caracas",
                         "Medellin",
                         "Quito",
-                        "Cali"
+                        "Cali",
+                        "Maracaibo",
                     };
                 case Direction.East:
                     return new List<string>
                     {
-                        "Nishino, Kagoshima",
-                        "Hengchung",
-                        "Caracas",
-                        "Maracaibo",
+                        "Bogota",
+                        "Guayaquil",
+                        "Cali",
                         "Medellin",
-                        "Quito"
+                        "Quito",
+                        "Maracaibo",
                     };
 
                 case Direction.West:
                     return new List<string>
                     {
-                        // Northern countries (mostly NA)
-                        "New York",
-                        // "Miami",
-                        "Caracas",
-                        "Maracaibo"
-                        // "Boston",
-                        // "Chicago",
+                        // African cities
+                        "Kinshasa",
+                        "Luanda",
+                        "Cairo",
+                        "Dar es Salaam",
+                        "Nairobi",
+                        "Abidjan",
                     };
                 case Direction.Any:
                 default:

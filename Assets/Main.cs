@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 using Attack;
 using Attack.Cases;
 using Logging;
@@ -13,21 +13,26 @@ using UnityEditor;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Utilities;
-using Logger = UnityEngine.Logger;
+using Utilities.Logging;
+using ILogger = Utilities.Logging.ILogger;
 
 public class Main : MonoBehaviour
 {
     // Environment Parameters
     [HideInInspector]
-    public float direction = 1f;   // If I make this private, Unity (serialization?) sets this to 0, which breaks the program.
+    public float
+        direction = 1f; // If I make this private, Unity (serialization?) sets this to 0, which breaks the program.
+
     private readonly float _directionChangeSpeed = 2f;
     private int _frameCount = 0;
     private float _pauseStartTime;
+
     private const double EarthPeriod = 86400f;
+
     // Core simulation objects
     private GroundstationCollection _groundstations;
     private GameObject[] _lasers;
-    private Satellite[] _nearestSats;   // used for calculating collision distances
+    private Satellite[] _nearestSats; // used for calculating collision distances
     private Node[] _nodes;
     private CityCreator _cityCreator;
     private ScenePainter _painter;
@@ -35,32 +40,39 @@ public class Main : MonoBehaviour
     private LinkCapacityMonitor _linkCapacities;
     private Attacker _attacker;
     private RouteGraph _rg;
+
     private Router _router;
+
     // Logging objects
     private Captures _captures;
     private string _loggingDirectory;
-    private Logging.ILogger _attackLogger;
-    private Logging.ILogger _pathLogger;
-    
+    private ILogger _attackLogger;
+    private ILogger _pathLogger;
+    private ILogger _latencyLogger;
+
     [Header("Environment")] public CustomCamera cam;
 
     [Tooltip("Speed 1 is realtime")] public float speed = 1f; // a value of 1 is realtime
 
-    [FormerlySerializedAs("use_isls")] [FormerlySerializedAs("use_ISLs")] [FormerlySerializedAs("useISLs")] [Tooltip("Enable use of inter-sat lasers")]
+    [FormerlySerializedAs("use_isls")]
+    [FormerlySerializedAs("use_ISLs")]
+    [FormerlySerializedAs("useISLs")]
+    [Tooltip("Enable use of inter-sat lasers")]
     public bool useIsls = true;
 
     [Header("Objects & Materials")]
     // GameObjects
     public GameObject orbit;
+
     public GameObject satellite;
     public GameObject laser;
     public GameObject thinLaser;
     public GameObject cityPrefab;
     public Material islMaterial;
     public Material[] laserMaterials;
-    public Material[] targetLinkMaterial;  // 1st is link up, 2nd is link down.
+    public Material[] targetLinkMaterial; // 1st is link up, 2nd is link down.
     public Material cityMaterial;
-    
+
     // Text
     public Text leftBottomText;
     public Text rightBottomText;
@@ -68,25 +80,29 @@ public class Main : MonoBehaviour
     public GameObject beamPrefab;
     public GameObject beamPrefab2;
 
-    [Header("Attack Parameters")]
-    public CaseChoice caseChoice;
+    [Header("Attack Parameters")] public CaseChoice caseChoice;
     public Direction targetLinkDirection;
     public float attackRadius = 1000f;
 
     // TODO: complete this later.
-    [HideInInspector]
-    [Tooltip("Whether the attacker assumes deterministic routing or not.")]
+    [HideInInspector] [Tooltip("Whether the attacker assumes deterministic routing or not.")]
     public bool deterministicAttacker = true; // YES OR NO...?
 
-    [Header("Defence Parameters")] 
-    public int rmax = 3;
-    [Tooltip("Apply shortest route randomisation mechannism.")]
+    [Header("Defence Parameters")] public int rmax = 1;
+
+    [Tooltip("Apply shortest route randomisation mechanism.")]
     public bool defenceOn = false;
 
-    [Header("Logging")]
-    public bool screenshotMode = true;
-    public bool logAttack = true;
+    [Header("Logging")] public bool screenshotMode = false;
+    public bool logAttack = false;
+    public bool logRTT = false;
 
+    [Tooltip(
+        "Maximum number of frames to compute before terminating the simulator. Only takes effect when any logging is enabled.")]
+    public int maxFrames = 50;
+
+    [HideInInspector] public int runId = 0; // For tracking (helpful for experiments on random behaviour)
+    
     private CustomCamera InitCamera()
     {
         var camscript = (CustomCamera)cam.GetComponent(typeof(CustomCamera));
@@ -97,19 +113,28 @@ public class Main : MonoBehaviour
     private void InitLogging()
     {
         // Create logging directory.
-        _loggingDirectory = $"{Directory.GetCurrentDirectory()}/Logs/Captures/{caseChoice}_{targetLinkDirection}";
+        string status;
+        if (rmax != 1 && defenceOn) status = rmax.ToString();
+        else status = "OFF";
+        string filename = $"{caseChoice}_{targetLinkDirection}_{status}_{runId:D3}";
+        _loggingDirectory = $"{Directory.GetCurrentDirectory()}/Logs/Captures/{filename}";
         if (Directory.Exists(_loggingDirectory)) Directory.Delete(_loggingDirectory, true);
         Directory.CreateDirectory(_loggingDirectory);
-        
+
         if (screenshotMode)
         {
-            _captures = new Captures(_loggingDirectory, $"{caseChoice}_{targetLinkDirection}");
+            _captures = new Captures(_loggingDirectory, $"{filename}");
         }
 
         if (logAttack)
         {
-            _attackLogger = new AttackLogger(_loggingDirectory, caseChoice, targetLinkDirection, _linkCapacities);
+            _attackLogger = new AttackLogger(_loggingDirectory, filename, _linkCapacities);
             _pathLogger = new PathLogger(_loggingDirectory, _groundstations);
+        }
+
+        if (logRTT)
+        {
+            _latencyLogger = new LatencyLogger(_loggingDirectory);
         }
     }
 
@@ -118,7 +143,8 @@ public class Main : MonoBehaviour
         // GameObjects
         _groundstations = new GroundstationCollection();
         _cityCreator = new CityCreator(transform, cityPrefab, _groundstations);
-        _constellation = new Constellation(transform, orbit, satellite, beamPrefab, beamPrefab2, laser, thinLaser, speed, useIsls);
+        _constellation = new Constellation(transform, orbit, satellite, beamPrefab, beamPrefab2, laser, thinLaser,
+            speed, useIsls);
         // UI Text + Visuals.
         rightBottomText.text = "";
         topLeftText.text = "";
@@ -130,23 +156,47 @@ public class Main : MonoBehaviour
         // Routing + Stats Monitoring
         _linkCapacities = new LinkCapacityMonitor();
         _rg = new RouteGraph();
-        _rg.InitRoute(_constellation.maxsats, _constellation.satlist, _constellation.maxdist, _constellation.km_per_unit);
-        _router = new Router(defenceOn, _groundstations, _rg, _painter, _linkCapacities, _constellation, _constellation.km_per_unit, rmax);
+        _rg.InitRoute(_constellation.maxsats, _constellation.satlist, _constellation.maxdist,
+            _constellation.km_per_unit);
+        _router = new Router(defenceOn, _groundstations, _rg, _painter, _linkCapacities, _constellation,
+            _constellation.km_per_unit, rmax);
     }
 
-    private void Start()
+    public void Start()
     {
         // Simulation configuration.
         Application.runInBackground = true;
+
+        if (!defenceOn)
+        {
+            runId = 0;
+        }
+        
+        Debug.Log($"Run Parameters:\n" +
+                  $"CASE CHOICE: {caseChoice}\n" +
+                  $"TARGET LINK DIRECTION: {targetLinkDirection}\n" +
+                  $"ATTACK RADIUS: {attackRadius}\n" +
+                  $"DEFENCE ON: {defenceOn}\n" +
+                  $"RMAX: {rmax}\n" +
+                  $"LOG ATTACK: {logAttack}\n" +
+                  $"LOG RTT: {logRTT}\n" +
+                  $"MAX FRAMES: {maxFrames}\n");
+        
         InitScene();
         var camscript = InitCamera();
         var attackerParams = CasesFactory
             .GetCase(caseChoice, _cityCreator, targetLinkDirection, _groundstations, camscript).GetParams();
         InitRoutingFramework();
-        _attacker = new Attacker(attackerParams, _constellation.sat0r, attackRadius, transform, cityPrefab, _groundstations,
+        _attacker = new Attacker(attackerParams, _constellation.sat0r, attackRadius, transform, cityPrefab,
+            _groundstations,
             _rg, _painter, _linkCapacities, _constellation);
-        InitLogging();
+        if (logAttack || logRTT || screenshotMode)
+        {
+            InitLogging();
+        }
+
         camscript.InitView();
+        Update();
     }
 
     private void OnDrawGizmos()
@@ -163,16 +213,17 @@ public class Main : MonoBehaviour
         // Move the orbits
         for (var i = 0; i < _constellation.maxorbits; i++)
             _constellation.orbits[i].transform.RotateAround(Vector3.zero, _constellation.orbitaxes[i],
-                (float)(-1f * EarthPeriod / _constellation.orbitalperiod[i] * _constellation.simspeed * direction) * Time.deltaTime);
+                (float)(-1f * EarthPeriod / _constellation.orbitalperiod[i] * _constellation.simspeed * direction) *
+                Time.deltaTime);
     }
 
-    private void UpdateSceneRTT(List<Routing.Route> routes)
+    private void UpdateSceneRTT(List<float> rttList)
     {
         var rttLog = "RTT: ";
-        for (int idx = 0; idx < routes.Count; idx++)
+        for (int idx = 0; idx < rttList.Count; idx++)
         {
-            float rtt = routes[idx].GetRTT(_constellation.km_per_unit);
-            if ( rtt > 2000f)
+            float rtt = rttList[idx];
+            if (Single.IsNaN(rtt))
             {
                 rttLog += "Fail!";
             }
@@ -189,6 +240,7 @@ public class Main : MonoBehaviour
                 rttLog += $"{(int)rtt} ms";
             }
         }
+
         topLeftText.text = rttLog;
     }
 
@@ -197,7 +249,7 @@ public class Main : MonoBehaviour
         if (_attacker.Target.Link != null)
         {
             rightBottomText.text =
-                $"Target Link Capacity: {_linkCapacities.GetCapacity(_attacker.Target.Link.SrcNode.Id, _attacker.Target.Link.DestNode.Id)} mbits/sec";
+                $"Target Link Capacity: {_linkCapacities.GetCapacity(_attacker.Target.Link.SrcNode.Id, _attacker.Target.Link.DestNode.Id) / 1000} Gbits/snapshot";
         }
         else
         {
@@ -211,52 +263,86 @@ public class Main : MonoBehaviour
         _linkCapacities.Reset();
         _rg.ClearRoutes(_painter);
     }
-    
-    private void UpdateScene(List<Routing.Route> routes)
+
+    private void UpdateScene(List<float> rttList)
     {
         _painter.UpdateLasers(_constellation.satlist, _constellation.maxsats, speed);
-        UpdateSceneRTT(routes);
+        UpdateSceneRTT(rttList);
         leftBottomText.text = $"Frame {_frameCount}";
         UpdateSceneLinkStatus();
+    }
+
+    private List<float> ExtractRTT(List<Route> routes)
+    {
+        // var rttLog = "RTT: ";
+        List<float> RTT = new List<float>();
+        for (int idx = 0; idx < routes.Count; idx++)
+        {
+            float rtt = routes[idx].GetRTT(_constellation.km_per_unit);
+            if (rtt > 2000f)
+            {
+                RTT.Add(Single.NaN);
+            }
+            else
+            {
+                RTT.Add(rtt);
+            }
+        }
+
+        return RTT;
     }
 
     /// <summary>
     /// Update function to run the main routegraph rebuild + attacker + frame recording (if enabled)
     /// </summary>
-    private void Update()
+    public void Update()
     {
         // TODO: DEMO MODE NEEDS TO PAUSE FOR EACH STEP/TAKE A SCREENSHOT.
         ResetScene();
 
-        // Attempt an attack on the network.
+        // // Attempt an attack on the network.
         var routes = _attacker.Run(_groundstations.ToList());
         _router.Run(routes, _attacker.Target);
-        
-        UpdateScene(routes);
-        
+
+        List<float> rttList = ExtractRTT(routes);
+        UpdateScene(rttList);
+
+        LoggingContext ctx = new LoggingContext()
+        {
+            Target = _attacker.Target,
+            Routes = routes,
+            RTT = rttList
+        };
         if (logAttack)
         {
-            _attackLogger.LogEntry(_frameCount, _attacker.Target, routes);
-            _pathLogger.LogEntry(_frameCount, _attacker.Target, routes);
+            _attackLogger.LogEntry(_frameCount, ctx);
+            _pathLogger.LogEntry(_frameCount, ctx);
         }
-        
+
+        if (logRTT)
+        {
+            _latencyLogger.LogEntry(_frameCount, ctx);
+        }
+
         // Terminate
         if (screenshotMode) _captures.TakeScreenshot(cam, leftBottomText, _frameCount);
-        if ((screenshotMode || logAttack) && _frameCount == 50) Terminate();
-        
-        _frameCount++; 
+        if ((screenshotMode || logAttack || logRTT) && _frameCount == maxFrames) Terminate();
+
+        _frameCount++;
     }
 
     private void Terminate()
     {
         if (screenshotMode)
         {
-            PowershellTools.SaveVideo(cam, _loggingDirectory, caseChoice, targetLinkDirection);
+            PowershellTools.SaveVideo(cam, _loggingDirectory, caseChoice, targetLinkDirection, defenceOn, rmax);
         }
-        if (logAttack)
+
+        if (logRTT)
         {
-            PowershellTools.PlotData(cam, _loggingDirectory, caseChoice, targetLinkDirection);
+            _latencyLogger.Save();
         }
+
         EditorApplication.Exit(0);
     }
 }

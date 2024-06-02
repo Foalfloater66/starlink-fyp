@@ -483,7 +483,7 @@ MonoBehaviour:
   direction: 1
   cam: {fileID: 1375312111}
   speed: 20
-  useISLs: 1
+  useIsls: 1
   orbit: {fileID: 1172864837802712, guid: 3b4a1d43d21bf42d8ad02077259400de, type: 3}
   satellite: {fileID: 1842355326392174, guid: 7327322cd40cd49898f0f3e031d063e4, type: 3}
   laser: {fileID: 1648504976000122, guid: 88944ffc92ba14ec5a48961205eeab10, type: 3}
@@ -499,19 +499,22 @@ MonoBehaviour:
   - {fileID: 2100000, guid: a5ba4d0a064734456bdca50184b5bda5, type: 2}
   - {fileID: 2100000, guid: 7fcb457815b4542d08ddfb4f8212b4d6, type: 2}
   cityMaterial: {fileID: 2100000, guid: d6795a24fec3f4b478a2532645da09a8, type: 2}
-  leftbottom: {fileID: 485043185}
-  rightbottom: {fileID: 1204926847}
-  topleft: {fileID: 2091605839}
+  leftBottomText: {fileID: 485043185}
+  rightBottomText: {fileID: 1204926847}
+  topLeftText: {fileID: 2091605839}
   beamPrefab: {fileID: 1179252676941566, guid: 4f91908e9c1b94fa9865a33a3dec4b0b, type: 3}
   beamPrefab2: {fileID: 1454064570112744, guid: ae0115a2e33c24b7d92d193312575599,
     type: 3}
   caseChoice: 1
-  targetLinkDirection: 0
+  targetLinkDirection: 1
   attackRadius: 1000
   deterministicAttacker: 0
-  defenceOn: 1
-  screenshotMode: 0
+  rmax: 3
+  defenceOn: 0
+  screenshotMode: 1
   logAttack: 0
+  logRTT: 0
+  maxFrames: 10
 --- !u!1 &1375312105
 GameObject:
   m_ObjectHideFlags: 0
