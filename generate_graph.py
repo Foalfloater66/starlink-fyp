@@ -6,6 +6,8 @@ import os
 import numpy as np
 from matplotlib.ticker import MaxNLocator
 
+# TODO: THIS IS NOT NEEDED I CAN REMOVE THIS ....
+
 parser = argparse.ArgumentParser(
     description="Saves a graph of the link flooding attack simulation over multiple frames."
 )
