@@ -9,7 +9,7 @@ namespace QuickPrimitives.Editor
 {
     public class CommandLineScript : MonoBehaviour
     {
-        [RuntimeInitializeOnLoadMethod]
+        // [RuntimeInitializeOnLoadMethod]
         public static void Run()
         {
             SceneManager.sceneLoaded += (scene, mode) =>

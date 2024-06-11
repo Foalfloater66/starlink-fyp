@@ -481,40 +481,42 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   direction: 1
+  exp: {fileID: 0}
   cam: {fileID: 1375312111}
-  speed: 20
+  speed: 1
   useIsls: 1
   orbit: {fileID: 1172864837802712, guid: 3b4a1d43d21bf42d8ad02077259400de, type: 3}
   satellite: {fileID: 1842355326392174, guid: 7327322cd40cd49898f0f3e031d063e4, type: 3}
   laser: {fileID: 1648504976000122, guid: 88944ffc92ba14ec5a48961205eeab10, type: 3}
-  thinLaser: {fileID: 1648504976000122, guid: d79140fe819d64f8980864f3fa028b6d, type: 3}
+  thinLaser: {fileID: 1648504976000122, guid: 88944ffc92ba14ec5a48961205eeab10, type: 3}
   cityPrefab: {fileID: 1240812473641584, guid: dca4c6136c32540cbbb49eb487de1c9d, type: 3}
   islMaterial: {fileID: 2100000, guid: 054725efd433545d0867a6c84dd8b574, type: 2}
   laserMaterials:
-  - {fileID: 2100000, guid: d6795a24fec3f4b478a2532645da09a8, type: 2}
-  - {fileID: 2100000, guid: 7931bb27edd134e85b919e88f2970275, type: 2}
   - {fileID: 2100000, guid: d42fe79d9d8d44828b2d78470b7f1d93, type: 2}
+  - {fileID: 2100000, guid: 4398602df8d6d4e44862bde1f4671791, type: 2}
+  - {fileID: 2100000, guid: 7931bb27edd134e85b919e88f2970275, type: 2}
   - {fileID: 2100000, guid: 4398602df8d6d4e44862bde1f4671791, type: 2}
   targetLinkMaterial:
   - {fileID: 2100000, guid: a5ba4d0a064734456bdca50184b5bda5, type: 2}
   - {fileID: 2100000, guid: 7fcb457815b4542d08ddfb4f8212b4d6, type: 2}
-  cityMaterial: {fileID: 2100000, guid: d6795a24fec3f4b478a2532645da09a8, type: 2}
+  cityMaterial: {fileID: 2100000, guid: 7fcb457815b4542d08ddfb4f8212b4d6, type: 2}
   leftBottomText: {fileID: 485043185}
   rightBottomText: {fileID: 1204926847}
   topLeftText: {fileID: 2091605839}
   beamPrefab: {fileID: 1179252676941566, guid: 4f91908e9c1b94fa9865a33a3dec4b0b, type: 3}
   beamPrefab2: {fileID: 1454064570112744, guid: ae0115a2e33c24b7d92d193312575599,
     type: 3}
-  caseChoice: 1
-  targetLinkDirection: 1
+  caseChoice: 0
+  targetLinkDirection: 0
   attackRadius: 1000
-  deterministicAttacker: 0
-  rmax: 3
+  deterministicAttacker: 1
+  rmax: 1
   defenceOn: 0
-  screenshotMode: 1
+  screenshotMode: 0
   logAttack: 0
   logRTT: 0
-  maxFrames: 10
+  maxFrames: 50
+  runId: 0
 --- !u!1 &1375312105
 GameObject:
   m_ObjectHideFlags: 0

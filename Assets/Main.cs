@@ -6,10 +6,10 @@ using Attack.Cases;
 using Logging;
 using Orbits;
 using Orbits.Satellites;
+using QuickPrimitives.Editor;
 using Routing;
 using UnityEngine;
 using Scene;
-using UnityEditor;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Utilities;
@@ -49,6 +49,7 @@ public class Main : MonoBehaviour
     private ILogger _attackLogger;
     private ILogger _pathLogger;
     private ILogger _latencyLogger;
+    public Experiments exp;
 
     [Header("Environment")] public CustomCamera cam;
 
@@ -172,15 +173,15 @@ public class Main : MonoBehaviour
             runId = 0;
         }
         
-        Debug.Log($"Run Parameters:\n" +
-                  $"CASE CHOICE: {caseChoice}\n" +
-                  $"TARGET LINK DIRECTION: {targetLinkDirection}\n" +
-                  $"ATTACK RADIUS: {attackRadius}\n" +
-                  $"DEFENCE ON: {defenceOn}\n" +
-                  $"RMAX: {rmax}\n" +
-                  $"LOG ATTACK: {logAttack}\n" +
-                  $"LOG RTT: {logRTT}\n" +
-                  $"MAX FRAMES: {maxFrames}\n");
+        Debug.Log($"Run Parameters: " +
+                  $"CASE CHOICE: {caseChoice};" +
+                  $"TARGET LINK DIRECTION: {targetLinkDirection}; " +
+                  $"ATTACK RADIUS: {attackRadius}; " +
+                  $"DEFENCE ON: {defenceOn}; " +
+                  $"RMAX: {rmax}; " +
+                  $"LOG ATTACK: {logAttack}; " +
+                  $"LOG RTT: {logRTT}; " +
+                  $"MAX FRAMES: {maxFrames};");
         
         InitScene();
         var camscript = InitCamera();
@@ -343,6 +344,13 @@ public class Main : MonoBehaviour
             _latencyLogger.Save();
         }
 
-        EditorApplication.Exit(0);
+        // EditorApplication.ExitPlaymode();
+        // Experiments exp = FindObjectOfType<Experiments>();
+        // Assert.IsNotNull(exp);
+        this.exp.Next();
+        // Experiments.SetParams(this, CaseChoice.Coastal, Direction.West, false, 1, 0);
+        // Experiments.ReloadScene();
+
+        // EditorApplication.Exit(0); // would effectively use this to reset any counters.
     }
 }
