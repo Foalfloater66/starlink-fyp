@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.IO;
 using Attack;
 using Attack.Cases;
+using Automation;
+using Experiments;
 using Logging;
 using Orbits;
 using Orbits.Satellites;
-using QuickPrimitives.Editor;
 using Routing;
 using UnityEngine;
 using Scene;
+using UnityEditor;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Utilities;
@@ -19,8 +21,7 @@ using ILogger = Utilities.Logging.ILogger;
 public class Main : MonoBehaviour
 {
     // Environment Parameters
-    [HideInInspector]
-    public float
+    [HideInInspector] public float
         direction = 1f; // If I make this private, Unity (serialization?) sets this to 0, which breaks the program.
 
     private readonly float _directionChangeSpeed = 2f;
@@ -49,11 +50,11 @@ public class Main : MonoBehaviour
     private ILogger _attackLogger;
     private ILogger _pathLogger;
     private ILogger _latencyLogger;
-    public Experiments exp;
+    [FormerlySerializedAs("exp")] [HideInInspector] public Runner runner;
 
     [Header("Environment")] public CustomCamera cam;
 
-    [Tooltip("Speed 1 is realtime")] public float speed = 1f; // a value of 1 is realtime
+    [Tooltip("Speed 1 is realtime")] public float speed = 10f; // a value of 1 is realtime
 
     [FormerlySerializedAs("use_isls")]
     [FormerlySerializedAs("use_ISLs")]
@@ -103,7 +104,7 @@ public class Main : MonoBehaviour
     public int maxFrames = 50;
 
     [HideInInspector] public int runId = 0; // For tracking (helpful for experiments on random behaviour)
-    
+
     private CustomCamera InitCamera()
     {
         var camscript = (CustomCamera)cam.GetComponent(typeof(CustomCamera));
@@ -172,7 +173,7 @@ public class Main : MonoBehaviour
         {
             runId = 0;
         }
-        
+
         Debug.Log($"Run Parameters: " +
                   $"CASE CHOICE: {caseChoice};" +
                   $"TARGET LINK DIRECTION: {targetLinkDirection}; " +
@@ -182,7 +183,7 @@ public class Main : MonoBehaviour
                   $"LOG ATTACK: {logAttack}; " +
                   $"LOG RTT: {logRTT}; " +
                   $"MAX FRAMES: {maxFrames};");
-        
+
         InitScene();
         var camscript = InitCamera();
         var attackerParams = CasesFactory
@@ -325,9 +326,10 @@ public class Main : MonoBehaviour
             _latencyLogger.LogEntry(_frameCount, ctx);
         }
 
-        // Terminate
         if (screenshotMode) _captures.TakeScreenshot(cam, leftBottomText, _frameCount);
-        if ((screenshotMode || logAttack || logRTT) && _frameCount == maxFrames) Terminate();
+
+        // Terminate
+        if (_frameCount == maxFrames) Terminate();
 
         _frameCount++;
     }
@@ -344,13 +346,15 @@ public class Main : MonoBehaviour
             _latencyLogger.Save();
         }
 
-        // EditorApplication.ExitPlaymode();
-        // Experiments exp = FindObjectOfType<Experiments>();
-        // Assert.IsNotNull(exp);
-        this.exp.Next();
-        // Experiments.SetParams(this, CaseChoice.Coastal, Direction.West, false, 1, 0);
-        // Experiments.ReloadScene();
-
-        // EditorApplication.Exit(0); // would effectively use this to reset any counters.
+        if (runner && runner.experimentMode && runner.Experiments.Count != 0)
+        {
+            Debug.Log("Switching Scenes.");
+            runner.Next();
+        }
+        else
+        {
+            Debug.Log("Run completed.");
+            EditorApplication.Exit(0);
+        }
     }
 }
