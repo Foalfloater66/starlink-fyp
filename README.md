@@ -22,13 +22,13 @@ _N.B. Recent Unity versions that support M* chips might perform well;
     it simply has not been tested, as it is beyond the scope of this project._
 
 
-### Scene Setup
+### Unity Scene Setup
 1. Clone the repository.
 2. From Unity Hub, add the `./simulator` directory as a new project.
 3. Go to "File" > "Open Scene" and select `Orbits/Scene_SP_basic`.
-4. Ensure all objects are assigned their asset [TODO, NEED TO CHECK IF THIS IS AUTOMATIC OR NOT.]
 
 ## Running the Simulator
+
 ### Through the Unity Editor
 _The Unity Editor only allows for single runs. For batch runs, check [CLI](###cli)._
 
@@ -46,7 +46,7 @@ Their definitions can be found in [CaseChoice.cs](https://github.com/Foalfloater
 Single run experiments are always assigned an ID of `0`.
 ```bat
 :: Windows
-./run/single.bat <choice> <direction> <rmax> <frames> <log_screenshots> <log_attack> <log_rtt>
+./simulator/run/single.bat <choice> <direction> <rmax> <frames> <log_screenshots> <log_attack> <log_rtt>
 ```
 
 #### Batch Runs
@@ -76,12 +76,13 @@ Each experiment is characterised by its `choice`, `direction`, `rmax`, and numbe
 Then run:
 ```bat
 :: Windows
-./run/batch.bat <filename>
+./simulator/run/batch.bat <filename>
 ```
 To preserve system file space, we recommend disabling `logScreenshots` in batch mode.
 
 ## Simulation Parameters [MISSING INFO]
 
+TODO: ADD THE REST...
 ### Logging
 Below is a list of the logging options that can be enabled and the files they produce.
 
@@ -115,13 +116,12 @@ This is an example directory where all three logging options are enabled.
 |               rtt.json
 ```
 
-## Thesis Experiments [NEED TO UPDATE]
+## Thesis Experiments
 Experimental thesis data was collected using the following command:
 ```batch
 ::Windows
-./run/batch.bat ./thesis/experiments.json
+./simulator/run/batch.bat ./thesis/experiments.json
 ```
-The code used for generating the plots in this thesis is available in a separate repository. [ADD LINK TO REPOSITORY]
 
 ## Troubleshooting
 When enabling `logScreenshots`, screenshots of the scene are taken from each enabled camera and saved to disk at each frame. 
