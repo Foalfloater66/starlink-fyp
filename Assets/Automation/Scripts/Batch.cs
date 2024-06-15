@@ -2,61 +2,31 @@
 using Attack.Cases;
 using Experiments;
 using UnityEditor;
+using UnityEditor.CrashReporting;
 using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace Automation.Scripts
 {
     [System.Serializable]
-    public class ExperimentParameters
+    public class ExperimentCollection
     {
-        public List<CaseChoice> cases;
-        public List<Direction> directions;
-        public List<int> rmaxList;
-        public int frames; // number of frames to run each run for.
-        public int reps; // number of repetitions for randomized runs.
+        public List<Experiment> experiments;
+        public int frames;
+        public bool logScreenshots;
+        public bool logAttack;
+        public bool logRTT;
     }
 
     public static class Batch
     {
-        private static ExperimentParameters ReadSpecification(string jsonPath)
+        private static ExperimentCollection ReadExperiments(string jsonPath)
         {
             // Parse the JSON file.
             string jsonData = System.IO.File.ReadAllText(jsonPath);
-            ExperimentParameters parameters = JsonUtility.FromJson<ExperimentParameters>(jsonData);
+            ExperimentCollection parameters = JsonUtility.FromJson<ExperimentCollection>(jsonData);
             Assert.IsNotNull(parameters);
             return parameters;
-        }
-
-        private static void FillExperimentsQueue(Runner runner, ExperimentParameters parameters)
-        {
-            foreach (CaseChoice choice in parameters.cases)
-            {
-                foreach (Direction direction in parameters.directions)
-                {
-                    foreach (int rmax in parameters.rmaxList)
-                    {
-                        int startID;
-                        int reps;
-                        if (rmax <= 1)
-                        {
-                            startID = 0;
-                            reps = 1;
-                        }
-                        else
-                        {
-                            startID = 1;
-                            reps = parameters.reps + 1;
-                        }
-
-                        for (int ID = startID; ID < reps; ID++)
-                        {
-                            runner.Experiments.Enqueue(new Experiment(choice, direction, rmax,
-                                parameters.frames, ID, false, true, true));
-                        }
-                    }
-                }
-            }
         }
 
         public static void Run(string[] args)
@@ -72,8 +42,16 @@ namespace Automation.Scripts
             runner.experimentMode = true;
             Assert.IsNotNull(runner);
 
-            ExperimentParameters parameters = ReadSpecification(args[6]);
-            FillExperimentsQueue(runner, parameters);
+            ExperimentCollection specification = ReadExperiments(args[6]);
+            
+            foreach (Experiment experiment in specification.experiments)
+            {
+                for (int id = 0; id < experiment.reps; id++)
+                {
+                    experiment.Build(id, specification.frames, specification.logScreenshots, specification.logAttack, specification.logRTT);
+                    runner.Experiments.Enqueue(experiment);
+                }
+            }
 
             // Run experiments.
             EditorApplication.EnterPlaymode();

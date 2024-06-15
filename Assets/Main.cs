@@ -4,7 +4,6 @@ using System.IO;
 using Attack;
 using Attack.Cases;
 using Automation;
-using Experiments;
 using Logging;
 using Orbits;
 using Orbits.Satellites;
@@ -95,7 +94,7 @@ public class Main : MonoBehaviour
     [Tooltip("Apply shortest route randomisation mechanism.")]
     public bool defenceOn = false;
 
-    [Header("Logging")] public bool screenshotMode = false;
+    [Header("Logging")] public bool logScreenshots = false;
     public bool logAttack = false;
     public bool logRTT = false;
 
@@ -123,14 +122,14 @@ public class Main : MonoBehaviour
         if (Directory.Exists(_loggingDirectory)) Directory.Delete(_loggingDirectory, true);
         Directory.CreateDirectory(_loggingDirectory);
 
-        if (screenshotMode)
+        if (logScreenshots)
         {
-            _captures = new Captures(_loggingDirectory, $"{filename}");
+            _captures = new Captures(_loggingDirectory);
         }
 
         if (logAttack)
         {
-            _attackLogger = new AttackLogger(_loggingDirectory, filename, _linkCapacities);
+            _attackLogger = new AttackLogger(_loggingDirectory, _linkCapacities);
             _pathLogger = new PathLogger(_loggingDirectory, _groundstations);
         }
 
@@ -192,7 +191,7 @@ public class Main : MonoBehaviour
         _attacker = new Attacker(attackerParams, _constellation.sat0r, attackRadius, transform, cityPrefab,
             _groundstations,
             _rg, _painter, _linkCapacities, _constellation);
-        if (logAttack || logRTT || screenshotMode)
+        if (logAttack || logRTT || logScreenshots)
         {
             InitLogging();
         }
@@ -326,7 +325,7 @@ public class Main : MonoBehaviour
             _latencyLogger.LogEntry(_frameCount, ctx);
         }
 
-        if (screenshotMode) _captures.TakeScreenshot(cam, leftBottomText, _frameCount);
+        if (logScreenshots) _captures.TakeScreenshot(cam, leftBottomText, _frameCount);
 
         // Terminate
         if (_frameCount == maxFrames) Terminate();
@@ -336,7 +335,7 @@ public class Main : MonoBehaviour
 
     private void Terminate()
     {
-        if (screenshotMode)
+        if (logScreenshots)
         {
             PowershellTools.SaveVideo(cam, _loggingDirectory, caseChoice, targetLinkDirection, defenceOn, rmax);
         }

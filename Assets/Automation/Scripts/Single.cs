@@ -26,8 +26,8 @@ namespace Automation.Scripts
                 (CaseChoice)Enum.Parse(typeof(CaseChoice), args[6]),
                 (Direction)Enum.Parse(typeof(Direction), args[7]),
                 int.Parse(args[8]),
-                int.Parse(args[10]),
                 int.Parse(args[9]),
+                int.Parse(args[10]),
                 bool.Parse(args[11]),
                 bool.Parse(args[12]),
                 bool.Parse(args[13])

@@ -11,11 +11,11 @@ namespace Utilities.Logging
         private readonly StreamWriter _logger;
         private readonly LinkCapacityMonitor _linkCapacityMonitor;
 
-        public AttackLogger(string directory, string name, 
+        public AttackLogger(string directory,
             LinkCapacityMonitor linkCapacities)
         {
             _linkCapacityMonitor = linkCapacities;
-            _logger = new StreamWriter(Path.Combine(directory, $"{name}.csv"));
+            _logger = new StreamWriter(Path.Combine(directory, $"attack.csv"));
             _logger.WriteLine("FRAME,TARGET LINK,ROUTE COUNT,FINAL CAPACITY");
         }
 

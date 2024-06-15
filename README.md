@@ -1,85 +1,131 @@
-# Starlink Link Flooding Attack Simulator for Unity
+# Starlink Link Flooding Attack Simulator for Unity [IN PROGRESS]
 This is a link flooding attack simulator on the SpaceX Starlink network based on [Mark Handley's SpaceX Starlink simulator](https://github.com/mhandley/Starlink0031).
 
 It simulates singular link flooding attacks on inter-satellite network (ISN) links located within a 1000km radius of a specified center point.
 
+⚠️ Please note that this program demands high computational effort from your device, and might not function if you do not meet the [system requirements](#system-requirements). 
+If the Unity Editor becomes unresponsive, please follow the instructions in [Troubleshooting](#troubleshooting).
+
+## Installation
+
+### System Requirements
+This program is most compatible with **Unity 2019.2.1f1** on **Windows 11**.
+Due to restrictions from the original code this simulator builds upon, other versions of Unity may experience difficulties at runtime.
+Running the code on Windows 10 should be fine.
+
+Due to the high computational demand from this program, we recommend using **gaming devices**, especially those that permit operating mode modification.
+For reference, the experiments were run on a ROG Zephyrus M16 equipped with an Intel Core i9 CPU and NVIDIA GeForce RTX 3070 Ti laptop GPU.
+Devices running this simulation with a low-performance CPU or a non-Intel architecture (Unity 2019.2.1f1 uses Intel architecture) are more likely to encounter performance issues. 
+This includes Apple M* chips which introduce significant delay from Rosetta ISA translation.
+
+_N.B. Recent Unity versions that support M* chips might perform well;
+    it simply has not been tested, as it is beyond the scope of this project._
+
+
+### Scene Setup
+1. Clone the repository.
+2. From Unity Hub, add the `./simulator` directory as a new project.
+3. Go to "File" > "Open Scene" and select `Orbits/Scene_SP_basic`.
+4. Ensure all objects are assigned their asset [TODO, NEED TO CHECK IF THIS IS AUTOMATIC OR NOT.]
+
 ## Running the Simulator
-_Adapted from Mark Handley's instructions._
+### Through the Unity Editor
+_The Unity Editor only allows for single runs. For batch runs, check [CLI](###cli)._
 
-To run the simulator, use version 2019.2.1f1 of Unity. 
-Clone the GitHub repository, and from UnityHub, add the repository directory as a new project.
+Simulation parameters can be configured in the `EarthHigh` object's inspector window.
 
-Select the project from UnityHub and Unity should start.
+To run the simulation, simply press `Cmd+P/Ctrl+P` or the Play icon at the top of the screen.
 
-In the Project tab near to the bottom of the screen, open the  `Assets/Orbits` folder, and select `Scene_SP_basic`.
+### Through the CLI
+_As this simulator was developed on Windows, there are currently no instructions for UNIX devices._
 
-You should be able to run a simulation using the Play icon at the top of the screen.
+Note that parameters`choice` and `direction`are enums, so understanding their textual translation is crucial to running the simulator correctly. 
+Their definitions can be found in [CaseChoice.cs](https://github.com/Foalfloater66/starlink-fyp/blob/main/Assets/Attack/Cases/CaseChoice.cs) and [Direction.cs](https://github.com/Foalfloater66/starlink-fyp/blob/main/Assets/Attack/Cases/Direction.cs)
 
-To select simulation parameters in the object Inspector, select the `EarthHigh` object on the left.
+#### Single Run
+Single run experiments are always assigned an ID of `0`.
+```bat
+:: Windows
+./run/single.bat <choice> <direction> <rmax> <frames> <log_screenshots> <log_attack> <log_rtt>
+```
 
-Note that this program requires high computational effort from your device and may have difficulties starting up.
-If Unity becomes unresponsive, please follow the instructions in [Troubleshooting](#troubleshooting).
+#### Batch Runs
+Batch runs allow you to run multiple experiments in one go.
 
-## Simulator Output Files
-Given a `qualitativeCase` and `targetLinkOrientation`, running this code will result in the creation of a `Logs/Captures/{qualitativeCase}_{targetLinkOrientation}` directory.
+Write an experiments specification in JSON format as shown in [experiments.json](https://github.com/Foalfloater66/starlink-fyp/blob/main/experiments.json):
+```json
+{
+"experiments": [
+    {
+    "choice": 1,
+    "direction": 0,
+    "rMax": 1,
+    "reps": 1
+    }
+],
+"frames": 100,
+"logScreenshots": false,
+"LogAttack": true,
+"LogRTT": true
+}
+```
+Each experiment is characterised by its `choice`, `direction`, `rmax`, and number of repetitions `reps`. 
+`frames`, `logScreenshots`, `LogAttack`, and `LogRTT` are global parameters that apply to all experiments.
 
-Additionally, running this code with `captureMode` enabled will save each frame to disk under the name `{qualitativeCase}_{targetLinkOrientation}_{framecount}.png` and generate an `output.mp4` video in the same folder.
-To avoid saving too many large files, this mode only runs for the first 50 frames.
 
-Below is an example directory listing for parameters `qualitativeCase=Landlocked` and `targetLinkOrientation=East`.
+Then run:
+```bat
+:: Windows
+./run/batch.bat <filename>
+```
+To preserve system file space, we recommend disabling `logScreenshots` in batch mode.
 
+## Simulation Parameters [MISSING INFO]
+
+### Logging
+Below is a list of the logging options that can be enabled and the files they produce.
+
+#### LogScreenshot
+`frame_i.png`: Screenshot of every camera view of a scene at frame `i`.
+
+`output.mp4`: Recording of the entire simulation.
+
+#### LogAttack
+`attack.csv`: Target link name, attack route count, and final target link capacity for each frame.
+
+`paths.csv`: List of source and destination ground stations for each attack attack path in each frame.
+
+#### LogRTT
+`rtt.json`: List of RTTs of each path in each frame.
+
+#### Log Directory Structure
+This is an example directory where all three logging options are enabled.
 ```bash
 ├───Logs
 │   └───Captures
-│       ├───Landlocked_East
-│               Landlocked_East.csv          # Logs the target link name, attack route count, and final target link capacity for each frame.
-│               Landlocked_East_*.png        # Image combining every camera view of the scene under a frame (if captureMode is enabled)
-│               Landlocked_East_graph.svg    # Graph summarizing information from Landlocked_East.csv
-│               output.mp4                   # Compiled video of the frames (if captureMode is enabled)
-│               paths.csv                    # Logs the attack paths for each frame.
+│       ├───Landlocked_East_OFF_001
+|               attack.csv      
+│               paths.csv      
+|               frame_0.png
+|               frame_1.png     
+|               frame_2.png
+|               frame_3.png
+|               frame_4.png
+│               output.mp4
+|               rtt.json
 ```
-## Link Status Color Coding
-The simulation uses the following color coding scheme:
 
-| Color | Meaning |
-| - | - |
-| orange | Used radio frequency link |
-| green | Used ISN link |
-| purple | Unused ISN link |
-| red | Congested target ISN link |
-| light pink/white | Uncongested target ISN link |
-
-Below are some example frames.
-These can be reproduced by using parameters `qualitativeCase=Landlocked` and `targetLinkDirection=East`.
-
-![Landlocked_East_03.png](./Docs/Landlocked_East_03.png)
-Example congested target link.
-
-![Landlocked_East_08](./Docs/Landlocked_East_08.png)
-Example uncongested target link.
+## Thesis Experiments [NEED TO UPDATE]
+Experimental thesis data was collected using the following command:
+```batch
+::Windows
+./run/batch.bat ./thesis/experiments.json
+```
+The code used for generating the plots in this thesis is available in a separate repository. [ADD LINK TO REPOSITORY]
 
 ## Troubleshooting
-When enabling `captureMode`, screenshots of the scene are taken from each camera enabled in the `qualitativeCase` and saved to disk at each frame. 
+When enabling `logScreenshots`, screenshots of the scene are taken from each enabled camera and saved to disk at each frame. 
 More precisely, the combined creation of city game objects and forced scene rendering at the first frame requires a high number of computations within a small timeframe and can cause the Unity simulation to become unresponsive.
-If this does occur, there are a couple of possible venues which you may apply individually or together.
 
-For reference, the experiments were run with Windows on a ROG Zephyrus M16 equipped with an Intel Core i9 CPU and NVIDIA GeForce RTX 3070 Ti laptop GPU.
-Devices running this simulation with a low-performance CPU or one whose architecture is not supported by Unity 2019.2.1f1 (e.g, Apple M* chips which use delay-inducing Rosetta ISA translation) are more likely to encounter this issue.
-
-### Change the Operating Mode
-This is the solution that is most likely to work.
-The experiments were run on a ROG Zephyrus M16.
-If you are using any computer that allows for operating mode modification, please set it to ["Performance" mode](https://rog.asus.com/articles/guides/armoury-crate-performance-modes-explained-silent-vs-performance-vs-turbo-vs-windows/);
-"Silent" provides insufficient computational power, and "Turbo" attempts to maximize the framerate, hence not giving Unity enough time to generate game objects.
-
-### (Hacky) Enable Debugging Mode
-From a Unity-supporting IDE like Rider or Visual Studio, add a breakpoint to the [`Main.Update()`](https://github.com/Foalfloater66/starlink-fyp/blob/4881396f83662f559eaf89ddb3e5df7abeb6d089/Assets/Main.cs#L333) method.
-Then, attach the Unity editor and run the program in debugging mode with breakpoints enabled.
-If the program remains responsive after the first couple of executions of `Main.Update()`, disable the breakpoints.
-The program should now run as intended.
-
-### (Hacky) Save the Unity Scene Under Different Parameters
-Select a set of `qualitativeCase`and `targetLinkDirection`parameters that you _do not intend to run_.
-Save the Unity scene.
-Then, change the parameters to the intended parameters and run the program. _Do not save the Scene before running the program_.
-
+If this does occur, please ensure that your computer is not set to an operating mode such as ASUS' ["Turbo" mode](https://rog.asus.com/articles/guides/armoury-crate-performance-modes-explained-silent-vs-performance-vs-turbo-vs-windows/) that attempts to maximize the framerate.
+These prioritize high framerate over generating game objects to completion, leading to Unity crashing at the first screenshot.

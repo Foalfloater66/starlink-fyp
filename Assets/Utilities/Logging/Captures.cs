@@ -14,10 +14,9 @@ namespace Logging
         /// Set up the directory to save screenshots in.
         /// </summary>
         /// <param name="outDirectory"></param>
-        /// <param name="imgNameFormat"></param>
-        public Captures(string outDirectory, string imgNameFormat)
+        public Captures(string outDirectory)
         {
-            _imgPathFormat = Path.Combine(outDirectory, imgNameFormat);
+            _imgPathFormat = Path.Combine(outDirectory, "frame");
         }
 
         /// <summary>

@@ -22,14 +22,14 @@ namespace Automation
             Experiment args = Experiments.Dequeue();
             Main instance = FindObjectOfType<Main>();
 
-            instance.caseChoice = args.Choice;
-            instance.targetLinkDirection = args.Direction;
-            instance.defenceOn = args.Rmax != 1;
-            instance.rmax = args.Rmax;
+            instance.caseChoice = args.choice;
+            instance.targetLinkDirection = args.direction;
+            instance.defenceOn = args.rMax!= 1;
+            instance.rmax = args.rMax;
             instance.runId = args.ID;
             instance.runner = this;
             instance.maxFrames = args.Frames;
-            instance.screenshotMode = args.LogScreenshots;
+            instance.logScreenshots = args.LogScreenshots;
             instance.logAttack = args.LogAttack;
             instance.logRTT = args.LogRTT;
 

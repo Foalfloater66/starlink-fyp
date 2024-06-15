@@ -11,7 +11,7 @@ namespace Utilities.Logging
         private GroundstationCollection _groundstations;
 
         public PathLogger(string directory,
-            GroundstationCollection groundstations) // TODO: I can split this into their own objects.
+            GroundstationCollection groundstations)
         {
             // Record information about the attack routes selected for each frame.
             _logger = new StreamWriter(Path.Combine(directory, "paths.csv"));
