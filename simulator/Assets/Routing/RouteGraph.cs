@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Orbits.Satellites;
 using Scene;
+using UnityEditor;
 using UnityEngine;
 using Utilities;
 
@@ -119,6 +120,7 @@ namespace Routing
 
         public void ComputeRoutes()
         {
+            // TODO: I need to check this function to understand how the distance is computed. So that I can check if it's correct.
             /* Essentially runs Dijkstra. */
             heap = new BinaryHeap<Node>(nodecount);
             for (var i = 0; i < nodecount; i++) heap.Add(nodes[i], (double)nodes[i].Dist);

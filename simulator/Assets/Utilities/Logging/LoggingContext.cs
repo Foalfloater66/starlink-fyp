@@ -9,6 +9,8 @@ namespace Utilities.Logging
         public AttackTarget Target { get; set;}
         public List<Route> Routes { get; set;}
         public List<float> RTT { get; set;}
+        
+        public List<int> Hops { get; set; }
     }
 }
 

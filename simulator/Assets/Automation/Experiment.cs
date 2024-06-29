@@ -1,7 +1,7 @@
 ﻿using System;
 using Attack.Cases;
 
-namespace Experiments
+namespace Automation
 {
 
     [System.Serializable]
@@ -22,6 +22,8 @@ namespace Experiments
         [NonSerialized]
         public  bool LogRTT;
 
+        [NonSerialized] public bool LogHops;
+
         /// <summary>
         /// Adds crucial runtime information not included in the serialized object.
         /// </summary>
@@ -30,7 +32,7 @@ namespace Experiments
         /// <param name="logScreenshots">If enabled, screenshots are taken at each frame.</param>
         /// <param name="logAttack">If enabled, the attack's performance is logged at each frame.</param>
         /// <param name="logRTT">If enabled, the RTT of all paths is logged at each frame.</param>
-        public void Build(int id, int frames, bool logScreenshots, bool logAttack, bool logRTT)
+        public void Build(int id, int frames, bool logScreenshots, bool logAttack, bool logRTT, bool logHops)
         {
             reps = 1;
             Frames = frames;
@@ -38,10 +40,11 @@ namespace Experiments
             LogScreenshots = logScreenshots;
             LogAttack = logAttack;
             LogRTT = logRTT;
+            LogHops = logHops;
         }
 
         public Experiment(CaseChoice choice, Direction direction, int rMax, int id, int frames, bool logScreenshots,
-            bool logAttack, bool logRTT)
+            bool logAttack, bool logRTT, bool logHops)
         {
             this.choice = choice;
             this.direction = direction;
@@ -52,6 +55,12 @@ namespace Experiments
             this.LogScreenshots = logScreenshots;
             this.LogAttack = logAttack;
             this.LogRTT = logRTT;
+            LogHops = logHops;
+        }
+
+        public Experiment Clone()
+        {
+            return new Experiment(choice, direction, rMax, ID, Frames, LogScreenshots, LogAttack, LogRTT, LogHops);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using Attack;
 using Attack.Cases;
 using Automation;
@@ -11,6 +12,7 @@ using Routing;
 using UnityEngine;
 using Scene;
 using UnityEditor;
+using UnityEngine.Assertions;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Utilities;
@@ -49,6 +51,7 @@ public class Main : MonoBehaviour
     private ILogger _attackLogger;
     private ILogger _pathLogger;
     private ILogger _latencyLogger;
+    private ILogger _hopLogger;
     [FormerlySerializedAs("exp")] [HideInInspector] public Runner runner;
 
     [Header("Environment")] public CustomCamera cam;
@@ -97,7 +100,9 @@ public class Main : MonoBehaviour
     [Header("Logging")] public bool logScreenshots = false;
     public bool logAttack = false;
     public bool logRTT = false;
-
+    public bool logHops = true; // TODO: change this. 
+    
+    
     [Tooltip(
         "Maximum number of frames to compute before terminating the simulator. Only takes effect when any logging is enabled.")]
     public int maxFrames = 50;
@@ -118,7 +123,7 @@ public class Main : MonoBehaviour
         if (rmax != 1 && defenceOn) status = rmax.ToString();
         else status = "OFF";
         string filename = $"{caseChoice}_{targetLinkDirection}_{status}_{runId:D3}";
-        _loggingDirectory = $"{Directory.GetCurrentDirectory()}/Logs/Captures/{filename}";
+        _loggingDirectory = $"{Directory.GetCurrentDirectory()}/Logs/{filename}";
         if (Directory.Exists(_loggingDirectory)) Directory.Delete(_loggingDirectory, true);
         Directory.CreateDirectory(_loggingDirectory);
 
@@ -136,6 +141,11 @@ public class Main : MonoBehaviour
         if (logRTT)
         {
             _latencyLogger = new LatencyLogger(_loggingDirectory);
+        }
+
+        if (logHops)
+        {
+            _hopLogger = new HopLogger(_loggingDirectory);
         }
     }
 
@@ -167,6 +177,7 @@ public class Main : MonoBehaviour
     {
         // Simulation configuration.
         Application.runInBackground = true;
+        // Thread.Sleep(20000);    // TODO: remmove this. temporary
 
         if (!defenceOn)
         {
@@ -176,11 +187,14 @@ public class Main : MonoBehaviour
         Debug.Log($"Run Parameters: " +
                   $"CASE CHOICE: {caseChoice};" +
                   $"TARGET LINK DIRECTION: {targetLinkDirection}; " +
-                  $"ATTACK RADIUS: {attackRadius}; " +
-                  $"DEFENCE ON: {defenceOn}; " +
                   $"RMAX: {rmax}; " +
+                  $"ID: {runId}; " +
+                  $"DEFENCE ON: {defenceOn}; " +
+                  $"ATTACK RADIUS: {attackRadius}; " +
+                  $"LOG FRAMES: {logScreenshots}; " +
                   $"LOG ATTACK: {logAttack}; " +
                   $"LOG RTT: {logRTT}; " +
+                  $"LOG HOPS: {logHops}" +
                   $"MAX FRAMES: {maxFrames};");
 
         InitScene();
@@ -191,7 +205,7 @@ public class Main : MonoBehaviour
         _attacker = new Attacker(attackerParams, _constellation.sat0r, attackRadius, transform, cityPrefab,
             _groundstations,
             _rg, _painter, _linkCapacities, _constellation);
-        if (logAttack || logRTT || logScreenshots)
+        if (logAttack || logRTT || logScreenshots || logHops)
         {
             InitLogging();
         }
@@ -289,8 +303,18 @@ public class Main : MonoBehaviour
                 RTT.Add(rtt);
             }
         }
-
         return RTT;
+    }
+
+    private List<int> ExtractHops(List<Route> routes)
+    {
+        List<int> hops = new List<int>();
+        for (int idx = 0; idx < routes.Count; idx++)
+        {
+            hops.Add(routes[idx].GetHops());
+        }
+
+        return hops;
     }
 
     /// <summary>
@@ -306,13 +330,16 @@ public class Main : MonoBehaviour
         _router.Run(routes, _attacker.Target);
 
         List<float> rttList = ExtractRTT(routes);
+        // List<int> hopList = ExtractHops(routes);
+
         UpdateScene(rttList);
 
         LoggingContext ctx = new LoggingContext()
         {
             Target = _attacker.Target,
             Routes = routes,
-            RTT = rttList
+            RTT = rttList,
+            Hops = ExtractHops(routes)
         };
         if (logAttack)
         {
@@ -323,6 +350,13 @@ public class Main : MonoBehaviour
         if (logRTT)
         {
             _latencyLogger.LogEntry(_frameCount, ctx);
+        }
+
+        if (logHops)
+        {
+            Assert.IsNotNull(_hopLogger);
+            Assert.IsNotNull(ctx.Hops);
+            _hopLogger.LogEntry(_frameCount, ctx);
         }
 
         if (logScreenshots) _captures.TakeScreenshot(cam, leftBottomText, _frameCount);
@@ -343,6 +377,11 @@ public class Main : MonoBehaviour
         if (logRTT)
         {
             _latencyLogger.Save();
+        }
+
+        if (logHops)
+        {
+            _hopLogger.Save();
         }
 
         if (runner && runner.experimentMode && runner.Experiments.Count != 0)

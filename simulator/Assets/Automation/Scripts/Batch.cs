@@ -1,8 +1,5 @@
 ﻿using System.Collections.Generic;
-using Attack.Cases;
-using Experiments;
 using UnityEditor;
-using UnityEditor.CrashReporting;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -16,6 +13,7 @@ namespace Automation.Scripts
         public bool logScreenshots;
         public bool logAttack;
         public bool logRTT;
+        public bool logHops;
     }
 
     public static class Batch
@@ -48,8 +46,9 @@ namespace Automation.Scripts
             {
                 for (int id = 0; id < experiment.reps; id++)
                 {
-                    experiment.Build(id, specification.frames, specification.logScreenshots, specification.logAttack, specification.logRTT);
-                    runner.Experiments.Enqueue(experiment);
+                    Experiment clone = experiment.Clone();
+                    clone.Build(id, specification.frames, specification.logScreenshots, specification.logAttack, specification.logRTT, specification.logHops);
+                    runner.Experiments.Enqueue(clone);
                 }
             }
 

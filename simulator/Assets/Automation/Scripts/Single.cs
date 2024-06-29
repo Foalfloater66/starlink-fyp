@@ -1,6 +1,5 @@
 ﻿using System;
 using Attack.Cases;
-using Experiments;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -11,17 +10,17 @@ namespace Automation.Scripts
     {
         public static void Run(string[] args)
         {
-            if (args.Length != 14)
+            if (args.Length != 15)
             {
                 Debug.Log("Incorrect number of arguments provided.");
                 Debug.Log(
-                    "Usage: -batch <case> <direction> <rmax> <id> <frames> <log_screenshots> <log_attack> <log_rtt>");
+                    "Usage: -batch <case> <direction> <rmax> <id> <frames> <log_screenshots> <log_attack> <log_rtt> <log_hops>");
                 return;
             }
 
             Runner runner = ScriptableObject.CreateInstance<Runner>();
             Assert.IsNotNull(runner);
-
+            
             runner.Experiments.Enqueue(new Experiment(
                 (CaseChoice)Enum.Parse(typeof(CaseChoice), args[6]),
                 (Direction)Enum.Parse(typeof(Direction), args[7]),
@@ -30,7 +29,8 @@ namespace Automation.Scripts
                 int.Parse(args[10]),
                 bool.Parse(args[11]),
                 bool.Parse(args[12]),
-                bool.Parse(args[13])
+                bool.Parse(args[13]),
+                bool.Parse(args[14])
             ));
 
             // Run experiments.

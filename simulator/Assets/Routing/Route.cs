@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Attack;
+using UnityEditor.Experimental;
 using UnityEngine;
 using Utilities;
 
@@ -33,6 +34,11 @@ namespace Routing
         {
             var endDist = kmPerUnit * _dist;
             return 2 * endDist / 299.792f; // speed of light in a vacuum  (metres/second)
+        }
+
+        public int GetHops()
+        {
+            return Nodes.Count;
         }
 
         public bool ContainsLink(int srcNodeId, int destNodeId)
