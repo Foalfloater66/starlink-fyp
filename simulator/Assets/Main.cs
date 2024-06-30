@@ -177,7 +177,7 @@ public class Main : MonoBehaviour
     {
         // Simulation configuration.
         Application.runInBackground = true;
-        // Thread.Sleep(20000);    // TODO: remmove this. temporary
+        // Thread.Sleep(10000);    // TODO: remmove this. temporary
 
         if (!defenceOn)
         {
@@ -312,6 +312,7 @@ public class Main : MonoBehaviour
         for (int idx = 0; idx < routes.Count; idx++)
         {
             hops.Add(routes[idx].GetHops());
+            
         }
 
         return hops;
@@ -325,12 +326,12 @@ public class Main : MonoBehaviour
         // TODO: DEMO MODE NEEDS TO PAUSE FOR EACH STEP/TAKE A SCREENSHOT.
         ResetScene();
 
-        // // Attempt an attack on the network.
+        // Attempt an attack on the network.
         var routes = _attacker.Run(_groundstations.ToList());
+        
         _router.Run(routes, _attacker.Target);
 
         List<float> rttList = ExtractRTT(routes);
-        // List<int> hopList = ExtractHops(routes);
 
         UpdateScene(rttList);
 
@@ -392,6 +393,7 @@ public class Main : MonoBehaviour
         else
         {
             Debug.Log("Run completed.");
+            // EditorApplication.isPaused = true; // TODO: fix this back.
             EditorApplication.Exit(0);
         }
     }

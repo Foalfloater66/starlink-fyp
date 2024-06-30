@@ -57,7 +57,7 @@ namespace Routing
         {
             for (var i = 0; i < _linkcount; i++)
                 if (_links[i].OtherNode(this) == peer)
-                    _links[i].Dist = INFINITY;
+                    _links[i].Dist = INFINITY; // MAKES THE LINK DISTANCE INFINITY. so it never gets used.
         }
 
         public int Id => _id;

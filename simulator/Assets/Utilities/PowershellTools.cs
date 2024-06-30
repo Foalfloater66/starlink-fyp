@@ -23,7 +23,7 @@ namespace Utilities
             }
 
             var command =
-                $"ffmpeg -framerate 3 -i {loggingDirectory}/{caseChoice}_{targetLinkDirection}_{type}_%02d_%03d.png -vf \"scale={imgWidth}:{imgHeight}\" -c:v libx265 -preset fast -crf 20 -pix_fmt yuv420p {loggingDirectory}/output.mp4";
+                $"ffmpeg -framerate 3 -i {loggingDirectory}/frame_%02d.png -vf \"scale={imgWidth}:{imgHeight}\" -c:v libx265 -preset fast -crf 20 -pix_fmt yuv420p {loggingDirectory}/output.mp4";
             PowershellTools.ExecutePowershellCommand(command);
         }
 

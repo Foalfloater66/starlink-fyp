@@ -3,6 +3,7 @@ using Orbits.Satellites;
 using Scene;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Assertions;
 using Utilities;
 
 namespace Routing
@@ -101,7 +102,10 @@ namespace Routing
 
         public void ResetNodeDistances()
         {
-            for (var i = 0; i < nodecount; i++) nodes[i].Dist = Node.INFINITY;
+            for (var i = 0; i < nodecount; i++) {
+                nodes[i].Dist = Node.INFINITY; //??? DOES IT DO THIS FOR EVERYTHING>
+                nodes[i].Parent = null; // TODO: MANUAL. FOR DEBUGGING SEE if thiS WORKS OR IF its USELEsS.
+            }
             startnode.Dist = 0f;
         } // TODO: maybe I should use this as well right after?
 
@@ -132,6 +136,11 @@ namespace Routing
                 for (var i = 0; i < u.LinkCount; i++)
                 {
                     var l = u.GetLink(i);
+                    // TODO: JUST FOR TESTING OUT.
+                    if (l.Dist == Node.INFINITY)
+                    {
+                        continue; // ignore any infinity links (excluded links)
+                    }
                     var n = u.GetNeighbour(l);
                     var dist = n.Dist;
                     var newdist = u.Dist + l.Dist;
@@ -212,7 +221,7 @@ namespace Routing
             ResetNodes(city1, city2);
             painter.TurnLasersOff(satlist, maxsats);
         }
-        
+
         /// <summary>
         /// Remove all of the used ISL and RF links from the routegraph.
         /// </summary>
@@ -221,8 +230,23 @@ namespace Routing
             painter.EraseAllISLLinks();
             painter.EraseAllRFLinks();
         }
+
+        public void ExcludeRouteLinks(Route route)
+        {
+            // Exclude all of a route's links from the route graph.
+            if (route == null) return;  // Do not check nil routes.
+            int idx = 0;
+            while (idx < route.Nodes.Count - 1)
+            {
+                Node prevNode = route.Nodes[idx];
+                Node node = route.Nodes[idx + 1];
+                node.LockLink(prevNode);
+                prevNode.LockLink(node);
+                idx += 1;
+            }
+        }
         
-        public void LockRoute(ScenePainter painter)
+        public void LockExecutedRoute(ScenePainter painter)
         {
             /* Basically maintain all of the used ISL links. */
             foreach (var pair in painter.UsedISLLinks)

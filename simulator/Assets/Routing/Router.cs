@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Attack;
 using Orbits;
 using Orbits.Satellites;
 using Scene;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -43,6 +45,7 @@ namespace Routing
         {
             // TODO: check what the randomizer uses.
             var selectedRouteId = new System.Random().Next(0, _rmax);
+            // Debug.Log($"selected route ID: {selectedRouteId}");
 
             // Compute the multiple shortest paths and select the one for the selected random ID.
             for (var i = 0; i < _rmax; i++)
@@ -51,21 +54,24 @@ namespace Routing
                 if (i == 0)
                 {
                     _rg.ResetRoute(route.StartCity, route.EndCity, _painter, _constellation.satlist,
-                        _constellation.maxsats);
+                        _constellation.maxsats); // actually resets everything. meaning no node has a parent here.
                     _rg.Build(route.StartCity, route.EndCity, _constellation.maxdist,
                         _constellation.margin, _constellation.maxsats, _constellation.satlist,
                         _constellation.km_per_unit);
                 }
                 else
                 {
-                    // TODO: This is just a temporary modification. I want to figure out how MH removes the uplinks from the routegraph too.
-                    _rg.ResetNodeDistances();
+                    _rg.ResetNodeDistances(); // resets all node distances to infinity and start node to 0.
                 }
                 _rg.ComputeRoutes();
-                if (i == selectedRouteId) return Route.Nodes2Route(route.StartNode, route.EndNode, route.StartCity, route.EndCity); 
-                _rg.LockRoute(_painter);
-            }
+                Route r = Route.Nodes2Route(route.StartNode, route.EndNode, route.StartCity, route.EndCity);
 
+                if (i == selectedRouteId)
+                {
+                    return r;
+                } 
+                _rg.ExcludeRouteLinks(r);
+            }
             return null;
         }
 
@@ -176,9 +182,18 @@ namespace Routing
             {
                 var executedRoute = route;
                 if (_defenceOn)
+                {
                     executedRoute = GetRandomRoute(route);
-                ExecuteRoute(executedRoute, 4000, _linkCapacityMonitor,
-                    _painter, _constellation);
+                    // TODO: if executed route is null, continue to next route. NOTE: check when the route is nil. How is this possible?
+                    // NOTE: I think that happens IF all RF links are taken. so basically I shouldn't exclude RF links. I will only exclude them to test htis out.
+                }
+
+                if (executedRoute != null)
+                {
+                    ExecuteRoute(executedRoute, 4000, _linkCapacityMonitor,
+                        _painter, _constellation); // TODO: put back.
+                    // _rg.LockRoute(_painter);
+                }
             }
 
             if (target.Link != null)
