@@ -16,7 +16,7 @@ namespace Utilities.Logging
         {
             _linkCapacityMonitor = linkCapacities;
             _logger = new StreamWriter(Path.Combine(directory, $"attack.csv"));
-            _logger.WriteLine("FRAME,TARGET LINK,ROUTE COUNT,FINAL CAPACITY");
+            _logger.WriteLine("FRAME,TARGET LINK,ROUTE COUNT,FINAL CAPACITY, MALICIOUS TRAFFIC");
         }
 
         public void LogEntry(int frameCount, LoggingContext ctx)
@@ -40,7 +40,14 @@ namespace Utilities.Logging
                     $"{_linkCapacityMonitor.GetCapacity(ctx.Target.Link.SrcNode.Id, ctx.Target.Link.DestNode.Id)}\n");
             else
                 _logger.Write("nan\n");
-
+            
+            // MALICIOUS TRAFFIC
+            if (ctx.Target.Link != null && ctx.Target.HasValidTargetLink())
+                _logger.Write(
+                    $"{20000-_linkCapacityMonitor.GetCapacity(ctx.Target.Link.SrcNode.Id, ctx.Target.Link.DestNode.Id)}\n");
+            else
+                _logger.Write("nan\n");
+            
             _logger.Flush();
         }
 

@@ -174,8 +174,9 @@ namespace Routing
         }
 
 
-        public void Run(List<Route> routes, AttackTarget target)
+        public List<Route> Run(List<Route> routes, AttackTarget target)
         {
+            List<Route> executedRoutes = new List<Route>();
 
             // Execute the final list of attack routes.
             foreach (var route in routes)
@@ -193,6 +194,7 @@ namespace Routing
                     ExecuteRoute(executedRoute, 4000, _linkCapacityMonitor,
                         _painter, _constellation); // TODO: put back.
                     // _rg.LockRoute(_painter);
+                    executedRoutes.Add(executedRoute);
                 }
             }
 
@@ -201,6 +203,8 @@ namespace Routing
                 UpdateTargetLinkVisuals(_constellation, target); // TODO: can move this outside? idk.
 
             }
+
+            return executedRoutes;
         }
     }
 }

@@ -13,9 +13,19 @@ reps = args.reps
 
 
 # YOU MAY MODIFY THIS IF YOU'D LIKE. 
-choices = {1} #, 2, 3, 4, 5, 6, 7}
-directions = {0, 1, 2, 3}
+choices = {1, 2, 4, 5, 6, 7} # excludes the Insular.
+directions = {0, 1} #, 2, 3}
 r_maxes = {1, 3, 6, 9}
+
+choices = {
+     1 : {0, 1},            # Landlocked
+     2 : {0, 1, 2, 3},      # Coastal
+     # exclude Insular
+     4 : {0, 1},            # Polar
+     5 : {0, 1, 2, 3, 4},    # Equatorial
+     6 : {0, 1},            # Intraorbital 
+     7 : {0, 1}             # Transorbital
+}
 
 
 
