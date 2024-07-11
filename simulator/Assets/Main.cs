@@ -107,7 +107,7 @@ public class Main : MonoBehaviour
         "Maximum number of frames to compute before terminating the simulator. Only takes effect when any logging is enabled.")]
     public int maxFrames = 50;
 
-    [HideInInspector] public int runId = 0; // For tracking (helpful for experiments on random behaviour)
+    [HideInInspector] public int runId = 0; // For tracking
 
     private CustomCamera InitCamera()
     {
@@ -178,11 +178,6 @@ public class Main : MonoBehaviour
         // Simulation configuration.
         Application.runInBackground = true;
         // Thread.Sleep(10000);    // TODO: remmove this. temporary
-
-        if (!defenceOn)
-        {
-            runId = 0;
-        }
 
         Debug.Log($"Run Parameters: " +
                   $"CASE CHOICE: {caseChoice};" +

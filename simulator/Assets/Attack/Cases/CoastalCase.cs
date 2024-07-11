@@ -6,6 +6,8 @@ namespace Attack.Cases
 {
     public class CoastalCase : BaseCase
     {
+        // Note about the coastal case: The coastal case focuses on perpendicular versus parallel. So north is north RELATIVE
+        // to the coastline, NOT to the world.
         public CoastalCase(CityCreator cityCreator, Direction targetLinkDirection,
             GroundstationCollection groundstations, CustomCamera cam) : base(cityCreator, targetLinkDirection,
             groundstations, cam)
@@ -41,6 +43,8 @@ namespace Attack.Cases
             switch (Ctx.Direction)
             {
                 case Direction.West:
+                    // Perpendicular westwards
+                    Ctx.OrbitId = 8;
                     return new List<string>
                     {
                         "New York",
@@ -51,6 +55,8 @@ namespace Attack.Cases
                         "Brisay"
                     };
                 case Direction.East:
+                    // Perpendicular eastwards
+                    Ctx.OrbitId = 8;
                     return new List<string>
                     {
                         // West Coast States
@@ -66,6 +72,9 @@ namespace Attack.Cases
                         "Vladivostok"
                     };
                 case Direction.North:
+                    // Parallel northwards
+                    // North is in reality eastwards, but northwards when parallel to the coastline.
+                    Ctx.Direction = Direction.East; 
                     Ctx.OrbitId = 16;
                     return new List<string>
                     {
@@ -77,6 +86,9 @@ namespace Attack.Cases
                         "Denver"
                     };
                 case Direction.South:
+                    // Parallel southwards
+                    // South is in reality westwards, but southwards when parallel to the coastline.
+                    Ctx.Direction = Direction.West;
                     Ctx.OrbitId = 16;
                     return new List<string>
                     {
