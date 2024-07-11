@@ -40,6 +40,7 @@ Thumbs.db
 # Python #
 # ====== #
 .env/
+__pycache__/
 
 # ======= #
 # Logging #
