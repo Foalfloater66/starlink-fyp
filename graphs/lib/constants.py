@@ -1,33 +1,29 @@
 # color palette reference: https://www.codecademy.com/article/seaborn-design-ii
 
-__SCENARIOS = {
+import seaborn as sns
+
+_SCENARIOS = {
     "Landlocked": {
-        # "palette":
         "type": "Geographical",
         "directions": ["East", "West"]
     },
     "Coastal": {
-        # "palette":
         "type": "Geographical",
-        "directions": ["East", "West"]
-    },
-    "Polar": {
-        # "palette":
-        "type": "Latitudinal",
         "directions": ["East", "West", "North", "South"]
     },
+    "Polar": {
+        "type": "Latitudinal",
+        "directions": ["East", "West"]
+    },
     "Equatorial": {
-        # "palette":
         "type": "Latitudinal",
         "directions": ["East", "West", "North", "South"]
     },
     "IntraOrbital": {
-        # "palette":
         "type": "Orbital",
         "directions": ["East", "West"]
     },
     "TransOrbital": {
-        # "palette":
         "type": "Orbital",
         "directions": ["East", "West"]
     }
@@ -39,14 +35,12 @@ class ScenarioAttribute(dict):
         self.attr = attr
 
     def __getitem__(self, key: str):
-        return __SCENARIOS[key][self.attr]
+        return _SCENARIOS[key][self.attr]
 
 
 LOG_DIRECTORY = "../../simulator/Logs/"
+ALL_DIRECTIONS= ["East", "West", "North", "South"]
 DIRECTIONS = ScenarioAttribute("directions")
 PALETTES = ScenarioAttribute("palette")
-SCENARIOS = list(__SCENARIOS.keys())
-
-
-def get_scenario_type(scenario: str):
-    return __SCENARIOS[scenario]["type"]
+TYPE = ScenarioAttribute("type")
+SCENARIOS = list(_SCENARIOS.keys())

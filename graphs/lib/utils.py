@@ -21,7 +21,7 @@ def load_csv_data(relative_path: str):
 def load_json_data(relative_path: str):
     """Load JSON data."""
     path = os.path.join(LOG_DIRECTORY, relative_path)
-    assert os.path.isfile(path)
+    assert os.path.isfile(path), f"Path does not exist: {path}"
     with open(path) as file:
         data = json.load(file)
     return pd.DataFrame(data["latencies"])  # LMAO WHY IS IT JUST LATENCIES...
