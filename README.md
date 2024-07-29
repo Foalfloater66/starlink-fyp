@@ -46,7 +46,7 @@ Their definitions can be found in [CaseChoice.cs](https://github.com/Foalfloater
 Single run experiments are always assigned an ID of `0`.
 ```bat
 :: Windows
-./simulator/run/single.bat <choice> <direction> <rmax> <frames> <log_screenshots> <log_attack> <log_rtt>
+./simulator/run/single.bat <choice> <direction> <rmax> <frames> <log_screenshots> <log_video> <log_attack> <log_rtt>
 ```
 
 #### Batch Runs
@@ -64,13 +64,14 @@ Write an experiments specification in JSON format as shown in [experiments.json]
     }
 ],
 "frames": 100,
-"logScreenshots": false,
+"LogScreenshots": false,
+"LogVideo" : false,
 "LogAttack": true,
 "LogRTT": true
 }
 ```
 Each experiment is characterised by its `choice`, `direction`, `rmax`, and number of repetitions `reps`. 
-`frames`, `logScreenshots`, `LogAttack`, and `LogRTT` are global parameters that apply to all experiments.
+`frames`, `LogScreenshots`, `LogVideo` `LogAttack`, and `LogRTT` are global parameters that apply to all experiments.
 
 
 Then run:
@@ -87,9 +88,10 @@ TODO: ADD THE REST...
 Below is a list of the logging options that can be enabled and the files they produce.
 
 #### LogScreenshot
-`frame_i.png`: Screenshot of every camera view of a scene at frame `i`.
+`frame_<i>.png`: Screenshot of every camera view of a scene at frame `i`.
 
-`output.mp4`: Recording of the entire simulation.
+#### LogVideo
+`output_<i>.mp4`: Recording of the entire simulation from camera `i`.
 
 #### LogAttack
 `attack.csv`: Target link name, attack route count, and final target link capacity for each frame.
@@ -112,7 +114,7 @@ This is an example directory where all three logging options are enabled.
 |               frame_2.png
 |               frame_3.png
 |               frame_4.png
-│               output.mp4
+│               output_0.mp4
 |               rtt.json
 ```
 
