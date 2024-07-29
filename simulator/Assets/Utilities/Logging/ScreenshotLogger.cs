@@ -26,10 +26,7 @@ namespace Utilities.Logging
             Canvas.ForceUpdateCanvases();
             text.canvas.renderMode = RenderMode.ScreenSpaceCamera;
             text.canvas.worldCamera = Camera.main;
-            
-            // TODO: DO THIS IF ITS VIDEO MODE.
 
-            // string directory = $"Logs/Captures/{folderName}";
             Texture2D existingImageTexture = null;
 
             for (var i = 0; i < views.cam_count; i++)
