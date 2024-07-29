@@ -5,7 +5,6 @@ using System.Threading;
 using Attack;
 using Attack.Cases;
 using Automation;
-using Logging;
 using Orbits;
 using Orbits.Satellites;
 using Routing;
@@ -46,7 +45,8 @@ public class Main : MonoBehaviour
     private Router _router;
 
     // Logging objects
-    private Captures _captures;
+    private ScreenshotLogger _screenshotLogger;
+    private VideoLogger _videoLogger;
     private string _loggingDirectory;
     private ILogger _attackLogger;
     private ILogger _pathLogger;
@@ -98,6 +98,7 @@ public class Main : MonoBehaviour
     public bool defenceOn = false;
 
     [Header("Logging")] public bool logScreenshots = false;
+    public bool logVideo = false;
     public bool logAttack = false;
     public bool logRTT = false;
     public bool logHops = true; // TODO: change this. 
@@ -129,7 +130,12 @@ public class Main : MonoBehaviour
 
         if (logScreenshots)
         {
-            _captures = new Captures(_loggingDirectory);
+            _screenshotLogger = new ScreenshotLogger(_loggingDirectory);
+        }
+
+        if (logVideo)
+        {
+            _videoLogger = new VideoLogger(_loggingDirectory);
         }
 
         if (logAttack)
@@ -187,6 +193,7 @@ public class Main : MonoBehaviour
                   $"DEFENCE ON: {defenceOn}; " +
                   $"ATTACK RADIUS: {attackRadius}; " +
                   $"LOG FRAMES: {logScreenshots}; " +
+                  $"LOG VIDEO: {logVideo}; " + 
                   $"LOG ATTACK: {logAttack}; " +
                   $"LOG RTT: {logRTT}; " +
                   $"LOG HOPS: {logHops}" +
@@ -200,7 +207,7 @@ public class Main : MonoBehaviour
         _attacker = new Attacker(attackerParams, _constellation.sat0r, attackRadius, transform, cityPrefab,
             _groundstations,
             _rg, _painter, _linkCapacities, _constellation);
-        if (logAttack || logRTT || logScreenshots || logHops)
+        if (logAttack || logRTT || logScreenshots || logHops || logVideo)
         {
             InitLogging();
         }
@@ -259,7 +266,7 @@ public class Main : MonoBehaviour
         if (_attacker.Target.Link != null)
         {
             rightBottomText.text =
-                $"Target Link Capacity: {_linkCapacities.GetCapacity(_attacker.Target.Link.SrcNode.Id, _attacker.Target.Link.DestNode.Id) / 1000} Gbits/snapshot";
+                $"Target Link Capacity: {_linkCapacities.GetCapacity(_attacker.Target.Link.SrcNode.Id, _attacker.Target.Link.DestNode.Id) / 1000} Gbps";
         }
         else
         {
@@ -355,7 +362,9 @@ public class Main : MonoBehaviour
             _hopLogger.LogEntry(_frameCount, ctx);
         }
 
-        if (logScreenshots) _captures.TakeScreenshot(cam, leftBottomText, _frameCount);
+        if (logScreenshots) _screenshotLogger.TakeScreenshot(cam, leftBottomText, _frameCount);
+
+        if (logVideo) _videoLogger.RecordFrame(cam, leftBottomText, _frameCount);
 
         // Terminate
         if (_frameCount == maxFrames) Terminate();
@@ -365,9 +374,10 @@ public class Main : MonoBehaviour
 
     private void Terminate()
     {
-        if (logScreenshots)
+        if (logVideo)
         {
-            PowershellTools.SaveVideo(cam, _loggingDirectory, caseChoice, targetLinkDirection, defenceOn, rmax);
+            _videoLogger.Save(cam);
+            _videoLogger.Clean();
         }
 
         if (logRTT)

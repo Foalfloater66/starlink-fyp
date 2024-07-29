@@ -29,6 +29,7 @@ namespace Automation
             instance.runner = this;
             instance.maxFrames = args.Frames;
             instance.logScreenshots = args.LogScreenshots;
+            instance.logVideo = args.LogVideo;
             instance.logAttack = args.LogAttack;
             instance.logRTT = args.LogRTT;
 

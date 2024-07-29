@@ -61,6 +61,33 @@ namespace Utilities
             lightrots.Add(new Vector3(20f, 130f, 0f));
         }
 
+        public void ViewAfrica()
+        {
+            cam_count = 1;
+            positions.Add (new Vector3 (30f, 16f, -35f));
+            angles.Add (new Vector3 (20f, -40f, 0f));
+            times.Add (0f);
+            speeds.Add (0.01f);
+            FoVs.Add(45f);
+            lightrots.Add(new Vector3 (20f, 0f, 0f));
+
+            // positions.Add (new Vector3 (30f, 16f, -35f));
+            // angles.Add (new Vector3 (20f, -40f, 0f));
+            // times.Add (10000f);
+            // speeds.Add (0.01f);
+            // FoVs.Add(45f);
+            // lightrots.Add(new Vector3 (20f, 0f, 0f));
+
+            // Africa View
+            // positions.Add(new Vector3(-25f, 23f, -8f));
+            // angles.Add(new Vector3(45f, 70f, 0f));
+            // times.Add(0f);
+            // speeds.Add(0.01f);
+            // FoVs.Add(60f);
+            //
+            // lightrots.Add(new Vector3(20f, 130f, 0f)); 
+        }
+
         /// <summary>
         /// Camera views for the qualitative Coastal example.
         /// </summary>
@@ -115,14 +142,8 @@ namespace Utilities
         {
             cam_count = 3;
 
-            // America view
-            positions.Add(new Vector3(-30f, 18f, -3f));
-            angles.Add(new Vector3(30f, 90f, 0f));
-            times.Add(0f);
-            speeds.Add(0.01f);
-            FoVs.Add(60f);
-            lightrots.Add(new Vector3(20f, 130f, 0f));
-
+            
+            Debug.Log(cam_count);
             // Middle Pacific view
             positions.Add(new Vector3(-25f, 10f, 30f));
             angles.Add(new Vector3(10f, 135f, 0f));
@@ -130,6 +151,14 @@ namespace Utilities
             speeds.Add(0.01f);
             FoVs.Add(60f);
             lightrots.Add(new Vector3(40f, 160f, 0f));
+
+            // America view
+            positions.Add(new Vector3(-30f, 18f, -3f));
+            angles.Add(new Vector3(30f, 90f, 0f));
+            times.Add(0f);
+            speeds.Add(0.01f);
+            FoVs.Add(60f);
+            lightrots.Add(new Vector3(20f, 130f, 0f));
 
             // Oceania view
             positions.Add(new Vector3(-6.3f, -12.6f, 37.9f));
@@ -171,23 +200,15 @@ namespace Utilities
         /// </summary>
         public void ViewAmericanEquator()
         {
-            cam_count = 2;
+            cam_count = 1;
 
-            // Polar view
+            // Equator view
             positions.Add(new Vector3(-25f, 10f, -22f));
             angles.Add(new Vector3(15, 50f, 0f));
             times.Add(0f);
             speeds.Add(0.01f);
             lightrots.Add(new Vector3(-5f, 20f, 20f));
             FoVs.Add(80f);
-            
-            // Africa view
-            positions.Add(new Vector3(15f, 20f, -28f));
-            angles.Add(new Vector3(30f, -20f, 0f));
-            times.Add(0f);
-            speeds.Add(0.01f);
-            lightrots.Add(new Vector3(45f, 30f, 0f));
-            FoVs.Add(85f);
         }
         
         // public void ViewTransOrbital()

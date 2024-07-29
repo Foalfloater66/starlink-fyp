@@ -7,23 +7,12 @@ namespace Utilities
 {
     public static class PowershellTools
     {
-        public static void SaveVideo(CustomCamera cam, string loggingDirectory, CaseChoice caseChoice, Direction targetLinkDirection, bool defenceOn, int rmax)
+        public static void SaveVideo(string loggingDirectory, int camId)
         {
-            var imgHeight = Screen.height * cam.cam_count;
+            var imgHeight = Screen.height; // * cam.cam_count;
             var imgWidth = Screen.width;
-            
-            string type;
-            if (!defenceOn)
-            {
-                type = "OFF";
-            }
-            else
-            {
-                type = rmax.ToString();
-            }
-
             var command =
-                $"ffmpeg -framerate 3 -i {loggingDirectory}/frame_%02d.png -vf \"scale={imgWidth}:{imgHeight}\" -c:v libx265 -preset fast -crf 20 -pix_fmt yuv420p {loggingDirectory}/output.mp4";
+                $"ffmpeg -framerate 3 -i {loggingDirectory}/frame_%02d_cam{camId}.png -vf \"scale={imgWidth}:{imgHeight}\" -c:v libx265 -preset fast -crf 20 -pix_fmt yuv420p {loggingDirectory}/output{camId}.mp4";
             PowershellTools.ExecutePowershellCommand(command);
         }
 

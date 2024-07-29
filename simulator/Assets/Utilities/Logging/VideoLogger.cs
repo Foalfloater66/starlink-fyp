@@ -1,48 +1,44 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.UI;
-using Utilities;
 
-namespace Logging
+namespace Utilities.Logging
 {
-    public class Captures
+    public class VideoLogger
     {
         private readonly string _imgPathFormat;
+        private readonly string _loggingDirectory;
+        private List<string> _screenshotPaths = new List<string>();
 
         /// <summary>
         /// Set up the directory to save screenshots in.
         /// </summary>
         /// <param name="outDirectory"></param>
-        public Captures(string outDirectory)
+        public VideoLogger(string outDirectory)
         {
+            _loggingDirectory = outDirectory;
             _imgPathFormat = Path.Combine(outDirectory, "frame");
         }
 
         /// <summary>
         /// Saves a screenshot of the current display on Unity.
         /// </summary>
-        public void TakeScreenshot(CustomCamera views, Text text, int imgId)
+        public void RecordFrame(CustomCamera views, Text text, int imgId)
         {
             Canvas.ForceUpdateCanvases();
             text.canvas.renderMode = RenderMode.ScreenSpaceCamera;
             text.canvas.worldCamera = Camera.main;
-
-            // string directory = $"Logs/Captures/{folderName}";
-            Texture2D existingImageTexture = null;
-
+            
             for (var i = 0; i < views.cam_count; i++)
             {
-                var screenshotTexture = CaptureScreenshotTexture();
+                Texture2D screenshotTexture = CaptureScreenshotTexture();
+                SaveTextureToFile(screenshotTexture, $"{_imgPathFormat}_{imgId:00}_cam{i}");
                 views.SwitchCamera();
-
-                if (i == 0)
-                    existingImageTexture = screenshotTexture;
-                else
-                    existingImageTexture = ConcatenateTextures(existingImageTexture, screenshotTexture);
             }
-
-            SaveTextureToFile(existingImageTexture, $"{_imgPathFormat}_{imgId:00}");
         }
 
         private static Texture2D CaptureScreenshotTexture()
@@ -70,33 +66,38 @@ namespace Logging
         }
 
         /// <summary>
-        /// Concatenate two textures vertically.
-        /// </summary>
-        /// <param name="texture1">Top 2D texture</param>
-        /// <param name="texture2">Bottom 2D texture</param>
-        /// <returns></returns>
-        private static Texture2D ConcatenateTextures(Texture2D texture1, Texture2D texture2)
-        {
-            var width = texture1.width;
-            var height = texture1.height + texture2.height;
-            var result = new Texture2D(width, height);
-
-            // Copy both textures.
-            result.SetPixels(0, 0, texture1.width, texture1.height, texture1.GetPixels());
-            result.SetPixels(0, texture1.height, texture2.width, texture2.height, texture2.GetPixels());
-            result.Apply();
-            return result;
-        }
-
-        /// <summary>
         /// Save a texture to a file.
         /// </summary>
         /// <param name="texture"></param>
         /// <param name="path"></param>
-        private static void SaveTextureToFile(Texture2D texture, string path)
+        private void SaveTextureToFile(Texture2D texture, string path)
         {
             var bytes = texture.EncodeToPNG();
             File.WriteAllBytes($"{path}.png", bytes);
+            this._screenshotPaths.Add($"{path}.png");
+
+        }
+
+        /// <summary>
+        /// Saves the video to the logging directory.
+        /// </summary>
+        public void Save(CustomCamera cam)
+        {
+            for (int i = 0 ; i < cam.cam_count; i++)
+            {
+                PowershellTools.SaveVideo(_loggingDirectory, i); 
+            }
+        }
+
+        /// <summary>
+        /// Deletes all images used to create the video.
+        /// </summary>
+        public void Clean()
+        {
+            foreach (string file in _screenshotPaths)
+            {
+                File.Delete(file);
+            }
         }
     }
 }

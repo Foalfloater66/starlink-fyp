@@ -11,6 +11,7 @@ namespace Automation.Scripts
         public List<Experiment> experiments;
         public int frames;
         public bool logScreenshots;
+        public bool logVideo;
         public bool logAttack;
         public bool logRTT;
         public bool logHops;
@@ -47,7 +48,7 @@ namespace Automation.Scripts
                 for (int id = 0; id < experiment.reps; id++)
                 {
                     Experiment clone = experiment.Clone();
-                    clone.Build(id, specification.frames, specification.logScreenshots, specification.logAttack, specification.logRTT, specification.logHops);
+                    clone.Build(id, specification.frames, specification.logScreenshots, specification.logVideo, specification.logAttack, specification.logRTT, specification.logHops);
                     runner.Experiments.Enqueue(clone);
                 }
             }

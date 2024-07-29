@@ -247,6 +247,23 @@ namespace Orbits
         }
 
         /// <summary>
+        /// Create cities near the poles to reduce unnecessary computation in the Insular scenario.
+        ///
+        /// Includes:
+        /// - NACities()
+        /// - NonASEANCities()
+        /// - WPacific()
+        /// - PacificCities()
+        /// - SACities()
+        /// - AFCities()
+        /// - OceaniaCities()
+        /// </summary>
+        // public void PolarCities()
+        // {
+        //     
+        // }
+
+        /// <summary>
         /// Creates cities for the top 20 most populated cities of Africa as of each country's national census.
         ///
         /// Source: https://en.wikipedia.org/wiki/List_of_cities_in_Africa_by_population
@@ -256,8 +273,8 @@ namespace Orbits
             CreateCity(-4.30f, -15.31f, "Kinshasa");
             CreateCity(6.52f, -3.37f, "Lagos");
             CreateCity(30.04f, -31.23f, "Cairo");
-            CreateCity(30.03f, -31.20f, "Giza");
-            CreateCity(-8.81f, -13.23f, "Luanda");
+            CreateCity(30.03f, -31.20f, "Giza"); // CAIRO AND GIZA ARE RIGHT NEXT TO EACH OTHER :skull:
+            CreateCity(-8.81f, -13.23f, "Luanda");   //Luanda, Angola
             CreateCity(-6.81f, -39.28f, "Dar es Salaam");
             CreateCity(15.59f, -32.53f, "Khartoum");
             CreateCity(-26.20f, -28.03f, "Johannesburg");
@@ -268,11 +285,17 @@ namespace Orbits
             CreateCity(-33.92f, -18.42f, "Cape Town");
             CreateCity(3.86f, -11.52f, "Yaounde");
             CreateCity(12.00f, -8.59f, "Kano");
-            CreateCity(-26.17f, -28.34f, "Ekurhuleni"); // (East Rand, Municipality)
+            // CreateCity(-26.17f, -28.34f, "Ekurhuleni"); // (East Rand, Municipality)
             CreateCity(-29.85f, -31.02f, "Durban");
             CreateCity(4.05f, -9.76f, "Douala");
             CreateCity(33.57f, 7.5f, "Casablanca");
             CreateCity(7.3f, -3.9f, "Ibadan");
+            CreateCity(6.66f,1.61f, "Kumasi, Ghana");    // #24
+            CreateCity(14.71f,17.46f, "Dakar, Senegal"); // #25
+            CreateCity(36.75f, -3.05f, "Algiers, Algeria"); // #29
+            CreateCity(-18.91f, -47.52f,"Antananarivo, Madagascar");    // #21
+            CreateCity(-15.41f, -28.27f, "Lusaka, Zambia"); // #28
+            CreateCity(0.31f, -32.58f, "Kampala, Uganda");   // #23
         }
 
         /// <summary>
@@ -303,7 +326,7 @@ namespace Orbits
             CreateCity(10.38f, 71.38f, "Maracaibo"); // Maracaibo, Venezuela
             CreateCity(-8.03f, 34.54f, "Recife"); // Recife, Brazil
             CreateCity(-17.48f, 63.11f, "Santa Cruz de la Sierra"); // Santa Cruz de la Sierra, Bolivia
-            
+            CreateCity(-54.80f, 68.30f, "Ushuaia, Argentina");
         }
 
         public void CarribbeanCities()

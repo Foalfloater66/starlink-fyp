@@ -10,16 +10,22 @@ namespace Automation.Scripts
     {
         public static void Run(string[] args)
         {
-            if (args.Length != 15)
+            if (args.Length != 16)
             {
                 Debug.Log("Incorrect number of arguments provided.");
                 Debug.Log(
-                    "Usage: -batch <case> <direction> <rmax> <id> <frames> <log_screenshots> <log_attack> <log_rtt> <log_hops>");
+                    "Usage: -batch <case> <direction> <rmax> <id> <frames> <log_screenshots> <log_video> <log_attack> <log_rtt> <log_hops>");
                 return;
             }
 
             Runner runner = ScriptableObject.CreateInstance<Runner>();
             Assert.IsNotNull(runner);
+            
+            Debug.Log(args[11]);
+            Debug.Log(args[12]);
+            Debug.Log(args[13]);
+            Debug.Log(args[14]);
+            Debug.Log(args[15]);
             
             runner.Experiments.Enqueue(new Experiment(
                 (CaseChoice)Enum.Parse(typeof(CaseChoice), args[6]),
@@ -30,7 +36,8 @@ namespace Automation.Scripts
                 bool.Parse(args[11]),
                 bool.Parse(args[12]),
                 bool.Parse(args[13]),
-                bool.Parse(args[14])
+                bool.Parse(args[14]),
+                bool.Parse(args[15])
             ));
 
             // Run experiments.

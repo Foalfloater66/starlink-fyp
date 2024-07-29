@@ -21,7 +21,11 @@ namespace Attack.Cases
         public float Latitude; // target area latitude.
         public float Longitude; // target area longitude.
 
-        public int OrbitId; // if -1, then there's no specific orbit.
+        // >=0: both link nodes must belong to a specific orbit.
+        // -1: no link specified.
+        // -2: link nodes must not share the same orbit.
+        // -3: both link nodes must share the same unspecified orbit.
+        public int OrbitId; 
 
         public Direction Direction; // preferred source node position.
         public List<GameObject> SrcGroundstations; // attacker source ground stations.

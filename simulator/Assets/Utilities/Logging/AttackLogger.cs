@@ -37,9 +37,9 @@ namespace Utilities.Logging
             // FINAL CAPACITY
             if (ctx.Target.Link != null && ctx.Target.HasValidTargetLink())
                 _logger.Write(
-                    $"{_linkCapacityMonitor.GetCapacity(ctx.Target.Link.SrcNode.Id, ctx.Target.Link.DestNode.Id)}\n");
+                    $"{_linkCapacityMonitor.GetCapacity(ctx.Target.Link.SrcNode.Id, ctx.Target.Link.DestNode.Id)},");
             else
-                _logger.Write("nan\n");
+                _logger.Write("nan,");
             
             // MALICIOUS TRAFFIC
             if (ctx.Target.Link != null && ctx.Target.HasValidTargetLink())

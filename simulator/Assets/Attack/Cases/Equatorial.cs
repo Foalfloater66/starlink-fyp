@@ -28,8 +28,6 @@ namespace Attack.Cases
 
             if (Ctx.Direction == Direction.East)
             {
-                // Cities.ASEANCities();
-                // Cities.OceaniaCities();
                 Cities.AFCities();
                 Cities.WPacific();
                 Cities.SACities();

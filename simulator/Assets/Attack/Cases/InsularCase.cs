@@ -19,15 +19,34 @@ namespace Attack.Cases
 
         protected override void CreateCities()
         {
-            // TODO: not finished.
-            Cities.NACities();
-            Cities.NonASEANCities();
-            Cities.ASEANCities();
-            Cities.WPacific();
-            Cities.PacificCities();
-            Cities.SACities();
-            Cities.AFCities();
-            Cities.OceaniaCities();
+            switch (Ctx.Direction)
+            {
+                case Direction.North:
+                case Direction.South:
+                    Cities.OceaniaCities();
+                    Cities.NACities();
+                    Cities.PacificCities();
+                    break;
+                case Direction.East:
+                case Direction.West:
+                    Cities.NorthAsiaCities();
+                    Cities.PacificCities();
+                    Cities.NonASEANCities();
+                    Cities.SACities();
+                    Cities.WPacific();
+                    break;
+                case Direction.Any:
+                    Cities.OceaniaCities();
+                    Cities.NACities();
+                    Cities.PacificCities();
+                    Cities.NorthAsiaCities();
+                    Cities.PacificCities();
+                    Cities.NonASEANCities();
+                    Cities.SACities();
+                    Cities.WPacific();
+                    break;
+                    
+            }
         }
 
         protected override void CreateTargetCoordinates()
@@ -49,7 +68,7 @@ namespace Attack.Cases
                         "Brisbane",
                         "Melbourne",
                         "Wellington",
-                        "Port Moresby"
+                        "Port Moresby",
                     };
                 case Direction.South:
                     return new List<string>()
@@ -67,21 +86,21 @@ namespace Attack.Cases
                     {
                         // North and South Asian countries.
                         "Shikotan",
-                        "Severo-Kurilsky",
-                        "Adak",
-                        "Delhi",
-                        "Lahore",
+                        "Severo-Kurilsky", // Russia
+                        "Vladivostok",
+                        "Irkutsk",
+                        "Hawaii",
                         "Chongqing"
                     };
                 case Direction.West:
                     return new List<string>()
                     {
-                        "Johannesburg",
-                        "Ekurhuleni",
-                        "Durban",
-                        "Dar es Salaam",
                         "Hawaii",
-                        "Belo Horizonte"
+                        "Buenos Aires",
+                        "Santiago",
+                        "Curitiba",
+                        "Belo Horizonte",
+                        "Ushuaia, Argentina"
                     };
 
                 case Direction.Any:
@@ -89,11 +108,11 @@ namespace Attack.Cases
                     return new List<string>()
                     {
                         "Christchurch",
-                        "Johannesburg",
                         "Severo-Kurilsky",
                         "Seattle",
                         "Port Hardy",
-                        "Brisbaine"
+                        "Brisbaine",
+                        "Ushuaia, Argentina"
                     };
             }
         }

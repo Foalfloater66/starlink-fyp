@@ -16,14 +16,17 @@ if not exist %UNITY_PATH% (
     exit /b
 )
 
+:: Read the arguments
 set CASE=%1
 set DIRECTION=%2
 set RMAX=%3
 set ID=%4
 set FRAMES=%5
 set LOG_SCREENSHOTS=%6
-set LOG_ATTACK=%7
-set LOG_RTT=%8
+set LOG_VIDEO=%7
+set LOG_ATTACK=%8
+set LOG_RTT=%9
+shift
 set LOG_HOPS=%9
 
-%UNITY_PATH% -projectPath %PROJECT_PATH% -executeMethod %METHOD_NAME% "-single" %CASE% %DIRECTION% %RMAX% %ID% %FRAMES% %LOG_SCREENSHOTS% %LOG_ATTACK% %LOG_RTT% %LOG_HOPS%
+%UNITY_PATH% -projectPath %PROJECT_PATH% -executeMethod %METHOD_NAME% "-single" %CASE% %DIRECTION% %RMAX% %ID% %FRAMES% %LOG_SCREENSHOTS% %LOG_VIDEO% %LOG_ATTACK% %LOG_RTT% %LOG_HOPS%
