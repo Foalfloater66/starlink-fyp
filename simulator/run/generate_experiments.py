@@ -67,19 +67,16 @@ for attribute in ATTRIBUTES:
         directions = DIRECTIONS
     else:
         directions = VULNERABLE_ATTRIBUTE2DIRECTIONS[attribute]
-    for imax in args.imaxes:
-        data["experiments"].append(
-            {
-                "choice": attribute,
-                "direction": (
-                    DIRECTIONS
-                    if not args.vulnerable
-                    else VULNERABLE_ATTRIBUTE2DIRECTIONS[attribute]
-                ),
-                "rMax": imax,
-                "reps": args.reps,
-            }
-        )
+    for direction in directions:
+        for imax in args.imaxes:
+            data["experiments"].append(
+                {
+                    "choice": attribute,
+                    "direction": direction,
+                    "rMax": imax,
+                    "reps": args.reps,
+                }
+            )
 
 
 # write to file.

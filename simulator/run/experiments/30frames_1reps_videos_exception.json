@@ -1,0 +1,142 @@
+{
+    "experiments": [
+        {
+            "choice": 2,
+            "direction": 2,
+            "rMax": 3,
+            "reps": 1
+        },
+        {
+            "choice": 2,
+            "direction": 3,
+            "rMax": 3,
+            "reps": 1
+        },
+        {
+            "choice": 3,
+            "direction": 0,
+            "rMax": 3,
+            "reps": 1
+        },
+        {
+            "choice": 3,
+            "direction": 1,
+            "rMax": 3,
+            "reps": 1
+        },
+        {
+            "choice": 3,
+            "direction": 2,
+            "rMax": 3,
+            "reps": 1
+        },
+        {
+            "choice": 3,
+            "direction": 3,
+            "rMax": 3,
+            "reps": 1
+        },
+        {
+            "choice": 4,
+            "direction": 0,
+            "rMax": 3,
+            "reps": 1
+        },
+        {
+            "choice": 4,
+            "direction": 1,
+            "rMax": 3,
+            "reps": 1
+        },
+        {
+            "choice": 4,
+            "direction": 2,
+            "rMax": 3,
+            "reps": 1
+        },
+        {
+            "choice": 4,
+            "direction": 3,
+            "rMax": 3,
+            "reps": 1
+        },
+        {
+            "choice": 5,
+            "direction": 0,
+            "rMax": 3,
+            "reps": 1
+        },
+        {
+            "choice": 5,
+            "direction": 1,
+            "rMax": 3,
+            "reps": 1
+        },
+        {
+            "choice": 5,
+            "direction": 2,
+            "rMax": 3,
+            "reps": 1
+        },
+        {
+            "choice": 5,
+            "direction": 3,
+            "rMax": 3,
+            "reps": 1
+        },
+        {
+            "choice": 6,
+            "direction": 0,
+            "rMax": 3,
+            "reps": 1
+        },
+        {
+            "choice": 6,
+            "direction": 1,
+            "rMax": 3,
+            "reps": 1
+        },
+        {
+            "choice": 6,
+            "direction": 2,
+            "rMax": 3,
+            "reps": 1
+        },
+        {
+            "choice": 6,
+            "direction": 3,
+            "rMax": 3,
+            "reps": 1
+        },
+        {
+            "choice": 7,
+            "direction": 0,
+            "rMax": 3,
+            "reps": 1
+        },
+        {
+            "choice": 7,
+            "direction": 1,
+            "rMax": 3,
+            "reps": 1
+        },
+        {
+            "choice": 7,
+            "direction": 2,
+            "rMax": 3,
+            "reps": 1
+        },
+        {
+            "choice": 7,
+            "direction": 3,
+            "rMax": 3,
+            "reps": 1
+        }
+    ],
+    "frames": 30,
+    "logScreenshots": false,
+    "logVideo": true,
+    "logAttack": false,
+    "logRTT": false,
+    "logHops": false
+}
