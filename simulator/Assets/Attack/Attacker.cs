@@ -163,6 +163,8 @@ namespace Attack
         /// Execute the attacker object.
         public List<Route> Run(List<GameObject> groundstations)
         {
+            // TODO: ADD AN OPTION TO SHOW CONSIDERED ROUTES. 
+            // 
             _rg.ResetRoute(_groundstations["New York"], _groundstations["Toronto"], _painter,
                 _constellation.satlist, _constellation.maxsats);
             _rg.Build(_groundstations["New York"], _groundstations["Toronto"],
