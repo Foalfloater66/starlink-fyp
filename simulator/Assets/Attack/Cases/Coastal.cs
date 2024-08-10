@@ -1,14 +1,16 @@
-﻿using System.Collections.Generic;
+﻿/* C138 Final Year Project 2023-2024 */
+
+using System.Collections.Generic;
 using Orbits;
 using Utilities;
 
 namespace Attack.Cases
 {
-    public class CoastalCase : BaseCase
+    public class Coastal : BaseAttribute
     {
         // Note about the coastal case: The coastal case focuses on perpendicular versus parallel. So north is north RELATIVE
         // to the coastline, NOT to the world.
-        public CoastalCase(CityCreator cityCreator, Direction targetLinkDirection,
+        public Coastal(CityCreator cityCreator, Direction targetLinkDirection,
             GroundstationCollection groundstations, CustomCamera cam) : base(cityCreator, targetLinkDirection,
             groundstations, cam)
         {
@@ -52,22 +54,15 @@ namespace Attack.Cases
                         "Boston",
                         "Washington DC",
                         "Toronto",
-                        "Brisay"
                     };
                 case Direction.East:
                     // Perpendicular eastwards
                     Ctx.OrbitId = 8;
                     return new List<string>
                     {
-                        // West Coast States
                         "San Francisco",
-
-                        // West Pacific
                         "Kagoshima City",
                         "Nishino, Kagoshima",
-                        "Ternate City",
-
-                        // Northeast Asia
                         "Saint Petersburg",
                         "Vladivostok"
                     };
@@ -78,12 +73,11 @@ namespace Attack.Cases
                     Ctx.OrbitId = 16;
                     return new List<string>
                     {
-                        "Los Angeles",
                         "El Paso",
-                        "San Diego",
                         "Phoenix",
                         "San Antonio",
-                        "Denver"
+                        "Mexico City, Mexico",
+                        "Puebla, Mexico"
                     };
                 case Direction.South:
                     // Parallel southwards
@@ -95,7 +89,6 @@ namespace Attack.Cases
                         "Seattle",
                         "Vancouver",
                         "San Francisco",
-                        "Calgary",
                         "Kagoshima City",
                         "Nishino, Kagoshima"
                     };

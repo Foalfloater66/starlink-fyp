@@ -1,6 +1,5 @@
-using System.Collections.Generic;
-using Attack;
-using Attack.Cases;
+/* C138 Final Year Project 2023-2024 */
+
 using Scene.GameObjectScripts;
 using UnityEngine;
 
@@ -101,12 +100,25 @@ namespace Orbits
         }
 
         /// <summary>
+        /// Top 5 most populated cities in Mexico.
+        /// </summary>
+        public void MexicoCities()
+        {
+            CreateCity(19.25f, 99.07f, "Mexico City, Mexico");
+            CreateCity(32.32f, 117.02f, "Tijuana, Mexico");
+            CreateCity(19.36f, 99.03f, "Ecatepec, Mexico");
+            CreateCity(21.07f, 101.40f, "Leon, Mexico");
+            CreateCity(19.02f, 98.11f, "Puebla, Mexico");
+        }
+
+        /// <summary>
         /// Creates 35 cities in North America.
         /// </summary>
         public void NACities()
         {
             USACities();
             CANCities();
+            MexicoCities();
         }
 
         /// <summary>

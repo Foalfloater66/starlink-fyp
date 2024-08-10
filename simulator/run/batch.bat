@@ -18,4 +18,12 @@ if not exist %UNITY_PATH% (
 
 :: Arguments
 set FILE=%1
+
+:: Measure time before launching Unity script
+echo Started at !TIME!
+
+:: Launch Unity script
 %UNITY_PATH% -projectPath %PROJECT_PATH% -executeMethod %METHOD_NAME% "-batch" %FILE%
+
+:: Measure time after Unity script finishes
+echo Completed at: !TIME!

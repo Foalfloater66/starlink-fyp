@@ -1,15 +1,17 @@
+/* C138 Final Year Project 2023-2024 */
+
 using System.Collections.Generic;
 using Orbits;
 using Utilities;
 
 namespace Attack.Cases
 {
-    public abstract class BaseCase
+    public abstract class BaseAttribute
     {
         protected AttackerParams Ctx;
         protected readonly CityCreator Cities;
 
-        protected BaseCase(CityCreator cityCreator, Direction targetLinkDirection,
+        protected BaseAttribute(CityCreator cityCreator, Direction targetLinkDirection,
             GroundstationCollection groundstations, CustomCamera cam)
         {
             Ctx = AttackerParams.Default;

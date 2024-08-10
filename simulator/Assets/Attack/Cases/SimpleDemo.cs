@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿/* C138 Final Year Project 2023-2024 */
+
+using System.Collections.Generic;
 using Orbits;
 using Utilities;
 
 namespace Attack.Cases
 {
-    public class SimpleDemo : BaseCase
+    public class SimpleDemo : BaseAttribute
     {
         public SimpleDemo(CityCreator cityCreator, Direction targetLinkDirection,
             GroundstationCollection groundstations, CustomCamera cam) : base(cityCreator, targetLinkDirection,

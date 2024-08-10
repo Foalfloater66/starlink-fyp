@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿/* C138 Final Year Project 2023-2024 */
+
+using System.Collections.Generic;
 using Orbits;
 using Utilities;
 
 namespace Attack.Cases
 {
-    public class Equatorial : BaseCase
+    public class Equatorial : BaseAttribute
     {
         public Equatorial(CityCreator cityCreator, Direction targetLinkDirection,
             GroundstationCollection groundstations, CustomCamera cam) : base(cityCreator, targetLinkDirection,
@@ -58,34 +60,27 @@ namespace Attack.Cases
                 case Direction.South:
                     return new List<string>
                     {
-                        // Northern countries (mostly NA)
                         "New York",
                         "Miami",
-                        // "Caracas",
                         "Guadeloupe",
                         "Maracaibo",
-                        "Boston",
-                        "Chicago"
+                        "Boston"
                     };
                 case Direction.North:
                     return new List<string>
                     {
-                        // Southern countries (SA)
                         "Guayaquil",
-                        // "Lima",
-                        "Caracas",
                         "Medellin",
                         "Quito",
                         "Cali",
                         "Maracaibo",
                     };
-                case Direction.East:
+                case Direction.East: 
                     return new List<string>
                     {
                         "Bogota",
                         "Guayaquil",
                         "Cali",
-                        "Medellin",
                         "Quito",
                         "Maracaibo",
                     };
@@ -93,10 +88,8 @@ namespace Attack.Cases
                 case Direction.West:
                     return new List<string>
                     {
-                        // African cities
                         "Kinshasa",
                         "Luanda",
-                        "Cairo",
                         "Dar es Salaam",
                         "Nairobi",
                         "Abidjan",
@@ -105,11 +98,8 @@ namespace Attack.Cases
                 default:
                     return new List<string>
                     {
-                        // South
-                        "Guayaquil",
                         "Lima",
                         "Quito",
-                        // North
                         "New York",
                         "Miami",
                         "Caracas"

@@ -1,12 +1,14 @@
-﻿using System.Collections.Generic;
+﻿/* C138 Final Year Project 2023-2024 */
+
+using System.Collections.Generic;
 using Orbits;
 using Utilities;
 
 namespace Attack.Cases
 {
-    public class LandlockedCase : BaseCase
+    public class Landlocked : BaseAttribute
     {
-        public LandlockedCase(CityCreator cityCreator, Direction targetLinkDirection,
+        public Landlocked(CityCreator cityCreator, Direction targetLinkDirection,
             GroundstationCollection groundstations, CustomCamera cam) : base(cityCreator, targetLinkDirection,
             groundstations, cam)
         {
@@ -77,7 +79,6 @@ namespace Attack.Cases
                         "Phoenix",
                         "Los Angeles",
                         "El Paso",
-                        "Houston",
                         "Denver"
                     };
                 case Direction.West:
@@ -86,7 +87,6 @@ namespace Attack.Cases
                     {
                         "Toronto",
                         "New York",
-                        "Chicago",
                         "Winnipeg",
                         "Edmundston",
                         "Montreal"
@@ -95,7 +95,6 @@ namespace Attack.Cases
                 case Direction.North:
                     return new List<string>
                     {
-                        "Kinshasa",
                         "Kampala, Uganda",
                         "Dar es Salaam",
                         "Antananarivo, Madagascar",
@@ -108,7 +107,6 @@ namespace Attack.Cases
                         "Casablanca",
                         "Cairo",
                         "Kano",
-                        "Dakar, Senegal",
                         "Algiers, Algeria",
                         "Alexandria"
                     };
@@ -119,7 +117,6 @@ namespace Attack.Cases
                         "Toronto",
                         "New York",
                         "Chicago",
-                        "Los Angeles",
                         "El Paso",
                         "Houston"
                     };

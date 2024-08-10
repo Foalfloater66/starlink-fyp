@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿/* C138 Final Year Project 2023-2024 */
+
+using System.Collections.Generic;
 using Orbits;
 using Utilities;
 
 namespace Attack.Cases
 {
-    public class TransOrbital : BaseCase
+    public class TransOrbital : BaseAttribute
     {
         public TransOrbital(CityCreator cityCreator, Direction targetLinkDirection,
             GroundstationCollection groundstations, CustomCamera cam) : base(cityCreator, targetLinkDirection,
@@ -75,7 +77,6 @@ namespace Attack.Cases
                 case Direction.North:
                     return new List<string>
                     {
-                        "Kinshasa",
                         "Kampala, Uganda",
                         "Dar es Salaam",
                         "Antananarivo, Madagascar",
@@ -88,7 +89,6 @@ namespace Attack.Cases
                         "Casablanca",
                         "Cairo",
                         "Kano",
-                        "Dakar, Senegal",
                         "Algiers, Algeria",
                         "Alexandria"
                     };
@@ -96,7 +96,6 @@ namespace Attack.Cases
                 case Direction.East:
                     return new List<string>
                     {
-                        "Vancouver",
                         "Calgary",
                         "Seattle",
                         "Edmonton",
@@ -110,7 +109,6 @@ namespace Attack.Cases
                         "Chicago",
                         "Nashville",
                         "Philadelphia",
-                        "Montreal",
                         "Phoenix",
                         "New York"
                     };

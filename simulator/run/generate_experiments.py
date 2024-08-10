@@ -43,9 +43,9 @@ ATTRIBUTES = [1, 2, 3, 4, 5, 6, 7]
 VULNERABLE_ATTRIBUTE2DIRECTIONS = {
     1: [0, 1, 2, 3],  # Landlocked
     2: [0, 1, 2, 3],  # Coastal
-    4: [0, 1],  # Polar
+    4: [0, 1],        # Polar
     5: [0, 1, 2, 3],  # Equatorial
-    6: [0, 1, 2, 3],  # Intraorbital
+    7: [0, 1, 2, 3],  # Intraorbital
 }
 
 
@@ -62,21 +62,30 @@ data = {
 
 
 # add experiments.
-for attribute in ATTRIBUTES:
-    if not args.vulnerable:
-        directions = DIRECTIONS
-    else:
-        directions = VULNERABLE_ATTRIBUTE2DIRECTIONS[attribute]
-    for direction in directions:
-        for imax in args.imaxes:
-            data["experiments"].append(
-                {
-                    "choice": attribute,
-                    "direction": direction,
-                    "rMax": imax,
-                    "reps": args.reps,
-                }
-            )
+if not args.vulnerable:
+    for attribute in ATTRIBUTES:
+        for direction in DIRECTIONS:
+            for imax in args.imaxes:
+                data["experiments"].append(
+                    {
+                        "choice": 0,
+                        "direction": direction,
+                        "rMax": imax,
+                        "reps": args.reps,
+                    }
+                )
+else:
+    for attribute, directions in VULNERABLE_ATTRIBUTE2DIRECTIONS.items():
+        for direction in directions:
+            for imax in args.imaxes:
+                data["experiments"].append(
+                    {
+                        "choice": attribute,
+                        "direction": direction,
+                        "rMax": imax,
+                        "reps": args.reps,
+                    }
+                )
 
 
 # write to file.

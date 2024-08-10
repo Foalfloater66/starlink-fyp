@@ -1,21 +1,23 @@
-﻿using Orbits;
+﻿/* C138 Final Year Project 2023-2024 */
+
+using Orbits;
 using Utilities;
 
 namespace Attack.Cases
 {
     public static class CasesFactory
     {
-        public static BaseCase GetCase(CaseChoice choice, CityCreator cities, Direction targetLinkDirection,
+        public static BaseAttribute GetCase(CaseChoice choice, CityCreator cities, Direction targetLinkDirection,
             GroundstationCollection groundstations, CustomCamera cam)
         {
             switch (choice)
             {
                 case CaseChoice.Coastal:
-                    return new CoastalCase(cities, targetLinkDirection, groundstations, cam);
+                    return new Coastal(cities, targetLinkDirection, groundstations, cam);
                 case CaseChoice.Landlocked:
-                    return new LandlockedCase(cities, targetLinkDirection, groundstations, cam);
+                    return new Landlocked(cities, targetLinkDirection, groundstations, cam);
                 case CaseChoice.Insular:
-                    return new InsularCase(cities, targetLinkDirection, groundstations, cam);
+                    return new Insular(cities, targetLinkDirection, groundstations, cam);
                 case CaseChoice.Polar:
                     return new Polar(cities, targetLinkDirection, groundstations, cam);
                 case CaseChoice.Equatorial:

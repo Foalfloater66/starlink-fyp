@@ -1,3 +1,5 @@
+/* C138 Final Year Project 2023-2024 */
+
 using UnityEngine;
 
 namespace Orbits.Satellites
@@ -7,14 +9,5 @@ namespace Orbits.Satellites
         public int orbit_id;
         public int id;
 
-        // REVIEW: Can I remove this?
-        private void Start()
-        {
-        }
-
-        // REVIEW: Can I remove this?
-        private void Update()
-        {
-        }
     }
 }

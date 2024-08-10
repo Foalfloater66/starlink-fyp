@@ -1,12 +1,14 @@
-﻿using System.Collections.Generic;
+﻿/* C138 Final Year Project 2023-2024 */
+
+using System.Collections.Generic;
 using Orbits;
 using Utilities;
 
 namespace Attack.Cases
 {
-    public class InsularCase : BaseCase
+    public class Insular : BaseAttribute
     {
-        public InsularCase(CityCreator cityCreator, Direction targetLinkDirection,
+        public Insular(CityCreator cityCreator, Direction targetLinkDirection,
             GroundstationCollection groundstations, CustomCamera cam) : base(cityCreator, targetLinkDirection,
             groundstations, cam)
         {
@@ -68,7 +70,6 @@ namespace Attack.Cases
                         "Brisbane",
                         "Melbourne",
                         "Wellington",
-                        "Port Moresby",
                     };
                 case Direction.South:
                     return new List<string>()
@@ -78,19 +79,16 @@ namespace Attack.Cases
                         "San Jose",
                         "Winnipeg",
                         "Edmonton",
-                        "New York"
                     };
 
                 case Direction.East:
                     return new List<string>()
                     {
-                        // North and South Asian countries.
                         "Shikotan",
-                        "Severo-Kurilsky", // Russia
+                        "Severo-Kurilsky", 
                         "Vladivostok",
                         "Irkutsk",
                         "Hawaii",
-                        "Chongqing"
                     };
                 case Direction.West:
                     return new List<string>()
@@ -99,7 +97,6 @@ namespace Attack.Cases
                         "Buenos Aires",
                         "Santiago",
                         "Curitiba",
-                        "Belo Horizonte",
                         "Ushuaia, Argentina"
                     };
 

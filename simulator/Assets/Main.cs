@@ -1,7 +1,8 @@
-﻿using System;
+﻿/* C138 Final Year Project 2023-2024 */
+
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 using Attack;
 using Attack.Cases;
 using Automation;
@@ -101,7 +102,7 @@ public class Main : MonoBehaviour
     public bool logVideo = false;
     public bool logAttack = false;
     public bool logRTT = false;
-    public bool logHops = true; // TODO: change this. 
+    public bool logHops = false; 
     
     
     [Tooltip(

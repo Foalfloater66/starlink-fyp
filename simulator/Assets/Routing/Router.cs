@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
+﻿/* C138 Final Year Project 2023-2024 */
+
+using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Attack;
 using Orbits;
 using Orbits.Satellites;
 using Scene;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 

@@ -1,4 +1,6 @@
-﻿namespace Attack.Cases
+﻿/* C138 Final Year Project 2023-2024 */
+
+namespace Attack.Cases
 {
     /// <summary>
     /// Defines the position of the source node in relation to the destination link.

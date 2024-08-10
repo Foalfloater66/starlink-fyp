@@ -46,7 +46,7 @@ Their definitions can be found in [CaseChoice.cs](https://github.com/Foalfloater
 Single run experiments are always assigned an ID of `0`.
 ```bat
 :: Windows
-./simulator/run/single.bat <choice> <direction> <rmax> <frames> <log_screenshots> <log_video> <log_attack> <log_rtt>
+./simulator/run/single.bat <choice> <direction> <rmax> <frames> <log_screenshots> <log_video> <log_attack> <log_rtt> <log_hops>
 ```
 
 #### Batch Runs
