@@ -172,7 +172,7 @@ public class Main : MonoBehaviour
     private void InitRoutingFramework()
     {
         // Routing + Stats Monitoring
-        _linkCapacities = new LinkCapacityMonitor();
+        _linkCapacities = new LinkCapacityMonitor(caseChoice);
         _rg = new RouteGraph();
         _rg.InitRoute(_constellation.maxsats, _constellation.satlist, _constellation.maxdist,
             _constellation.km_per_unit);
@@ -219,7 +219,9 @@ public class Main : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.red;
+        Color color = Color.red;
+        color.a = 0.4f;
+        Gizmos.color = color;
         Gizmos.DrawSphere(_attacker.Target.Center, _attacker.Target.Radius);
     }
 

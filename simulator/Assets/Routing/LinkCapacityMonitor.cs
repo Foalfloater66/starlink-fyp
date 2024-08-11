@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using Attack.Cases;
 
 namespace Routing
 {
@@ -35,8 +36,12 @@ namespace Routing
         /// Constructor initializing the <c>LinkCapacityMonitor</c> object and its`_initial_capacity` and `_capacities`.
         /// </summary>
         /// <param name="initial_capacity">Initial maximum capacity of any link in the network.</param>
-        public LinkCapacityMonitor()
+        public LinkCapacityMonitor(CaseChoice attack)
         {
+            if (attack == CaseChoice.SimpleDemo)
+            {
+                _initialISLCapacity = 8000; // 8 Gbps for demonstrative purposes.
+            }
             _ISLcapacities = new Dictionary<(int, int), int>();
             _RFcapacities = new Dictionary<(string, string), int>();
         }
