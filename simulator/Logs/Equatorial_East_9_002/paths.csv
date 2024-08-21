@@ -1,0 +1,52 @@
+FRAME,PATHS
+0,nan
+1,nan
+2,nan
+3,nan
+4,nan
+5,nan
+6,nan
+7,nan
+8,Cali -> Dakar, Senegal
+9,Cali -> Dakar, Senegal
+10,Maracaibo -> Luanda,Cali -> Luanda
+11,Cali -> Luanda
+12,Maracaibo -> Luanda,Cali -> Kinshasa
+13,Bogota -> Kinshasa,Maracaibo -> Luanda,Cali -> Kinshasa
+14,Bogota -> Kinshasa,Maracaibo -> Luanda,Cali -> Kinshasa
+15,Bogota -> Kinshasa,Cali -> Luanda,Maracaibo -> Luanda,Quito -> Luanda
+16,Bogota -> Kinshasa,Cali -> Kinshasa,Quito -> Kinshasa
+17,Cali -> Kinshasa,Maracaibo -> Luanda,Guayaquil -> Luanda,Quito -> Kinshasa
+18,nan
+19,nan
+20,nan
+21,nan
+22,nan
+23,nan
+24,nan
+25,nan
+26,nan
+27,nan
+28,nan
+29,nan
+30,nan
+31,nan
+32,nan
+33,nan
+34,Cali -> Dakar, Senegal
+35,Cali -> Dakar, Senegal
+36,Bogota -> Luanda,Maracaibo -> Luanda,Cali -> Luanda
+37,nan
+38,Bogota -> Kinshasa,Maracaibo -> Luanda,Cali -> Kinshasa
+39,Bogota -> Kinshasa,Cali -> Kinshasa
+40,Cali -> Kinshasa
+41,Bogota -> Kinshasa
+42,Bogota -> Kinshasa,Cali -> Kinshasa,Maracaibo -> Luanda,Guayaquil -> Luanda,Quito -> Kinshasa
+43,Maracaibo -> Luanda,Guayaquil -> Luanda,Quito -> Kinshasa
+44,nan
+45,nan
+46,nan
+47,nan
+48,nan
+49,nan
+50,nan

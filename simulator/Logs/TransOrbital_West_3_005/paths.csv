@@ -1,0 +1,52 @@
+FRAME,PATHS
+0,nan
+1,Chicago -> Calgary,New York -> Calgary
+2,Chicago -> Calgary,New York -> San Francisco
+3,Chicago -> Calgary,New York -> San Francisco
+4,Chicago -> Vancouver,New York -> Seattle
+5,Chicago -> Vancouver,New York -> Seattle,Philadelphia -> Seattle
+6,Philadelphia -> Seattle,New York -> Seattle
+7,New York -> Seattle
+8,New York -> Seattle
+9,New York -> Seattle
+10,nan
+11,nan
+12,Chicago -> Los Angeles,New York -> Los Angeles,Philadelphia -> San Francisco
+13,Chicago -> Los Angeles,New York -> Los Angeles,Philadelphia -> San Francisco
+14,Chicago -> Los Angeles,New York -> Los Angeles,Philadelphia -> San Francisco
+15,Chicago -> Los Angeles,New York -> Los Angeles,Philadelphia -> San Francisco
+16,Chicago -> Los Angeles,New York -> Los Angeles,Philadelphia -> San Francisco
+17,Chicago -> Los Angeles,New York -> Los Angeles,Philadelphia -> San Francisco
+18,Chicago -> San Jose,New York -> San Jose,Philadelphia -> San Francisco
+19,Chicago -> San Jose,New York -> San Jose,Philadelphia -> San Francisco
+20,nan
+21,nan
+22,nan
+23,nan
+24,Philadelphia -> Calgary
+25,Philadelphia -> Calgary
+26,Philadelphia -> Calgary,New York -> Calgary
+27,Philadelphia -> Calgary,New York -> Calgary
+28,Chicago -> Calgary,New York -> Calgary
+29,Chicago -> Calgary,New York -> San Francisco
+30,Chicago -> Vancouver,New York -> Seattle
+31,Chicago -> Vancouver,New York -> Seattle,Philadelphia -> Seattle
+32,Philadelphia -> Seattle,New York -> Seattle
+33,Philadelphia -> Seattle,New York -> Seattle
+34,New York -> Seattle
+35,New York -> Seattle
+36,nan
+37,nan
+38,Chicago -> Los Angeles,New York -> Los Angeles,Philadelphia -> San Francisco
+39,Chicago -> Los Angeles,New York -> Los Angeles,Philadelphia -> San Francisco
+40,Chicago -> Los Angeles,New York -> Los Angeles,Philadelphia -> San Francisco
+41,Chicago -> Los Angeles,New York -> Los Angeles,Philadelphia -> San Francisco
+42,Chicago -> Los Angeles,New York -> Los Angeles,Philadelphia -> San Francisco
+43,Chicago -> Los Angeles,New York -> Los Angeles,Philadelphia -> San Francisco
+44,Chicago -> San Jose,New York -> San Jose,Philadelphia -> San Francisco
+45,Chicago -> San Jose,New York -> San Jose,Philadelphia -> San Francisco
+46,nan
+47,nan
+48,nan
+49,nan
+50,Philadelphia -> Calgary

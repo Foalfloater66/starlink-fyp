@@ -1,0 +1,52 @@
+FRAME,PATHS
+0,nan
+1,Chicago -> Wellington,Washington DC -> Christchurch,Toronto -> Wellington,New York -> Christchurch,Boston -> Wellington
+2,Chicago -> Wellington,Toronto -> Wellington,Washington DC -> Christchurch,Boston -> Wellington,New York -> Wellington
+3,Chicago -> Wellington,Toronto -> Wellington,Washington DC -> Christchurch,Boston -> Wellington,New York -> Wellington
+4,Chicago -> Wellington,Toronto -> Wellington,Washington DC -> Christchurch,Boston -> Wellington,New York -> Wellington
+5,Chicago -> Wellington,Toronto -> Wellington,Washington DC -> Christchurch,Boston -> Wellington,New York -> Wellington
+6,Chicago -> Wellington,Toronto -> Wellington,Washington DC -> Christchurch,Boston -> Wellington,New York -> Wellington
+7,Chicago -> Wellington,Toronto -> Wellington,New York -> Christchurch,Washington DC -> Wellington,Boston -> Wellington
+8,Chicago -> Wellington,New York -> Wellington,Toronto -> Wellington,Washington DC -> Wellington,Boston -> Wellington
+9,Chicago -> Wellington,New York -> Wellington,Toronto -> Wellington,Washington DC -> Wellington,Boston -> Wellington
+10,Chicago -> San Diego,New York -> Tijuana, Mexico,Toronto -> Wellington,Washington DC -> Wellington,Boston -> Wellington
+11,Chicago -> San Diego,New York -> San Diego,Washington DC -> Wellington,Toronto -> Wellington,Boston -> Auckland
+12,Chicago -> San Diego,New York -> San Diego,Washington DC -> Wellington,Toronto -> Wellington,Boston -> Auckland
+13,Chicago -> San Diego,New York -> San Diego,Washington DC -> Wellington,Toronto -> Wellington,Boston -> Auckland
+14,Chicago -> San Diego,New York -> San Diego,Washington DC -> Wellington,Toronto -> Wellington,Boston -> Auckland
+15,Chicago -> San Diego,New York -> Tijuana, Mexico,Toronto -> Auckland,Washington DC -> Auckland,Boston -> Wellington
+16,Chicago -> San Diego,New York -> Tijuana, Mexico,Toronto -> Auckland,Washington DC -> Auckland,Boston -> Wellington
+17,Chicago -> San Diego,New York -> Tijuana, Mexico,Toronto -> Auckland,Washington DC -> Auckland,Boston -> Wellington
+18,Chicago -> Los Angeles,New York -> Los Angeles,Washington DC -> Auckland,Toronto -> Wellington,Boston -> Wellington
+19,Chicago -> Los Angeles,Boston -> Los Angeles,New York -> Los Angeles,Toronto -> Auckland,Washington DC -> Auckland
+20,Chicago -> Los Angeles,Boston -> Los Angeles,New York -> Los Angeles,Toronto -> Auckland,Washington DC -> Auckland
+21,Chicago -> Los Angeles,Boston -> Los Angeles,New York -> Los Angeles,Toronto -> Auckland,Washington DC -> Auckland
+22,Chicago -> Los Angeles,Boston -> Los Angeles,New York -> Los Angeles,Toronto -> Auckland,Washington DC -> Auckland
+23,Chicago -> Los Angeles,New York -> Los Angeles,Boston -> Tijuana, Mexico
+24,Chicago -> Wellington,Boston -> Wellington,New York -> Christchurch
+25,Chicago -> Wellington,Boston -> Wellington,New York -> Christchurch
+26,Chicago -> Wellington,Boston -> Wellington,New York -> Christchurch
+27,Chicago -> Wellington,Boston -> Wellington,New York -> Christchurch
+28,Chicago -> Wellington,Washington DC -> Christchurch,Toronto -> Wellington,New York -> Christchurch,Boston -> Wellington
+29,Chicago -> Wellington,Toronto -> Wellington,Washington DC -> Christchurch,Boston -> Wellington,New York -> Wellington
+30,Chicago -> Wellington,Toronto -> Wellington,Washington DC -> Christchurch,Boston -> Wellington,New York -> Wellington
+31,Chicago -> Wellington,Toronto -> Wellington,Washington DC -> Christchurch,Boston -> Wellington,New York -> Wellington
+32,Chicago -> Wellington,Toronto -> Wellington,Washington DC -> Christchurch,Boston -> Wellington,New York -> Wellington
+33,Chicago -> Wellington,Toronto -> Wellington,New York -> Christchurch,Washington DC -> Wellington,Boston -> Wellington
+34,Chicago -> Wellington,New York -> Wellington,Toronto -> Wellington,Washington DC -> Wellington,Boston -> Wellington
+35,Chicago -> Wellington,New York -> Wellington,Toronto -> Wellington,Washington DC -> Wellington,Boston -> Wellington
+36,Chicago -> San Diego,New York -> Tijuana, Mexico,Toronto -> Wellington,Washington DC -> Wellington,Boston -> Wellington
+37,Chicago -> San Diego,New York -> San Diego,Washington DC -> Wellington,Toronto -> Wellington,Boston -> Auckland
+38,Chicago -> San Diego,New York -> San Diego,Washington DC -> Wellington,Toronto -> Wellington,Boston -> Auckland
+39,Chicago -> San Diego,New York -> San Diego,Washington DC -> Wellington,Toronto -> Wellington,Boston -> Auckland
+40,Chicago -> San Diego,New York -> San Diego,Washington DC -> Wellington,Toronto -> Wellington,Boston -> Auckland
+41,Chicago -> San Diego,New York -> Tijuana, Mexico,Toronto -> Auckland,Washington DC -> Auckland,Boston -> Wellington
+42,Chicago -> San Diego,New York -> Tijuana, Mexico,Toronto -> Auckland,Washington DC -> Auckland,Boston -> Wellington
+43,Chicago -> San Diego,New York -> Tijuana, Mexico,Toronto -> Auckland,Washington DC -> Auckland,Boston -> Wellington
+44,Chicago -> Los Angeles,Washington DC -> Auckland,Toronto -> Wellington,Boston -> Wellington
+45,Chicago -> Los Angeles,Boston -> Los Angeles,New York -> Los Angeles,Toronto -> Auckland,Washington DC -> Auckland
+46,Chicago -> Los Angeles,Boston -> Los Angeles,New York -> Los Angeles,Toronto -> Auckland,Washington DC -> Auckland
+47,Chicago -> Los Angeles,Boston -> Los Angeles,New York -> Los Angeles,Toronto -> Auckland,Washington DC -> Auckland
+48,Chicago -> Los Angeles,Boston -> Los Angeles,New York -> Los Angeles,Toronto -> Auckland,Washington DC -> Auckland
+49,Chicago -> Los Angeles,New York -> Los Angeles,Boston -> Tijuana, Mexico
+50,Chicago -> Wellington,Boston -> Wellington,New York -> Christchurch

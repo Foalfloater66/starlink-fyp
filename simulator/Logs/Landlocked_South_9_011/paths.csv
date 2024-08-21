@@ -1,0 +1,52 @@
+FRAME,PATHS
+0,nan
+1,Kano -> Addis Ababa,Cairo -> Kampala, Uganda,Alexandria -> Kampala, Uganda,Algiers, Algeria -> Addis Ababa,Casablanca -> Addis Ababa
+2,Cairo -> Kampala, Uganda,Alexandria -> Kampala, Uganda,Algiers, Algeria -> Addis Ababa,Casablanca -> Addis Ababa
+3,Kano -> Addis Ababa,Cairo -> Kampala, Uganda,Alexandria -> Kampala, Uganda,Algiers, Algeria -> Addis Ababa,Casablanca -> Addis Ababa
+4,Kano -> Addis Ababa,Alexandria -> Kampala, Uganda,Algiers, Algeria -> Addis Ababa,Cairo -> Kampala, Uganda,Casablanca -> Addis Ababa
+5,Kano -> Addis Ababa,Cairo -> Kampala, Uganda,Casablanca -> Addis Ababa
+6,Kano -> Addis Ababa,Cairo -> Kampala, Uganda,Algiers, Algeria -> Addis Ababa,Casablanca -> Addis Ababa
+7,Kano -> Addis Ababa,Casablanca -> Addis Ababa,Algiers, Algeria -> Addis Ababa
+8,Kano -> Addis Ababa,Cairo -> Nairobi,Alexandria -> Nairobi,Casablanca -> Addis Ababa,Algiers, Algeria -> Addis Ababa
+9,Kano -> Addis Ababa,Alexandria -> Nairobi,Casablanca -> Addis Ababa,Algiers, Algeria -> Addis Ababa
+10,Kano -> Addis Ababa,Cairo -> Nairobi,Alexandria -> Nairobi,Casablanca -> Addis Ababa,Algiers, Algeria -> Addis Ababa
+11,Kano -> Addis Ababa,Cairo -> Nairobi,Alexandria -> Nairobi,Casablanca -> Addis Ababa,Algiers, Algeria -> Addis Ababa
+12,Kano -> Addis Ababa,Cairo -> Nairobi,Alexandria -> Nairobi,Casablanca -> Addis Ababa,Algiers, Algeria -> Addis Ababa
+13,Kano -> Addis Ababa,Cairo -> Nairobi,Casablanca -> Addis Ababa,Algiers, Algeria -> Addis Ababa
+14,Kano -> Addis Ababa,Casablanca -> Addis Ababa,Algiers, Algeria -> Addis Ababa
+15,Kano -> Addis Ababa,Cairo -> Nairobi,Alexandria -> Nairobi,Casablanca -> Addis Ababa,Algiers, Algeria -> Addis Ababa
+16,Kano -> Addis Ababa,Cairo -> Nairobi,Alexandria -> Nairobi,Algiers, Algeria -> Addis Ababa,Casablanca -> Addis Ababa
+17,Kano -> Addis Ababa,Cairo -> Nairobi,Algiers, Algeria -> Addis Ababa,Casablanca -> Addis Ababa
+18,Kano -> Addis Ababa,Cairo -> Nairobi,Algiers, Algeria -> Addis Ababa,Casablanca -> Addis Ababa
+19,Cairo -> Nairobi,Algiers, Algeria -> Addis Ababa,Alexandria -> Nairobi,Casablanca -> Addis Ababa
+20,Cairo -> Nairobi,Algiers, Algeria -> Addis Ababa,Casablanca -> Addis Ababa
+21,Algiers, Algeria -> Addis Ababa,Alexandria -> Nairobi,Casablanca -> Addis Ababa
+22,Cairo -> Nairobi,Algiers, Algeria -> Addis Ababa,Casablanca -> Addis Ababa
+23,Cairo -> Kampala, Uganda,Alexandria -> Kampala, Uganda,Algiers, Algeria -> Addis Ababa,Casablanca -> Addis Ababa
+24,Cairo -> Kampala, Uganda,Alexandria -> Kampala, Uganda,Algiers, Algeria -> Addis Ababa,Casablanca -> Addis Ababa
+25,Cairo -> Kampala, Uganda,Alexandria -> Kampala, Uganda,Algiers, Algeria -> Addis Ababa,Casablanca -> Addis Ababa
+26,Kano -> Nairobi,Cairo -> Kampala, Uganda,Alexandria -> Kampala, Uganda,Casablanca -> Addis Ababa
+27,Cairo -> Kampala, Uganda,Alexandria -> Kampala, Uganda,Algiers, Algeria -> Addis Ababa,Casablanca -> Addis Ababa
+28,Cairo -> Kampala, Uganda,Alexandria -> Kampala, Uganda,Algiers, Algeria -> Addis Ababa,Casablanca -> Addis Ababa
+29,Cairo -> Kampala, Uganda,Alexandria -> Kampala, Uganda,Algiers, Algeria -> Addis Ababa,Casablanca -> Addis Ababa
+30,Kano -> Addis Ababa,Alexandria -> Kampala, Uganda,Algiers, Algeria -> Addis Ababa,Cairo -> Kampala, Uganda,Casablanca -> Addis Ababa
+31,Kano -> Addis Ababa,Cairo -> Kampala, Uganda,Algiers, Algeria -> Addis Ababa,Alexandria -> Nairobi,Casablanca -> Addis Ababa
+32,Kano -> Addis Ababa,Casablanca -> Addis Ababa
+33,Kano -> Addis Ababa,Cairo -> Nairobi,Alexandria -> Nairobi,Casablanca -> Addis Ababa,Algiers, Algeria -> Addis Ababa
+34,Kano -> Addis Ababa,Cairo -> Nairobi,Alexandria -> Nairobi
+35,Cairo -> Nairobi,Alexandria -> Nairobi,Casablanca -> Addis Ababa,Algiers, Algeria -> Addis Ababa
+36,Kano -> Addis Ababa,Cairo -> Nairobi,Alexandria -> Nairobi,Casablanca -> Addis Ababa,Algiers, Algeria -> Addis Ababa
+37,Casablanca -> Addis Ababa,Algiers, Algeria -> Addis Ababa
+38,Cairo -> Nairobi,Alexandria -> Nairobi,Casablanca -> Addis Ababa,Algiers, Algeria -> Addis Ababa
+39,Alexandria -> Nairobi,Casablanca -> Addis Ababa,Algiers, Algeria -> Addis Ababa
+40,Kano -> Addis Ababa,Cairo -> Nairobi,Alexandria -> Nairobi,Casablanca -> Addis Ababa,Algiers, Algeria -> Addis Ababa
+41,Kano -> Addis Ababa,Casablanca -> Addis Ababa,Algiers, Algeria -> Addis Ababa
+42,Kano -> Addis Ababa,Cairo -> Nairobi,Alexandria -> Nairobi,Algiers, Algeria -> Addis Ababa,Casablanca -> Addis Ababa
+43,Kano -> Addis Ababa,Cairo -> Nairobi,Algiers, Algeria -> Addis Ababa,Casablanca -> Addis Ababa
+44,Kano -> Addis Ababa,Cairo -> Nairobi,Algiers, Algeria -> Addis Ababa,Alexandria -> Nairobi,Casablanca -> Addis Ababa
+45,Cairo -> Nairobi,Algiers, Algeria -> Addis Ababa,Alexandria -> Nairobi,Casablanca -> Addis Ababa
+46,Algiers, Algeria -> Addis Ababa,Casablanca -> Addis Ababa
+47,Algiers, Algeria -> Addis Ababa,Alexandria -> Nairobi,Casablanca -> Addis Ababa
+48,Cairo -> Nairobi,Algiers, Algeria -> Addis Ababa,Alexandria -> Nairobi,Casablanca -> Addis Ababa
+49,Cairo -> Kampala, Uganda,Alexandria -> Kampala, Uganda,Algiers, Algeria -> Addis Ababa,Casablanca -> Addis Ababa
+50,Cairo -> Kampala, Uganda,Alexandria -> Kampala, Uganda,Algiers, Algeria -> Addis Ababa,Casablanca -> Addis Ababa

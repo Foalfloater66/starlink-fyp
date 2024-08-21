@@ -1,0 +1,52 @@
+FRAME,PATHS
+0,nan
+1,Guadeloupe -> Bogota,Miami -> Quito,New York -> Medellin
+2,Guadeloupe -> Bogota,Miami -> Quito,New York -> Bogota,Boston -> Quito
+3,Guadeloupe -> Bogota,Miami -> Quito,New York -> Bogota,Boston -> Quito
+4,Guadeloupe -> Bogota,Miami -> Quito,New York -> Bogota,Boston -> Quito
+5,Guadeloupe -> Bogota,Miami -> Quito,New York -> Bogota,Boston -> Quito
+6,Guadeloupe -> Bogota
+7,Guadeloupe -> Bogota,Miami -> Quito,New York -> Bogota
+8,Guadeloupe -> Bogota,Miami -> Quito,New York -> Bogota,Boston -> Bogota
+9,Guadeloupe -> Bogota,Miami -> Quito,New York -> Bogota
+10,Guadeloupe -> Bogota,Miami -> Guayaquil,New York -> Bogota,Boston -> Bogota
+11,Miami -> Guayaquil,New York -> Bogota,Boston -> Bogota
+12,Guadeloupe -> Bogota,Miami -> Guayaquil,New York -> Bogota,Boston -> Bogota
+13,Guadeloupe -> Medellin,Miami -> Guayaquil,New York -> Bogota
+14,Boston -> Guayaquil
+15,Guadeloupe -> Medellin,Miami -> Guayaquil,New York -> Bogota,Boston -> Guayaquil
+16,Guadeloupe -> Medellin,Miami -> Guayaquil,Boston -> Cali,New York -> Bogota
+17,Miami -> Guayaquil,Boston -> Cali,New York -> Bogota
+18,Guadeloupe -> Maracaibo,Miami -> Guayaquil,Boston -> Maracaibo,New York -> Maracaibo
+19,Boston -> Maracaibo,New York -> Maracaibo
+20,Miami -> Guayaquil,New York -> Maracaibo,Boston -> Maracaibo
+21,Miami -> Guayaquil,New York -> Maracaibo,Boston -> Maracaibo
+22,Miami -> Guayaquil
+23,Boston -> Cali
+24,Miami -> Guayaquil,New York -> Maracaibo,Boston -> Cali
+25,New York -> Bogota,Boston -> Cali
+26,Guadeloupe -> Bogota,New York -> Bogota,Boston -> Cali
+27,Guadeloupe -> Bogota,Miami -> Quito,New York -> Medellin,Boston -> Quito
+28,New York -> Medellin,Boston -> Quito
+29,Guadeloupe -> Bogota,Miami -> Quito
+30,Guadeloupe -> Bogota,Miami -> Quito,New York -> Bogota,Boston -> Quito
+31,Guadeloupe -> Bogota,Miami -> Quito,New York -> Bogota,Boston -> Quito
+32,Guadeloupe -> Bogota,Miami -> Quito,New York -> Bogota
+33,Guadeloupe -> Bogota,Boston -> Quito
+34,Guadeloupe -> Bogota,Miami -> Quito,New York -> Bogota,Boston -> Quito
+35,Guadeloupe -> Bogota,Miami -> Quito,New York -> Bogota,Boston -> Bogota
+36,Guadeloupe -> Bogota,Boston -> Bogota
+37,Guadeloupe -> Bogota,Miami -> Guayaquil
+38,Guadeloupe -> Bogota,Miami -> Guayaquil,New York -> Bogota,Boston -> Bogota
+39,Guadeloupe -> Medellin,New York -> Bogota,Boston -> Guayaquil
+40,Guadeloupe -> Medellin,Miami -> Guayaquil,New York -> Bogota,Boston -> Guayaquil
+41,Guadeloupe -> Medellin,Miami -> Guayaquil,New York -> Bogota,Boston -> Guayaquil
+42,Guadeloupe -> Medellin,Miami -> Guayaquil,New York -> Bogota,Boston -> Guayaquil
+43,Boston -> Cali,New York -> Bogota
+44,Guadeloupe -> Maracaibo,Miami -> Guayaquil,Boston -> Maracaibo,New York -> Maracaibo
+45,Guadeloupe -> Maracaibo,Miami -> Guayaquil
+46,Miami -> Guayaquil,New York -> Maracaibo,Boston -> Maracaibo
+47,Miami -> Guayaquil,New York -> Maracaibo,Boston -> Maracaibo
+48,Miami -> Guayaquil,New York -> Maracaibo,Boston -> Maracaibo
+49,Miami -> Guayaquil,New York -> Maracaibo,Boston -> Cali
+50,Miami -> Guayaquil,New York -> Maracaibo,Boston -> Cali

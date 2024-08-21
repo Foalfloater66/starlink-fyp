@@ -1,0 +1,52 @@
+FRAME,PATHS
+0,nan
+1,nan
+2,nan
+3,nan
+4,nan
+5,nan
+6,nan
+7,nan
+8,nan
+9,nan
+10,nan
+11,Nairobi -> Cali
+12,Kinshasa -> Bogota,Luanda -> Bogota,Dar es Salaam -> Cali,Nairobi -> Cali
+13,Kinshasa -> Bogota,Luanda -> Bogota,Dar es Salaam -> Medellin,Nairobi -> Medellin
+14,Dar es Salaam -> Medellin,Nairobi -> Medellin
+15,Kinshasa -> Bogota,Luanda -> Medellin,Dar es Salaam -> Medellin,Nairobi -> Bogota
+16,Luanda -> Medellin,Nairobi -> Cali,Dar es Salaam -> Bogota
+17,Kinshasa -> Bogota,Luanda -> Medellin,Nairobi -> Cali,Dar es Salaam -> Bogota
+18,nan
+19,nan
+20,nan
+21,nan
+22,nan
+23,nan
+24,nan
+25,nan
+26,nan
+27,nan
+28,nan
+29,nan
+30,nan
+31,nan
+32,nan
+33,nan
+34,nan
+35,nan
+36,Nairobi -> Cali
+37,Luanda -> Bogota,Dar es Salaam -> Bogota,Nairobi -> Cali
+38,Kinshasa -> Bogota,Luanda -> Bogota,Dar es Salaam -> Cali
+39,Kinshasa -> Bogota,Luanda -> Bogota,Dar es Salaam -> Medellin,Nairobi -> Medellin
+40,Dar es Salaam -> Medellin,Nairobi -> Medellin
+41,Kinshasa -> Bogota
+42,Nairobi -> Cali,Dar es Salaam -> Bogota
+43,Kinshasa -> Bogota,Dar es Salaam -> Bogota
+44,nan
+45,nan
+46,nan
+47,nan
+48,nan
+49,nan
+50,nan

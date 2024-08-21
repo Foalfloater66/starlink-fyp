@@ -1,0 +1,52 @@
+FRAME,PATHS
+0,nan
+1,Sydney -> Phoenix
+2,Sydney -> Phoenix
+3,Sydney -> Phoenix
+4,Sydney -> Las Vegas
+5,Sydney -> Las Vegas,Melbourne -> Denver
+6,Sydney -> Las Vegas,Melbourne -> Denver
+7,Sydney -> Las Vegas,Melbourne -> Denver
+8,Sydney -> Las Vegas,Melbourne -> Denver
+9,Sydney -> San Francisco,Melbourne -> San Francisco
+10,Sydney -> San Francisco,Melbourne -> San Francisco
+11,Sydney -> San Francisco,Melbourne -> San Francisco
+12,Sydney -> San Jose,Melbourne -> San Jose
+13,Sydney -> San Jose,Melbourne -> San Jose
+14,Sydney -> San Jose,Melbourne -> San Jose
+15,Sydney -> San Jose,Melbourne -> San Jose
+16,Sydney -> San Jose,Melbourne -> San Jose
+17,Sydney -> Los Angeles,Melbourne -> San Jose
+18,Sydney -> Los Angeles,Melbourne -> San Francisco
+19,Sydney -> Los Angeles,Melbourne -> San Francisco
+20,Sydney -> Los Angeles,Melbourne -> San Francisco
+21,Sydney -> Los Angeles,Melbourne -> Denver
+22,Sydney -> Los Angeles,Melbourne -> Denver
+23,Sydney -> San Diego,Melbourne -> Denver
+24,Sydney -> San Diego,Melbourne -> Oklahoma City
+25,Sydney -> San Francisco,Melbourne -> Denver
+26,Sydney -> San Francisco
+27,Sydney -> San Francisco
+28,Sydney -> Phoenix
+29,Sydney -> Phoenix
+30,Sydney -> Las Vegas
+31,Sydney -> Las Vegas,Melbourne -> Denver
+32,Sydney -> Las Vegas,Melbourne -> Denver
+33,Sydney -> Las Vegas,Melbourne -> Denver
+34,Sydney -> Las Vegas,Melbourne -> Denver
+35,Sydney -> San Francisco,Melbourne -> San Francisco
+36,Sydney -> San Francisco,Melbourne -> San Francisco
+37,Sydney -> San Francisco,Melbourne -> San Francisco
+38,Sydney -> San Jose,Melbourne -> San Jose
+39,Sydney -> San Jose,Melbourne -> San Jose
+40,Sydney -> San Jose,Melbourne -> San Jose
+41,Sydney -> San Jose,Melbourne -> San Jose
+42,Sydney -> San Jose,Melbourne -> San Jose
+43,Sydney -> Los Angeles,Melbourne -> San Jose
+44,Sydney -> Los Angeles,Melbourne -> San Francisco
+45,Sydney -> Los Angeles,Melbourne -> San Francisco
+46,Sydney -> Los Angeles,Melbourne -> San Francisco
+47,Sydney -> Los Angeles,Melbourne -> Denver
+48,Sydney -> Los Angeles,Melbourne -> Denver
+49,Sydney -> San Diego,Melbourne -> Denver
+50,Sydney -> San Diego,Melbourne -> Oklahoma City

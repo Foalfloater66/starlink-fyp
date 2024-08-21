@@ -1,0 +1,82 @@
+{
+    "experiments": [
+        {
+            "choice": 7,
+            "direction": 0,
+            "rMax": 3,
+            "reps": 20
+        },
+        {
+            "choice": 7,
+            "direction": 0,
+            "rMax": 6,
+            "reps": 20
+        },
+        {
+            "choice": 7,
+            "direction": 0,
+            "rMax": 9,
+            "reps": 20
+        },
+        {
+            "choice": 7,
+            "direction": 1,
+            "rMax": 3,
+            "reps": 20
+        },
+        {
+            "choice": 7,
+            "direction": 1,
+            "rMax": 6,
+            "reps": 20
+        },
+        {
+            "choice": 7,
+            "direction": 1,
+            "rMax": 9,
+            "reps": 20
+        },
+        {
+            "choice": 7,
+            "direction": 2,
+            "rMax": 3,
+            "reps": 20
+        },
+        {
+            "choice": 7,
+            "direction": 2,
+            "rMax": 6,
+            "reps": 20
+        },
+        {
+            "choice": 7,
+            "direction": 2,
+            "rMax": 9,
+            "reps": 20
+        },
+        {
+            "choice": 7,
+            "direction": 3,
+            "rMax": 3,
+            "reps": 20
+        },
+        {
+            "choice": 7,
+            "direction": 3,
+            "rMax": 6,
+            "reps": 20
+        },
+        {
+            "choice": 7,
+            "direction": 3,
+            "rMax": 9,
+            "reps": 20
+        }
+    ],
+    "frames": 50,
+    "logScreenshots": false,
+    "logVideo": false,
+    "logAttack": true,
+    "logRTT": true,
+    "logHops": false
+}

@@ -284,9 +284,9 @@ public class Main : MonoBehaviour
     private void UpdateScene(List<float> rttList)
     {
         _painter.UpdateLasers(_constellation.satlist, _constellation.maxsats, speed);
-        UpdateSceneRTT(rttList);
+        // UpdateSceneRTT(rttList);
         leftBottomText.text = $"Frame {_frameCount}";
-        UpdateSceneLinkStatus();
+        // UpdateSceneLinkStatus();
     }
 
     private List<float> ExtractRTT(List<Route> routes)
@@ -328,14 +328,14 @@ public class Main : MonoBehaviour
         ResetScene();
 
         // Attempt an attack on the network.
-        var routes = _attacker.Run(_groundstations.ToList());
-
+        // var routes = _attacker.Run(_groundstations.ToList());
+        var routes = new List<Route>();
         routes = _router.Run(routes, _attacker.Target);
 
         List<float> rttList = ExtractRTT(routes);
 
         UpdateScene(rttList);
-
+        
         LoggingContext ctx = new LoggingContext()
         {
             Target = _attacker.Target,
@@ -348,12 +348,12 @@ public class Main : MonoBehaviour
             _attackLogger.LogEntry(_frameCount, ctx);
             _pathLogger.LogEntry(_frameCount, ctx);
         }
-
+        
         if (logRTT)
         {
             _latencyLogger.LogEntry(_frameCount, ctx);
         }
-
+        
         if (logHops)
         {
             Assert.IsNotNull(_hopLogger);
