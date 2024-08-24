@@ -6,6 +6,9 @@ It simulates singular link flooding attacks on inter-satellite network (ISN) lin
 ⚠️ Please note that this program demands high computational effort from your device, and might not function if you do not meet the [system requirements](#system-requirements). 
 If the Unity Editor becomes unresponsive, please follow the instructions in [Troubleshooting](#troubleshooting).
 
+Moreover, please note that the simulator this project is based on ignores reachability constraints normally imposed on Starlink's satellites to avoid interfering with geostationary satellite communications.
+We chose not to change this, as fixing it would ultimately simply reduce the number of ground stations that the adversary could use near equatorial regions, whereas our main focus is to observe how our mitigation algorithm performs against the attacker. See [Handley's Github repository](https://github.com/mhandley/Starlink0031) for more information.
+
 ℹ️ Since the $i_\text{max}$ parameter was previously named $r_\text{max}$, the code often refers to $r_\text{max}$ instead of $i_\text{max}$. These refer to the same RiDS parameter mentioned in the paper.
 
 ## Installation

@@ -1,4 +1,4 @@
-﻿/* C138 Final Year Project 2023-2024 */
+/* C138 Final Year Project 2023-2024 */
 
 using System.Collections.Generic;
 using Orbits;
@@ -81,8 +81,8 @@ namespace Attack.Cases
                         "Denver"
                     };
                 case Direction.West:
-                {
-                    return new List<string>
+                    {
+                        return new List<string>
                     {
                         "Toronto",
                         "New York",
@@ -90,7 +90,7 @@ namespace Attack.Cases
                         "Edmundston",
                         "Montreal"
                     };
-                }
+                    }
                 case Direction.North:
                     return new List<string>
                     {
