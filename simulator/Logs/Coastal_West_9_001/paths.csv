@@ -17,9 +17,9 @@ FRAME,PATHS
 15,Chicago -> San Diego,New York -> Tijuana, Mexico,Toronto -> Auckland,Washington DC -> Auckland,Boston -> Wellington
 16,Chicago -> San Diego,New York -> Tijuana, Mexico,Toronto -> Auckland,Washington DC -> Auckland,Boston -> Wellington
 17,Chicago -> San Diego,New York -> Tijuana, Mexico,Toronto -> Auckland,Washington DC -> Auckland,Boston -> Wellington
-18,New York -> Los Angeles,Washington DC -> Auckland,Toronto -> Wellington,Boston -> Wellington
-19,Chicago -> Los Angeles,Boston -> Los Angeles,New York -> Los Angeles,Toronto -> Auckland,Washington DC -> Auckland
-20,Chicago -> Los Angeles,Boston -> Los Angeles,Toronto -> Auckland,Washington DC -> Auckland
+18,Chicago -> Los Angeles,New York -> Los Angeles,Washington DC -> Auckland,Toronto -> Wellington,Boston -> Wellington
+19,Chicago -> Los Angeles,Boston -> Los Angeles,Toronto -> Auckland,Washington DC -> Auckland
+20,Chicago -> Los Angeles,Boston -> Los Angeles,New York -> Los Angeles,Toronto -> Auckland,Washington DC -> Auckland
 21,Chicago -> Los Angeles,Boston -> Los Angeles,New York -> Los Angeles,Toronto -> Auckland,Washington DC -> Auckland
 22,Chicago -> Los Angeles,Boston -> Los Angeles,New York -> Los Angeles,Toronto -> Auckland,Washington DC -> Auckland
 23,Chicago -> Los Angeles,New York -> Los Angeles,Boston -> Tijuana, Mexico
@@ -44,9 +44,9 @@ FRAME,PATHS
 42,Chicago -> San Diego,New York -> Tijuana, Mexico,Toronto -> Auckland,Washington DC -> Auckland,Boston -> Wellington
 43,Chicago -> San Diego,New York -> Tijuana, Mexico,Toronto -> Auckland,Washington DC -> Auckland,Boston -> Wellington
 44,Chicago -> Los Angeles,New York -> Los Angeles,Washington DC -> Auckland,Toronto -> Wellington,Boston -> Wellington
-45,Chicago -> Los Angeles,Boston -> Los Angeles,Toronto -> Auckland,Washington DC -> Auckland
-46,Boston -> Los Angeles,New York -> Los Angeles,Toronto -> Auckland,Washington DC -> Auckland
-47,Chicago -> Los Angeles,Boston -> Los Angeles,Toronto -> Auckland,Washington DC -> Auckland
+45,Chicago -> Los Angeles,Boston -> Los Angeles,New York -> Los Angeles,Toronto -> Auckland,Washington DC -> Auckland
+46,Chicago -> Los Angeles,Boston -> Los Angeles,Toronto -> Auckland,Washington DC -> Auckland
+47,Chicago -> Los Angeles,New York -> Los Angeles,Toronto -> Auckland,Washington DC -> Auckland
 48,Chicago -> Los Angeles,Boston -> Los Angeles,New York -> Los Angeles,Toronto -> Auckland,Washington DC -> Auckland
 49,Chicago -> Los Angeles,New York -> Los Angeles,Boston -> Tijuana, Mexico
 50,Chicago -> Wellington,Boston -> Wellington,New York -> Christchurch

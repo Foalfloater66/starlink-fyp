@@ -1,52 +1,52 @@
 FRAME,PATHS
 0,nan
-1,Medellin -> Guadeloupe,Cali -> Guadeloupe,Quito -> Guadeloupe,Guayaquil -> Guadeloupe
-2,Medellin -> Guadeloupe,Cali -> Guadeloupe,Quito -> Guadeloupe,Guayaquil -> Guadeloupe
+1,Cali -> Guadeloupe,Quito -> Guadeloupe
+2,Cali -> Guadeloupe,Quito -> Guadeloupe
 3,Quito -> Guadeloupe,Guayaquil -> Guadeloupe
-4,Medellin -> Guadeloupe,Cali -> Guadeloupe,Quito -> Guadeloupe,Guayaquil -> Guadeloupe
-5,Medellin -> Guadeloupe,Cali -> Guadeloupe,Quito -> Guadeloupe,Guayaquil -> Guadeloupe
-6,Medellin -> Guadeloupe,Quito -> Guadeloupe
-7,Medellin -> Guadeloupe,Quito -> Guadeloupe,Cali -> Guadeloupe,Guayaquil -> Guadeloupe
-8,Medellin -> Guadeloupe,Quito -> Guadeloupe,Cali -> Guadeloupe,Guayaquil -> Guadeloupe
-9,Medellin -> Guadeloupe,Guayaquil -> Guadeloupe
+4,Cali -> Guadeloupe,Quito -> Guadeloupe,Guayaquil -> Guadeloupe
+5,Medellin -> Guadeloupe,Cali -> Guadeloupe,Quito -> Guadeloupe
+6,Medellin -> Guadeloupe,Cali -> Guadeloupe,Guayaquil -> Guadeloupe
+7,Medellin -> Guadeloupe,Cali -> Guadeloupe,Guayaquil -> Guadeloupe
+8,Medellin -> Guadeloupe,Quito -> Guadeloupe,Cali -> Guadeloupe
+9,Medellin -> Guadeloupe,Quito -> Guadeloupe,Cali -> Guadeloupe,Guayaquil -> Guadeloupe
 10,Medellin -> Guadeloupe,Cali -> Guadeloupe,Quito -> Guadeloupe,Guayaquil -> Guadeloupe
-11,Cali -> Guadeloupe,Quito -> Guadeloupe,Guayaquil -> Guadeloupe
-12,Medellin -> Guadeloupe,Cali -> Guadeloupe,Quito -> Guadeloupe,Guayaquil -> Guadeloupe
-13,Medellin -> Guadeloupe,Cali -> Guadeloupe
-14,Medellin -> Guadeloupe,Cali -> Guadeloupe,Guayaquil -> Guadeloupe,Quito -> Guadeloupe
-15,Cali -> Guadeloupe,Guayaquil -> Guadeloupe,Quito -> Guadeloupe
-16,Medellin -> Guadeloupe,Cali -> Guadeloupe,Guayaquil -> Guadeloupe,Quito -> Guadeloupe
-17,Medellin -> Guadeloupe,Cali -> Guadeloupe,Guayaquil -> Guadeloupe,Quito -> Guadeloupe
-18,Maracaibo -> Guadeloupe,Cali -> Guadeloupe,Medellin -> Guadeloupe,Guayaquil -> Guadeloupe
-19,Medellin -> Guadeloupe,Guayaquil -> Guadeloupe,Quito -> Guadeloupe
-20,Guayaquil -> Miami,Cali -> New York
-21,Quito -> Miami,Maracaibo -> New York,Cali -> Boston
-22,Guayaquil -> Miami,Quito -> Miami,Maracaibo -> New York,Cali -> New York
-23,Guayaquil -> Miami,Quito -> Miami,Maracaibo -> New York,Cali -> New York
-24,Maracaibo -> New York,Cali -> New York
-25,Cali -> Guadeloupe,Quito -> Guadeloupe,Guayaquil -> Guadeloupe
-26,Quito -> Santo Domingo,Guayaquil -> Guadeloupe
+11,Medellin -> Guadeloupe,Cali -> Guadeloupe
+12,Cali -> Guadeloupe,Quito -> Guadeloupe
+13,Medellin -> Guadeloupe,Cali -> Guadeloupe,Quito -> Guadeloupe,Guayaquil -> Guadeloupe
+14,Cali -> Guadeloupe,Guayaquil -> Guadeloupe,Quito -> Guadeloupe
+15,Medellin -> Guadeloupe,Cali -> Guadeloupe
+16,Medellin -> Guadeloupe,Cali -> Guadeloupe
+17,Cali -> Guadeloupe,Guayaquil -> Guadeloupe,Quito -> Guadeloupe
+18,Cali -> Guadeloupe,Medellin -> Guadeloupe,Guayaquil -> Guadeloupe,Quito -> Guadeloupe
+19,Maracaibo -> Guadeloupe,Cali -> Guadeloupe,Medellin -> Guadeloupe,Guayaquil -> Guadeloupe,Quito -> Guadeloupe
+20,Quito -> Miami,Maracaibo -> New York
+21,Quito -> Miami
+22,Guayaquil -> Miami,Maracaibo -> New York,Cali -> New York
+23,Guayaquil -> Miami,Quito -> Miami
+24,Guayaquil -> Miami,Maracaibo -> New York,Cali -> New York
+25,Quito -> Guadeloupe,Guayaquil -> Guadeloupe
+26,Medellin -> Guadeloupe,Quito -> Santo Domingo,Guayaquil -> Guadeloupe
 27,Medellin -> Guadeloupe,Cali -> Guadeloupe,Quito -> Guadeloupe,Guayaquil -> Guadeloupe
-28,Medellin -> Guadeloupe,Cali -> Guadeloupe,Quito -> Guadeloupe,Guayaquil -> Guadeloupe
-29,Cali -> Guadeloupe,Quito -> Guadeloupe,Guayaquil -> Guadeloupe
-30,Medellin -> Guadeloupe,Cali -> Guadeloupe,Quito -> Guadeloupe,Guayaquil -> Guadeloupe
-31,nan
-32,Medellin -> Guadeloupe,Quito -> Guadeloupe,Cali -> Guadeloupe,Guayaquil -> Guadeloupe
-33,Medellin -> Guadeloupe,Quito -> Guadeloupe,Cali -> Guadeloupe
-34,Medellin -> Guadeloupe,Cali -> Guadeloupe,Guayaquil -> Guadeloupe
-35,Cali -> Guadeloupe
+28,Medellin -> Guadeloupe,Cali -> Guadeloupe,Guayaquil -> Guadeloupe
+29,Medellin -> Guadeloupe,Cali -> Guadeloupe,Quito -> Guadeloupe,Guayaquil -> Guadeloupe
+30,Medellin -> Guadeloupe,Cali -> Guadeloupe,Guayaquil -> Guadeloupe
+31,Cali -> Guadeloupe,Guayaquil -> Guadeloupe
+32,Medellin -> Guadeloupe,Quito -> Guadeloupe,Cali -> Guadeloupe
+33,Medellin -> Guadeloupe,Quito -> Guadeloupe,Cali -> Guadeloupe,Guayaquil -> Guadeloupe
+34,Medellin -> Guadeloupe,Quito -> Guadeloupe,Guayaquil -> Guadeloupe
+35,Medellin -> Guadeloupe,Quito -> Guadeloupe,Cali -> Guadeloupe,Guayaquil -> Guadeloupe
 36,Medellin -> Guadeloupe,Cali -> Guadeloupe,Guayaquil -> Guadeloupe,Quito -> Guadeloupe
-37,Quito -> Guadeloupe,Guayaquil -> Guadeloupe
-38,Medellin -> Guadeloupe,Cali -> Guadeloupe,Quito -> Guadeloupe,Guayaquil -> Guadeloupe
+37,Medellin -> Guadeloupe,Cali -> Guadeloupe,Quito -> Guadeloupe,Guayaquil -> Guadeloupe
+38,Medellin -> Guadeloupe,Cali -> Guadeloupe,Guayaquil -> Guadeloupe
 39,Medellin -> Guadeloupe,Cali -> Guadeloupe,Quito -> Guadeloupe,Guayaquil -> Guadeloupe
 40,Medellin -> Guadeloupe,Cali -> Guadeloupe,Guayaquil -> Guadeloupe,Quito -> Guadeloupe
-41,Medellin -> Guadeloupe,Cali -> Guadeloupe,Guayaquil -> Guadeloupe,Quito -> Guadeloupe
-42,Cali -> Guadeloupe,Guayaquil -> Guadeloupe,Quito -> Guadeloupe
-43,Medellin -> Guadeloupe,Cali -> Guadeloupe,Guayaquil -> Guadeloupe,Quito -> Guadeloupe
-44,Maracaibo -> Guadeloupe,Cali -> Guadeloupe,Medellin -> Guadeloupe,Guayaquil -> Guadeloupe,Quito -> Guadeloupe
-45,Cali -> Guadeloupe,Medellin -> Guadeloupe,Guayaquil -> Guadeloupe,Quito -> Guadeloupe
-46,Guayaquil -> Miami
-47,Guayaquil -> Miami,Quito -> Miami
-48,Maracaibo -> New York,Cali -> New York
-49,Guayaquil -> Miami,Quito -> Miami,Maracaibo -> New York,Cali -> New York
-50,Guayaquil -> Miami,Quito -> Miami,Maracaibo -> New York,Cali -> New York
+41,Medellin -> Guadeloupe,Guayaquil -> Guadeloupe,Quito -> Guadeloupe
+42,Medellin -> Guadeloupe,Cali -> Guadeloupe
+43,Cali -> Guadeloupe,Quito -> Guadeloupe
+44,Maracaibo -> Guadeloupe,Cali -> Guadeloupe,Medellin -> Guadeloupe,Quito -> Guadeloupe
+45,Cali -> Guadeloupe,Guayaquil -> Guadeloupe
+46,Guayaquil -> Miami,Quito -> Miami,Cali -> New York
+47,Guayaquil -> Miami,Cali -> Boston
+48,Guayaquil -> Miami,Quito -> Miami,Cali -> New York
+49,Guayaquil -> Miami,Quito -> Miami
+50,Quito -> Miami,Maracaibo -> New York,Cali -> New York

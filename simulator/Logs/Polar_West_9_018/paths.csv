@@ -2,26 +2,26 @@ FRAME,PATHS
 0,nan
 1,St. John's, Canada -> Winnipeg,Abidjan -> Winnipeg
 2,Abidjan -> Winnipeg
-3,Abidjan -> Winnipeg
-4,Abidjan -> Calgary
-5,nan
-6,nan
+3,nan
+4,nan
+5,Abidjan -> Calgary
+6,Abidjan -> Calgary
 7,nan
 8,nan
 9,nan
-10,nan
-11,nan
+10,Abidjan -> Calgary
+11,Abidjan -> Calgary
 12,St. John's, Canada -> Calgary,Abidjan -> Edmonton
 13,St. John's, Canada -> Calgary,Abidjan -> Edmonton
 14,St. John's, Canada -> Calgary,Abidjan -> Winnipeg
-15,St. John's, Canada -> Calgary,Abidjan -> Winnipeg
+15,St. John's, Canada -> Calgary
 16,St. John's, Canada -> Calgary
 17,St. John's, Canada -> Calgary,Abidjan -> Winnipeg
-18,St. John's, Canada -> Calgary,Abidjan -> Winnipeg
+18,St. John's, Canada -> Calgary
 19,St. John's, Canada -> Calgary,Abidjan -> Winnipeg
 20,St. John's, Canada -> Calgary,Abidjan -> Winnipeg
-21,nan
-22,Abidjan -> Winnipeg
+21,Abidjan -> Winnipeg
+22,nan
 23,Abidjan -> Winnipeg
 24,Abidjan -> Winnipeg
 25,St. John's, Canada -> Winnipeg,Abidjan -> Winnipeg
@@ -29,24 +29,24 @@ FRAME,PATHS
 27,St. John's, Canada -> Winnipeg,Abidjan -> Winnipeg
 28,St. John's, Canada -> Winnipeg,Abidjan -> Winnipeg
 29,Abidjan -> Winnipeg
-30,nan
-31,Abidjan -> Calgary
+30,Abidjan -> Calgary
+31,nan
 32,Abidjan -> Calgary
 33,Abidjan -> Calgary
-34,Abidjan -> Calgary
-35,Abidjan -> Calgary
+34,nan
+35,nan
 36,Abidjan -> Calgary
 37,Abidjan -> Calgary
-38,St. John's, Canada -> Calgary,Abidjan -> Edmonton
+38,St. John's, Canada -> Calgary
 39,St. John's, Canada -> Calgary,Abidjan -> Edmonton
 40,St. John's, Canada -> Calgary,Abidjan -> Winnipeg
 41,St. John's, Canada -> Calgary,Abidjan -> Winnipeg
 42,St. John's, Canada -> Calgary,Abidjan -> Winnipeg
-43,St. John's, Canada -> Calgary,Abidjan -> Winnipeg
-44,St. John's, Canada -> Calgary,Abidjan -> Winnipeg
+43,St. John's, Canada -> Calgary
+44,St. John's, Canada -> Calgary
 45,St. John's, Canada -> Calgary,Abidjan -> Winnipeg
-46,St. John's, Canada -> Calgary,Abidjan -> Winnipeg
-47,nan
+46,St. John's, Canada -> Calgary
+47,Abidjan -> Winnipeg
 48,Abidjan -> Winnipeg
 49,Abidjan -> Winnipeg
 50,Abidjan -> Winnipeg

@@ -1,0 +1,16 @@
+{
+    "experiments": [
+        {
+            "choice": 1,
+            "direction": 3,
+            "rMax": 3,
+            "reps": 20
+        }
+    ],
+    "frames": 50,
+    "logScreenshots": false,
+    "logVideo": false,
+    "logAttack": true,
+    "logRTT": true,
+    "logHops": false
+}

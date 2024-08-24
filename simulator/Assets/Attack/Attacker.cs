@@ -181,7 +181,7 @@ namespace Attack
             if (Target.Link != null && Target.HasValidTargetLink())
             {
                 var viableAttackRoutes = _FindAttackRoutes(_rg, groundstations);
-                return FloodLink(viableAttackRoutes, 200); // send the maximum RF link capacity.
+                return FloodLink(viableAttackRoutes, 4000); // send the maximum RF link capacity.
             }
 
             return new List<Route>();

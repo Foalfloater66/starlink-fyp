@@ -14,14 +14,14 @@ FRAME,PATHS
 12,El Paso -> Chicago,Phoenix -> Indianapolis
 13,Phoenix -> Chicago,El Paso -> Winnipeg
 14,Phoenix -> Chicago,El Paso -> Winnipeg
-15,Phoenix -> Chicago,El Paso -> Winnipeg
+15,Phoenix -> Chicago
 16,Phoenix -> Chicago,El Paso -> Winnipeg
 17,Phoenix -> Chicago,El Paso -> Winnipeg
 18,Denver -> Chicago,El Paso -> Winnipeg,Phoenix -> Chicago,Los Angeles -> Chicago
 19,Denver -> Indianapolis,El Paso -> Winnipeg,Phoenix -> Chicago,Los Angeles -> Chicago
 20,Oklahoma City -> Winnipeg,Denver -> Indianapolis,Phoenix -> Chicago,El Paso -> Winnipeg,Los Angeles -> Chicago
-21,Oklahoma City -> Winnipeg,Denver -> Indianapolis,Phoenix -> Chicago,El Paso -> Winnipeg
-22,Oklahoma City -> Winnipeg,Denver -> Indianapolis,Phoenix -> Chicago,El Paso -> Winnipeg,Los Angeles -> Chicago
+21,Oklahoma City -> Winnipeg,Denver -> Indianapolis,Phoenix -> Chicago,El Paso -> Winnipeg,Los Angeles -> Chicago
+22,Oklahoma City -> Winnipeg,Denver -> Indianapolis,El Paso -> Winnipeg,Los Angeles -> Chicago
 23,Oklahoma City -> Winnipeg,Denver -> Indianapolis,Phoenix -> Chicago,El Paso -> Winnipeg,Los Angeles -> Chicago
 24,Oklahoma City -> Winnipeg,Denver -> Indianapolis,Phoenix -> Winnipeg,El Paso -> Winnipeg,Los Angeles -> Chicago
 25,Oklahoma City -> Winnipeg,Phoenix -> Chicago,El Paso -> Winnipeg,Denver -> New York,Los Angeles -> Chicago

@@ -23,7 +23,7 @@ FRAME,PATHS
 21,Winnipeg -> Fort Worth,New York -> Denver,Montreal -> Denver,Edmundston -> Phoenix
 22,Winnipeg -> Fort Worth,New York -> Denver,Montreal -> Denver,Edmundston -> Phoenix
 23,Winnipeg -> Fort Worth,New York -> Denver,Montreal -> Phoenix,Edmundston -> Phoenix
-24,Winnipeg -> Fort Worth,New York -> Denver,Montreal -> Phoenix,Edmundston -> Las Vegas
+24,Winnipeg -> Fort Worth,New York -> Denver,Edmundston -> Las Vegas
 25,Winnipeg -> Fort Worth,New York -> Denver,Montreal -> Phoenix,Edmundston -> Phoenix
 26,Winnipeg -> Oklahoma City,New York -> Denver,Montreal -> Phoenix,Edmundston -> El Paso
 27,Winnipeg -> Oklahoma City,New York -> Denver,Montreal -> Phoenix,Edmundston -> El Paso

@@ -1,52 +1,52 @@
 FRAME,PATHS
 0,nan
-1,El Paso -> San Jose,San Antonio -> San Jose,Mexico City, Mexico -> San Jose,Puebla, Mexico -> San Jose
-2,El Paso -> San Jose,San Antonio -> San Jose,Mexico City, Mexico -> San Jose,Puebla, Mexico -> San Jose
-3,El Paso -> San Jose,San Antonio -> San Jose,Mexico City, Mexico -> San Jose,Puebla, Mexico -> San Jose
-4,El Paso -> San Jose,San Antonio -> San Jose,Mexico City, Mexico -> San Jose
-5,El Paso -> San Jose,San Antonio -> San Jose,Mexico City, Mexico -> San Jose,Puebla, Mexico -> San Jose
-6,San Antonio -> San Jose,Puebla, Mexico -> San Jose,Mexico City, Mexico -> San Jose
-7,San Antonio -> San Jose,Puebla, Mexico -> San Jose,Mexico City, Mexico -> San Jose
-8,San Antonio -> San Jose,Puebla, Mexico -> San Jose,Mexico City, Mexico -> San Jose
-9,Mexico City, Mexico -> San Jose
-10,Mexico City, Mexico -> San Jose
+1,El Paso -> San Jose,San Antonio -> San Jose,Mexico City, Mexico -> San Jose
+2,El Paso -> San Jose,San Antonio -> San Jose,Mexico City, Mexico -> San Jose
+3,El Paso -> San Jose,Mexico City, Mexico -> San Jose,Puebla, Mexico -> San Jose
+4,El Paso -> San Jose,San Antonio -> San Jose,Mexico City, Mexico -> San Jose,Puebla, Mexico -> San Jose
+5,El Paso -> San Jose,San Antonio -> San Jose,Mexico City, Mexico -> San Jose
+6,San Antonio -> San Jose,Mexico City, Mexico -> San Jose
+7,San Antonio -> San Jose,Puebla, Mexico -> San Jose
+8,Puebla, Mexico -> San Jose,Mexico City, Mexico -> San Jose
+9,San Antonio -> San Jose,Puebla, Mexico -> San Jose,Mexico City, Mexico -> San Jose
+10,San Antonio -> San Jose,Puebla, Mexico -> San Jose,Mexico City, Mexico -> San Jose
 11,San Antonio -> San Jose,Puebla, Mexico -> San Jose,Mexico City, Mexico -> San Jose
 12,San Antonio -> San Jose,Puebla, Mexico -> San Jose,Mexico City, Mexico -> San Jose
-13,San Antonio -> San Jose,Mexico City, Mexico -> San Jose,Puebla, Mexico -> San Jose
-14,San Antonio -> San Jose,Mexico City, Mexico -> San Jose
-15,San Antonio -> San Jose,Puebla, Mexico -> San Francisco,Mexico City, Mexico -> San Jose
+13,San Antonio -> San Jose,Mexico City, Mexico -> San Jose
+14,Puebla, Mexico -> San Francisco,Mexico City, Mexico -> San Jose
+15,San Antonio -> San Jose,Mexico City, Mexico -> San Jose
 16,San Antonio -> Los Angeles,Puebla, Mexico -> Los Angeles,Mexico City, Mexico -> San Jose
-17,San Antonio -> Los Angeles,Mexico City, Mexico -> San Jose
+17,San Antonio -> Los Angeles,Puebla, Mexico -> Los Angeles,Mexico City, Mexico -> San Jose
 18,San Antonio -> Los Angeles,Puebla, Mexico -> Los Angeles,Mexico City, Mexico -> Los Angeles
-19,San Antonio -> Los Angeles,Puebla, Mexico -> Los Angeles,Mexico City, Mexico -> Los Angeles
-20,El Paso -> San Jose,San Antonio -> San Jose,Mexico City, Mexico -> San Jose,Puebla, Mexico -> San Jose
-21,El Paso -> San Jose,San Antonio -> San Jose,Mexico City, Mexico -> San Jose,Puebla, Mexico -> San Jose
-22,El Paso -> San Jose,San Antonio -> San Jose,Mexico City, Mexico -> San Jose
+19,Puebla, Mexico -> Los Angeles,Mexico City, Mexico -> Los Angeles
+20,El Paso -> San Jose,San Antonio -> San Jose,Puebla, Mexico -> San Jose
+21,El Paso -> San Jose,San Antonio -> San Jose,Puebla, Mexico -> San Jose
+22,El Paso -> San Jose,San Antonio -> San Jose,Mexico City, Mexico -> San Jose,Puebla, Mexico -> San Jose
 23,El Paso -> San Jose,San Antonio -> San Jose,Mexico City, Mexico -> San Jose,Puebla, Mexico -> San Jose
 24,El Paso -> San Jose,San Antonio -> San Jose,Mexico City, Mexico -> San Jose,Puebla, Mexico -> San Jose
-25,El Paso -> San Jose,San Antonio -> San Jose,Mexico City, Mexico -> San Jose
-26,El Paso -> San Jose,San Antonio -> San Jose,Puebla, Mexico -> San Jose
-27,El Paso -> San Jose,San Antonio -> San Jose,Mexico City, Mexico -> San Jose,Puebla, Mexico -> San Jose
-28,El Paso -> San Jose,Mexico City, Mexico -> San Jose,Puebla, Mexico -> San Jose
-29,El Paso -> San Jose,San Antonio -> San Jose,Puebla, Mexico -> San Jose
+25,El Paso -> San Jose,San Antonio -> San Jose,Puebla, Mexico -> San Jose
+26,El Paso -> San Jose,Mexico City, Mexico -> San Jose,Puebla, Mexico -> San Jose
+27,El Paso -> San Jose,San Antonio -> San Jose
+28,El Paso -> San Jose,San Antonio -> San Jose,Mexico City, Mexico -> San Jose,Puebla, Mexico -> San Jose
+29,El Paso -> San Jose,San Antonio -> San Jose,Mexico City, Mexico -> San Jose,Puebla, Mexico -> San Jose
 30,El Paso -> San Jose,San Antonio -> San Jose,Mexico City, Mexico -> San Jose,Puebla, Mexico -> San Jose
 31,El Paso -> San Jose,San Antonio -> San Jose,Mexico City, Mexico -> San Jose,Puebla, Mexico -> San Jose
-32,San Antonio -> San Jose,Puebla, Mexico -> San Jose,Mexico City, Mexico -> San Jose
-33,Mexico City, Mexico -> San Jose
-34,Mexico City, Mexico -> San Jose
-35,Puebla, Mexico -> San Jose,Mexico City, Mexico -> San Jose
-36,San Antonio -> San Jose,Puebla, Mexico -> San Jose,Mexico City, Mexico -> San Jose
+32,San Antonio -> San Jose,Puebla, Mexico -> San Jose
+33,San Antonio -> San Jose,Puebla, Mexico -> San Jose,Mexico City, Mexico -> San Jose
+34,San Antonio -> San Jose,Puebla, Mexico -> San Jose,Mexico City, Mexico -> San Jose
+35,San Antonio -> San Jose,Mexico City, Mexico -> San Jose
+36,Puebla, Mexico -> San Jose,Mexico City, Mexico -> San Jose
 37,San Antonio -> San Jose,Mexico City, Mexico -> San Jose
-38,San Antonio -> San Jose,Mexico City, Mexico -> San Jose
+38,Mexico City, Mexico -> San Jose
 39,San Antonio -> San Jose,Mexico City, Mexico -> San Jose,Puebla, Mexico -> San Jose
-40,San Antonio -> San Jose,Mexico City, Mexico -> San Jose
+40,San Antonio -> San Jose,Puebla, Mexico -> San Francisco,Mexico City, Mexico -> San Jose
 41,San Antonio -> San Jose,Puebla, Mexico -> San Francisco,Mexico City, Mexico -> San Jose
 42,San Antonio -> Los Angeles,Puebla, Mexico -> Los Angeles,Mexico City, Mexico -> San Jose
 43,San Antonio -> Los Angeles,Puebla, Mexico -> Los Angeles,Mexico City, Mexico -> San Jose
-44,Puebla, Mexico -> Los Angeles,Mexico City, Mexico -> San Jose
+44,San Antonio -> Los Angeles,Puebla, Mexico -> Los Angeles,Mexico City, Mexico -> San Jose
 45,San Antonio -> Los Angeles,Puebla, Mexico -> Los Angeles,Mexico City, Mexico -> Los Angeles
-46,El Paso -> San Jose,San Antonio -> San Jose,Mexico City, Mexico -> San Jose,Puebla, Mexico -> San Jose
+46,El Paso -> San Jose,San Antonio -> San Jose,Mexico City, Mexico -> San Jose
 47,El Paso -> San Jose,San Antonio -> San Jose,Mexico City, Mexico -> San Jose,Puebla, Mexico -> San Jose
-48,El Paso -> San Jose,San Antonio -> San Jose
+48,El Paso -> San Jose,San Antonio -> San Jose,Mexico City, Mexico -> San Jose
 49,El Paso -> San Jose,San Antonio -> San Jose,Mexico City, Mexico -> San Jose,Puebla, Mexico -> San Jose
-50,El Paso -> San Jose,San Antonio -> San Jose,Mexico City, Mexico -> San Jose,Puebla, Mexico -> San Jose
+50,El Paso -> San Jose,San Antonio -> San Jose,Puebla, Mexico -> San Jose

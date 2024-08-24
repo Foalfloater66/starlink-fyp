@@ -1,52 +1,52 @@
 FRAME,PATHS
 0,nan
-1,Kampala, Uganda -> Giza,Dar es Salaam -> Cairo,Antananarivo, Madagascar -> Giza
-2,Kampala, Uganda -> Giza,Dar es Salaam -> Cairo,Antananarivo, Madagascar -> Giza
-3,Addis Ababa -> Kano,Nairobi -> Kano,Kampala, Uganda -> Giza,Dar es Salaam -> Cairo,Antananarivo, Madagascar -> Giza
+1,Kampala, Uganda -> Giza,Antananarivo, Madagascar -> Giza
+2,Addis Ababa -> Kano,Antananarivo, Madagascar -> Giza
+3,Addis Ababa -> Kano,Nairobi -> Kano,Dar es Salaam -> Cairo,Antananarivo, Madagascar -> Giza
 4,Addis Ababa -> Kano,Nairobi -> Kano,Kampala, Uganda -> Cairo,Dar es Salaam -> Giza,Antananarivo, Madagascar -> Cairo
-5,Addis Ababa -> Kano,Nairobi -> Kano,Kampala, Uganda -> Cairo,Dar es Salaam -> Alexandria,Antananarivo, Madagascar -> Cairo
-6,Addis Ababa -> Kano,Nairobi -> Kano,Kampala, Uganda -> Cairo,Dar es Salaam -> Alexandria,Antananarivo, Madagascar -> Cairo
-7,Addis Ababa -> Kano,Nairobi -> Kano,Kampala, Uganda -> Rome,Dar es Salaam -> Cairo,Antananarivo, Madagascar -> Cairo
+5,Addis Ababa -> Kano,Kampala, Uganda -> Cairo,Dar es Salaam -> Alexandria,Antananarivo, Madagascar -> Cairo
+6,Addis Ababa -> Kano,Kampala, Uganda -> Cairo,Dar es Salaam -> Alexandria,Antananarivo, Madagascar -> Cairo
+7,Addis Ababa -> Kano,Kampala, Uganda -> Rome,Dar es Salaam -> Cairo,Antananarivo, Madagascar -> Cairo
 8,Addis Ababa -> Kano,Nairobi -> Kano,Kampala, Uganda -> Rome,Dar es Salaam -> Cairo,Antananarivo, Madagascar -> Giza
 9,Addis Ababa -> Kano,Nairobi -> Kano,Kampala, Uganda -> Rome,Dar es Salaam -> Cairo,Antananarivo, Madagascar -> Alexandria
 10,Addis Ababa -> Kano,Nairobi -> Kano,Kampala, Uganda -> Rome,Dar es Salaam -> Cairo,Antananarivo, Madagascar -> Giza
-11,Nairobi -> Kano,Kampala, Uganda -> Istanbul,Dar es Salaam -> Cairo,Antananarivo, Madagascar -> Giza
-12,Addis Ababa -> Kano,Nairobi -> Kano,Antananarivo, Madagascar -> Giza
+11,Addis Ababa -> Kano,Nairobi -> Kano,Kampala, Uganda -> Istanbul,Dar es Salaam -> Cairo,Antananarivo, Madagascar -> Giza
+12,Addis Ababa -> Kano,Nairobi -> Kano,Dar es Salaam -> Cairo,Kampala, Uganda -> Algiers, Algeria,Antananarivo, Madagascar -> Giza
 13,Addis Ababa -> Kano,Nairobi -> Kano,Dar es Salaam -> Cairo,Kampala, Uganda -> Algiers, Algeria,Antananarivo, Madagascar -> Giza
 14,Addis Ababa -> Kano,Nairobi -> Kano,Dar es Salaam -> Cairo,Kampala, Uganda -> Algiers, Algeria,Antananarivo, Madagascar -> Giza
-15,Dar es Salaam -> Cairo,Kampala, Uganda -> Algiers, Algeria,Antananarivo, Madagascar -> Giza
-16,Nairobi -> Kano,Dar es Salaam -> Cairo,Kampala, Uganda -> Algiers, Algeria,Antananarivo, Madagascar -> Giza
-17,Dar es Salaam -> Cairo,Kampala, Uganda -> Algiers, Algeria,Antananarivo, Madagascar -> Giza
-18,Addis Ababa -> Kano,Nairobi -> Kano,Dar es Salaam -> Cairo,Kampala, Uganda -> Algiers, Algeria,Antananarivo, Madagascar -> Giza
-19,Addis Ababa -> Algiers, Algeria,Kampala, Uganda -> Algiers, Algeria,Antananarivo, Madagascar -> Cairo
+15,Addis Ababa -> Kano,Nairobi -> Kano,Dar es Salaam -> Cairo,Kampala, Uganda -> Algiers, Algeria,Antananarivo, Madagascar -> Giza
+16,Addis Ababa -> Kano,Nairobi -> Kano,Dar es Salaam -> Cairo,Kampala, Uganda -> Algiers, Algeria,Antananarivo, Madagascar -> Giza
+17,Addis Ababa -> Kano,Dar es Salaam -> Cairo,Kampala, Uganda -> Algiers, Algeria,Antananarivo, Madagascar -> Giza
+18,Addis Ababa -> Kano,Nairobi -> Kano,Kampala, Uganda -> Algiers, Algeria,Antananarivo, Madagascar -> Giza
+19,Nairobi -> Cairo,Dar es Salaam -> Cairo,Addis Ababa -> Algiers, Algeria,Kampala, Uganda -> Algiers, Algeria,Antananarivo, Madagascar -> Cairo
 20,Addis Ababa -> Algiers, Algeria,Dar es Salaam -> Cairo,Kampala, Uganda -> Algiers, Algeria,Antananarivo, Madagascar -> Cairo
 21,Nairobi -> Cairo,Addis Ababa -> Algiers, Algeria,Dar es Salaam -> Cairo,Kampala, Uganda -> Algiers, Algeria,Antananarivo, Madagascar -> Cairo
-22,Dar es Salaam -> Giza,Addis Ababa -> Algiers, Algeria,Kampala, Uganda -> Algiers, Algeria,Antananarivo, Madagascar -> Giza
-23,Kampala, Uganda -> Cairo,Nairobi -> Cairo,Dar es Salaam -> Cairo,Addis Ababa -> Algiers, Algeria,Antananarivo, Madagascar -> Cairo
-24,Kampala, Uganda -> Cairo,Dar es Salaam -> Cairo,Addis Ababa -> Algiers, Algeria,Antananarivo, Madagascar -> Cairo
-25,Kampala, Uganda -> Cairo,Addis Ababa -> Algiers, Algeria,Nairobi -> Cairo,Dar es Salaam -> Cairo,Antananarivo, Madagascar -> Giza
+22,Nairobi -> Cairo,Dar es Salaam -> Giza,Addis Ababa -> Algiers, Algeria,Kampala, Uganda -> Algiers, Algeria,Antananarivo, Madagascar -> Giza
+23,Kampala, Uganda -> Cairo,Nairobi -> Cairo,Addis Ababa -> Algiers, Algeria,Antananarivo, Madagascar -> Cairo
+24,Kampala, Uganda -> Cairo,Nairobi -> Cairo,Dar es Salaam -> Cairo,Addis Ababa -> Algiers, Algeria,Antananarivo, Madagascar -> Cairo
+25,Kampala, Uganda -> Cairo,Addis Ababa -> Algiers, Algeria,Dar es Salaam -> Cairo,Antananarivo, Madagascar -> Giza
 26,Nairobi -> Kano,Kampala, Uganda -> Giza,Addis Ababa -> Algiers, Algeria,Dar es Salaam -> Cairo,Antananarivo, Madagascar -> Giza
-27,Nairobi -> Kano,Kampala, Uganda -> Giza,Addis Ababa -> Algiers, Algeria,Dar es Salaam -> Cairo,Antananarivo, Madagascar -> Giza
-28,Addis Ababa -> Kano,Nairobi -> Kano,Kampala, Uganda -> Giza,Dar es Salaam -> Cairo,Antananarivo, Madagascar -> Giza
-29,Addis Ababa -> Kano,Kampala, Uganda -> Giza,Dar es Salaam -> Cairo,Antananarivo, Madagascar -> Giza
+27,Kampala, Uganda -> Giza,Addis Ababa -> Algiers, Algeria,Dar es Salaam -> Cairo,Antananarivo, Madagascar -> Giza
+28,Addis Ababa -> Kano,Kampala, Uganda -> Giza,Dar es Salaam -> Cairo,Antananarivo, Madagascar -> Giza
+29,Addis Ababa -> Kano,Nairobi -> Kano,Kampala, Uganda -> Giza,Dar es Salaam -> Cairo,Antananarivo, Madagascar -> Giza
 30,Addis Ababa -> Kano,Nairobi -> Kano,Kampala, Uganda -> Cairo,Dar es Salaam -> Giza,Antananarivo, Madagascar -> Cairo
 31,Addis Ababa -> Kano,Nairobi -> Kano,Kampala, Uganda -> Cairo,Dar es Salaam -> Alexandria,Antananarivo, Madagascar -> Cairo
 32,Addis Ababa -> Kano,Nairobi -> Kano,Kampala, Uganda -> Cairo,Dar es Salaam -> Alexandria,Antananarivo, Madagascar -> Cairo
 33,Addis Ababa -> Kano,Nairobi -> Kano,Kampala, Uganda -> Rome,Antananarivo, Madagascar -> Cairo
 34,Addis Ababa -> Kano,Nairobi -> Kano,Kampala, Uganda -> Rome,Dar es Salaam -> Cairo,Antananarivo, Madagascar -> Giza
-35,Addis Ababa -> Kano,Nairobi -> Kano,Kampala, Uganda -> Rome,Dar es Salaam -> Cairo,Antananarivo, Madagascar -> Alexandria
-36,Addis Ababa -> Kano,Kampala, Uganda -> Rome,Dar es Salaam -> Cairo,Antananarivo, Madagascar -> Giza
-37,Addis Ababa -> Kano,Kampala, Uganda -> Istanbul,Dar es Salaam -> Cairo,Antananarivo, Madagascar -> Giza
+35,Nairobi -> Kano,Kampala, Uganda -> Rome,Dar es Salaam -> Cairo,Antananarivo, Madagascar -> Alexandria
+36,Addis Ababa -> Kano,Nairobi -> Kano,Kampala, Uganda -> Rome,Dar es Salaam -> Cairo,Antananarivo, Madagascar -> Giza
+37,Addis Ababa -> Kano,Kampala, Uganda -> Istanbul,Antananarivo, Madagascar -> Giza
 38,Addis Ababa -> Kano,Dar es Salaam -> Cairo,Kampala, Uganda -> Algiers, Algeria,Antananarivo, Madagascar -> Cairo
 39,Addis Ababa -> Kano,Nairobi -> Kano,Dar es Salaam -> Cairo,Kampala, Uganda -> Algiers, Algeria,Antananarivo, Madagascar -> Giza
 40,Addis Ababa -> Kano,Nairobi -> Kano,Dar es Salaam -> Cairo,Kampala, Uganda -> Algiers, Algeria,Antananarivo, Madagascar -> Giza
-41,Addis Ababa -> Kano,Nairobi -> Kano,Dar es Salaam -> Cairo,Kampala, Uganda -> Algiers, Algeria,Antananarivo, Madagascar -> Giza
-42,Addis Ababa -> Kano,Nairobi -> Kano,Dar es Salaam -> Cairo,Kampala, Uganda -> Algiers, Algeria,Antananarivo, Madagascar -> Giza
+41,Nairobi -> Kano,Dar es Salaam -> Cairo,Kampala, Uganda -> Algiers, Algeria,Antananarivo, Madagascar -> Giza
+42,Dar es Salaam -> Cairo,Kampala, Uganda -> Algiers, Algeria,Antananarivo, Madagascar -> Giza
 43,Addis Ababa -> Kano,Nairobi -> Kano,Dar es Salaam -> Cairo,Kampala, Uganda -> Algiers, Algeria,Antananarivo, Madagascar -> Giza
-44,Addis Ababa -> Kano,Nairobi -> Kano,Dar es Salaam -> Cairo,Kampala, Uganda -> Algiers, Algeria,Antananarivo, Madagascar -> Giza
-45,Nairobi -> Cairo,Dar es Salaam -> Cairo,Addis Ababa -> Algiers, Algeria,Kampala, Uganda -> Algiers, Algeria,Antananarivo, Madagascar -> Cairo
+44,Addis Ababa -> Kano,Nairobi -> Kano,Kampala, Uganda -> Algiers, Algeria,Antananarivo, Madagascar -> Giza
+45,Nairobi -> Cairo,Addis Ababa -> Algiers, Algeria,Kampala, Uganda -> Algiers, Algeria,Antananarivo, Madagascar -> Cairo
 46,Nairobi -> Cairo,Addis Ababa -> Algiers, Algeria,Dar es Salaam -> Cairo,Kampala, Uganda -> Algiers, Algeria,Antananarivo, Madagascar -> Cairo
-47,Nairobi -> Cairo,Addis Ababa -> Algiers, Algeria,Dar es Salaam -> Cairo,Kampala, Uganda -> Algiers, Algeria,Antananarivo, Madagascar -> Cairo
-48,Nairobi -> Cairo,Dar es Salaam -> Giza,Addis Ababa -> Algiers, Algeria,Kampala, Uganda -> Algiers, Algeria,Antananarivo, Madagascar -> Giza
+47,Addis Ababa -> Algiers, Algeria,Dar es Salaam -> Cairo,Kampala, Uganda -> Algiers, Algeria,Antananarivo, Madagascar -> Cairo
+48,Dar es Salaam -> Giza,Addis Ababa -> Algiers, Algeria,Kampala, Uganda -> Algiers, Algeria,Antananarivo, Madagascar -> Giza
 49,Kampala, Uganda -> Cairo,Nairobi -> Cairo,Dar es Salaam -> Cairo,Addis Ababa -> Algiers, Algeria,Antananarivo, Madagascar -> Cairo
-50,Kampala, Uganda -> Cairo,Nairobi -> Cairo,Dar es Salaam -> Cairo,Addis Ababa -> Algiers, Algeria,Antananarivo, Madagascar -> Cairo
+50,Kampala, Uganda -> Cairo,Addis Ababa -> Algiers, Algeria,Antananarivo, Madagascar -> Cairo

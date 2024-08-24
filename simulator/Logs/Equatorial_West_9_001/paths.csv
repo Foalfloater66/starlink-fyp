@@ -9,14 +9,14 @@ FRAME,PATHS
 7,nan
 8,nan
 9,nan
-10,Luanda -> Bogota,Dar es Salaam -> Bogota,Nairobi -> Cali
-11,Luanda -> Bogota,Dar es Salaam -> Bogota,Nairobi -> Cali
-12,Dar es Salaam -> Cali,Nairobi -> Cali
-13,Kinshasa -> Bogota,Luanda -> Bogota,Dar es Salaam -> Medellin,Nairobi -> Medellin
+10,Nairobi -> Cali
+11,Nairobi -> Cali
+12,Kinshasa -> Bogota
+13,Kinshasa -> Bogota,Luanda -> Bogota,Nairobi -> Medellin
 14,Kinshasa -> Bogota,Luanda -> Bogota,Dar es Salaam -> Medellin,Nairobi -> Medellin
-15,Kinshasa -> Bogota,Luanda -> Medellin,Dar es Salaam -> Medellin,Nairobi -> Bogota
-16,Kinshasa -> Bogota,Luanda -> Medellin,Nairobi -> Cali,Dar es Salaam -> Bogota
-17,nan
+15,Kinshasa -> Bogota,Dar es Salaam -> Medellin
+16,Kinshasa -> Bogota,Luanda -> Medellin,Nairobi -> Cali
+17,Luanda -> Medellin,Dar es Salaam -> Bogota
 18,nan
 19,nan
 20,nan
@@ -35,14 +35,14 @@ FRAME,PATHS
 33,nan
 34,nan
 35,nan
-36,Luanda -> Bogota,Dar es Salaam -> Bogota,Nairobi -> Cali
+36,Luanda -> Bogota,Nairobi -> Cali
 37,Luanda -> Bogota,Dar es Salaam -> Bogota,Nairobi -> Cali
-38,Luanda -> Bogota,Dar es Salaam -> Cali,Nairobi -> Cali
+38,Kinshasa -> Bogota,Luanda -> Bogota,Dar es Salaam -> Cali,Nairobi -> Cali
 39,Kinshasa -> Bogota,Luanda -> Bogota,Dar es Salaam -> Medellin
-40,Kinshasa -> Bogota,Luanda -> Bogota,Dar es Salaam -> Medellin,Nairobi -> Medellin
+40,Luanda -> Bogota,Dar es Salaam -> Medellin
 41,Kinshasa -> Bogota,Luanda -> Medellin,Dar es Salaam -> Medellin,Nairobi -> Bogota
-42,Dar es Salaam -> Bogota
-43,Kinshasa -> Bogota,Luanda -> Medellin,Nairobi -> Cali,Dar es Salaam -> Bogota
+42,Luanda -> Medellin,Nairobi -> Cali,Dar es Salaam -> Bogota
+43,Kinshasa -> Bogota,Luanda -> Medellin
 44,nan
 45,nan
 46,nan

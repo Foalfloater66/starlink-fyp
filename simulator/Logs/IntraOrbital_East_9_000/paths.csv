@@ -14,18 +14,18 @@ FRAME,PATHS
 12,El Paso -> Chicago,Phoenix -> Indianapolis
 13,Phoenix -> Chicago,El Paso -> Winnipeg
 14,Phoenix -> Chicago,El Paso -> Winnipeg
-15,Phoenix -> Chicago,El Paso -> Winnipeg
+15,Phoenix -> Chicago
 16,Phoenix -> Chicago,El Paso -> Winnipeg
 17,Phoenix -> Chicago,El Paso -> Winnipeg
 18,Denver -> Chicago,El Paso -> Winnipeg,Phoenix -> Chicago,Los Angeles -> Chicago
-19,Denver -> Indianapolis,El Paso -> Winnipeg,Phoenix -> Chicago
+19,Denver -> Indianapolis,El Paso -> Winnipeg,Phoenix -> Chicago,Los Angeles -> Chicago
 20,Oklahoma City -> Winnipeg,Denver -> Indianapolis,Phoenix -> Chicago,El Paso -> Winnipeg,Los Angeles -> Chicago
 21,Oklahoma City -> Winnipeg,Denver -> Indianapolis,Phoenix -> Chicago,El Paso -> Winnipeg,Los Angeles -> Chicago
-22,Oklahoma City -> Winnipeg,Denver -> Indianapolis,Phoenix -> Chicago,El Paso -> Winnipeg,Los Angeles -> Chicago
+22,Oklahoma City -> Winnipeg,Denver -> Indianapolis,El Paso -> Winnipeg,Los Angeles -> Chicago
 23,Oklahoma City -> Winnipeg,Denver -> Indianapolis,Phoenix -> Chicago,El Paso -> Winnipeg,Los Angeles -> Chicago
 24,Oklahoma City -> Winnipeg,Denver -> Indianapolis,Phoenix -> Winnipeg,El Paso -> Winnipeg,Los Angeles -> Chicago
 25,Oklahoma City -> Winnipeg,Phoenix -> Chicago,El Paso -> Winnipeg,Denver -> New York,Los Angeles -> Chicago
-26,Oklahoma City -> Winnipeg,El Paso -> Winnipeg,Denver -> New York,Los Angeles -> New York
+26,Oklahoma City -> Winnipeg,El Paso -> Winnipeg,Denver -> New York,Phoenix -> Boston,Los Angeles -> New York
 27,Oklahoma City -> Winnipeg,El Paso -> Winnipeg,Denver -> New York,Phoenix -> Boston,Los Angeles -> New York
 28,El Paso -> Winnipeg,Denver -> New York,Phoenix -> New York,Oklahoma City -> Brisay,Los Angeles -> Boston
 29,Denver -> Boston,Oklahoma City -> Brisay,Phoenix -> New York,El Paso -> Ottawa,Los Angeles -> New York
@@ -38,7 +38,7 @@ FRAME,PATHS
 36,Denver -> Toronto,Phoenix -> Toronto,El Paso -> Montreal,Oklahoma City -> Brisay
 37,Denver -> Toronto,Phoenix -> Toronto,El Paso -> Montreal,Oklahoma City -> Brisay
 38,El Paso -> Chicago,Phoenix -> Indianapolis
-39,Phoenix -> Chicago
+39,Phoenix -> Chicago,El Paso -> Winnipeg
 40,Phoenix -> Chicago,El Paso -> Winnipeg
 41,Phoenix -> Chicago,El Paso -> Winnipeg
 42,Phoenix -> Chicago,El Paso -> Winnipeg
@@ -46,7 +46,7 @@ FRAME,PATHS
 44,Denver -> Chicago,El Paso -> Winnipeg,Phoenix -> Chicago,Los Angeles -> Chicago
 45,Denver -> Indianapolis,El Paso -> Winnipeg,Phoenix -> Chicago,Los Angeles -> Chicago
 46,Oklahoma City -> Winnipeg,Denver -> Indianapolis,Phoenix -> Chicago,El Paso -> Winnipeg,Los Angeles -> Chicago
-47,Denver -> Indianapolis,Phoenix -> Chicago,El Paso -> Winnipeg,Los Angeles -> Chicago
+47,Oklahoma City -> Winnipeg,Denver -> Indianapolis,Phoenix -> Chicago,El Paso -> Winnipeg,Los Angeles -> Chicago
 48,Oklahoma City -> Winnipeg,Denver -> Indianapolis,Phoenix -> Chicago,El Paso -> Winnipeg,Los Angeles -> Chicago
 49,Oklahoma City -> Winnipeg,Denver -> Indianapolis,Phoenix -> Chicago,El Paso -> Winnipeg,Los Angeles -> Chicago
 50,Oklahoma City -> Winnipeg,Denver -> Indianapolis,Phoenix -> Chicago,El Paso -> Winnipeg,Los Angeles -> Chicago

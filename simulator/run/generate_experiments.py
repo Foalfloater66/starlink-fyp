@@ -41,11 +41,11 @@ args = parser.parse_args()
 DIRECTIONS = [0, 1, 2, 3]
 ATTRIBUTES = [1, 2, 3, 4, 5, 6, 7]
 VULNERABLE_ATTRIBUTE2DIRECTIONS = {
-    1: [0, 1, 2, 3],  # Landlocked
-    2: [0, 1, 2, 3],  # Coastal
-    4: [0, 1],        # Polar
-    5: [0, 1, 2, 3],  # Equatorial
-    7: [0, 1, 2, 3],  # Intraorbital
+    1: [0] #, 1, 2, 3],  # Landlocked
+    # 2: [0, 1, 2, 3],  # Coastal
+    # 4: [0, 1],        # Polar
+    # 5: [0, 1, 2, 3],  # Equatorial
+    # 7: [0, 1, 2, 3],  # Intraorbital
 }
 
 

@@ -4,8 +4,8 @@ FRAME,PATHS
 2,Kano -> Addis Ababa,Cairo -> Kampala, Uganda,Alexandria -> Kampala, Uganda,Algiers, Algeria -> Addis Ababa,Casablanca -> Addis Ababa
 3,Kano -> Addis Ababa,Cairo -> Kampala, Uganda,Alexandria -> Kampala, Uganda,Algiers, Algeria -> Addis Ababa,Casablanca -> Addis Ababa
 4,Kano -> Addis Ababa,Alexandria -> Kampala, Uganda,Algiers, Algeria -> Addis Ababa,Cairo -> Kampala, Uganda,Casablanca -> Addis Ababa
-5,Kano -> Addis Ababa,Cairo -> Kampala, Uganda,Algiers, Algeria -> Addis Ababa,Casablanca -> Addis Ababa
-6,Kano -> Addis Ababa,Cairo -> Kampala, Uganda,Algiers, Algeria -> Addis Ababa,Casablanca -> Addis Ababa
+5,Kano -> Addis Ababa,Cairo -> Kampala, Uganda,Algiers, Algeria -> Addis Ababa,Alexandria -> Nairobi,Casablanca -> Addis Ababa
+6,Kano -> Addis Ababa,Cairo -> Kampala, Uganda,Algiers, Algeria -> Addis Ababa,Alexandria -> Nairobi,Casablanca -> Addis Ababa
 7,Kano -> Addis Ababa,Cairo -> Nairobi,Alexandria -> Nairobi,Casablanca -> Addis Ababa,Algiers, Algeria -> Addis Ababa
 8,Kano -> Addis Ababa,Cairo -> Nairobi,Alexandria -> Nairobi,Casablanca -> Addis Ababa,Algiers, Algeria -> Addis Ababa
 9,Kano -> Addis Ababa,Cairo -> Nairobi,Alexandria -> Nairobi,Casablanca -> Addis Ababa,Algiers, Algeria -> Addis Ababa

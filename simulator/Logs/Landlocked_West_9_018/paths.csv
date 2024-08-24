@@ -16,15 +16,15 @@ FRAME,PATHS
 14,Winnipeg -> Dallas,Montreal -> Las Vegas,Toronto -> Las Vegas,New York -> Las Vegas,Edmundston -> Las Vegas
 15,Winnipeg -> Dallas,Montreal -> Las Vegas,Toronto -> Las Vegas,New York -> Las Vegas,Edmundston -> Las Vegas
 16,Winnipeg -> Dallas,Montreal -> Las Vegas,Toronto -> Las Vegas,New York -> Las Vegas,Edmundston -> Las Vegas
-17,Winnipeg -> Dallas,Montreal -> Las Vegas,Toronto -> Las Vegas,New York -> Las Vegas,Edmundston -> Las Vegas
-18,New York -> Denver,Montreal -> Denver,Toronto -> Las Vegas,Edmundston -> Las Vegas
+17,Montreal -> Las Vegas,Toronto -> Las Vegas,New York -> Las Vegas,Edmundston -> Las Vegas
+18,Winnipeg -> Dallas,New York -> Denver,Montreal -> Denver,Toronto -> Las Vegas,Edmundston -> Las Vegas
 19,Winnipeg -> Dallas,New York -> Denver,Montreal -> Denver,Toronto -> Las Vegas,Edmundston -> Las Vegas
 20,Winnipeg -> Dallas,Montreal -> Denver,New York -> Denver,Edmundston -> Phoenix
 21,Winnipeg -> Fort Worth,New York -> Denver,Montreal -> Denver,Edmundston -> Phoenix
 22,Winnipeg -> Fort Worth,New York -> Denver,Montreal -> Denver,Edmundston -> Phoenix
 23,Winnipeg -> Fort Worth,New York -> Denver,Montreal -> Phoenix,Edmundston -> Phoenix
-24,Winnipeg -> Fort Worth,New York -> Denver,Montreal -> Phoenix,Edmundston -> Las Vegas
-25,Winnipeg -> Fort Worth,New York -> Denver
+24,Winnipeg -> Fort Worth,New York -> Denver,Edmundston -> Las Vegas
+25,Winnipeg -> Fort Worth,New York -> Denver,Montreal -> Phoenix,Edmundston -> Phoenix
 26,Winnipeg -> Oklahoma City,New York -> Denver,Montreal -> Phoenix,Edmundston -> El Paso
 27,Winnipeg -> Oklahoma City,New York -> Denver,Montreal -> Phoenix,Edmundston -> El Paso
 28,New York -> Denver,Winnipeg -> El Paso,Montreal -> El Paso,Edmundston -> Phoenix
@@ -41,12 +41,12 @@ FRAME,PATHS
 39,Winnipeg -> Dallas,Montreal -> Las Vegas,Toronto -> Las Vegas,New York -> Las Vegas,Edmundston -> Las Vegas
 40,Winnipeg -> Dallas,Montreal -> Las Vegas,Toronto -> Las Vegas,New York -> Las Vegas,Edmundston -> Las Vegas
 41,Winnipeg -> Dallas,Montreal -> Las Vegas,Toronto -> Las Vegas,New York -> Las Vegas,Edmundston -> Las Vegas
-42,Montreal -> Las Vegas,Toronto -> Las Vegas,New York -> Las Vegas,Edmundston -> Las Vegas
+42,Winnipeg -> Dallas,Montreal -> Las Vegas,Toronto -> Las Vegas,New York -> Las Vegas,Edmundston -> Las Vegas
 43,Winnipeg -> Dallas,Montreal -> Las Vegas,Toronto -> Las Vegas,New York -> Las Vegas,Edmundston -> Las Vegas
-44,New York -> Denver,Montreal -> Denver,Toronto -> Las Vegas,Edmundston -> Las Vegas
+44,Winnipeg -> Dallas,New York -> Denver,Montreal -> Denver,Toronto -> Las Vegas,Edmundston -> Las Vegas
 45,Winnipeg -> Dallas,New York -> Denver,Montreal -> Denver,Toronto -> Las Vegas,Edmundston -> Las Vegas
 46,Winnipeg -> Dallas,Montreal -> Denver,New York -> Denver,Edmundston -> Phoenix
 47,Winnipeg -> Fort Worth,New York -> Denver,Montreal -> Denver,Edmundston -> Phoenix
 48,Winnipeg -> Fort Worth,New York -> Denver,Montreal -> Denver,Edmundston -> Phoenix
-49,Winnipeg -> Fort Worth,New York -> Denver,Edmundston -> Phoenix
+49,Winnipeg -> Fort Worth,New York -> Denver,Montreal -> Phoenix,Edmundston -> Phoenix
 50,Winnipeg -> Fort Worth,New York -> Denver,Montreal -> Phoenix,Edmundston -> Las Vegas

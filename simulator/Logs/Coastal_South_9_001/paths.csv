@@ -1,26 +1,26 @@
 FRAME,PATHS
 0,nan
-1,San Francisco -> El Paso,Seattle -> El Paso,Vancouver -> Leon, Mexico,Kagoshima City -> El Paso,Nishino, Kagoshima -> El Paso
+1,San Francisco -> El Paso,Seattle -> El Paso,Vancouver -> Leon, Mexico,Nishino, Kagoshima -> El Paso
 2,San Francisco -> El Paso,Seattle -> El Paso,Vancouver -> Leon, Mexico,Nishino, Kagoshima -> El Paso
 3,San Francisco -> El Paso,Seattle -> El Paso,Vancouver -> Leon, Mexico,Kagoshima City -> El Paso,Nishino, Kagoshima -> El Paso
 4,San Francisco -> El Paso,Seattle -> El Paso,Vancouver -> Leon, Mexico,Kagoshima City -> El Paso,Nishino, Kagoshima -> El Paso
 5,San Francisco -> El Paso,Seattle -> El Paso,Vancouver -> Leon, Mexico,Kagoshima City -> El Paso,Nishino, Kagoshima -> El Paso
-6,San Francisco -> Houston,Seattle -> Ecatepec, Mexico,Vancouver -> Puebla, Mexico,Nishino, Kagoshima -> San Antonio,Kagoshima City -> San Antonio
-7,San Francisco -> Houston,Seattle -> Ecatepec, Mexico,Vancouver -> Puebla, Mexico,Nishino, Kagoshima -> San Antonio
-8,San Francisco -> Houston,Seattle -> Ecatepec, Mexico,Vancouver -> Puebla, Mexico,Nishino, Kagoshima -> San Antonio
+6,San Francisco -> Houston,Vancouver -> Puebla, Mexico,Nishino, Kagoshima -> San Antonio,Kagoshima City -> San Antonio
+7,San Francisco -> Houston,Vancouver -> Puebla, Mexico,Nishino, Kagoshima -> San Antonio,Kagoshima City -> San Antonio
+8,San Francisco -> Houston,Seattle -> Ecatepec, Mexico,Vancouver -> Puebla, Mexico,Nishino, Kagoshima -> San Antonio,Kagoshima City -> San Antonio
 9,San Francisco -> Houston,Seattle -> Leon, Mexico,Vancouver -> Leon, Mexico,Kagoshima City -> San Antonio,Nishino, Kagoshima -> Leon, Mexico
 10,San Francisco -> Houston,Seattle -> Leon, Mexico,Vancouver -> Leon, Mexico,Kagoshima City -> San Antonio,Nishino, Kagoshima -> Leon, Mexico
 11,San Francisco -> Houston,Seattle -> Leon, Mexico,Vancouver -> Leon, Mexico,Kagoshima City -> San Antonio,Nishino, Kagoshima -> Leon, Mexico
-12,San Francisco -> Houston,Seattle -> Leon, Mexico,Vancouver -> Leon, Mexico
+12,San Francisco -> Houston,Seattle -> Leon, Mexico,Vancouver -> Leon, Mexico,Kagoshima City -> San Antonio
 13,San Francisco -> Houston,Seattle -> Leon, Mexico,Vancouver -> Leon, Mexico,Kagoshima City -> Leon, Mexico,Nishino, Kagoshima -> Leon, Mexico
 14,San Francisco -> Houston,Seattle -> Leon, Mexico,Vancouver -> Leon, Mexico,Nishino, Kagoshima -> Leon, Mexico,Kagoshima City -> Leon, Mexico
-15,San Francisco -> Houston,Seattle -> Leon, Mexico,Vancouver -> Leon, Mexico,Nishino, Kagoshima -> Leon, Mexico
-16,San Francisco -> San Antonio,Seattle -> Leon, Mexico,Vancouver -> Leon, Mexico,Kagoshima City -> San Antonio,Nishino, Kagoshima -> San Antonio
+15,San Francisco -> Houston,Seattle -> Leon, Mexico,Vancouver -> Leon, Mexico,Nishino, Kagoshima -> Leon, Mexico,Kagoshima City -> Leon, Mexico
+16,San Francisco -> San Antonio,Seattle -> Leon, Mexico,Vancouver -> Leon, Mexico,Nishino, Kagoshima -> San Antonio
 17,San Francisco -> San Antonio,Seattle -> Leon, Mexico,Vancouver -> Leon, Mexico,Kagoshima City -> San Antonio,Nishino, Kagoshima -> San Antonio
 18,San Francisco -> San Antonio,Seattle -> Leon, Mexico,Vancouver -> Leon, Mexico,Kagoshima City -> San Antonio,Nishino, Kagoshima -> San Antonio
 19,San Francisco -> San Antonio,Seattle -> Leon, Mexico,Vancouver -> Leon, Mexico,Kagoshima City -> San Antonio,Nishino, Kagoshima -> San Antonio
 20,San Francisco -> El Paso,Seattle -> El Paso,Vancouver -> El Paso,Kagoshima City -> El Paso,Nishino, Kagoshima -> El Paso
-21,San Francisco -> El Paso,Seattle -> El Paso,Vancouver -> El Paso,Nishino, Kagoshima -> El Paso
+21,San Francisco -> El Paso,Seattle -> El Paso,Vancouver -> El Paso,Kagoshima City -> El Paso,Nishino, Kagoshima -> El Paso
 22,San Francisco -> El Paso,Seattle -> El Paso,Vancouver -> El Paso,Kagoshima City -> El Paso,Nishino, Kagoshima -> El Paso
 23,San Francisco -> El Paso,Seattle -> El Paso,Vancouver -> El Paso,Kagoshima City -> El Paso,Nishino, Kagoshima -> El Paso
 24,San Francisco -> El Paso,Seattle -> El Paso,Vancouver -> El Paso,Kagoshima City -> El Paso,Nishino, Kagoshima -> El Paso
@@ -31,21 +31,21 @@ FRAME,PATHS
 29,San Francisco -> El Paso,Seattle -> El Paso,Vancouver -> Leon, Mexico,Kagoshima City -> El Paso,Nishino, Kagoshima -> El Paso
 30,San Francisco -> El Paso,Seattle -> El Paso,Vancouver -> Leon, Mexico,Kagoshima City -> El Paso,Nishino, Kagoshima -> El Paso
 31,San Francisco -> El Paso,Seattle -> El Paso,Vancouver -> Leon, Mexico,Kagoshima City -> El Paso,Nishino, Kagoshima -> El Paso
-32,San Francisco -> Houston,Nishino, Kagoshima -> San Antonio,Kagoshima City -> San Antonio
-33,San Francisco -> Houston,Seattle -> Ecatepec, Mexico,Vancouver -> Puebla, Mexico,Nishino, Kagoshima -> San Antonio,Kagoshima City -> San Antonio
-34,San Francisco -> Houston,Seattle -> Ecatepec, Mexico,Vancouver -> Puebla, Mexico,Nishino, Kagoshima -> San Antonio,Kagoshima City -> San Antonio
-35,San Francisco -> Houston,Seattle -> Leon, Mexico,Vancouver -> Leon, Mexico,Nishino, Kagoshima -> Leon, Mexico
+32,San Francisco -> Houston,Seattle -> Ecatepec, Mexico,Vancouver -> Puebla, Mexico,Nishino, Kagoshima -> San Antonio,Kagoshima City -> San Antonio
+33,San Francisco -> Houston,Seattle -> Ecatepec, Mexico,Vancouver -> Puebla, Mexico,Kagoshima City -> San Antonio
+34,San Francisco -> Houston,Seattle -> Ecatepec, Mexico,Vancouver -> Puebla, Mexico,Nishino, Kagoshima -> San Antonio
+35,San Francisco -> Houston,Seattle -> Leon, Mexico,Vancouver -> Leon, Mexico,Kagoshima City -> San Antonio,Nishino, Kagoshima -> Leon, Mexico
 36,San Francisco -> Houston,Seattle -> Leon, Mexico,Vancouver -> Leon, Mexico,Kagoshima City -> San Antonio,Nishino, Kagoshima -> Leon, Mexico
-37,San Francisco -> Houston,Seattle -> Leon, Mexico,Vancouver -> Leon, Mexico,Kagoshima City -> San Antonio,Nishino, Kagoshima -> Leon, Mexico
-38,San Francisco -> Houston,Seattle -> Leon, Mexico,Vancouver -> Leon, Mexico,Nishino, Kagoshima -> Leon, Mexico
+37,San Francisco -> Houston,Seattle -> Leon, Mexico,Vancouver -> Leon, Mexico,Nishino, Kagoshima -> Leon, Mexico
+38,San Francisco -> Houston,Seattle -> Leon, Mexico,Vancouver -> Leon, Mexico,Kagoshima City -> San Antonio,Nishino, Kagoshima -> Leon, Mexico
 39,San Francisco -> Houston,Seattle -> Leon, Mexico,Vancouver -> Leon, Mexico,Kagoshima City -> Leon, Mexico,Nishino, Kagoshima -> Leon, Mexico
-40,San Francisco -> Houston,Seattle -> Leon, Mexico,Vancouver -> Leon, Mexico,Nishino, Kagoshima -> Leon, Mexico
-41,San Francisco -> Houston,Seattle -> Leon, Mexico,Vancouver -> Leon, Mexico,Nishino, Kagoshima -> Leon, Mexico,Kagoshima City -> Leon, Mexico
+40,San Francisco -> Houston,Seattle -> Leon, Mexico,Vancouver -> Leon, Mexico,Nishino, Kagoshima -> Leon, Mexico,Kagoshima City -> Leon, Mexico
+41,Seattle -> Leon, Mexico,Vancouver -> Leon, Mexico,Nishino, Kagoshima -> Leon, Mexico,Kagoshima City -> Leon, Mexico
 42,San Francisco -> San Antonio,Seattle -> Leon, Mexico,Vancouver -> Leon, Mexico,Kagoshima City -> San Antonio,Nishino, Kagoshima -> San Antonio
 43,San Francisco -> San Antonio,Seattle -> Leon, Mexico,Vancouver -> Leon, Mexico,Kagoshima City -> San Antonio,Nishino, Kagoshima -> San Antonio
 44,San Francisco -> San Antonio,Seattle -> Leon, Mexico,Vancouver -> Leon, Mexico,Kagoshima City -> San Antonio,Nishino, Kagoshima -> San Antonio
-45,San Francisco -> San Antonio,Seattle -> Leon, Mexico,Vancouver -> Leon, Mexico,Kagoshima City -> San Antonio,Nishino, Kagoshima -> San Antonio
-46,San Francisco -> El Paso,Seattle -> El Paso,Vancouver -> El Paso
+45,San Francisco -> San Antonio,Seattle -> Leon, Mexico,Vancouver -> Leon, Mexico,Nishino, Kagoshima -> San Antonio
+46,San Francisco -> El Paso,Seattle -> El Paso,Vancouver -> El Paso,Kagoshima City -> El Paso,Nishino, Kagoshima -> El Paso
 47,San Francisco -> El Paso,Seattle -> El Paso,Vancouver -> El Paso,Kagoshima City -> El Paso,Nishino, Kagoshima -> El Paso
 48,San Francisco -> El Paso,Seattle -> El Paso,Vancouver -> El Paso,Kagoshima City -> El Paso,Nishino, Kagoshima -> El Paso
 49,San Francisco -> El Paso,Seattle -> El Paso,Vancouver -> El Paso,Kagoshima City -> El Paso,Nishino, Kagoshima -> El Paso

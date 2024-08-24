@@ -8,6 +8,7 @@ using Orbits.Satellites;
 using Scene;
 using UnityEngine;
 using UnityEngine.Assertions;
+using MathNet.Numerics.Random;
 
 namespace Routing
 {
@@ -24,6 +25,7 @@ namespace Routing
         private RouteGraph _rg;
         private Constellation _constellation;
         private int _rmax;
+        private MersenneTwister rng = new MersenneTwister(seed:12345); 
 
         public Router(bool defenceOn, GroundstationCollection groundstations, RouteGraph rg, ScenePainter painter,
             LinkCapacityMonitor
@@ -42,7 +44,7 @@ namespace Routing
 
         private Route GetRandomRoute(Route route)
         {
-            var selectedRouteId = new System.Random().Next(0, _rmax);
+            var selectedRouteId = rng.Next(0, _rmax);
 
             // Compute the multiple shortest paths and select the one for the selected random ID.
             for (var i = 0; i < _rmax; i++)

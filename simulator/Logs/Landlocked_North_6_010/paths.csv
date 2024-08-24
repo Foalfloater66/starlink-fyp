@@ -1,10 +1,10 @@
 FRAME,PATHS
 0,nan
 1,Addis Ababa -> Kano,Nairobi -> Kano,Kampala, Uganda -> Giza,Dar es Salaam -> Cairo,Antananarivo, Madagascar -> Giza
-2,Addis Ababa -> Kano,Nairobi -> Kano,Kampala, Uganda -> Giza,Dar es Salaam -> Cairo,Antananarivo, Madagascar -> Giza
+2,Addis Ababa -> Kano,Kampala, Uganda -> Giza,Dar es Salaam -> Cairo,Antananarivo, Madagascar -> Giza
 3,Addis Ababa -> Kano,Nairobi -> Kano,Kampala, Uganda -> Giza,Dar es Salaam -> Cairo,Antananarivo, Madagascar -> Giza
 4,Addis Ababa -> Kano,Nairobi -> Kano,Kampala, Uganda -> Cairo,Dar es Salaam -> Giza,Antananarivo, Madagascar -> Cairo
-5,Addis Ababa -> Kano,Kampala, Uganda -> Cairo,Dar es Salaam -> Alexandria,Antananarivo, Madagascar -> Cairo
+5,Addis Ababa -> Kano,Nairobi -> Kano,Kampala, Uganda -> Cairo,Dar es Salaam -> Alexandria,Antananarivo, Madagascar -> Cairo
 6,Addis Ababa -> Kano,Nairobi -> Kano,Kampala, Uganda -> Cairo,Dar es Salaam -> Alexandria,Antananarivo, Madagascar -> Cairo
 7,Addis Ababa -> Kano,Nairobi -> Kano,Kampala, Uganda -> Rome,Dar es Salaam -> Cairo,Antananarivo, Madagascar -> Cairo
 8,Addis Ababa -> Kano,Nairobi -> Kano,Kampala, Uganda -> Rome,Dar es Salaam -> Cairo,Antananarivo, Madagascar -> Giza

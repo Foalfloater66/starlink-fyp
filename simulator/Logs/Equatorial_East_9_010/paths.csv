@@ -7,16 +7,16 @@ FRAME,PATHS
 5,nan
 6,nan
 7,nan
-8,Cali -> Dakar, Senegal
+8,nan
 9,Cali -> Dakar, Senegal
-10,Maracaibo -> Luanda,Cali -> Luanda
-11,Bogota -> Luanda,Maracaibo -> Luanda,Cali -> Luanda
-12,Bogota -> Kinshasa,Maracaibo -> Luanda,Cali -> Kinshasa
-13,Bogota -> Kinshasa,Maracaibo -> Luanda,Cali -> Kinshasa
+10,Bogota -> Luanda
+11,Bogota -> Luanda,Maracaibo -> Luanda
+12,Cali -> Kinshasa
+13,Bogota -> Kinshasa,Cali -> Kinshasa
 14,Bogota -> Kinshasa,Maracaibo -> Luanda,Cali -> Kinshasa
-15,Bogota -> Kinshasa,Cali -> Luanda,Quito -> Luanda,Guayaquil -> Kinshasa
-16,Maracaibo -> Luanda,Quito -> Kinshasa
-17,Bogota -> Kinshasa,Cali -> Kinshasa,Maracaibo -> Luanda,Guayaquil -> Luanda,Quito -> Kinshasa
+15,Bogota -> Kinshasa,Cali -> Luanda,Quito -> Luanda
+16,Bogota -> Kinshasa,Cali -> Kinshasa,Maracaibo -> Luanda
+17,Bogota -> Kinshasa,Cali -> Kinshasa,Maracaibo -> Luanda,Guayaquil -> Luanda
 18,nan
 19,nan
 20,nan
@@ -36,13 +36,13 @@ FRAME,PATHS
 34,Cali -> Dakar, Senegal
 35,Cali -> Dakar, Senegal
 36,Bogota -> Luanda,Maracaibo -> Luanda,Cali -> Luanda
-37,Cali -> Luanda
-38,Maracaibo -> Luanda,Cali -> Kinshasa
-39,Bogota -> Kinshasa,Maracaibo -> Luanda,Cali -> Kinshasa
-40,Bogota -> Kinshasa,Maracaibo -> Luanda
-41,Bogota -> Kinshasa,Cali -> Luanda,Guayaquil -> Kinshasa
-42,Bogota -> Kinshasa,Cali -> Kinshasa,Quito -> Kinshasa
-43,Maracaibo -> Luanda,Guayaquil -> Luanda,Quito -> Kinshasa
+37,Bogota -> Luanda,Maracaibo -> Luanda,Cali -> Luanda
+38,Bogota -> Kinshasa,Maracaibo -> Luanda
+39,Bogota -> Kinshasa,Cali -> Kinshasa
+40,Bogota -> Kinshasa,Cali -> Kinshasa
+41,Bogota -> Kinshasa,Cali -> Luanda,Maracaibo -> Luanda,Guayaquil -> Kinshasa
+42,Bogota -> Kinshasa,Cali -> Kinshasa,Maracaibo -> Luanda,Guayaquil -> Luanda
+43,Cali -> Kinshasa,Maracaibo -> Luanda
 44,nan
 45,nan
 46,nan
