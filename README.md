@@ -76,7 +76,7 @@ Write an experiments specification in JSON format as shown in [experiments.json]
 "logVideo" : false,
 "logAttack": true,
 "logRTT": true,
-"logHops" : false,
+"logHops" : false
 }
 ```
 Each experiment is characterised by its `choice`, `direction`, `rmax`, and number of repetitions `reps`. 
