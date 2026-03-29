@@ -21,7 +21,7 @@ namespace Automation
         public void OnSceneLoaded(UnityEngine.SceneManagement.Scene scene, LoadSceneMode mode)
         {
             Experiment args = Experiments.Dequeue();
-            Main instance = FindObjectOfType<Main>();
+            Main instance = FindAnyObjectByType<Main>();
 
             instance.caseChoice = args.choice;
             instance.targetLinkDirection = args.direction;

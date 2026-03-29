@@ -1,9 +1,9 @@
 @echo off
 
 :: Manually set the Unity executable path
-set UNITY_PATH="C:\Program Files\Unity\Hub\Editor\2019.2.1f1\Editor\Unity.exe"
+set UNITY_PATH="C:\Program Files\Unity\Hub\Editor\6000.3.5f2\Editor\Unity.exe"
 echo UNITY_PATH: %UNITY_PATH%
-set PROJECT_PATH=%cd%
+set PROJECT_PATH=%cd%\simulator
 echo PROJECT_PATH: %PROJECT_PATH%
 set METHOD_NAME="QuickPrimitives.Editor.CLI.Run"
 echo 

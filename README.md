@@ -14,8 +14,7 @@ We chose not to change this, as fixing it would ultimately simply reduce the num
 ## Installation
 
 ### System Requirements
-This program is most compatible with **Unity 2019.2.1f1** on **Windows 11**.
-Due to restrictions from the original code this simulator builds upon, other versions of Unity may experience difficulties at runtime.
+As of March 2026, this program is compatible with **Unity 6.3 LTS** on **Windows 11**.
 Running the code on Windows 10 should be fine.
 
 Due to the high computational demand from this program, we recommend using **gaming devices**, especially those that permit operating mode modification.
