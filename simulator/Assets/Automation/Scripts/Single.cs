@@ -23,12 +23,6 @@ namespace Automation.Scripts
             Runner runner = ScriptableObject.CreateInstance<Runner>();
             Assert.IsNotNull(runner);
 
-            Debug.Log(args[11]);
-            Debug.Log(args[12]);
-            Debug.Log(args[13]);
-            Debug.Log(args[14]);
-            Debug.Log(args[15]);
-
             runner.Experiments.Enqueue(new Experiment(
                 (CaseChoice)Enum.Parse(typeof(CaseChoice), args[6]),
                 (Direction)Enum.Parse(typeof(Direction), args[7]),

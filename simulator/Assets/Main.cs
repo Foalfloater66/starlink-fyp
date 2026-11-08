@@ -329,7 +329,6 @@ public class Main : MonoBehaviour
 
         // Attempt an attack on the network.
         var routes = _attacker.Run(_groundstations.ToList());
-        Debug.Log(routes.Count);
         routes = _router.Run(routes, _attacker.Target);
 
         List<float> rttList = ExtractRTT(routes);

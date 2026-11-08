@@ -128,8 +128,6 @@ namespace Utilities
         {
             cam_count = 3;
 
-
-            Debug.Log(cam_count);
             // Middle Pacific view
             positions.Add(new Vector3(-25f, 10f, 30f));
             angles.Add(new Vector3(10f, 135f, 0f));
